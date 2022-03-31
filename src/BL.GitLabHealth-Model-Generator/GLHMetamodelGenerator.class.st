@@ -3,7 +3,8 @@ Class {
 	#superclass : #FamixMetamodelGenerator,
 	#instVars : [
 		'project',
-		'group'
+		'group',
+		'pipeline'
 	],
 	#category : #'BL.GitLabHealth-Model-Generator'
 }
@@ -23,6 +24,7 @@ GLHMetamodelGenerator >> defineClasses [
 	super defineClasses.
 	group := builder newClassNamed: #Group comment: 'A GitLab Group'.
 	project := builder newClassNamed: #Project comment: 'A GitLab Project'.
+	pipeline := builder newClassNamed: #Pipeline comment: 'A GitLab Pipeline execution'
 ]
 
 { #category : #definition }
@@ -39,6 +41,9 @@ GLHMetamodelGenerator >> defineProperties [
 
 	"Project properties"
 	project property: #id type: #Number.
+	project property: #topics type: #Object.
+	project property: #archived type: #Boolean.
+	project property: #archived type: #Boolean.
 	project property: #description type: #String.
 	project property: #name type: #String.
 	project property: #readme_url type: #String.

@@ -5,12 +5,14 @@ Class {
 	#name : #GLHProject,
 	#superclass : #GLHEntity,
 	#instVars : [
+		'#archived => FMProperty',
 		'#avatar_url => FMProperty',
 		'#description => FMProperty',
 		'#group => FMOne type: #GLHGroup opposite: #projects',
 		'#id => FMProperty',
 		'#name => FMProperty',
 		'#readme_url => FMProperty',
+		'#topics => FMProperty',
 		'#web_url => FMProperty'
 	],
 	#category : #'BL.GitLabHealth-Model-Entities'
@@ -23,6 +25,20 @@ GLHProject class >> annotation [
 	<package: #'BL.GitLabHealth-Model'>
 	<generated>
 	^self
+]
+
+{ #category : #accessing }
+GLHProject >> archived [
+
+	<FMProperty: #archived type: #Boolean>
+	<generated>
+	^ archived
+]
+
+{ #category : #accessing }
+GLHProject >> archived: anObject [
+	<generated>
+	archived := anObject
 ]
 
 { #category : #accessing }
@@ -116,6 +132,20 @@ GLHProject >> readme_url [
 GLHProject >> readme_url: anObject [
 	<generated>
 	readme_url := anObject
+]
+
+{ #category : #accessing }
+GLHProject >> topics [
+
+	<FMProperty: #topics type: #Object>
+	<generated>
+	^ topics
+]
+
+{ #category : #accessing }
+GLHProject >> topics: anObject [
+	<generated>
+	topics := anObject
 ]
 
 { #category : #accessing }

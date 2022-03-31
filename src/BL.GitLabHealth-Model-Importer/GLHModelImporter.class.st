@@ -44,6 +44,7 @@ GLHModelImporter >> glhModel: anObject [
 GLHModelImporter >> importGroup: aGroupID [
 
 	| result groupResult |
+	('Import group: ', aGroupID printString) recordInfo.
 	result := ZnClient new
 		          accept: ZnMimeType applicationJson;
 		          headerAt: #'PRIVATE-TOKEN' add: self privateToken;
@@ -70,6 +71,19 @@ GLHModelImporter >> parseGroupResult: aResult [
 	^ reader nextAs: GLHGroup
 ]
 
+{ #category : #private }
+GLHModelImporter >> parseSubGroupResult: aResult [
+
+	| reader |
+	reader := NeoJSONReader on: aResult readStream.
+	reader mapInstVarsFor: GLHGroup.
+	reader
+		for: #ArrayOfGroups
+		customDo: [ :customMappting | 
+		customMappting listOfElementSchema: GLHGroup ].
+	^ reader nextAs: #ArrayOfGroups
+]
+
 { #category : #accessing }
 GLHModelImporter >> privateToken [
 
@@ -85,11 +99,13 @@ GLHModelImporter >> privateToken: anObject [
 { #category : #api }
 GLHModelImporter >> subGroupsOf: aGroupID [
 
-	| result groupResult |
+	| result |
+	('Search subgroup of: ' , aGroupID printString) recordInfo.
 	result := ZnClient new
 		          accept: ZnMimeType applicationJson;
 		          headerAt: #'PRIVATE-TOKEN' add: self privateToken;
 		          get:
-			          self baseAPIUrl , '/groups/' , aGroupID printString , '/subgroups'.
-	groupResult := self parseGroupResult: result
+			          self baseAPIUrl , '/groups/' , aGroupID printString
+			          , '/subgroups'.
+	^ self parseSubGroupResult: result
 ]
