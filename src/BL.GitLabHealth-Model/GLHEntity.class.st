@@ -1,6 +1,8 @@
 Class {
 	#name : #GLHEntity,
 	#superclass : #MooseEntity,
+	#traits : 'TEntityMetaLevelDependency',
+	#classTraits : 'TEntityMetaLevelDependency classTrait',
 	#category : #'BL.GitLabHealth-Model-Entities'
 }
 

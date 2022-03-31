@@ -13,12 +13,17 @@ GLHGroupVisualization >> forGroup: aGLHGroup [
 	shapes := (aGLHGroup allToScope: GLHGroup) collect: [ :group | 
 		          | lbl projects composite |
 		          projects := group projects
-			                      collect: [ :m | 
-				                      RSBox new
-					                      color: Color red;
-					                      size: 5;
-					                      model: m;
-					                      yourself ]
+			                      collect: [ :project | 
+				                      | box |
+				                      box := RSBox new
+					                             size: 5;
+					                             model: project;
+					                             yourself.
+				                      (project pipelines isNotEmpty and: [ 
+					                       project pipelines last status = #success ])
+					                      ifTrue: [ box color: Color green ]
+					                      ifFalse: [ box color: Color red ].
+				                      box ]
 			                      as: RSGroup.
 		          projects @ (RSPopup text: #name).
 		          RSGridLayout on: projects.

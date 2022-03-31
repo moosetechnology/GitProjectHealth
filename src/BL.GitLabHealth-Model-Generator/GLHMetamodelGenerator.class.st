@@ -37,8 +37,7 @@ GLHMetamodelGenerator >> defineClasses [
 GLHMetamodelGenerator >> defineHierarchy [
 
 	super defineHierarchy.
-	group --|> #TEntityMetaLevelDependency.
-	project --|> #TEntityMetaLevelDependency.
+	(builder ensureClassNamed: #Entity) --|> #TEntityMetaLevelDependency
 ]
 
 { #category : #definition }
@@ -62,7 +61,10 @@ GLHMetamodelGenerator >> defineProperties [
 	project property: #name type: #String.
 	project property: #readme_url type: #String.
 	project property: #avatar_url type: #String.
-	project property: #web_url type: #String
+	project property: #web_url type: #String.
+	
+	"Pipelines properties"
+	pipeline property: #status type: #String.
 ]
 
 { #category : #definition }
@@ -70,5 +72,6 @@ GLHMetamodelGenerator >> defineRelations [
 
 	super defineRelations.
 	(group property: #projects) <>-* (project property: #group).
-	(group property: #subGroups) <>-* (group property: #group)
+	(group property: #subGroups) <>-* (group property: #group).
+	(project property: #pipelines) <>-* (pipeline property: #project)
 ]

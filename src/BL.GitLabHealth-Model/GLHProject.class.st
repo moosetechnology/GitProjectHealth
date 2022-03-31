@@ -29,6 +29,12 @@ GLHProject class >> annotation [
 	^self
 ]
 
+{ #category : #adding }
+GLHProject >> addPipeline: anObject [
+	<generated>
+	^ self pipelines add: anObject
+]
+
 { #category : #accessing }
 GLHProject >> archived [
 
@@ -120,6 +126,29 @@ GLHProject >> name [
 GLHProject >> name: anObject [
 	<generated>
 	name := anObject
+]
+
+{ #category : #accessing }
+GLHProject >> pipelines [
+	"Relation named: #pipelines type: #GLHPipeline opposite: #project"
+
+	<generated>
+	<derived>
+	^ pipelines
+]
+
+{ #category : #accessing }
+GLHProject >> pipelines: anObject [
+
+	<generated>
+	pipelines value: anObject
+]
+
+{ #category : #navigation }
+GLHProject >> pipelinesGroup [
+	<generated>
+	<navigation: 'Pipelines'>
+	^ MooseSpecializedGroup withAll: self pipelines asSet
 ]
 
 { #category : #accessing }

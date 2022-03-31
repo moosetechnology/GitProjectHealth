@@ -28,6 +28,14 @@ GLHModelImporter >> baseAPIUrl: anObject [
 	baseAPIUrl := anObject
 ]
 
+{ #category : #api }
+GLHModelImporter >> completeImportProject: aGLHProject [
+
+	('Complete import project: ' , aGLHProject id printString) recordInfo.
+	(self pipelinesOf: aGLHProject id) do: [ :pipeline | 
+		aGLHProject addPipeline: pipeline ]
+]
+
 { #category : #accessing }
 GLHModelImporter >> glhModel [
 
@@ -50,6 +58,7 @@ GLHModelImporter >> importGroup: aGroupID [
 		          headerAt: #'PRIVATE-TOKEN' add: self privateToken;
 		          get: self baseAPIUrl , '/groups/' , aGroupID printString.
 	groupResult := self parseGroupResult: result.
+	groupResult projects do: [ :project | self completeImportProject: project ].
 	self addGroupResultToModel: groupResult.
 	(self subGroupsOf: aGroupID) do: [ :subGroup | 
 		groupResult addSubGroup: (self importGroup: subGroup id) ].
@@ -72,6 +81,19 @@ GLHModelImporter >> parseGroupResult: aResult [
 	^ reader nextAs: GLHGroup
 ]
 
+{ #category : #api }
+GLHModelImporter >> parsePipelinesResult: result [
+
+	| reader |
+	reader := NeoJSONReader on: result readStream.
+	reader mapInstVarsFor: GLHPipeline.
+	reader
+		for: #ArrayOfPipelines
+		customDo: [ :customMappting | 
+		customMappting listOfElementSchema: GLHPipeline ].
+	^ reader nextAs: #ArrayOfPipelines
+]
+
 { #category : #private }
 GLHModelImporter >> parseSubGroupResult: aResult [
 
@@ -83,6 +105,20 @@ GLHModelImporter >> parseSubGroupResult: aResult [
 		customDo: [ :customMappting | 
 		customMappting listOfElementSchema: GLHGroup ].
 	^ reader nextAs: #ArrayOfGroups
+]
+
+{ #category : #api }
+GLHModelImporter >> pipelinesOf: aProjectID [
+
+	| result |
+	('Search pipelines of: ' , aProjectID printString) recordInfo.
+	result := ZnClient new
+		          accept: ZnMimeType applicationJson;
+		          headerAt: #'PRIVATE-TOKEN' add: self privateToken;
+		          get:
+			          self baseAPIUrl , '/projects/' , aProjectID printString
+			          , '/pipelines'.
+	^ self parsePipelinesResult: result
 ]
 
 { #category : #accessing }
