@@ -7,7 +7,7 @@ Class {
 { #category : #running }
 GLHGroupVisualization >> forGroup: aGLHGroup [
 
-	| c shapes |
+	| c shapes legend |
 	c := RSCanvas new.
 
 	shapes := (aGLHGroup allToScope: GLHGroup) collect: [ :group | 
@@ -58,6 +58,21 @@ GLHGroupVisualization >> forGroup: aGLHGroup [
 		shapes: c nodes;
 		connectFrom: #group.
 	RSHorizontalVanDerPloegTreeLayout new on: c nodes.
-	c zoomToFit.
+	legend := RSLegend new.
+	legend container: c.
+	legend
+		text: 'Repository with last Green Pipeline'
+		withBoxColor: Color green.
+	legend
+		text: 'Repository without Pipeline or last red Pipeline'
+		withBoxColor: Color red.
+	legend legendDo: [ :l | 
+		l
+			draggable;
+			withBorder;
+			padding: 20 ].
+	legend location right middle.
+	legend build.
+
 	^ c
 ]
