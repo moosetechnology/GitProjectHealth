@@ -1,0 +1,10 @@
+
+image: hpiswa/smalltalkci
+
+stages:
+  - test
+
+Moose64-9.0:
+  stage: test
+  script: 
+    - smalltalkci -s "Moose64-9.0"

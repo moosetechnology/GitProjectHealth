@@ -1,0 +1,15 @@
+SmalltalkCISpec {
+  #preLoading : 'ci/preLoading.st',
+  #loading : [
+    SCIMetacelloLoadSpec {
+      #baseline : 'GitLabHealth',
+      #directory : 'src',
+      #platforms : [ #pharo ],
+      #onConflict : #useIncoming,
+      #onUpgrade : #useIncoming
+    }
+  ],
+  #testing: {
+    #packages : [ 'BL.GitLab*' ],
+  }
+}
