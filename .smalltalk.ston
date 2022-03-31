@@ -2,7 +2,7 @@ SmalltalkCISpec {
   #preLoading : 'ci/preLoading.st',
   #loading : [
     SCIMetacelloLoadSpec {
-      #baseline : 'GitLabHealth',
+      #baseline : 'BLGitLabHealth',
       #directory : 'src',
       #platforms : [ #pharo ],
       #onConflict : #useIncoming,
