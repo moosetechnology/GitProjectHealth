@@ -11,18 +11,34 @@ GLHGroupVisualization >> forGroup: aGLHGroup [
 	c := RSCanvas new.
 
 	shapes := (aGLHGroup allToScope: GLHGroup) collect: [ :group | 
-		          | box lbl |
+		          | lbl projects composite |
+		          projects := group projects
+			                      collect: [ :m | 
+				                      RSBox new
+					                      color: Color red;
+					                      size: 5;
+					                      model: m;
+					                      yourself ]
+			                      as: RSGroup.
+		          projects @ (RSPopup text: #name).
+		          RSGridLayout on: projects.
 		          lbl := RSLabel new
 			                 text: group name;
+			                 color: Color white;
 			                 yourself.
-		          box := RSBox new
-			                 withBorder;
-			                 extent: lbl extent + 10.
-		          RSComposite new
-			          draggable;
+
+		          RSLocation new
+			          above;
+			          move: lbl on: projects.
+		          composite := RSComposite new.
+		          composite @ RSAnimatedPopup @ RSDraggable.
+
+		          composite
+			          color: Color gray;
 			          model: group;
-			          shapes: (RSGroup with: box with: lbl);
-			          yourself ].
+			          shapes: projects , { lbl }.
+		          composite padding: 10.
+		          composite ].
 	c addAll: shapes.
 	c @ RSCanvasController.
 	RSLineBuilder orthoHorizontal
