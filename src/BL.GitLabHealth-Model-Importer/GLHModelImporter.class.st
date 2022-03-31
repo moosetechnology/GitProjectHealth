@@ -9,6 +9,13 @@ Class {
 	#category : #'BL.GitLabHealth-Model-Importer'
 }
 
+{ #category : #private }
+GLHModelImporter >> addGroupResultToModel: groupResult [
+
+	self glhModel add: groupResult.
+	self glhModel addAll: groupResult projects
+]
+
 { #category : #accessing }
 GLHModelImporter >> baseAPIUrl [
 
@@ -33,6 +40,36 @@ GLHModelImporter >> glhModel: anObject [
 	glhModel := anObject
 ]
 
+{ #category : #api }
+GLHModelImporter >> importGroup: aGroupID [
+
+	| result groupResult |
+	result := ZnClient new
+		          accept: ZnMimeType applicationJson;
+		          headerAt: #'PRIVATE-TOKEN' add: self privateToken;
+		          get: self baseAPIUrl , '/groups/', aGroupID printString.
+	groupResult := self parseGroupResult: result.
+	self addGroupResultToModel: groupResult.
+	(self subGroupsOf: aGroupID) do: [ :subGroup | 
+		self importGroup: subGroup id ]
+]
+
+{ #category : #private }
+GLHModelImporter >> parseGroupResult: aResult [
+
+	| reader |
+	reader := NeoJSONReader on: aResult readStream.
+	reader for: GLHGroup do: [ :mapping | 
+		mapping mapInstVars.
+		(mapping mapInstVar: #projects) valueSchema: #ArrayOfProjects ].
+	reader mapInstVarsFor: GLHProject.
+	reader
+		for: #ArrayOfProjects
+		customDo: [ :customMappting | 
+		customMappting listOfElementSchema: GLHProject ].
+	^ reader nextAs: GLHGroup
+]
+
 { #category : #accessing }
 GLHModelImporter >> privateToken [
 
@@ -43,4 +80,16 @@ GLHModelImporter >> privateToken [
 GLHModelImporter >> privateToken: anObject [
 
 	privateToken := anObject
+]
+
+{ #category : #api }
+GLHModelImporter >> subGroupsOf: aGroupID [
+
+	| result groupResult |
+	result := ZnClient new
+		          accept: ZnMimeType applicationJson;
+		          headerAt: #'PRIVATE-TOKEN' add: self privateToken;
+		          get:
+			          self baseAPIUrl , '/groups/' , aGroupID printString , '/subgroups'.
+	groupResult := self parseGroupResult: result
 ]
