@@ -4,6 +4,8 @@ A GitLab Project
 Class {
 	#name : #GLHProject,
 	#superclass : #GLHEntity,
+	#traits : 'TEntityMetaLevelDependency',
+	#classTraits : 'TEntityMetaLevelDependency classTrait',
 	#instVars : [
 		'#archived => FMProperty',
 		'#avatar_url => FMProperty',

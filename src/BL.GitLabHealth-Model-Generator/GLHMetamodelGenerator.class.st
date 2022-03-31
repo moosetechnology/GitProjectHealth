@@ -19,12 +19,26 @@ GLHMetamodelGenerator class >> prefix [
 	^ #GLH
 ]
 
+{ #category : #accessing }
+GLHMetamodelGenerator class >> submetamodels [
+
+	^ { FamixMooseQueryGenerator }
+]
+
 { #category : #definition }
 GLHMetamodelGenerator >> defineClasses [
 	super defineClasses.
 	group := builder newClassNamed: #Group comment: 'A GitLab Group'.
 	project := builder newClassNamed: #Project comment: 'A GitLab Project'.
 	pipeline := builder newClassNamed: #Pipeline comment: 'A GitLab Pipeline execution'
+]
+
+{ #category : #definition }
+GLHMetamodelGenerator >> defineHierarchy [
+
+	super defineHierarchy.
+	group --|> #TEntityMetaLevelDependency.
+	project --|> #TEntityMetaLevelDependency.
 ]
 
 { #category : #definition }

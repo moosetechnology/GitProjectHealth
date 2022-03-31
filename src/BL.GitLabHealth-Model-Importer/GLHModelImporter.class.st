@@ -44,15 +44,16 @@ GLHModelImporter >> glhModel: anObject [
 GLHModelImporter >> importGroup: aGroupID [
 
 	| result groupResult |
-	('Import group: ', aGroupID printString) recordInfo.
+	('Import group: ' , aGroupID printString) recordInfo.
 	result := ZnClient new
 		          accept: ZnMimeType applicationJson;
 		          headerAt: #'PRIVATE-TOKEN' add: self privateToken;
-		          get: self baseAPIUrl , '/groups/', aGroupID printString.
+		          get: self baseAPIUrl , '/groups/' , aGroupID printString.
 	groupResult := self parseGroupResult: result.
 	self addGroupResultToModel: groupResult.
 	(self subGroupsOf: aGroupID) do: [ :subGroup | 
-		self importGroup: subGroup id ]
+		groupResult addSubGroup: (self importGroup: subGroup id) ].
+	^ groupResult
 ]
 
 { #category : #private }

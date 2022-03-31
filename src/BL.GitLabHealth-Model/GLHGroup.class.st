@@ -4,16 +4,18 @@ A GitLab Group
 Class {
 	#name : #GLHGroup,
 	#superclass : #GLHEntity,
+	#traits : 'TEntityMetaLevelDependency',
+	#classTraits : 'TEntityMetaLevelDependency classTrait',
 	#instVars : [
-		'#id => FMProperty',
-		'#web_url => FMProperty',
-		'#name => FMProperty',
-		'#description => FMProperty',
-		'#visibility => FMProperty',
 		'#avatar_url => FMProperty',
+		'#description => FMProperty',
+		'#group => FMOne type: #GLHGroup opposite: #subGroups',
+		'#id => FMProperty',
+		'#name => FMProperty',
 		'#projects => FMMany type: #GLHProject opposite: #group',
 		'#subGroups => FMMany type: #GLHGroup opposite: #group',
-		'#group => FMOne type: #GLHGroup opposite: #subGroups'
+		'#visibility => FMProperty',
+		'#web_url => FMProperty'
 	],
 	#category : #'BL.GitLabHealth-Model-Entities'
 }
