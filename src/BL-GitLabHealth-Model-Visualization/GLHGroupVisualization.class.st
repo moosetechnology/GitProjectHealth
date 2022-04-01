@@ -1,7 +1,7 @@
 Class {
 	#name : #GLHGroupVisualization,
 	#superclass : #MiAbstractVisualization,
-	#category : #'BL-GitLabHealth-Model-Visualisation'
+	#category : #'BL-GitLabHealth-Model-Visualization'
 }
 
 { #category : #running }
