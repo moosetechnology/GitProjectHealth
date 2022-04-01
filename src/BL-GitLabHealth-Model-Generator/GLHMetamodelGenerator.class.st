@@ -6,7 +6,7 @@ Class {
 		'group',
 		'pipeline'
 	],
-	#category : #'BL.GitLabHealth-Model-Generator'
+	#category : #'BL-GitLabHealth-Model-Generator'
 }
 
 { #category : #accessing }

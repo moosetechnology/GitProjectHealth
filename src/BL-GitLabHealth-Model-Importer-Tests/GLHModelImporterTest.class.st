@@ -4,5 +4,9 @@ A GLHModelImporterTest is a test class for testing the behavior of GLHModelImpor
 Class {
 	#name : #GLHModelImporterTest,
 	#superclass : #TestCase,
-	#category : #'BL.GitLabHealth-Model-Importer-Tests'
+	#category : #'BL-GitLabHealth-Model-Importer-Tests'
 }
+
+{ #category : #tests }
+GLHModelImporterTest >> testImport [
+]

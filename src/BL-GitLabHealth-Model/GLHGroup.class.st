@@ -4,8 +4,6 @@ A GitLab Group
 Class {
 	#name : #GLHGroup,
 	#superclass : #GLHEntity,
-	#traits : 'TEntityMetaLevelDependency',
-	#classTraits : 'TEntityMetaLevelDependency classTrait',
 	#instVars : [
 		'#avatar_url => FMProperty',
 		'#description => FMProperty',
@@ -17,7 +15,7 @@ Class {
 		'#visibility => FMProperty',
 		'#web_url => FMProperty'
 	],
-	#category : #'BL.GitLabHealth-Model-Entities'
+	#category : #'BL-GitLabHealth-Model-Entities'
 }
 
 { #category : #meta }

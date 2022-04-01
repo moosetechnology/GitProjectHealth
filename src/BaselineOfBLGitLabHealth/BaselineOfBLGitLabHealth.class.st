@@ -23,7 +23,7 @@ BaselineOfBLGitLabHealth >> defineDependencies: spec [
 		with: [ spec repository: 'github://svenvc/NeoJSON/repository' ].
 	spec
 		baseline: 'MoreLogger'
-		with: [ spec repository: 'github://badetitou/MoreLogger:main/src' ]
+		with: [ spec repository: 'github://badetitou/MoreLogger/src' ]
 ]
 
 { #category : #baselines }
@@ -34,9 +34,11 @@ BaselineOfBLGitLabHealth >> defineGroups: spec [
 BaselineOfBLGitLabHealth >> definePackages: spec [
 
 	spec
-		package: 'BL.GitLabHealth-Model';
-		package: 'BL.GitLabHealth-Model-Generator';
-		package: 'BL.GitLabHealth-Visualization';
-		package: 'BL.GitLabHealth-Model-Importer'
-		with: [ spec requires: #( 'NeoJSON' ) ]
+		package: 'BL-GitLabHealth-Model';
+		package: 'BL-GitLabHealth-Model-Generator';
+		package: 'BL-GitLabHealth-Visualization';
+		package: 'BL-GitLabHealth-Model-Importer'
+		with: [ spec requires: #( 'NeoJSON' 'MoreLogger' ) ];
+		package: 'BL-GitLabHealth-Model-Importer-Tests'
+		with: [ spec requires: #( 'BL-GitLabHealth-Model-Importer' ) ]
 ]

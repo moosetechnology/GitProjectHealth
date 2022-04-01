@@ -4,8 +4,6 @@ A GitLab Project
 Class {
 	#name : #GLHProject,
 	#superclass : #GLHEntity,
-	#traits : 'TEntityMetaLevelDependency',
-	#classTraits : 'TEntityMetaLevelDependency classTrait',
 	#instVars : [
 		'#archived => FMProperty',
 		'#avatar_url => FMProperty',
@@ -13,11 +11,12 @@ Class {
 		'#group => FMOne type: #GLHGroup opposite: #projects',
 		'#id => FMProperty',
 		'#name => FMProperty',
+		'#pipelines => FMMany type: #GLHPipeline opposite: #project',
 		'#readme_url => FMProperty',
 		'#topics => FMProperty',
 		'#web_url => FMProperty'
 	],
-	#category : #'BL.GitLabHealth-Model-Entities'
+	#category : #'BL-GitLabHealth-Model-Entities'
 }
 
 { #category : #meta }

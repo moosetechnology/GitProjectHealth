@@ -6,7 +6,7 @@ Class {
 		'baseAPIUrl',
 		'privateToken'
 	],
-	#category : #'BL.GitLabHealth-Model-Importer'
+	#category : #'BL-GitLabHealth-Model-Importer'
 }
 
 { #category : #private }

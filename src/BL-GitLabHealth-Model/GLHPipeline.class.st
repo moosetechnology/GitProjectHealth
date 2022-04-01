@@ -8,7 +8,7 @@ Class {
 		'#project => FMOne type: #GLHProject opposite: #pipelines',
 		'#status => FMProperty'
 	],
-	#category : #'BL.GitLabHealth-Model-Entities'
+	#category : #'BL-GitLabHealth-Model-Entities'
 }
 
 { #category : #meta }

@@ -3,7 +3,7 @@ Class {
 	#superclass : #MooseEntity,
 	#traits : 'TEntityMetaLevelDependency',
 	#classTraits : 'TEntityMetaLevelDependency classTrait',
-	#category : #'BL.GitLabHealth-Model-Entities'
+	#category : #'BL-GitLabHealth-Model-Entities'
 }
 
 { #category : #meta }

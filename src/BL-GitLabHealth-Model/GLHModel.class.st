@@ -1,7 +1,7 @@
 Class {
 	#name : #GLHModel,
 	#superclass : #MooseModel,
-	#category : #'BL.GitLabHealth-Model-Model'
+	#category : #'BL-GitLabHealth-Model-Model'
 }
 
 { #category : #accessing }
