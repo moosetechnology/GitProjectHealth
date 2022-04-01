@@ -23,7 +23,7 @@ BaselineOfBLGitLabHealth >> defineDependencies: spec [
 		with: [ spec repository: 'github://svenvc/NeoJSON/repository' ].
 	spec
 		baseline: 'MoreLogger'
-		with: [ spec repository: 'github://badetitou/MoreLogger/src' ]
+		with: [ spec repository: 'github://badetitou/MoreLogger:main/src' ]
 ]
 
 { #category : #baselines }
