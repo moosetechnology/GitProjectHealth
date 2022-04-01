@@ -10,7 +10,7 @@ SmalltalkCISpec {
     }
   ],
   #testing: {
-    #packages : [ 'BL.GitLab*' ]
+    #packages : [ 'BL-GitLab*' ]
   },
   #failOnZeroTests : false
 }
