@@ -5,8 +5,8 @@ Class {
 	#name : #GLHPipeline,
 	#superclass : #GLHEntity,
 	#instVars : [
-		'#project => FMOne type: #GLHProject opposite: #pipelines',
-		'#status => FMProperty'
+		'#status => FMProperty',
+		'#project => FMOne type: #GLHProject opposite: #pipelines'
 	],
 	#category : #'BL-GitLabHealth-Model-Entities'
 }
@@ -15,7 +15,7 @@ Class {
 GLHPipeline class >> annotation [
 
 	<FMClass: #Pipeline super: #GLHEntity>
-	<package: #'BL.GitLabHealth-Model'>
+	<package: #'BL-GitLabHealth-Model'>
 	<generated>
 	^self
 ]

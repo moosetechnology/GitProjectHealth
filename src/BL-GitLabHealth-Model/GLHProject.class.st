@@ -5,16 +5,18 @@ Class {
 	#name : #GLHProject,
 	#superclass : #GLHEntity,
 	#instVars : [
-		'#archived => FMProperty',
-		'#avatar_url => FMProperty',
-		'#description => FMProperty',
-		'#group => FMOne type: #GLHGroup opposite: #projects',
 		'#id => FMProperty',
-		'#name => FMProperty',
-		'#pipelines => FMMany type: #GLHPipeline opposite: #project',
-		'#readme_url => FMProperty',
 		'#topics => FMProperty',
-		'#web_url => FMProperty'
+		'#archived => FMProperty',
+		'#description => FMProperty',
+		'#name => FMProperty',
+		'#readme_url => FMProperty',
+		'#avatar_url => FMProperty',
+		'#web_url => FMProperty',
+		'#creator_id => FMProperty',
+		'#group => FMOne type: #GLHGroup opposite: #projects',
+		'#pipelines => FMMany type: #GLHPipeline opposite: #project',
+		'#creator => FMOne type: #GLHUser opposite: #createdProjects'
 	],
 	#category : #'BL-GitLabHealth-Model-Entities'
 }
@@ -23,7 +25,7 @@ Class {
 GLHProject class >> annotation [
 
 	<FMClass: #Project super: #GLHEntity>
-	<package: #'BL.GitLabHealth-Model'>
+	<package: #'BL-GitLabHealth-Model'>
 	<generated>
 	^self
 ]
@@ -60,6 +62,35 @@ GLHProject >> avatar_url [
 GLHProject >> avatar_url: anObject [
 	<generated>
 	avatar_url := anObject
+]
+
+{ #category : #accessing }
+GLHProject >> creator [
+	"Relation named: #creator type: #GLHUser opposite: #createdProjects"
+
+	<generated>
+	^ creator
+]
+
+{ #category : #accessing }
+GLHProject >> creator: anObject [
+
+	<generated>
+	creator := anObject
+]
+
+{ #category : #accessing }
+GLHProject >> creator_id [
+
+	<FMProperty: #creator_id type: #Number>
+	<generated>
+	^ creator_id
+]
+
+{ #category : #accessing }
+GLHProject >> creator_id: anObject [
+	<generated>
+	creator_id := anObject
 ]
 
 { #category : #accessing }

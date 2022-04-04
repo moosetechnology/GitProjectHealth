@@ -10,7 +10,7 @@ Class {
 GLHEntity class >> annotation [
 
 	<FMClass: #Entity super: #MooseEntity>
-	<package: #'BL.GitLabHealth-Model'>
+	<package: #'BL-GitLabHealth-Model'>
 	<generated>
 	^self
 ]

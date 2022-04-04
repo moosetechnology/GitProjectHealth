@@ -5,15 +5,15 @@ Class {
 	#name : #GLHGroup,
 	#superclass : #GLHEntity,
 	#instVars : [
-		'#avatar_url => FMProperty',
-		'#description => FMProperty',
-		'#group => FMOne type: #GLHGroup opposite: #subGroups',
 		'#id => FMProperty',
+		'#web_url => FMProperty',
 		'#name => FMProperty',
+		'#description => FMProperty',
+		'#visibility => FMProperty',
+		'#avatar_url => FMProperty',
 		'#projects => FMMany type: #GLHProject opposite: #group',
 		'#subGroups => FMMany type: #GLHGroup opposite: #group',
-		'#visibility => FMProperty',
-		'#web_url => FMProperty'
+		'#group => FMOne type: #GLHGroup opposite: #subGroups'
 	],
 	#category : #'BL-GitLabHealth-Model-Entities'
 }
@@ -22,7 +22,7 @@ Class {
 GLHGroup class >> annotation [
 
 	<FMClass: #Group super: #GLHEntity>
-	<package: #'BL.GitLabHealth-Model'>
+	<package: #'BL-GitLabHealth-Model'>
 	<generated>
 	^self
 ]

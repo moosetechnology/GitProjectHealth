@@ -13,6 +13,6 @@ GLHModel class >> allSubmetamodelsPackagesNames [
 { #category : #meta }
 GLHModel class >> annotation [
 	<FMClass: #GLHModel super: #MooseModel>
-	<package: #'BL.GitLabHealth-Model'>
+	<package: #'BL-GitLabHealth-Model'>
 	<generated>
 ]

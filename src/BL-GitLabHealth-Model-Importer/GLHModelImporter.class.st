@@ -33,7 +33,8 @@ GLHModelImporter >> completeImportProject: aGLHProject [
 
 	('Complete import project: ' , aGLHProject id printString) recordInfo.
 	(self pipelinesOf: aGLHProject id) do: [ :pipeline | 
-		aGLHProject addPipeline: pipeline ]
+		aGLHProject addPipeline: pipeline ].
+	aGLHProject creator: (self importUser: aGLHProject creator_id)
 ]
 
 { #category : #accessing }
@@ -65,6 +66,21 @@ GLHModelImporter >> importGroup: aGroupID [
 	^ groupResult
 ]
 
+{ #category : #api }
+GLHModelImporter >> importUser: aUserID [
+
+	| result userResult |
+	(glhModel allWithType: GLHUser) detect: [ :user | user id = aUserID ] ifFound: [ :user | ^ user ].
+	('Import user: ' , aUserID printString) recordInfo.
+	result := ZnClient new
+		          accept: ZnMimeType applicationJson;
+		          headerAt: #'PRIVATE-TOKEN' add: self privateToken;
+		          get: self baseAPIUrl , '/users/' , aUserID printString.
+	userResult := self parseUserResult: result.
+	glhModel add: userResult.
+	^ userResult
+]
+
 { #category : #private }
 GLHModelImporter >> parseGroupResult: aResult [
 
@@ -81,7 +97,7 @@ GLHModelImporter >> parseGroupResult: aResult [
 	^ reader nextAs: GLHGroup
 ]
 
-{ #category : #api }
+{ #category : #private }
 GLHModelImporter >> parsePipelinesResult: result [
 
 	| reader |
@@ -105,6 +121,15 @@ GLHModelImporter >> parseSubGroupResult: aResult [
 		customDo: [ :customMappting | 
 		customMappting listOfElementSchema: GLHGroup ].
 	^ reader nextAs: #ArrayOfGroups
+]
+
+{ #category : #private }
+GLHModelImporter >> parseUserResult: result [
+
+	| reader |
+	reader := NeoJSONReader on: result readStream.
+	reader mapInstVarsFor: GLHUser.
+	^ reader nextAs: GLHUser
 ]
 
 { #category : #api }
