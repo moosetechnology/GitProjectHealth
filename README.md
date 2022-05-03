@@ -11,7 +11,7 @@ In the Moose image, in a playground (`Ctrl+O`, `Ctrl+W`), perform:
 ```st
 Metacello new
   repository: 'gitlab://gitlab.forge.berger-levrault.com:bl-drit/bl.moose/gitlabhealth:main/src';
-  baseline: 'GitLabHealth';
+  baseline: 'BLGitLabHealth';
   onConflict: [ :ex | ex useIncoming ];
   onUpgrade: [ :ex | ex useIncoming ];
   onDowngrade: [ :ex | ex useLoaded ];
