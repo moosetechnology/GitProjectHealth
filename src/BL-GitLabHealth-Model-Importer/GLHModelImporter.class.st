@@ -3,8 +3,7 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'glhModel',
-		'baseAPIUrl',
-		'privateToken'
+		'glhApi'
 	],
 	#category : #'BL-GitLabHealth-Model-Importer'
 }
@@ -16,18 +15,6 @@ GLHModelImporter >> addGroupResultToModel: groupResult [
 	self glhModel addAll: groupResult projects
 ]
 
-{ #category : #accessing }
-GLHModelImporter >> baseAPIUrl [
-
-	^ baseAPIUrl
-]
-
-{ #category : #accessing }
-GLHModelImporter >> baseAPIUrl: anObject [
-
-	baseAPIUrl := anObject
-]
-
 { #category : #api }
 GLHModelImporter >> completeImportProject: aGLHProject [
 
@@ -35,6 +22,18 @@ GLHModelImporter >> completeImportProject: aGLHProject [
 	(self pipelinesOf: aGLHProject id) do: [ :pipeline | 
 		aGLHProject addPipeline: pipeline ].
 	aGLHProject creator: (self importUser: aGLHProject creator_id)
+]
+
+{ #category : #accessing }
+GLHModelImporter >> glhApi [
+
+	^ glhApi
+]
+
+{ #category : #accessing }
+GLHModelImporter >> glhApi: anObject [
+
+	glhApi := anObject
 ]
 
 { #category : #accessing }
@@ -54,12 +53,10 @@ GLHModelImporter >> importGroup: aGroupID [
 
 	| result groupResult |
 	('Import group: ' , aGroupID printString) recordInfo.
-	result := ZnClient new
-		          accept: ZnMimeType applicationJson;
-		          headerAt: #'PRIVATE-TOKEN' add: self privateToken;
-		          get: self baseAPIUrl , '/groups/' , aGroupID printString.
+	result := self glhApi group: aGroupID.
 	groupResult := self parseGroupResult: result.
-	groupResult projects do: [ :project | self completeImportProject: project ].
+	groupResult projects do: [ :project | 
+		self completeImportProject: project ].
 	self addGroupResultToModel: groupResult.
 	(self subGroupsOf: aGroupID) do: [ :subGroup | 
 		groupResult addSubGroup: (self importGroup: subGroup id) ].
@@ -72,10 +69,7 @@ GLHModelImporter >> importUser: aUserID [
 	| result userResult |
 	(glhModel allWithType: GLHUser) detect: [ :user | user id = aUserID ] ifFound: [ :user | ^ user ].
 	('Import user: ' , aUserID printString) recordInfo.
-	result := ZnClient new
-		          accept: ZnMimeType applicationJson;
-		          headerAt: #'PRIVATE-TOKEN' add: self privateToken;
-		          get: self baseAPIUrl , '/users/' , aUserID printString.
+	result := self glhApi user: aUserID.
 	userResult := self parseUserResult: result.
 	glhModel add: userResult.
 	^ userResult
@@ -137,25 +131,8 @@ GLHModelImporter >> pipelinesOf: aProjectID [
 
 	| result |
 	('Search pipelines of: ' , aProjectID printString) recordInfo.
-	result := ZnClient new
-		          accept: ZnMimeType applicationJson;
-		          headerAt: #'PRIVATE-TOKEN' add: self privateToken;
-		          get:
-			          self baseAPIUrl , '/projects/' , aProjectID printString
-			          , '/pipelines'.
+	result := self glhApi pipelinesOfProject: aProjectID.
 	^ self parsePipelinesResult: result
-]
-
-{ #category : #accessing }
-GLHModelImporter >> privateToken [
-
-	^ privateToken
-]
-
-{ #category : #accessing }
-GLHModelImporter >> privateToken: anObject [
-
-	privateToken := anObject
 ]
 
 { #category : #api }
@@ -163,11 +140,6 @@ GLHModelImporter >> subGroupsOf: aGroupID [
 
 	| result |
 	('Search subgroup of: ' , aGroupID printString) recordInfo.
-	result := ZnClient new
-		          accept: ZnMimeType applicationJson;
-		          headerAt: #'PRIVATE-TOKEN' add: self privateToken;
-		          get:
-			          self baseAPIUrl , '/groups/' , aGroupID printString
-			          , '/subgroups'.
+	result := self glhApi subgroupsOfGroup: aGroupID.
 	^ self parseSubGroupResult: result
 ]
