@@ -86,4 +86,22 @@ GLHMetamodelGenerator >> userProperties [
 	user property: #id type: #Number.
 	user property: #username type: #String.
 	user property: #name type: #String.
+	user property: #state type: #String.
+	user property: #avatar_url type: #String.
+	user property: #web_url type: #String.
+	user property: #created_at type: #String.
+	user property: #bio type: #String.
+	user property: #location type: #String.
+	user property: #public_email type: #String.
+	user property: #skype type: #String.
+	user property: #linkedin type: #String.
+	user property: #twitter type: #String.
+	user property: #website_url type: #String.
+	user property: #organization type: #String.
+	user property: #job_title type: #String.
+	user property: #pronouns type: #String.
+	user property: #bot type: #String.
+	user property: #work_information type: #String.
+	user property: #followers type: #String.
+	user property: #following type: #String
 ]

@@ -90,14 +90,6 @@ GLHGroup >> groupGroup [
 	^ MooseSpecializedGroup with: self group
 ]
 
-{ #category : #'as yet unclassified' }
-GLHGroup >> groupQuality: aBuilder [
-	<inspectorPresentationOrder: 100 title: 'Group Quality'>
-	^ SpRoassal3InspectorPresenter new
-		canvas: (GLHGroupVisualization new forGroup: self);
-		yourself
-]
-
 { #category : #accessing }
 GLHGroup >> id [
 

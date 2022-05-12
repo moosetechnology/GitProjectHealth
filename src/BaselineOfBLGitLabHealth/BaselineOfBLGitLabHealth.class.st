@@ -36,6 +36,8 @@ BaselineOfBLGitLabHealth >> definePackages: spec [
 	spec
 		package: 'BL-GitLabHealth-Model';
 		package: 'BL-GitLabHealth-Model-Generator';
+		package: 'BL-GitLabHealth-Model-Inspector'
+		with: [ spec requires: #( 'BL-GitLabHealth-Model-Visualization' ) ];
 		package: 'BL-GitLabHealth-Model-Visualization';
 		package: 'BL-GitLabHealth-Model-Importer'
 		with: [ spec requires: #( 'NeoJSON' 'MoreLogger' ) ];
