@@ -5,18 +5,19 @@ Class {
 	#name : #GLHProject,
 	#superclass : #GLHEntity,
 	#instVars : [
-		'#id => FMProperty',
-		'#topics => FMProperty',
 		'#archived => FMProperty',
-		'#description => FMProperty',
-		'#name => FMProperty',
-		'#readme_url => FMProperty',
 		'#avatar_url => FMProperty',
-		'#web_url => FMProperty',
+		'#creator => FMOne type: #GLHUser opposite: #createdProjects',
 		'#creator_id => FMProperty',
+		'#description => FMProperty',
 		'#group => FMOne type: #GLHGroup opposite: #projects',
+		'#id => FMProperty',
+		'#name => FMProperty',
 		'#pipelines => FMMany type: #GLHPipeline opposite: #project',
-		'#creator => FMOne type: #GLHUser opposite: #createdProjects'
+		'#readme_url => FMProperty',
+		'#repository => FMOne type: #GLHRepository opposite: #project',
+		'#topics => FMProperty',
+		'#web_url => FMProperty'
 	],
 	#category : #'BL-GitLabHealth-Model-Entities'
 }
@@ -193,6 +194,28 @@ GLHProject >> readme_url [
 GLHProject >> readme_url: anObject [
 	<generated>
 	readme_url := anObject
+]
+
+{ #category : #accessing }
+GLHProject >> repository [
+	"Relation named: #repository type: #GLHRepository opposite: #project"
+
+	<generated>
+	^ repository
+]
+
+{ #category : #accessing }
+GLHProject >> repository: anObject [
+
+	<generated>
+	repository := anObject
+]
+
+{ #category : #navigation }
+GLHProject >> repositoryGroup [
+	<generated>
+	<navigation: 'Repository'>
+	^ MooseSpecializedGroup with: self repository
 ]
 
 { #category : #accessing }

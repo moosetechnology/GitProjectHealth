@@ -5,7 +5,10 @@ Class {
 		'project',
 		'group',
 		'pipeline',
-		'user'
+		'user',
+		'repository',
+		'branch',
+		'file'
 	],
 	#category : #'BL-GitLabHealth-Model-Generator'
 }
@@ -32,7 +35,10 @@ GLHMetamodelGenerator >> defineClasses [
 	group := builder newClassNamed: #Group comment: 'A GitLab Group'.
 	project := builder newClassNamed: #Project comment: 'A GitLab Project'.
 	pipeline := builder newClassNamed: #Pipeline comment: 'A GitLab Pipeline execution'.
-	user := builder newClassNamed: #User comment: 'A GitLab User'
+	user := builder newClassNamed: #User comment: 'A GitLab User'.
+	repository := builder newClassNamed: #Repository comment: 'A git repository'.
+	branch := builder newClassNamed: #Branch comment: 'A git branch'.
+	file := builder newClassNamed: #File comment: 'A file'.
 ]
 
 { #category : #definition }
@@ -78,7 +84,10 @@ GLHMetamodelGenerator >> defineRelations [
 	(group property: #projects) <>-* (project property: #group).
 	(group property: #subGroups) <>-* (group property: #group).
 	(project property: #pipelines) <>-* (pipeline property: #project).
-	(project property: #creator) *- (user property: #createdProjects)
+	(project property: #creator) *- (user property: #createdProjects).
+	(project property: #repository) <>- (repository property: #project).
+	(repository property: #branches) <>-* (branch property: #repository).
+	(branch property: #files) <>-* (file property: #branch)
 ]
 
 { #category : #definition }
