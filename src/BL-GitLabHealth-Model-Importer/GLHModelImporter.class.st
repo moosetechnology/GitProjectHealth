@@ -82,13 +82,13 @@ GLHModelImporter >> importDirectoryFiles: aDirectoryFile OfBranch: aBranch [
 	result := self glhApi
 		          treeOfRepository: aBranch repository project id
 		          ofBranch: aBranch name
-		          andPath: aDirectoryFile path.
+		          andPath: aDirectoryFile path , '/'.
 	apiFiles := self parseFileTreeResult: result.
 	files := apiFiles collect: [ :apiFile | 
 		         self convertApiFileAsFile: apiFile ].
 	files do: [ :file | 
 		self glhModel add: file.
-		aBranch addFile: file ].
+		aDirectoryFile addFile: file ].
 	files
 		select: [ :file | file isKindOf: GLHFileDirectory ]
 		thenCollect: [ :file | 
