@@ -6,11 +6,18 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'baseAPIUrl',
-		'privateToken',
 		'client'
 	],
 	#category : #'BL-GitHubHealth-Model-Importer'
 }
+
+{ #category : #api }
+GHApi >> actionsRunOfRepo: aRepoName ofOrganization: anOrganizationName [
+
+	^ self client get:
+		  self baseAPIUrl , '/repos/' , anOrganizationName , '/' , aRepoName
+		  , '/actions/runs'
+]
 
 { #category : #accessing }
 GHApi >> baseAPIUrl [
@@ -36,7 +43,7 @@ GHApi >> client: anObject [
 	client := anObject
 ]
 
-{ #category : #accessing }
+{ #category : #initialization }
 GHApi >> initialize [
 
 	self baseAPIUrl: 'https://api.github.com'.
@@ -45,8 +52,26 @@ GHApi >> initialize [
 			 yourself)
 ]
 
-{ #category : #accessing }
+{ #category : #api }
 GHApi >> organization: anOrganizationName [
 
 	^ self client get: self baseAPIUrl , '/orgs/' , anOrganizationName
+]
+
+{ #category : #accessing }
+GHApi >> privateToken [
+
+		^ self client request headers at: #'Authorization'
+]
+
+{ #category : #accessing }
+GHApi >> privateToken: anObject [
+
+	self client headerAt: #'Authorization' add: ('token ', anObject)
+]
+
+{ #category : #api }
+GHApi >> reposOfOrganization: anOrganizationName [
+
+	^ self client get: self baseAPIUrl , '/orgs/' , anOrganizationName, '/repos'
 ]
