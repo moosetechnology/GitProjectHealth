@@ -93,11 +93,12 @@ GLHApi >> subgroupsOfGroup: aGroupID [
 GLHApi >> treeOfRepository: aProjectID ofBranch: aBranchRef andPath: aPath [
 
 	| result |
+	self client url:
+		self baseAPIUrl , '/projects/' , aProjectID printString
+		, '/repository/tree'.
 	aBranchRef ifNotNil: [ self client queryAt: #ref put: aBranchRef ].
 	aPath ifNotNil: [ self client queryAt: #path put: aPath ].
-	result := self client get:
-		          self baseAPIUrl , '/projects/' , aProjectID printString
-		          , '/repository/tree'.
+	result := self client get.
 	self resetClient.
 	^ result
 ]
