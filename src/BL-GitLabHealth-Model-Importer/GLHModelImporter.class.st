@@ -31,10 +31,12 @@ GLHModelImporter >> completeImportProject: aGLHProject [
 
 	('Complete import project: ' , aGLHProject id printString) recordInfo.
 	(self pipelinesOf: aGLHProject id) do: [ :pipeline | 
+		self glhModel add: pipeline.
 		aGLHProject addPipeline: pipeline ].
 	aGLHProject creator: (self importUser: aGLHProject creator_id).
 	aGLHProject repository: GLHRepository new.
-	self importRepository: aGLHProject repository.
+	self glhModel add: aGLHProject repository.
+	self importRepository: aGLHProject repository
 ]
 
 { #category : #private }
@@ -74,6 +76,26 @@ GLHModelImporter >> glhModel: anObject [
 ]
 
 { #category : #api }
+GLHModelImporter >> importDirectoryFiles: aDirectoryFile OfBranch: aBranch [
+
+	| result files apiFiles |
+	result := self glhApi
+		          treeOfRepository: aBranch repository project id
+		          ofBranch: aBranch name
+		          andPath: aDirectoryFile path.
+	apiFiles := self parseFileTreeResult: result.
+	files := apiFiles collect: [ :apiFile | 
+		         self convertApiFileAsFile: apiFile ].
+	files do: [ :file | 
+		self glhModel add: file.
+		aBranch addFile: file ].
+	files
+		select: [ :file | file isKindOf: GLHFileDirectory ]
+		thenCollect: [ :file | 
+		self importDirectoryFiles: file OfBranch: aBranch ]
+]
+
+{ #category : #api }
 GLHModelImporter >> importFilesOfBranch: aBranch [
 
 	| result files apiFiles |
@@ -84,7 +106,13 @@ GLHModelImporter >> importFilesOfBranch: aBranch [
 	apiFiles := self parseFileTreeResult: result.
 	files := apiFiles collect: [ :apiFile | 
 		         self convertApiFileAsFile: apiFile ].
-	files do: [ :file | aBranch addFile: file ]
+	files do: [ :file | 
+		self glhModel add: file.
+		aBranch addFile: file ].
+	files
+		select: [ :file | file isKindOf: GLHFileDirectory ]
+		thenCollect: [ :file | 
+		self importDirectoryFiles: file OfBranch: aBranch ]
 ]
 
 { #category : #api }

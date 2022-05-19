@@ -35,6 +35,8 @@ BaselineOfBLGitLabHealth >> definePackages: spec [
 
 	spec
 		package: 'BL-GitLabHealth-Model';
+		package: 'BL-GitLabHealth-Model-Extension'
+		with: [ spec requires: #( 'BL-GitLabHealth-Model' ) ];
 		package: 'BL-GitLabHealth-Model-Generator';
 		package: 'BL-GitLabHealth-Model-Inspector'
 		with: [ spec requires: #( 'BL-GitLabHealth-Model-Visualization' ) ];
