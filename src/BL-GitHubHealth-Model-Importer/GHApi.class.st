@@ -31,6 +31,15 @@ GHApi >> baseAPIUrl: anObject [
 	baseAPIUrl := anObject
 ]
 
+{ #category : #api }
+GHApi >> branchesOfRepo: aRepoName ofOrganization: anOrganizationName [
+
+	self client url:
+		self baseAPIUrl , '/repos/' , anOrganizationName , '/' , aRepoName
+		, '/branches'.
+	^ self client get
+]
+
 { #category : #accessing }
 GHApi >> client [
 
@@ -41,6 +50,16 @@ GHApi >> client [
 GHApi >> client: anObject [
 
 	client := anObject
+]
+
+{ #category : #api }
+GHApi >> contentsOfRepo: aRepoName ofOrganization: anOrganizationName inBranch: aBranchRef withPath: aPath [
+
+	self client url:
+		self baseAPIUrl , '/repos/' , anOrganizationName , '/' , aRepoName
+		, '/contents/' , (aPath ifNil: [ '' ]).
+	aBranchRef ifNotNil: [ self client queryAt: #ref put: aBranchRef ].
+	^ self client get
 ]
 
 { #category : #initialization }

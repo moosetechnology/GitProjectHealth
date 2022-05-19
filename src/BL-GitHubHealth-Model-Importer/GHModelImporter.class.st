@@ -3,7 +3,8 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'api',
-		'glhModel'
+		'glhModel',
+		'withFiles'
 	],
 	#category : #'BL-GitHubHealth-Model-Importer'
 }
@@ -21,6 +22,30 @@ GHModelImporter >> api: anObject [
 ]
 
 { #category : #accessing }
+GHModelImporter >> beWithFiles [
+
+	withFiles := true
+]
+
+{ #category : #accessing }
+GHModelImporter >> beWithoutFiles [
+
+	withFiles := false
+]
+
+{ #category : #private }
+GHModelImporter >> convertApiFileAsFile: aAPIFile [
+
+	aAPIFile type = 'dir' ifTrue: [ 
+		^ GLHFileDirectory new
+			  name: aAPIFile name;
+			  yourself ].
+	^ GLHFileBlob new
+		  name: aAPIFile name;
+		  yourself
+]
+
+{ #category : #accessing }
 GHModelImporter >> glhModel [
 
 	^ glhModel
@@ -30,6 +55,68 @@ GHModelImporter >> glhModel [
 GHModelImporter >> glhModel: anObject [
 
 	glhModel := anObject
+]
+
+{ #category : #api }
+GHModelImporter >> importBranchesOf: project [
+
+	"add the pipeline (actions runs) in the project"
+
+	| branchesResult branches repository |
+	branchesResult := self api
+		                  branchesOfRepo: project name
+		                  ofOrganization: project group name.
+	branches := self parseBranchesResult: branchesResult.
+	self glhModel addAll: branches.
+	repository := GLHRepository new.
+	self glhModel add: repository.
+	project repository: repository.
+	branches do: [ :branch | 
+		repository addBranch: branch.
+		self withFiles ifTrue: [ self importFilesOfBranch: branch ] ]
+]
+
+{ #category : #api }
+GHModelImporter >> importDirectoryFiles: aDirectoryFile OfBranch: aBranch [
+
+	| result files apiFiles |
+	('Explore ' , aDirectoryFile name) recordInfo.
+	result := self api
+		          contentsOfRepo: aBranch repository project name
+		          ofOrganization: aBranch repository project group name
+		          inBranch: aBranch name
+		          withPath: aDirectoryFile path.
+	apiFiles := self parseFileTreeResult: result.
+	files := apiFiles collect: [ :apiFile | 
+		         self convertApiFileAsFile: apiFile ].
+	files do: [ :file | 
+		self glhModel add: file.
+		aDirectoryFile addFile: file ].
+	files
+		select: [ :file | file isKindOf: GLHFileDirectory ]
+		thenCollect: [ :file | 
+		self importDirectoryFiles: file OfBranch: aBranch ]
+]
+
+{ #category : #api }
+GHModelImporter >> importFilesOfBranch: aBranch [
+
+	| result files apiFiles |
+	result := self api
+		          contentsOfRepo: aBranch repository project name
+		          ofOrganization: aBranch repository project group name
+		          inBranch: aBranch name
+		          withPath: nil.
+	apiFiles := self parseFileTreeResult: result.
+	files := apiFiles collect: [ :apiFile | 
+		         self convertApiFileAsFile: apiFile ].
+	files do: [ :file | 
+		self glhModel add: file.
+		aBranch addFile: file ].
+	files
+		select: [ :file | file isKindOf: GLHFileDirectory ]
+		thenCollect: [ :file | 
+		self importDirectoryFiles: file OfBranch: aBranch ]
 ]
 
 { #category : #api }
@@ -65,7 +152,9 @@ GHModelImporter >> importRepositoriesOfGroup: groupResult [
 	groupResult projects addAll: (self parseArrayOfProject: reposResult).
 	self glhModel addAll: groupResult projects.
 	groupResult projects do: [ :project | 
-		self importPipelinesOf: project ].
+		self importPipelinesOf: project.
+		self importBranchesOf: project.
+		 ].
 	^ groupResult
 ]
 
@@ -73,6 +162,7 @@ GHModelImporter >> importRepositoriesOfGroup: groupResult [
 GHModelImporter >> initialize [
 	super initialize.
 	self api: GHApi new.
+	withFiles := false
 ]
 
 { #category : #private }
@@ -92,6 +182,32 @@ GHModelImporter >> parseArrayOfProject: arrayOfProjects [
 		mapping mapInstVar: #web_url to: #html_url.
 		mapping mapInstVar: #topics to: #topics ].
 	^ reader nextAs: #ArrayOfProjects
+]
+
+{ #category : #private }
+GHModelImporter >> parseBranchesResult: arrayOfBranch [
+
+	| reader |
+	reader := NeoJSONReader on: arrayOfBranch readStream.
+	reader mapInstVarsFor: GLHBranch.
+	reader
+		for: #ArrayOfBranch
+		customDo: [ :customMappting | 
+		customMappting listOfElementSchema: GLHBranch ].
+	^ reader nextAs: #ArrayOfBranch
+]
+
+{ #category : #private }
+GHModelImporter >> parseFileTreeResult: aResult [
+
+	| reader |
+	reader := NeoJSONReader on: aResult readStream.
+	reader mapInstVarsFor: GHApiFile.
+	reader
+		for: #ArrayOfFile
+		customDo: [ :customMappting | 
+		customMappting listOfElementSchema: GHApiFile ].
+	^ reader nextAs: #ArrayOfFile
 ]
 
 { #category : #private }
@@ -133,4 +249,16 @@ GHModelImporter >> privateToken [
 { #category : #api }
 GHModelImporter >> privateToken: aTokenString [
 	^ self api privateToken: aTokenString
+]
+
+{ #category : #accessing }
+GHModelImporter >> withFiles [
+
+	^ withFiles
+]
+
+{ #category : #accessing }
+GHModelImporter >> withFiles: anObject [
+
+	withFiles := anObject
 ]
