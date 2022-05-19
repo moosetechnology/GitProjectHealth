@@ -5,8 +5,9 @@ Class {
 	#name : #GLHBranch,
 	#superclass : #GLHEntity,
 	#instVars : [
-		'#repository => FMOne type: #GLHRepository opposite: #branches',
-		'#files => FMMany type: #GLHFile opposite: #branch'
+		'#files => FMMany type: #GLHFile opposite: #branch',
+		'#name => FMProperty',
+		'#repository => FMOne type: #GLHRepository opposite: #branches'
 	],
 	#category : #'BL-GitLabHealth-Model-Entities'
 }
@@ -47,6 +48,20 @@ GLHBranch >> filesGroup [
 	<generated>
 	<navigation: 'Files'>
 	^ MooseSpecializedGroup withAll: self files asSet
+]
+
+{ #category : #accessing }
+GLHBranch >> name [
+
+	<FMProperty: #name type: #String>
+	<generated>
+	^ name
+]
+
+{ #category : #accessing }
+GLHBranch >> name: anObject [
+	<generated>
+	name := anObject
 ]
 
 { #category : #accessing }

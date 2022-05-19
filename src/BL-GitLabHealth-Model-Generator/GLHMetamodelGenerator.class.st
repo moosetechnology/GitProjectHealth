@@ -8,7 +8,9 @@ Class {
 		'user',
 		'repository',
 		'branch',
-		'file'
+		'file',
+		'fileBlob',
+		'fileDirectory'
 	],
 	#category : #'BL-GitLabHealth-Model-Generator'
 }
@@ -30,6 +32,12 @@ GLHMetamodelGenerator class >> submetamodels [
 ]
 
 { #category : #definition }
+GLHMetamodelGenerator >> branchProperties [
+
+	branch property: #name type: #String
+]
+
+{ #category : #definition }
 GLHMetamodelGenerator >> defineClasses [
 	super defineClasses.
 	group := builder newClassNamed: #Group comment: 'A GitLab Group'.
@@ -39,13 +47,17 @@ GLHMetamodelGenerator >> defineClasses [
 	repository := builder newClassNamed: #Repository comment: 'A git repository'.
 	branch := builder newClassNamed: #Branch comment: 'A git branch'.
 	file := builder newClassNamed: #File comment: 'A file'.
+	fileBlob := builder newClassNamed: #FileBlob comment: 'A file blob'.
+	fileDirectory := builder newClassNamed: #FileDirectory comment: 'A file directory'.
 ]
 
 { #category : #definition }
 GLHMetamodelGenerator >> defineHierarchy [
 
 	super defineHierarchy.
-	(builder ensureClassNamed: #Entity) --|> #TEntityMetaLevelDependency
+	(builder ensureClassNamed: #Entity) --|> #TEntityMetaLevelDependency.
+	fileDirectory --|> file.
+	fileBlob --|> file
 ]
 
 { #category : #definition }
@@ -75,6 +87,8 @@ GLHMetamodelGenerator >> defineProperties [
 	"Pipelines properties"
 	pipeline property: #status type: #String.
 	self userProperties.
+	self branchProperties.
+	self fileProperties.
 ]
 
 { #category : #definition }
@@ -87,7 +101,14 @@ GLHMetamodelGenerator >> defineRelations [
 	(project property: #creator) *- (user property: #createdProjects).
 	(project property: #repository) <>- (repository property: #project).
 	(repository property: #branches) <>-* (branch property: #repository).
-	(branch property: #files) <>-* (file property: #branch)
+	(branch property: #files) <>-* (file property: #branch).
+	(fileDirectory property: #files) <>-* (file property: #directoryOwner) 
+]
+
+{ #category : #definition }
+GLHMetamodelGenerator >> fileProperties [
+
+	file property: #name type: #String
 ]
 
 { #category : #definition }

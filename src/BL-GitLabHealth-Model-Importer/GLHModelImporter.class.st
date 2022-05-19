@@ -3,7 +3,8 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'glhModel',
-		'glhApi'
+		'glhApi',
+		'withFiles'
 	],
 	#category : #'BL-GitLabHealth-Model-Importer'
 }
@@ -15,13 +16,37 @@ GLHModelImporter >> addGroupResultToModel: groupResult [
 	self glhModel addAll: groupResult projects
 ]
 
+{ #category : #accessing }
+GLHModelImporter >> beWithFiles [
+	withFiles := true
+]
+
+{ #category : #accessing }
+GLHModelImporter >> beWithouFiles [
+	withFiles := false
+]
+
 { #category : #api }
 GLHModelImporter >> completeImportProject: aGLHProject [
 
 	('Complete import project: ' , aGLHProject id printString) recordInfo.
 	(self pipelinesOf: aGLHProject id) do: [ :pipeline | 
 		aGLHProject addPipeline: pipeline ].
-	aGLHProject creator: (self importUser: aGLHProject creator_id)
+	aGLHProject creator: (self importUser: aGLHProject creator_id).
+	aGLHProject repository: GLHRepository new.
+	self importRepository: aGLHProject repository.
+]
+
+{ #category : #private }
+GLHModelImporter >> convertApiFileAsFile: aAPIFile [
+
+	aAPIFile type = 'tree' ifTrue: [ 
+		^ GLHFileDirectory new
+			  name: aAPIFile name;
+			  yourself ].
+	^ GLHFileBlob new
+		  name: aAPIFile name;
+		  yourself
 ]
 
 { #category : #accessing }
@@ -49,6 +74,20 @@ GLHModelImporter >> glhModel: anObject [
 ]
 
 { #category : #api }
+GLHModelImporter >> importFilesOfBranch: aBranch [
+
+	| result files apiFiles |
+	result := self glhApi
+		          treeOfRepository: aBranch repository project id
+		          ofBranch: aBranch name
+		          andPath: nil.
+	apiFiles := self parseFileTreeResult: result.
+	files := apiFiles collect: [ :apiFile | 
+		         self convertApiFileAsFile: apiFile ].
+	files do: [ :file | aBranch addFile: file ]
+]
+
+{ #category : #api }
 GLHModelImporter >> importGroup: aGroupID [
 
 	| result groupResult |
@@ -64,6 +103,22 @@ GLHModelImporter >> importGroup: aGroupID [
 ]
 
 { #category : #api }
+GLHModelImporter >> importRepository: aGLHRepository [
+
+	| resultBranches branches |
+	[ 
+	resultBranches := self glhApi branchesOfRepository:
+		                  aGLHRepository project id.
+	branches := self parseBranchesResult: resultBranches.
+	branches do: [ :branch | aGLHRepository addBranch: branch ].
+	self withFiles ifTrue: [ 
+		branches do: [ :branch | self importFilesOfBranch: branch ] ] ]
+		on: NeoJSONParseError
+		do: [ 
+		self inform: aGLHRepository project name , ' has no repository' ]
+]
+
+{ #category : #api }
 GLHModelImporter >> importUser: aUserID [
 
 	| result userResult |
@@ -73,6 +128,37 @@ GLHModelImporter >> importUser: aUserID [
 	userResult := self parseUserResult: result.
 	glhModel add: userResult.
 	^ userResult
+]
+
+{ #category : #api }
+GLHModelImporter >> initialize [
+	withFiles := false
+]
+
+{ #category : #private }
+GLHModelImporter >> parseBranchesResult: result [
+
+	| reader |
+	reader := NeoJSONReader on: result readStream.
+	reader mapInstVarsFor: GLHBranch.
+	reader
+		for: #ArrayOfBranch
+		customDo: [ :customMappting | 
+		customMappting listOfElementSchema: GLHBranch ].
+	^ reader nextAs: #ArrayOfBranch
+]
+
+{ #category : #private }
+GLHModelImporter >> parseFileTreeResult: aResult [
+
+	| reader |
+	reader := NeoJSONReader on: aResult readStream.
+	reader mapInstVarsFor: GLHApiFile.
+	reader
+		for: #ArrayOfFile
+		customDo: [ :customMappting | 
+		customMappting listOfElementSchema: GLHApiFile ].
+	^ reader nextAs: #ArrayOfFile
 ]
 
 { #category : #private }
@@ -142,4 +228,14 @@ GLHModelImporter >> subGroupsOf: aGroupID [
 	('Search subgroup of: ' , aGroupID printString) recordInfo.
 	result := self glhApi subgroupsOfGroup: aGroupID.
 	^ self parseSubGroupResult: result
+]
+
+{ #category : #accessing }
+GLHModelImporter >> withFiles [
+	^ withFiles
+]
+
+{ #category : #accessing }
+GLHModelImporter >> withFiles: aBoolean [
+	withFiles := aBoolean
 ]

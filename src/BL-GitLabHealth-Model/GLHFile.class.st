@@ -5,7 +5,9 @@ Class {
 	#name : #GLHFile,
 	#superclass : #GLHEntity,
 	#instVars : [
-		'#branch => FMOne type: #GLHBranch opposite: #files'
+		'#branch => FMOne type: #GLHBranch opposite: #files',
+		'#directoryOwner => FMOne type: #GLHFileDirectory opposite: #files',
+		'#name => FMProperty'
 	],
 	#category : #'BL-GitLabHealth-Model-Entities'
 }
@@ -40,4 +42,41 @@ GLHFile >> branchGroup [
 	<generated>
 	<navigation: 'Branch'>
 	^ MooseSpecializedGroup with: self branch
+]
+
+{ #category : #accessing }
+GLHFile >> directoryOwner [
+	"Relation named: #directoryOwner type: #GLHFileDirectory opposite: #files"
+
+	<generated>
+	<container>
+	^ directoryOwner
+]
+
+{ #category : #accessing }
+GLHFile >> directoryOwner: anObject [
+
+	<generated>
+	directoryOwner := anObject
+]
+
+{ #category : #navigation }
+GLHFile >> directoryOwnerGroup [
+	<generated>
+	<navigation: 'DirectoryOwner'>
+	^ MooseSpecializedGroup with: self directoryOwner
+]
+
+{ #category : #accessing }
+GLHFile >> name [
+
+	<FMProperty: #name type: #String>
+	<generated>
+	^ name
+]
+
+{ #category : #accessing }
+GLHFile >> name: anObject [
+	<generated>
+	name := anObject
 ]
