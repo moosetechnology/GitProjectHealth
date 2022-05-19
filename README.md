@@ -46,3 +46,16 @@ canvas svgCairoExporter
 		fileName: 'd:/drit-health';
 		export
 ```
+
+## Usages GitHub
+
+In a playground (`Ctrl+O`, `Ctrl+W`).
+
+```st
+glhModel := GLHModel new.
+
+githubImporter := GHModelImporter new glhModel: glhModel; privateToken: '<my private token>'; yourself.
+
+githubImporter importGroup: 'moosetechnology'.
+```
+
