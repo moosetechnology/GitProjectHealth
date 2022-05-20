@@ -58,3 +58,7 @@ githubImporter := GHModelImporter new glhModel: glhModel; privateToken: '<my pri
 
 githubImporter importGroup: 'moosetechnology'.
 ```
+
+## Contributor
+
+This work has been first developed by the [research department of Berger-Levrault](research-bl.com/)
