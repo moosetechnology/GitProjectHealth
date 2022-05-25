@@ -26,7 +26,7 @@ Class {
 GLHProject class >> annotation [
 
 	<FMClass: #Project super: #GLHEntity>
-	<package: #'BL-GitLabHealth-Model'>
+	<package: #'GitLabHealth-Model'>
 	<generated>
 	^self
 ]

@@ -22,7 +22,7 @@ Class {
 GLHGroup class >> annotation [
 
 	<FMClass: #Group super: #GLHEntity>
-	<package: #'BL-GitLabHealth-Model'>
+	<package: #'GitLabHealth-Model'>
 	<generated>
 	^self
 ]

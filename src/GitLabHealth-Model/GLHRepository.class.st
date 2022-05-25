@@ -15,7 +15,7 @@ Class {
 GLHRepository class >> annotation [
 
 	<FMClass: #Repository super: #GLHEntity>
-	<package: #'BL-GitLabHealth-Model'>
+	<package: #'GitLabHealth-Model'>
 	<generated>
 	^self
 ]

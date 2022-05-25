@@ -35,7 +35,7 @@ Class {
 GLHUser class >> annotation [
 
 	<FMClass: #User super: #GLHEntity>
-	<package: #'BL-GitLabHealth-Model'>
+	<package: #'GitLabHealth-Model'>
 	<generated>
 	^self
 ]

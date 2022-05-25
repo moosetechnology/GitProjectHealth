@@ -14,7 +14,7 @@ Class {
 GLHFileDirectory class >> annotation [
 
 	<FMClass: #FileDirectory super: #GLHFile>
-	<package: #'BL-GitLabHealth-Model'>
+	<package: #'GitLabHealth-Model'>
 	<generated>
 	^self
 ]

@@ -17,7 +17,7 @@ Class {
 
 { #category : #accessing }
 GLHMetamodelGenerator class >> packageName [
-	^ #'BL-GitLabHealth-Model'
+	^ #'GitLabHealth-Model'
 ]
 
 { #category : #accessing }
