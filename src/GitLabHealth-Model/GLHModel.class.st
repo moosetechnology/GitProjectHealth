@@ -7,7 +7,7 @@ Class {
 { #category : #accessing }
 GLHModel class >> allSubmetamodelsPackagesNames [
 	<generated>
-	^ #(#'Moose-Query')
+	^ #(#'Moose-Query' #'Famix-Traits')
 ]
 
 { #category : #meta }

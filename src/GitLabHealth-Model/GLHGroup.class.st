@@ -4,16 +4,17 @@ A GitLab Group
 Class {
 	#name : #GLHGroup,
 	#superclass : #GLHEntity,
+	#traits : 'FamixTNamedEntity',
+	#classTraits : 'FamixTNamedEntity classTrait',
 	#instVars : [
-		'#id => FMProperty',
-		'#web_url => FMProperty',
-		'#name => FMProperty',
-		'#description => FMProperty',
-		'#visibility => FMProperty',
 		'#avatar_url => FMProperty',
+		'#description => FMProperty',
+		'#group => FMOne type: #GLHGroup opposite: #subGroups',
+		'#id => FMProperty',
 		'#projects => FMMany type: #GLHProject opposite: #group',
 		'#subGroups => FMMany type: #GLHGroup opposite: #group',
-		'#group => FMOne type: #GLHGroup opposite: #subGroups'
+		'#visibility => FMProperty',
+		'#web_url => FMProperty'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }
@@ -102,20 +103,6 @@ GLHGroup >> id [
 GLHGroup >> id: anObject [
 	<generated>
 	id := anObject
-]
-
-{ #category : #accessing }
-GLHGroup >> name [
-
-	<FMProperty: #name type: #String>
-	<generated>
-	^ name
-]
-
-{ #category : #accessing }
-GLHGroup >> name: anObject [
-	<generated>
-	name := anObject
 ]
 
 { #category : #accessing }

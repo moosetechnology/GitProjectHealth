@@ -28,7 +28,7 @@ GLHMetamodelGenerator class >> prefix [
 { #category : #accessing }
 GLHMetamodelGenerator class >> submetamodels [
 
-	^ { FamixMooseQueryGenerator }
+	^ { FamixMooseQueryGenerator . FamixGenerator }
 ]
 
 { #category : #definition }
@@ -57,7 +57,10 @@ GLHMetamodelGenerator >> defineHierarchy [
 	super defineHierarchy.
 	(builder ensureClassNamed: #Entity) --|> #TEntityMetaLevelDependency.
 	fileDirectory --|> file.
-	fileBlob --|> file
+	fileBlob --|> file.
+	
+	group --|> #TNamedEntity.
+	project --|> #TNamedEntity.
 ]
 
 { #category : #definition }
@@ -67,7 +70,6 @@ GLHMetamodelGenerator >> defineProperties [
 	"Group properties"
 	group property: #id type: #Number.
 	group property: #web_url type: #String.
-	group property: #name type: #String.
 	group property: #description type: #String.
 	group property: #visibility type: #String.
 	group property: #avatar_url type: #String.
@@ -78,7 +80,6 @@ GLHMetamodelGenerator >> defineProperties [
 	project property: #archived type: #Boolean.
 	project property: #archived type: #Boolean.
 	project property: #description type: #String.
-	project property: #name type: #String.
 	project property: #readme_url type: #String.
 	project property: #avatar_url type: #String.
 	project property: #web_url type: #String.
@@ -102,7 +103,7 @@ GLHMetamodelGenerator >> defineRelations [
 	(project property: #repository) <>- (repository property: #project).
 	(repository property: #branches) <>-* (branch property: #repository).
 	(branch property: #files) <>-* (file property: #branch).
-	(fileDirectory property: #files) <>-* (file property: #directoryOwner) 
+	(fileDirectory property: #files) <>-* (file property: #directoryOwner).
 ]
 
 { #category : #definition }

@@ -4,6 +4,8 @@ A GitLab Project
 Class {
 	#name : #GLHProject,
 	#superclass : #GLHEntity,
+	#traits : 'FamixTNamedEntity',
+	#classTraits : 'FamixTNamedEntity classTrait',
 	#instVars : [
 		'#archived => FMProperty',
 		'#avatar_url => FMProperty',
@@ -12,7 +14,6 @@ Class {
 		'#description => FMProperty',
 		'#group => FMOne type: #GLHGroup opposite: #projects',
 		'#id => FMProperty',
-		'#name => FMProperty',
 		'#pipelines => FMMany type: #GLHPipeline opposite: #project',
 		'#readme_url => FMProperty',
 		'#repository => FMOne type: #GLHRepository opposite: #project',
@@ -143,20 +144,6 @@ GLHProject >> id [
 GLHProject >> id: anObject [
 	<generated>
 	id := anObject
-]
-
-{ #category : #accessing }
-GLHProject >> name [
-
-	<FMProperty: #name type: #String>
-	<generated>
-	^ name
-]
-
-{ #category : #accessing }
-GLHProject >> name: anObject [
-	<generated>
-	name := anObject
 ]
 
 { #category : #accessing }
