@@ -80,11 +80,3 @@ GLHFile >> name: anObject [
 	<generated>
 	name := anObject
 ]
-
-{ #category : #'*GitLabHealth-Model-Extension' }
-GLHFile >> path [
-
-	^ (self directoryOwner
-		   ifNotNil: [ :owner | owner path , '/' ]
-		   ifNil: [ '' ]) , self name
-]
