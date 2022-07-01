@@ -41,6 +41,26 @@ GLHApi >> client: anObject [
 	client := anObject
 ]
 
+{ #category : #'api - branches' }
+GLHApi >> createBranch: newBranchName forProject: aProjectID fromBranch: refBranchName [
+
+	self client url:
+		self baseAPIUrl , '/projects/' , aProjectID printString
+		, '/repository/branches'.
+	self client queryAt: #ref put: refBranchName.
+	self client queryAt: #branch put: newBranchName.
+	^ self client post
+]
+
+{ #category : #'api - branches' }
+GLHApi >> deleteBranch: branchName forProject: aProjectID [
+
+	self client url:
+		self baseAPIUrl , '/projects/' , aProjectID printString
+		, '/repository/branches/' , branchName.
+	^ self client delete
+]
+
 { #category : #api }
 GLHApi >> group: aGroupID [
 
