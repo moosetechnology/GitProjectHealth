@@ -111,11 +111,20 @@ GLHApi >> resetClient [
 	self client accept: ZnMimeType applicationJson
 ]
 
-{ #category : #api }
+{ #category : #'api - groups' }
 GLHApi >> subgroupsOfGroup: aGroupID [
 
 	^ self client get:
 		  self baseAPIUrl , '/groups/' , aGroupID printString , '/subgroups'
+]
+
+{ #category : #'api - groups' }
+GLHApi >> subgroupsOfGroup: aGroupID page: aPageNumber [
+
+	self client url:
+		self baseAPIUrl , '/groups/' , aGroupID printString , '/subgroups'.
+	aPageNumber ifNotNil: [ self client queryAt: #page put: aPageNumber ].
+	^ self client get
 ]
 
 { #category : #api }

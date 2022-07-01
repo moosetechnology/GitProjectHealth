@@ -252,10 +252,19 @@ GLHModelImporter >> pipelinesOf: aProjectID [
 { #category : #api }
 GLHModelImporter >> subGroupsOf: aGroupID [
 
-	| result |
+	| results parsedResult result page |
 	('Search subgroup of: ' , aGroupID printString) recordInfo.
-	result := self glhApi subgroupsOfGroup: aGroupID.
-	^ self parseSubGroupResult: result
+	results := OrderedCollection new.
+	page := 1.
+	result := self glhApi subgroupsOfGroup: aGroupID page: page.
+	parsedResult := self parseSubGroupResult: result.
+	results addAll: parsedResult.
+	[ parsedResult size = 20 ] whileTrue: [ 
+		page := page + 1.
+		result := self glhApi subgroupsOfGroup: aGroupID page: page.
+		parsedResult := self parseSubGroupResult: result.
+		results addAll: parsedResult ].
+	^ results
 ]
 
 { #category : #accessing }
