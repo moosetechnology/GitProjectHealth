@@ -61,6 +61,15 @@ GLHApi >> deleteBranch: branchName forProject: aProjectID [
 	^ self client delete
 ]
 
+{ #category : #'api - projects' }
+GLHApi >> editProject: aProjectID changeDefaultBranchTo: refBranchName [
+
+	self client url:
+		self baseAPIUrl , '/projects/' , aProjectID printString.
+	self client queryAt: #default_branch put: refBranchName.
+	^ self client put
+]
+
 { #category : #api }
 GLHApi >> group: aGroupID [
 
