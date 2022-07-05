@@ -41,6 +41,14 @@ GLHApi >> client: anObject [
 	client := anObject
 ]
 
+{ #category : #'api - commits' }
+GLHApi >> commitsOfProject: aProjectId [
+
+	^ self client get:
+		  self baseAPIUrl , '/projects/' , aProjectId printString
+		  , '/repository/commits'
+]
+
 { #category : #'api - branches' }
 GLHApi >> createBranch: newBranchName forProject: aProjectID fromBranch: refBranchName [
 

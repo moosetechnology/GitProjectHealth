@@ -5,9 +5,10 @@ Class {
 	#name : #GLHBranch,
 	#superclass : #GLHEntity,
 	#instVars : [
-		'#files => FMMany type: #GLHFile opposite: #branch',
 		'#name => FMProperty',
-		'#repository => FMOne type: #GLHRepository opposite: #branches'
+		'#repository => FMOne type: #GLHRepository opposite: #branches',
+		'#files => FMMany type: #GLHFile opposite: #branch',
+		'#commits => FMMany type: #GLHCommit opposite: #branch'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }
@@ -22,9 +23,38 @@ GLHBranch class >> annotation [
 ]
 
 { #category : #adding }
+GLHBranch >> addCommit: anObject [
+	<generated>
+	^ self commits add: anObject
+]
+
+{ #category : #adding }
 GLHBranch >> addFile: anObject [
 	<generated>
 	^ self files add: anObject
+]
+
+{ #category : #accessing }
+GLHBranch >> commits [
+	"Relation named: #commits type: #GLHCommit opposite: #branch"
+
+	<generated>
+	<derived>
+	^ commits
+]
+
+{ #category : #accessing }
+GLHBranch >> commits: anObject [
+
+	<generated>
+	commits value: anObject
+]
+
+{ #category : #navigation }
+GLHBranch >> commitsGroup [
+	<generated>
+	<navigation: 'Commits'>
+	^ MooseSpecializedGroup withAll: self commits asSet
 ]
 
 { #category : #accessing }

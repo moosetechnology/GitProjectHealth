@@ -10,7 +10,8 @@ Class {
 		'branch',
 		'file',
 		'fileBlob',
-		'fileDirectory'
+		'fileDirectory',
+		'commit'
 	],
 	#category : #'GitLabHealth-Model-Generator'
 }
@@ -38,6 +39,23 @@ GLHMetamodelGenerator >> branchProperties [
 ]
 
 { #category : #definition }
+GLHMetamodelGenerator >> commitProperties [
+
+	commit property: #id type: #String.
+	commit property: #short_id type: #String.
+	commit property: #title type: #String.
+	commit property: #author_name type: #String.
+	commit property: #author_email type: #String.
+	commit property: #authored_date type: #Object.
+	commit property: #committer_name type: #String.
+	commit property: #committer_email type: #String.
+	commit property: #committed_date type: #Object.
+	commit property: #created_at type: #Object.
+	commit property: #message type: #String.
+	commit property: #web_url type: #String
+]
+
+{ #category : #definition }
 GLHMetamodelGenerator >> defineClasses [
 	super defineClasses.
 	group := builder newClassNamed: #Group comment: 'A GitLab Group'.
@@ -49,6 +67,7 @@ GLHMetamodelGenerator >> defineClasses [
 	file := builder newClassNamed: #File comment: 'A file'.
 	fileBlob := builder newClassNamed: #FileBlob comment: 'A file blob'.
 	fileDirectory := builder newClassNamed: #FileDirectory comment: 'A file directory'.
+	commit := builder newClassNamed: #Commit comment: 'a commit attached to a repository'
 ]
 
 { #category : #definition }
@@ -90,6 +109,7 @@ GLHMetamodelGenerator >> defineProperties [
 	self userProperties.
 	self branchProperties.
 	self fileProperties.
+	self commitProperties.
 ]
 
 { #category : #definition }
@@ -104,6 +124,8 @@ GLHMetamodelGenerator >> defineRelations [
 	(repository property: #branches) <>-* (branch property: #repository).
 	(branch property: #files) <>-* (file property: #branch).
 	(fileDirectory property: #files) <>-* (file property: #directoryOwner).
+	(repository property: #commits) <>-* (commit property: #repository).
+	(branch property: #commits) <>-* (commit property: #branch).
 ]
 
 { #category : #definition }

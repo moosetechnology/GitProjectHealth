@@ -36,7 +36,8 @@ GLHModelImporter >> completeImportProject: aGLHProject [
 	aGLHProject creator: (self importUser: aGLHProject creator_id).
 	aGLHProject repository: GLHRepository new.
 	self glhModel add: aGLHProject repository.
-	self importRepository: aGLHProject repository
+	self importRepository: aGLHProject repository.
+	self importCommits: aGLHProject
 ]
 
 { #category : #private }
@@ -73,6 +74,15 @@ GLHModelImporter >> glhModel [
 GLHModelImporter >> glhModel: anObject [
 
 	glhModel := anObject
+]
+
+{ #category : #api }
+GLHModelImporter >> importCommits: aGLHProject [
+
+	| results parsedResults |
+	results := self glhApi commitsOfProject: aGLHProject id.
+	parsedResults := self parseCommitsResult: results.
+	aGLHProject repository commits addAll: parsedResults
 ]
 
 { #category : #api }
@@ -174,6 +184,28 @@ GLHModelImporter >> parseBranchesResult: result [
 		customDo: [ :customMappting | 
 		customMappting listOfElementSchema: GLHBranch ].
 	^ reader nextAs: #ArrayOfBranch
+]
+
+{ #category : #private }
+GLHModelImporter >> parseCommitsResult: result [
+
+	| reader |
+	reader := NeoJSONReader on: result readStream.
+	reader for: GLHCommit do: [ :mapping | 
+		mapping mapInstVars:
+			#( id short_id title author_name author_email committer_name
+			   committer_email message web_url ).
+		(mapping mapInstVar: #authored_date) valueSchema: DateAndTime.
+		(mapping mapInstVar: #committed_date) valueSchema: DateAndTime.
+		(mapping mapInstVar: #created_at) valueSchema: DateAndTime ].
+
+	reader for: DateAndTime customDo: [ :mapping | 
+		mapping decoder: [ :string | DateAndTime fromString: string ] ].
+	reader
+		for: #ArrayOfCommit
+		customDo: [ :customMappting | 
+		customMappting listOfElementSchema: GLHCommit ].
+	^ reader nextAs: #ArrayOfCommit
 ]
 
 { #category : #private }

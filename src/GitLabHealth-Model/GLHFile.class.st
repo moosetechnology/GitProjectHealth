@@ -5,9 +5,9 @@ Class {
 	#name : #GLHFile,
 	#superclass : #GLHEntity,
 	#instVars : [
+		'#name => FMProperty',
 		'#branch => FMOne type: #GLHBranch opposite: #files',
-		'#directoryOwner => FMOne type: #GLHFileDirectory opposite: #files',
-		'#name => FMProperty'
+		'#directoryOwner => FMOne type: #GLHFileDirectory opposite: #files'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }
