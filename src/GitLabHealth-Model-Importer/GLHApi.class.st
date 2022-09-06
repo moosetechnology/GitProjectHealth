@@ -78,6 +78,17 @@ GLHApi >> editProject: aProjectID changeDefaultBranchTo: refBranchName [
 	^ self client put
 ]
 
+{ #category : #'api - projects' }
+GLHApi >> editProject: aProjectID usingDictionary: aDictionaryOfNewParam [
+
+	self client url:
+		self baseAPIUrl , '/projects/' , aProjectID printString.
+	aDictionaryOfNewParam keysAndValuesDo: [ :k :v | 
+		self client queryAt: k put: v ].
+
+	^ self client put
+]
+
 { #category : #api }
 GLHApi >> group: aGroupID [
 
