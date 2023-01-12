@@ -24,10 +24,15 @@ In a playground (`Ctrl+O`, `Ctrl+W`).
 
 ```st
 glhModel := GLHModel new.
+
+glhApi := GLHApi new
+	privateToken: '<Your private token>';
+	baseAPIUrl:'https://gitlab.myPrivateHost.com/api/v4';
+	yourself.
+
 glhImporter := GLHModelImporter new
-  baseAPIUrl: 'https://gitlab.myPrivateHost.com/api/v4';
-  privateToken: 'YOU PRIVATE KEY';
-  glhModel: glhModel.
+	glhApi: glhApi;
+	glhModel: glhModel.
 
 
 "137 is the ID of the a Group, you can find the number in the webpage of every project and group"
