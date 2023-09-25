@@ -25,7 +25,7 @@ GLHGroup class >> annotation [
 	<FMClass: #Group super: #GLHEntity>
 	<package: #'GitLabHealth-Model'>
 	<generated>
-	^self
+	^ self
 ]
 
 { #category : #adding }

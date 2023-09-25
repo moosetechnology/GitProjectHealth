@@ -19,7 +19,7 @@ GLHBranch class >> annotation [
 	<FMClass: #Branch super: #GLHEntity>
 	<package: #'GitLabHealth-Model'>
 	<generated>
-	^self
+	^ self
 ]
 
 { #category : #adding }

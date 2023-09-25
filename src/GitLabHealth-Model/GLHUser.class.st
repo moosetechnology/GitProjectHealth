@@ -37,7 +37,7 @@ GLHUser class >> annotation [
 	<FMClass: #User super: #GLHEntity>
 	<package: #'GitLabHealth-Model'>
 	<generated>
-	^self
+	^ self
 ]
 
 { #category : #adding }

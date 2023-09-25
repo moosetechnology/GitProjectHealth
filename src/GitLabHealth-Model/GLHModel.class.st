@@ -1,6 +1,8 @@
 Class {
 	#name : #GLHModel,
 	#superclass : #MooseModel,
+	#traits : 'GLHTEntityCreator',
+	#classTraits : 'GLHTEntityCreator classTrait',
 	#category : #'GitLabHealth-Model-Model'
 }
 

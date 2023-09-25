@@ -13,5 +13,5 @@ GLHFileBlob class >> annotation [
 	<FMClass: #FileBlob super: #GLHFile>
 	<package: #'GitLabHealth-Model'>
 	<generated>
-	^self
+	^ self
 ]

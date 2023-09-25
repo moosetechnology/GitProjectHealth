@@ -11,7 +11,8 @@ Class {
 		'file',
 		'fileBlob',
 		'fileDirectory',
-		'commit'
+		'commit',
+		'commitStats'
 	],
 	#category : #'GitLabHealth-Model-Generator'
 }
@@ -52,22 +53,38 @@ GLHMetamodelGenerator >> commitProperties [
 	commit property: #committed_date type: #Object.
 	commit property: #created_at type: #Object.
 	commit property: #message type: #String.
-	commit property: #web_url type: #String
+	commit property: #web_url type: #String.
+
+	(commit property: #additions type: #Number) comment:
+		'The number of line that git consider added'.
+	(commit property: #deletions type: #Number) comment:
+		'The number of line that git consider deleted'
 ]
 
 { #category : #definition }
 GLHMetamodelGenerator >> defineClasses [
+
 	super defineClasses.
 	group := builder newClassNamed: #Group comment: 'A GitLab Group'.
-	project := builder newClassNamed: #Project comment: 'A GitLab Project'.
-	pipeline := builder newClassNamed: #Pipeline comment: 'A GitLab Pipeline execution'.
+	project := builder
+		           newClassNamed: #Project
+		           comment: 'A GitLab Project'.
+	pipeline := builder
+		            newClassNamed: #Pipeline
+		            comment: 'A GitLab Pipeline execution'.
 	user := builder newClassNamed: #User comment: 'A GitLab User'.
-	repository := builder newClassNamed: #Repository comment: 'A git repository'.
+	repository := builder
+		              newClassNamed: #Repository
+		              comment: 'A git repository'.
 	branch := builder newClassNamed: #Branch comment: 'A git branch'.
 	file := builder newClassNamed: #File comment: 'A file'.
 	fileBlob := builder newClassNamed: #FileBlob comment: 'A file blob'.
-	fileDirectory := builder newClassNamed: #FileDirectory comment: 'A file directory'.
-	commit := builder newClassNamed: #Commit comment: 'a commit attached to a repository'
+	fileDirectory := builder
+		                 newClassNamed: #FileDirectory
+		                 comment: 'A file directory'.
+	commit := builder
+		          newClassNamed: #Commit
+		          comment: 'a commit attached to a repository'
 ]
 
 { #category : #definition }

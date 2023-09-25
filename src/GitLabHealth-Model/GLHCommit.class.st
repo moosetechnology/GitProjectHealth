@@ -5,20 +5,22 @@ Class {
 	#name : #GLHCommit,
 	#superclass : #GLHEntity,
 	#instVars : [
+		'#additions => FMProperty',
+		'#author_email => FMProperty',
+		'#author_name => FMProperty',
+		'#authored_date => FMProperty',
+		'#branch => FMOne type: #GLHBranch opposite: #commits',
+		'#committed_date => FMProperty',
+		'#committer_email => FMProperty',
+		'#committer_name => FMProperty',
+		'#created_at => FMProperty',
+		'#deletions => FMProperty',
 		'#id => FMProperty',
+		'#message => FMProperty',
+		'#repository => FMOne type: #GLHRepository opposite: #commits',
 		'#short_id => FMProperty',
 		'#title => FMProperty',
-		'#author_name => FMProperty',
-		'#author_email => FMProperty',
-		'#authored_date => FMProperty',
-		'#committer_name => FMProperty',
-		'#committer_email => FMProperty',
-		'#committed_date => FMProperty',
-		'#created_at => FMProperty',
-		'#message => FMProperty',
-		'#web_url => FMProperty',
-		'#repository => FMOne type: #GLHRepository opposite: #commits',
-		'#branch => FMOne type: #GLHBranch opposite: #commits'
+		'#web_url => FMProperty'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }
@@ -29,7 +31,22 @@ GLHCommit class >> annotation [
 	<FMClass: #Commit super: #GLHEntity>
 	<package: #'GitLabHealth-Model'>
 	<generated>
-	^self
+	^ self
+]
+
+{ #category : #accessing }
+GLHCommit >> additions [
+
+	<FMProperty: #additions type: #Number>
+	<generated>
+	<FMComment: 'The number of line that git consider added'>
+	^ additions
+]
+
+{ #category : #accessing }
+GLHCommit >> additions: anObject [
+	<generated>
+	additions := anObject
 ]
 
 { #category : #accessing }
@@ -151,6 +168,21 @@ GLHCommit >> created_at [
 GLHCommit >> created_at: anObject [
 	<generated>
 	created_at := anObject
+]
+
+{ #category : #accessing }
+GLHCommit >> deletions [
+
+	<FMProperty: #deletions type: #Number>
+	<generated>
+	<FMComment: 'The number of line that git consider deleted'>
+	^ deletions
+]
+
+{ #category : #accessing }
+GLHCommit >> deletions: anObject [
+	<generated>
+	deletions := anObject
 ]
 
 { #category : #accessing }

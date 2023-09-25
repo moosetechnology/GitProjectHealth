@@ -16,7 +16,7 @@ GLHFileDirectory class >> annotation [
 	<FMClass: #FileDirectory super: #GLHFile>
 	<package: #'GitLabHealth-Model'>
 	<generated>
-	^self
+	^ self
 ]
 
 { #category : #adding }

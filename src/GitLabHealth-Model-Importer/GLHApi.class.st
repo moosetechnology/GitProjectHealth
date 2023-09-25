@@ -59,10 +59,12 @@ GLHApi >> commitsOfProject: aProjectId [
 		  firstParent: nil
 		  order: nil
 		  trailers: nil
+		  perPage: nil
+		  page: nil
 ]
 
 { #category : #'api - commits' }
-GLHApi >> commitsOfProject: aProjectId forRefName: refName since: since until: until path: aPath author: author all: aAllBoolean with_stats: withStateBoolean firstParent: firstParent order: orderString trailers: trailers [
+GLHApi >> commitsOfProject: aProjectId forRefName: refName since: since until: until path: aPath author: author all: aAllBoolean with_stats: withStateBoolean firstParent: firstParent order: orderString trailers: trailers perPage: aPerPageNumber page: aPageNumber [
 	"https://docs.gitlab.com/ee/api/commits.html#list-repository-commits"
 
 	refName ifNotNil: [ self client queryAt: #ref_name put: refName ].
@@ -77,9 +79,13 @@ GLHApi >> commitsOfProject: aProjectId forRefName: refName since: since until: u
 		self client queryAt: #first_parent put: firstParent ].
 	orderString ifNotNil: [ self client queryAt: #order put: orderString ].
 	trailers ifNotNil: [ self client queryAt: #trailers put: trailers ].
-	^ self client get:
-		  self baseAPIUrl , '/projects/' , aProjectId printString
-		  , '/repository/commits'
+	aPerPageNumber ifNotNil: [
+		self client queryAt: #per_page put: aPerPageNumber ].
+	aPageNumber ifNotNil: [ self client queryAt: #page put: aPageNumber ].
+	self client path:
+		self baseAPIUrl , '/projects/' , aProjectId printString
+		, '/repository/commits'.
+	^ self client get
 ]
 
 { #category : #'api - branches' }

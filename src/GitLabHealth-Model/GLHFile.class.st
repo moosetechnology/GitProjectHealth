@@ -18,7 +18,7 @@ GLHFile class >> annotation [
 	<FMClass: #File super: #GLHEntity>
 	<package: #'GitLabHealth-Model'>
 	<generated>
-	^self
+	^ self
 ]
 
 { #category : #accessing }

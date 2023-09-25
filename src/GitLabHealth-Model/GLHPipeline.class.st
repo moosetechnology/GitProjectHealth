@@ -17,7 +17,7 @@ GLHPipeline class >> annotation [
 	<FMClass: #Pipeline super: #GLHEntity>
 	<package: #'GitLabHealth-Model'>
 	<generated>
-	^self
+	^ self
 ]
 
 { #category : #accessing }

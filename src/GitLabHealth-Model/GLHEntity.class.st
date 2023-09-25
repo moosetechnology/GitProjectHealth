@@ -12,7 +12,15 @@ GLHEntity class >> annotation [
 	<FMClass: #Entity super: #MooseEntity>
 	<package: #'GitLabHealth-Model'>
 	<generated>
-	^self
+	<abstract>
+	^ self
+]
+
+{ #category : #testing }
+GLHEntity class >> isAbstract [
+
+	<generated>
+	^ self == GLHEntity
 ]
 
 { #category : #meta }
