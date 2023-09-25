@@ -80,15 +80,6 @@ GLHModelImporter >> glhModel: anObject [
 GLHModelImporter >> importCommits: aGLHProject [
 
 	| results parsedResults |
-	results := self glhApi commitsOfProject: aGLHProject id.
-	parsedResults := self parseCommitsResult: results.
-	aGLHProject repository commits addAll: parsedResults
-]
-
-{ #category : #api }
-GLHModelImporter >> importCommitsOf: aGLHProject withStats: aBoolean until: toDate [
-
-	| results parsedResults |
 	results := self glhApi
 		           commitsOfProject: aGLHProject id
 		           forRefName: nil
@@ -97,15 +88,52 @@ GLHModelImporter >> importCommitsOf: aGLHProject withStats: aBoolean until: toDa
 		           path: nil
 		           author: nil
 		           all: nil
-		           with_stats: aBoolean
+		           with_stats: true
 		           firstParent: nil
 		           order: nil
 		           trailers: nil
 		           perPage: nil
 		           page: nil.
 	parsedResults := self parseCommitsResult: results.
-	self halt.
+	aGLHProject repository mooseModel addAll: parsedResults.
 	aGLHProject repository commits addAll: parsedResults
+]
+
+{ #category : #api }
+GLHModelImporter >> importCommitsOf: aGLHProject withStats: aBoolean until: toDate [
+
+	| newlyFoundCommit page |
+	page := 0.
+	newlyFoundCommit := { true }.
+	[ newlyFoundCommit isNotEmpty ] whileTrue: [
+		| results parsedResults existingCommits |
+		page := page + 1.
+		('import commit page ' , page printString) recordInfo.
+		results := self glhApi
+			           commitsOfProject: aGLHProject id
+			           forRefName: nil
+			           since: nil
+			           until: nil
+			           path: nil
+			           author: nil
+			           all: nil
+			           with_stats: aBoolean
+			           firstParent: nil
+			           order: nil
+			           trailers: nil
+			           perPage: 100
+			           page: page.
+		parsedResults := self parseCommitsResult: results.
+		existingCommits := aGLHProject mooseModel allWithType: GLHCommit.
+
+		newlyFoundCommit := parsedResults reject: [ :commitParsed |
+			                    (toDate isNil or: [
+				                     commitParsed committed_date
+				                     < toDate asDateAndTime ]) or: [
+				                    existingCommits anySatisfy: [ :existingCommit |
+					                    existingCommit id = commitParsed id ] ] ].
+		aGLHProject mooseModel addAll: newlyFoundCommit.
+		aGLHProject repository commits addAll: newlyFoundCommit ]
 ]
 
 { #category : #'private - api' }

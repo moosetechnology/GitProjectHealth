@@ -67,6 +67,9 @@ GLHApi >> commitsOfProject: aProjectId [
 GLHApi >> commitsOfProject: aProjectId forRefName: refName since: since until: until path: aPath author: author all: aAllBoolean with_stats: withStateBoolean firstParent: firstParent order: orderString trailers: trailers perPage: aPerPageNumber page: aPageNumber [
 	"https://docs.gitlab.com/ee/api/commits.html#list-repository-commits"
 
+	self client path:
+		self baseAPIUrl , '/projects/' , aProjectId printString
+		, '/repository/commits'.
 	refName ifNotNil: [ self client queryAt: #ref_name put: refName ].
 	since ifNotNil: [ self client queryAt: #since put: since ].
 	until ifNotNil: [ self client queryAt: #until put: until ].
@@ -82,9 +85,7 @@ GLHApi >> commitsOfProject: aProjectId forRefName: refName since: since until: u
 	aPerPageNumber ifNotNil: [
 		self client queryAt: #per_page put: aPerPageNumber ].
 	aPageNumber ifNotNil: [ self client queryAt: #page put: aPageNumber ].
-	self client path:
-		self baseAPIUrl , '/projects/' , aProjectId printString
-		, '/repository/commits'.
+
 	^ self client get
 ]
 
