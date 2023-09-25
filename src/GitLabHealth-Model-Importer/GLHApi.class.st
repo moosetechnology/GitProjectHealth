@@ -1,3 +1,6 @@
+"
+This is the API. I do not perform any kinds of JSON transformation
+"
 Class {
 	#name : #GLHApi,
 	#superclass : #Object,
@@ -44,6 +47,36 @@ GLHApi >> client: anObject [
 { #category : #'api - commits' }
 GLHApi >> commitsOfProject: aProjectId [
 
+	^ self
+		  commitsOfProject: aProjectId
+		  forRefName: nil
+		  since: nil
+		  until: nil
+		  path: nil
+		  author: nil
+		  all: nil
+		  with_stats: nil
+		  firstParent: nil
+		  order: nil
+		  trailers: nil
+]
+
+{ #category : #'api - commits' }
+GLHApi >> commitsOfProject: aProjectId forRefName: refName since: since until: until path: aPath author: author all: aAllBoolean with_stats: withStateBoolean firstParent: firstParent order: orderString trailers: trailers [
+	"https://docs.gitlab.com/ee/api/commits.html#list-repository-commits"
+
+	refName ifNotNil: [ self client queryAt: #ref_name put: refName ].
+	since ifNotNil: [ self client queryAt: #since put: since ].
+	until ifNotNil: [ self client queryAt: #until put: until ].
+	aPath ifNotNil: [ self client queryAt: #path put: aPath ].
+	author ifNotNil: [ self client queryAt: #author put: author ].
+	aAllBoolean ifNotNil: [ self client queryAt: #all put: aAllBoolean ].
+	withStateBoolean ifNotNil: [
+		self client queryAt: #with_stats put: withStateBoolean ].
+	firstParent ifNotNil: [
+		self client queryAt: #first_parent put: firstParent ].
+	orderString ifNotNil: [ self client queryAt: #order put: orderString ].
+	trailers ifNotNil: [ self client queryAt: #trailers put: trailers ].
 	^ self client get:
 		  self baseAPIUrl , '/projects/' , aProjectId printString
 		  , '/repository/commits'
