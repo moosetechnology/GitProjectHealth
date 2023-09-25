@@ -26,7 +26,7 @@ GLHModelImporter >> beWithouFiles [
 	withFiles := false
 ]
 
-{ #category : #api }
+{ #category : #'private - api' }
 GLHModelImporter >> completeImportProject: aGLHProject [
 
 	('Complete import project: ' , aGLHProject id printString) recordInfo.
@@ -76,7 +76,7 @@ GLHModelImporter >> glhModel: anObject [
 	glhModel := anObject
 ]
 
-{ #category : #api }
+{ #category : #'private - api' }
 GLHModelImporter >> importCommits: aGLHProject [
 
 	| results parsedResults |
@@ -86,6 +86,29 @@ GLHModelImporter >> importCommits: aGLHProject [
 ]
 
 { #category : #api }
+GLHModelImporter >> importCommitsOf: aGLHProject withStats: aBoolean until: toDate [
+
+	| results parsedResults |
+	results := self glhApi
+		           commitsOfProject: aGLHProject id
+		           forRefName: nil
+		           since: nil
+		           until: nil
+		           path: nil
+		           author: nil
+		           all: nil
+		           with_stats: aBoolean
+		           firstParent: nil
+		           order: nil
+		           trailers: nil
+		           perPage: nil
+		           page: nil.
+	parsedResults := self parseCommitsResult: results.
+	self halt.
+	aGLHProject repository commits addAll: parsedResults
+]
+
+{ #category : #'private - api' }
 GLHModelImporter >> importDirectoryFiles: aDirectoryFile OfBranch: aBranch [
 
 	| result files apiFiles |
@@ -105,7 +128,7 @@ GLHModelImporter >> importDirectoryFiles: aDirectoryFile OfBranch: aBranch [
 		self importDirectoryFiles: file OfBranch: aBranch ]
 ]
 
-{ #category : #api }
+{ #category : #'private - api' }
 GLHModelImporter >> importFilesOfBranch: aBranch [
 
 	| result files apiFiles |
@@ -140,7 +163,7 @@ GLHModelImporter >> importGroup: aGroupID [
 	^ groupResult
 ]
 
-{ #category : #api }
+{ #category : #'private - api' }
 GLHModelImporter >> importRepository: aGLHRepository [
 
 	| resultBranches branches |
@@ -156,7 +179,7 @@ GLHModelImporter >> importRepository: aGLHRepository [
 		self inform: aGLHRepository project name , ' has no repository' ]
 ]
 
-{ #category : #api }
+{ #category : #'private - api' }
 GLHModelImporter >> importUser: aUserID [
 
 	| result userResult |
@@ -168,7 +191,7 @@ GLHModelImporter >> importUser: aUserID [
 	^ userResult
 ]
 
-{ #category : #api }
+{ #category : #initialization }
 GLHModelImporter >> initialize [
 	withFiles := false
 ]
@@ -191,19 +214,25 @@ GLHModelImporter >> parseCommitsResult: result [
 
 	| reader |
 	reader := NeoJSONReader on: result readStream.
-	reader for: GLHCommit do: [ :mapping | 
+	reader for: GLHCommit do: [ :mapping |
 		mapping mapInstVars:
 			#( id short_id title author_name author_email committer_name
 			   committer_email message web_url ).
 		(mapping mapInstVar: #authored_date) valueSchema: DateAndTime.
 		(mapping mapInstVar: #committed_date) valueSchema: DateAndTime.
-		(mapping mapInstVar: #created_at) valueSchema: DateAndTime ].
+		(mapping mapInstVar: #created_at) valueSchema: DateAndTime.
+		mapping
+			mapProperty: 'stats'
+			getter: [ :el | "Not used" ]
+			setter: [ :commit :value |
+				commit deletions: (value at: #deletions).
+				commit additions: (value at: #additions) ] ].
 
-	reader for: DateAndTime customDo: [ :mapping | 
+	reader for: DateAndTime customDo: [ :mapping |
 		mapping decoder: [ :string | DateAndTime fromString: string ] ].
 	reader
 		for: #ArrayOfCommit
-		customDo: [ :customMappting | 
+		customDo: [ :customMappting |
 		customMappting listOfElementSchema: GLHCommit ].
 	^ reader nextAs: #ArrayOfCommit
 ]
@@ -272,7 +301,7 @@ GLHModelImporter >> parseUserResult: result [
 	^ reader nextAs: GLHUser
 ]
 
-{ #category : #api }
+{ #category : #'private - api' }
 GLHModelImporter >> pipelinesOf: aProjectID [
 
 	| result |
@@ -281,7 +310,7 @@ GLHModelImporter >> pipelinesOf: aProjectID [
 	^ self parsePipelinesResult: result
 ]
 
-{ #category : #api }
+{ #category : #'private - api' }
 GLHModelImporter >> subGroupsOf: aGroupID [
 
 	| results parsedResult result page |
