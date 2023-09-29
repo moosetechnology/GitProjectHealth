@@ -109,6 +109,24 @@ GLHApi >> commitsOfProject: aProjectId forRefName: refName since: since until: u
 	^ self client get
 ]
 
+{ #category : #'api - repositories' }
+GLHApi >> compareProject: aProjectID from: fromSha to: toSha fromProject: fromProjectID straight: straight unidiff: unidiff [
+
+	self client path:
+		self baseAPIUrl , '/projects/' , aProjectID printString
+		, '/repository/compare'.
+
+	self client queryAt: #from put: fromSha.
+	self client queryAt: #to put: toSha.
+
+	fromProjectID ifNotNil: [
+		self client queryAt: #from_project_id put: fromProjectID ].
+	straight ifNotNil: [ self client queryAt: #straight put: straight ].
+	unidiff ifNotNil: [ self client queryAt: #unidiff put: unidiff ].
+
+	^ self client get
+]
+
 { #category : #'api - branches' }
 GLHApi >> createBranch: newBranchName forProject: aProjectID fromBranch: refBranchName [
 
