@@ -31,6 +31,13 @@ GLHTEntityCreator >> newCommit [
 ]
 
 { #category : #'entity creation' }
+GLHTEntityCreator >> newDiff [
+
+	<generated>
+	^ self add: GLHDiff new
+]
+
+{ #category : #'entity creation' }
 GLHTEntityCreator >> newFile [
 
 	<generated>

@@ -15,6 +15,7 @@ Class {
 		'#committer_name => FMProperty',
 		'#created_at => FMProperty',
 		'#deletions => FMProperty',
+		'#diffs => FMMany type: #GLHDiff opposite: #commit',
 		'#id => FMProperty',
 		'#message => FMProperty',
 		'#repository => FMOne type: #GLHRepository opposite: #commits',
@@ -32,6 +33,12 @@ GLHCommit class >> annotation [
 	<package: #'GitLabHealth-Model'>
 	<generated>
 	^ self
+]
+
+{ #category : #adding }
+GLHCommit >> addDiff: anObject [
+	<generated>
+	^ self diffs add: anObject
 ]
 
 { #category : #accessing }
@@ -183,6 +190,29 @@ GLHCommit >> deletions [
 GLHCommit >> deletions: anObject [
 	<generated>
 	deletions := anObject
+]
+
+{ #category : #accessing }
+GLHCommit >> diffs [
+	"Relation named: #diffs type: #GLHDiff opposite: #commit"
+
+	<generated>
+	<derived>
+	^ diffs
+]
+
+{ #category : #accessing }
+GLHCommit >> diffs: anObject [
+
+	<generated>
+	diffs value: anObject
+]
+
+{ #category : #navigation }
+GLHCommit >> diffsGroup [
+	<generated>
+	<navigation: 'Diffs'>
+	^ MooseSpecializedGroup withAll: self diffs asSet
 ]
 
 { #category : #accessing }
