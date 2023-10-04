@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'glhModel',
 		'glhApi',
-		'withFiles'
+		'withFiles',
+		'withCommitDiffs'
 	],
 	#category : #'GitLabHealth-Model-Importer'
 }
@@ -96,7 +97,8 @@ GLHModelImporter >> importCommits: aGLHProject [
 		           page: nil.
 	parsedResults := self parseCommitsResult: results.
 	aGLHProject repository mooseModel addAll: parsedResults.
-	aGLHProject repository commits addAll: parsedResults
+	aGLHProject repository commits addAll: parsedResults.
+	self withCommitDiffs ifTrue: [ aGLHProject repository commits do: [ :commit | self importDiffOfCommit: commit ] ].
 ]
 
 { #category : #api }
@@ -133,7 +135,26 @@ GLHModelImporter >> importCommitsOf: aGLHProject withStats: aBoolean until: toDa
 				                    existingCommits anySatisfy: [ :existingCommit |
 					                    existingCommit id = commitParsed id ] ] ].
 		aGLHProject mooseModel addAll: newlyFoundCommit.
-		aGLHProject repository commits addAll: newlyFoundCommit ]
+		aGLHProject repository commits addAll: newlyFoundCommit ].
+	self withCommitDiffs ifTrue: [
+		aGLHProject repository commits do: [ :commit |
+			self importDiffOfCommit: commit ] ]
+]
+
+{ #category : #api }
+GLHModelImporter >> importDiffOfCommit: aCommit [
+
+	| result diffsResult |
+	('Import diff of commit : ' , aCommit short_id printString)
+		recordInfo.
+	result := self glhApi
+		          commitDiff: aCommit id
+		          ofProject: aCommit repository project id
+		          unidiff: true.
+	diffsResult := self parseDiffResult: result.
+	aCommit diffs addAll: diffsResult.
+	aCommit mooseModel addAll: diffsResult.
+	^ diffsResult
 ]
 
 { #category : #'private - api' }
@@ -221,7 +242,9 @@ GLHModelImporter >> importUser: aUserID [
 
 { #category : #initialization }
 GLHModelImporter >> initialize [
-	withFiles := false
+
+	withFiles := false.
+	withCommitDiffs := false
 ]
 
 { #category : #private }
@@ -263,6 +286,23 @@ GLHModelImporter >> parseCommitsResult: result [
 		customDo: [ :customMappting |
 		customMappting listOfElementSchema: GLHCommit ].
 	^ reader nextAs: #ArrayOfCommit
+]
+
+{ #category : #private }
+GLHModelImporter >> parseDiffResult: result [
+
+	| reader |
+	reader := NeoJSONReader on: result readStream.
+	reader for: GLHDiff do: [ :mapping |
+		mapping mapInstVars:
+			#( deleted_file new_file new_path old_path renamed_file ).
+		mapping mapInstVar: #diffString to: #diff ].
+
+	reader
+		for: #ArrayOfDiffs
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHDiff ].
+	^ reader nextAs: #ArrayOfDiffs
 ]
 
 { #category : #private }
@@ -354,6 +394,18 @@ GLHModelImporter >> subGroupsOf: aGroupID [
 		parsedResult := self parseSubGroupResult: result.
 		results addAll: parsedResult ].
 	^ results
+]
+
+{ #category : #accessing }
+GLHModelImporter >> withCommitDiffs [
+
+	^ withCommitDiffs
+]
+
+{ #category : #accessing }
+GLHModelImporter >> withCommitDiffs: anObject [
+
+	withCommitDiffs := anObject
 ]
 
 { #category : #accessing }
