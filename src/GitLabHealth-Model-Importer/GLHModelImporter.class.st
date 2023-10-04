@@ -145,7 +145,11 @@ GLHModelImporter >> importCommitsOf: aGLHProject withStats: aBoolean until: toDa
 GLHModelImporter >> importDiffOfCommit: aCommit [
 
 	| result diffsResult |
-	('Import diff of commit : ' , aCommit short_id printString)
+	aCommit diffs ifNotEmpty: [
+		'Diff of already importer: '
+		, aCommit short_id printString recordInfo.
+		^ aCommit diffs ].
+	('Import diff of commit: ' , aCommit short_id printString)
 		recordInfo.
 	result := self glhApi
 		          commitDiff: aCommit id

@@ -5,13 +5,13 @@ Class {
 	#name : #GLHDiff,
 	#superclass : #GLHEntity,
 	#instVars : [
-		'#commit => FMOne type: #GLHCommit opposite: #diffs',
-		'#deleted_file => FMProperty defaultValue: false',
 		'#diffString => FMProperty',
-		'#new_file => FMProperty defaultValue: false',
 		'#new_path => FMProperty',
 		'#old_path => FMProperty',
-		'#renamed_file => FMProperty defaultValue: false'
+		'#new_file => FMProperty defaultValue: false',
+		'#renamed_file => FMProperty defaultValue: false',
+		'#deleted_file => FMProperty defaultValue: false',
+		'#commit => FMOne type: #GLHCommit opposite: #diffs'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }
