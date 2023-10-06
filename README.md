@@ -160,4 +160,4 @@ classDiagram
 
 ## Contributor
 
-This work has been first developed by the [research department of Berger-Levrault](https://research-bl.com/)
+This work has been first developed by the [research department of Berger-Levrault](https://www.research-bl.com/)
