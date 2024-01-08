@@ -1,6 +1,11 @@
 Class {
 	#name : #GLHGroupVisualization,
 	#superclass : #MiAbstractVisualization,
+	#instVars : [
+		'noPipelineColor',
+		'passingPipelineColor',
+		'failingPipelinecolor'
+	],
 	#category : #'GitLabHealth-Model-Visualization'
 }
 
@@ -64,6 +69,18 @@ GLHGroupVisualization >> createShapes: aGLHGroup [
 		  composite ]
 ]
 
+{ #category : #accessing }
+GLHGroupVisualization >> failingPipelinecolor [
+
+	^ failingPipelinecolor
+]
+
+{ #category : #accessing }
+GLHGroupVisualization >> failingPipelinecolor: anObject [
+
+	failingPipelinecolor := anObject
+]
+
 { #category : #running }
 GLHGroupVisualization >> forGroup: aGLHGroup [
 
@@ -92,4 +109,38 @@ GLHGroupVisualization >> forGroup: aGLHGroup [
 	legend build.
 
 	^ c
+]
+
+{ #category : #initialization }
+GLHGroupVisualization >> initialize [
+
+	super initialize.
+
+	noPipelineColor := Color purple.
+	passingPipelineColor := Color green.
+	failingPipelinecolor := Color red
+]
+
+{ #category : #accessing }
+GLHGroupVisualization >> noPipelineColor [
+
+	^ noPipelineColor
+]
+
+{ #category : #accessing }
+GLHGroupVisualization >> noPipelineColor: anObject [
+
+	noPipelineColor := anObject
+]
+
+{ #category : #accessing }
+GLHGroupVisualization >> passingPipelineColor [
+
+	^ passingPipelineColor
+]
+
+{ #category : #accessing }
+GLHGroupVisualization >> passingPipelineColor: anObject [
+
+	passingPipelineColor := anObject
 ]
