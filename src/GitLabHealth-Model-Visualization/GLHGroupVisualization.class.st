@@ -5,6 +5,27 @@ Class {
 }
 
 { #category : #running }
+GLHGroupVisualization >> createLegend [
+
+	| legend |
+	legend := RSLegend new.
+	legend
+		text: 'Repository with last Green Pipeline'
+		withBoxColor: Color green.
+	legend
+		text: 'Repository without Pipeline or last red Pipeline'
+		withBoxColor: Color red.
+	legend legendDo: [ :l |
+		l
+			draggable;
+			withBorder;
+			padding: 20 ].
+	legend location right middle.
+
+	^ legend
+]
+
+{ #category : #running }
 GLHGroupVisualization >> createShapes: aGLHGroup [
 
 	^ (aGLHGroup allToScope: GLHGroup) collect: [ :group |
@@ -51,6 +72,7 @@ GLHGroupVisualization >> forGroup: aGLHGroup [
 
 	shapes := self createShapes: aGLHGroup.
 	c addAll: shapes.
+
 	c @ RSCanvasController.
 	RSLineBuilder orthoHorizontal
 		markerEnd: (RSMarker new
@@ -64,21 +86,10 @@ GLHGroupVisualization >> forGroup: aGLHGroup [
 		shapes: c nodes;
 		connectFrom: #group.
 	RSHorizontalVanDerPloegTreeLayout new on: c nodes.
-	legend := RSLegend new.
-	legend
-		text: 'Repository with last Green Pipeline'
-		withBoxColor: Color green.
-	legend
-		text: 'Repository without Pipeline or last red Pipeline'
-		withBoxColor: Color red.
-	legend legendDo: [ :l |
-		l
-			draggable;
-			withBorder;
-			padding: 20 ].
-	legend location right middle.
-	legend build.
+
+	legend := self createLegend.
 	legend container: c.
+	legend build.
 
 	^ c
 ]
