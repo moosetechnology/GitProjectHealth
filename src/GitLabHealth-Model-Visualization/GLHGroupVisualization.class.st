@@ -31,42 +31,48 @@ GLHGroupVisualization >> createLegend [
 ]
 
 { #category : #running }
+GLHGroupVisualization >> createShapeFor: project [
+
+	| box |
+	box := RSBox new
+		       size: 5;
+		       model: project;
+		       yourself.
+	(project pipelines isNotEmpty and: [
+		 project pipelines last status = #success ])
+		ifTrue: [ box color: Color green ]
+		ifFalse: [ box color: Color red ].
+	^ box
+]
+
+{ #category : #running }
 GLHGroupVisualization >> createShapes: aGLHGroup [
 
-	^ (aGLHGroup allToScope: GLHGroup) collect: [ :group |
-		  | lbl projects composite |
-		  projects := group projects
-			              collect: [ :project |
-				              | box |
-				              box := RSBox new
-					                     size: 5;
-					                     model: project;
-					                     yourself.
-				              (project pipelines isNotEmpty and: [
-					               project pipelines last status = #success ])
-					              ifTrue: [ box color: Color green ]
-					              ifFalse: [ box color: Color red ].
-				              box ]
-			              as: RSGroup.
-		  projects @ (RSPopup text: #name).
-		  RSGridLayout on: projects.
-		  lbl := RSLabel new
+	^(aGLHGroup allToScope: GLHGroup) collect: [ :group || lbl projects composite |
+		projects := group projects
+			collect: [ :project | self createShapeFor: project ]
+			as: RSGroup.
+
+		projects @ (RSPopup text: #name).
+		RSGridLayout on: projects.
+		lbl := RSLabel new
 			         text: group name;
 			         color: Color white;
 			         yourself.
 
-		  RSLocation new
-			  above;
-			  move: lbl on: projects.
-		  composite := RSComposite new.
-		  composite @ RSAnimatedPopup @ RSDraggable.
+		RSLocation new
+			above;
+			move: lbl on: projects.
+		composite := RSComposite new.
+		composite @ RSAnimatedPopup @ RSDraggable.
 
-		  composite
-			  color: Color gray;
-			  model: group;
-			  shapes: projects , { lbl }.
-		  composite padding: 10.
-		  composite ]
+		composite
+			color: Color gray;
+			model: group;
+			shapes: projects , { lbl }.
+		composite padding: 10.
+		composite
+	]
 ]
 
 { #category : #accessing }
