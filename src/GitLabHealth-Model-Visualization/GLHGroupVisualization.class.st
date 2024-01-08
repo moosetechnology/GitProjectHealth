@@ -5,45 +5,51 @@ Class {
 }
 
 { #category : #running }
+GLHGroupVisualization >> createShapes: aGLHGroup [
+
+	^ (aGLHGroup allToScope: GLHGroup) collect: [ :group |
+		  | lbl projects composite |
+		  projects := group projects
+			              collect: [ :project |
+				              | box |
+				              box := RSBox new
+					                     size: 5;
+					                     model: project;
+					                     yourself.
+				              (project pipelines isNotEmpty and: [
+					               project pipelines last status = #success ])
+					              ifTrue: [ box color: Color green ]
+					              ifFalse: [ box color: Color red ].
+				              box ]
+			              as: RSGroup.
+		  projects @ (RSPopup text: #name).
+		  RSGridLayout on: projects.
+		  lbl := RSLabel new
+			         text: group name;
+			         color: Color white;
+			         yourself.
+
+		  RSLocation new
+			  above;
+			  move: lbl on: projects.
+		  composite := RSComposite new.
+		  composite @ RSAnimatedPopup @ RSDraggable.
+
+		  composite
+			  color: Color gray;
+			  model: group;
+			  shapes: projects , { lbl }.
+		  composite padding: 10.
+		  composite ]
+]
+
+{ #category : #running }
 GLHGroupVisualization >> forGroup: aGLHGroup [
 
 	| c shapes legend |
 	c := RSCanvas new.
 
-	shapes := (aGLHGroup allToScope: GLHGroup) collect: [ :group | 
-		          | lbl projects composite |
-		          projects := group projects
-			                      collect: [ :project | 
-				                      | box |
-				                      box := RSBox new
-					                             size: 5;
-					                             model: project;
-					                             yourself.
-				                      (project pipelines isNotEmpty and: [ 
-					                       project pipelines last status = #success ])
-					                      ifTrue: [ box color: Color green ]
-					                      ifFalse: [ box color: Color red ].
-				                      box ]
-			                      as: RSGroup.
-		          projects @ (RSPopup text: #name).
-		          RSGridLayout on: projects.
-		          lbl := RSLabel new
-			                 text: group name;
-			                 color: Color white;
-			                 yourself.
-
-		          RSLocation new
-			          above;
-			          move: lbl on: projects.
-		          composite := RSComposite new.
-		          composite @ RSAnimatedPopup @ RSDraggable.
-
-		          composite
-			          color: Color gray;
-			          model: group;
-			          shapes: projects , { lbl }.
-		          composite padding: 10.
-		          composite ].
+	shapes := self createShapes: aGLHGroup.
 	c addAll: shapes.
 	c @ RSCanvasController.
 	RSLineBuilder orthoHorizontal
@@ -59,20 +65,20 @@ GLHGroupVisualization >> forGroup: aGLHGroup [
 		connectFrom: #group.
 	RSHorizontalVanDerPloegTreeLayout new on: c nodes.
 	legend := RSLegend new.
-	legend container: c.
 	legend
 		text: 'Repository with last Green Pipeline'
 		withBoxColor: Color green.
 	legend
 		text: 'Repository without Pipeline or last red Pipeline'
 		withBoxColor: Color red.
-	legend legendDo: [ :l | 
+	legend legendDo: [ :l |
 		l
 			draggable;
 			withBorder;
 			padding: 20 ].
 	legend location right middle.
 	legend build.
+	legend container: c.
 
 	^ c
 ]
