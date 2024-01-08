@@ -87,9 +87,9 @@ dritGroup := (glhModel allWithType: GLHGroup) detect: [ :group | group id = 137 
 canvas := (GLHGroupVisualization new forGroup: dritGroup).
 canvas open.
 
-canvas svgCairoExporter
-  noFixedShapes;
-  fileName: 'd:/drit-health';
+canvas svgExporter
+  withoutFixedShapes;
+  fileName: 'drit-group-health';
   export.
 ```
 
