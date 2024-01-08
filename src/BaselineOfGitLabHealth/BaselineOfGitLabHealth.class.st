@@ -43,6 +43,8 @@ BaselineOfGitLabHealth >> definePackages: spec [
 		package: 'GitLabHealth-Model-Visualization';
 		package: 'GitLabHealth-Model-Importer'
 		with: [ spec requires: #( 'NeoJSON' 'MoreLogger' ) ];
+		package: 'GitHubHealth-Model-Importer'
+		with: [ spec requires: #( 'NeoJSON' 'MoreLogger' ) ];
 		package: 'GitLabHealth-Model-Importer-Tests'
 		with: [ spec requires: #( 'GitLabHealth-Model-Importer' 'GitHubHealth-Model-Importer' ) ]
 ]
