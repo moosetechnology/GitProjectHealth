@@ -38,10 +38,13 @@ GLHGroupVisualization >> createShapeFor: project [
 		       size: 5;
 		       model: project;
 		       yourself.
-	(project pipelines isNotEmpty and: [
-		 project pipelines last status = #success ])
-		ifTrue: [ box color: Color green ]
-		ifFalse: [ box color: Color red ].
+	box color: (project pipelines
+		ifEmpty: [ self noPipelineColor ]
+		ifNotEmpty: [ :pipelines |
+			(pipelines last status = #success)
+				ifTrue: [ Color green ]
+				ifFalse: [ Color red ]
+		]).
 	^ box
 ]
 
@@ -122,7 +125,7 @@ GLHGroupVisualization >> initialize [
 
 	super initialize.
 
-	noPipelineColor := Color purple.
+	noPipelineColor := Color purple lighter.
 	passingPipelineColor := Color green.
 	failingPipelinecolor := Color red
 ]
