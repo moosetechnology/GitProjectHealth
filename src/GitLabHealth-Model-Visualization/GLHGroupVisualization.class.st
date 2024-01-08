@@ -15,11 +15,15 @@ GLHGroupVisualization >> createLegend [
 	| legend |
 	legend := RSLegend new.
 	legend
-		text: 'Repository with last Green Pipeline'
-		withBoxColor: Color green.
+		text: 'Repository with last pipeline passing'
+		withBoxColor: self passingPipelineColor.
 	legend
-		text: 'Repository without Pipeline or last red Pipeline'
-		withBoxColor: Color red.
+		text: 'Repository with last Pipeline failing'
+		withBoxColor: self failingPipelinecolor.
+	legend
+		text: 'Repository without pipeline'
+		withBoxColor: self noPipelineColor.
+
 	legend legendDo: [ :l |
 		l
 			draggable;
