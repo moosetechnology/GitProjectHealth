@@ -66,11 +66,10 @@ GLHGroupVisualization >> createShapeFor: project [
 GLHGroupVisualization >> createShapes: aGLHGroup [
 
 	^(aGLHGroup allToScope: GLHGroup) collect: [ :group || lbl projects composite |
-		projects := group projects
+		projects := (group projects sorted: [:a :b | a lastPipelineDate > b lastPipelineDate])
 			collect: [ :project | self createShapeFor: project ]
 			as: RSGroup.
 
-		projects @ (RSPopup text: #name).
 		RSGridLayout on: projects.
 		lbl := RSLabel new
 			         text: group name;
