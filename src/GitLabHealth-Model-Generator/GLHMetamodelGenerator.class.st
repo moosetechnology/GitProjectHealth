@@ -124,7 +124,9 @@ GLHMetamodelGenerator >> defineProperties [
 	project property: #creator_id type: #Number.
 
 	"Pipelines properties"
-	pipeline property: #status type: #String.
+	(pipeline property: #status type: #String) comment: '#success or #failure'.
+	(pipeline property: #runDate type: #Object) comment: 'Date this pipeline was run'.
+
 	self userProperties.
 	self branchProperties.
 	self fileProperties.
