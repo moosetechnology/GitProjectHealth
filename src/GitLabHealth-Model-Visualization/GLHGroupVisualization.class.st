@@ -37,7 +37,8 @@ GLHGroupVisualization >> createLegend [
 { #category : #running }
 GLHGroupVisualization >> createShapeFor: project [
 
-	| box |
+	| box inspect |
+
 	box := RSBox new
 		       size: 5;
 		       model: project;
@@ -45,10 +46,19 @@ GLHGroupVisualization >> createShapeFor: project [
 	box color: (project pipelines
 		ifEmpty: [ self noPipelineColor ]
 		ifNotEmpty: [ :pipelines |
-			(pipelines last status = #success)
+			((pipelines asOrderedCollection sort: [ :a :b | a runDate > b runDate]) first status = #success)
 				ifTrue: [ Color green ]
 				ifFalse: [ Color red ]
 		]).
+
+	inspect := RSInspectableInteraction new.
+	inspect inspectShapeBlock: [ :proj |
+		proj inspect.
+		"block must return a Window :-("
+		SystemWindow  new
+	].
+	box @ inspect.
+
 	^ box
 ]
 
