@@ -43,10 +43,10 @@ GLHGroupVisualization >> createShapeFor: project [
 		       size: 5;
 		       model: project;
 		       yourself.
-	box color: (project pipelines
-		ifEmpty: [ self noPipelineColor ]
-		ifNotEmpty: [ :pipelines |
-			((pipelines asOrderedCollection sort: [ :a :b | a runDate > b runDate]) first status = #success)
+	box color: (project lastPipeline
+		ifNil: [ self noPipelineColor ]
+		ifNotNil: [ :lastPipeline |
+			(lastPipeline status = #success)
 				ifTrue: [ Color green ]
 				ifFalse: [ Color red ]
 		]).
@@ -58,6 +58,13 @@ GLHGroupVisualization >> createShapeFor: project [
 		SystemWindow  new
 	].
 	box @ inspect.
+
+	box @ (RSPopup text: [ :proj |
+		String streamContents: [ :st | 
+			st << proj name ;  cr ; << 'on: '.
+			BasicDatePrinter default printYMD: proj lastPipelineDate withLeadingSpace: false on: st.
+			st space.
+			BasicDatePrinter default printHMS: proj lastPipelineDate separatedBy: $: on: st ] ]).
 
 	^ box
 ]
