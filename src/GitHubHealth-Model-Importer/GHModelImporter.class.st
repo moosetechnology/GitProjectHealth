@@ -237,7 +237,11 @@ GHModelImporter >> parsePipelinesResult: pipelineOverview [
 		customMappting listOfElementSchema: GLHPipeline ].
 	reader
 		for: GLHPipeline
-		do: [ :mapping | mapping mapInstVar: #status to: #conclusion ].
+		do: [ :mapping |
+			mapping
+				mapInstVar: #status to: #conclusion ;
+				mapProperty: #run_started_at getter: [ :object | #ignore ] setter: [ :object : value | object runDate: (DateAndTime fromString: value) ]
+		].
 	^ reader nextAs: GHAPIPipelineOverview
 ]
 

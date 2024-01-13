@@ -37,18 +37,35 @@ GLHGroupVisualization >> createLegend [
 { #category : #running }
 GLHGroupVisualization >> createShapeFor: project [
 
-	| box |
+	| box inspect |
+
 	box := RSBox new
 		       size: 5;
 		       model: project;
 		       yourself.
-	box color: (project pipelines
-		ifEmpty: [ self noPipelineColor ]
-		ifNotEmpty: [ :pipelines |
-			(pipelines last status = #success)
+	box color: (project lastPipeline
+		ifNil: [ self noPipelineColor ]
+		ifNotNil: [ :lastPipeline |
+			(lastPipeline status = #success)
 				ifTrue: [ Color green ]
 				ifFalse: [ Color red ]
 		]).
+
+	inspect := RSInspectableInteraction new.
+	inspect inspectShapeBlock: [ :proj |
+		proj inspect.
+		"block must return a Window :-("
+		SystemWindow  new
+	].
+	box @ inspect.
+
+	box @ (RSPopup text: [ :proj |
+		String streamContents: [ :st | 
+			st << proj name ;  cr ; << 'on: '.
+			BasicDatePrinter default printYMD: proj lastPipelineDate withLeadingSpace: false on: st.
+			st space.
+			BasicDatePrinter default printHMS: proj lastPipelineDate separatedBy: $: on: st ] ]).
+
 	^ box
 ]
 
@@ -56,11 +73,10 @@ GLHGroupVisualization >> createShapeFor: project [
 GLHGroupVisualization >> createShapes: aGLHGroup [
 
 	^(aGLHGroup allToScope: GLHGroup) collect: [ :group || lbl projects composite |
-		projects := group projects
+		projects := (group projects sorted: [:a :b | a lastPipelineDate > b lastPipelineDate])
 			collect: [ :project | self createShapeFor: project ]
 			as: RSGroup.
 
-		projects @ (RSPopup text: #name).
 		RSGridLayout on: projects.
 		lbl := RSLabel new
 			         text: group name;
