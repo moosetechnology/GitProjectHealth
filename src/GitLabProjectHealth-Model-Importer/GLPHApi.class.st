@@ -4,6 +4,14 @@ Class {
 	#category : #'GitLabProjectHealth-Model-Importer'
 }
 
+{ #category : #'as yet unclassified' }
+GLPHApi >> diffsMergeRequestOfProject: aProjectID withId: anMRiid [
+
+	^ self client get:
+		  self baseAPIUrl , '/projects/' , aProjectID printString
+		  , '/merge_requests/' , anMRiid printString , '/diffs/'
+]
+
 { #category : #initialization }
 GLPHApi >> initialize [
 
@@ -18,14 +26,17 @@ GLPHApi >> mergeRequestOfProject: aProjectID [
 		  , '/merge_requests/'
 ]
 
-{ #category : #accessing }
-GLPHApi >> privateToken [
+{ #category : #'as yet unclassified' }
+GLPHApi >> mergeRequestOfProject: aProjectID withId: anMRiid [
 
-	^ self client request headers at: #'PRIVATE-TOKEN'
+	^ self client get:
+		  self baseAPIUrl , '/projects/' , aProjectID printString
+		  , '/merge_requests/' , anMRiid printString
 ]
 
 { #category : #accessing }
-GLPHApi >> privateToken: anObject [
+GLPHApi >> project: aProjectID [
 
-	self client headerAt: #'PRIVATE-TOKEN' add: anObject
+	^ self client get:
+		  self baseAPIUrl , '/projects/' , aProjectID printString
 ]
