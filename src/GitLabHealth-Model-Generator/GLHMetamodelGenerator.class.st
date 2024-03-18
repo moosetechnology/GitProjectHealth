@@ -145,8 +145,7 @@ GLHMetamodelGenerator >> defineRelations [
 	(project property: #repository) <>- (repository property: #project).
 	(repository property: #branches) <>-* (branch property: #repository).
 	(branch property: #files) <>-* (file property: #branch).
-	(fileDirectory property: #files)
-	<>-* (file property: #directoryOwner).
+	(fileDirectory property: #files) <>-* (file property: #directoryOwner).
 	(repository property: #commits) <>-* (commit property: #repository).
 	(branch property: #commits) <>-* (commit property: #branch).
 	(commit property: #diffs) <>-* (diff property: #commit)
@@ -157,15 +156,20 @@ GLHMetamodelGenerator >> diffProperties [
 
 	(diff property: #diffString type: #String) comment:
 		'The string presenting the diff. It should follow the [Detailed-Unified](https://www.gnu.org/software/diffutils/manual/html_node/Detailed-Unified.html) format'.
+		
 	(diff property: #new_path type: #String) comment:
 		'The path to the file in the resulted repository commitish'.
+		
 	(diff property: #old_path type: #String) comment:
 		'The path to the file in the origin repository commitish'.
+		
 	(diff property: #new_file type: #Boolean defaultValue: false)
 		comment: 'Is the file of the diff is a new file'.
+		
 	(diff property: #renamed_file type: #Boolean defaultValue: false)
 		comment:
 		'Is the file of the diff has been renamed (see old_path/new_path) file'.
+		
 	(diff property: #deleted_file type: #Boolean defaultValue: false)
 		comment: 'Is the file of the diff has been removed'
 ]
