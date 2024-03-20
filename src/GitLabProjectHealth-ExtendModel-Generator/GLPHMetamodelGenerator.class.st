@@ -11,7 +11,8 @@ Class {
 		'diff',
 		'user',
 		'pipeline',
-		'commit'
+		'commit',
+		'project'
 	],
 	#category : #'GitLabProjectHealth-ExtendModel-Generator'
 }
@@ -76,7 +77,8 @@ GLPHMetamodelGenerator >> defineClasses [
 	diff := self remoteEntity: #Diff withPrefix: #GLH.
 	user := self remoteEntity: #User withPrefix: #GLH.
 	pipeline := self remoteEntity: #Pipeline withPrefix: #GLH.
-	commit := self remoteEntity: #Commit withPrefix: #GLH
+	commit := self remoteEntity: #Commit withPrefix: #GLH.
+	project := self remoteEntity: #Project withPrefix: #GLH
 ]
 
 { #category : #definition }
@@ -106,7 +108,7 @@ GLPHMetamodelGenerator >> defineRelations [
 	"MERGE REQUEST RELATIONS"
 	(mergeRequest property: #author)
 	*- (user property: #createdMergeRequests).
-	
+
 	(mergeRequest property: #merge_user) *- (user property: #usedMerges).
 
 	(mergeRequest property: #closed_by)
@@ -135,6 +137,8 @@ GLPHMetamodelGenerator >> defineRelations [
 
 	(mergeRequest property: #diff) - (diff property: #mergeRequest).
 
+	(project property: #mergeRequests) <>-*(mergeRequest property: #project).
+	
 	"DIFF"
 	(diff property: #changes) <>-* (change property: #diff)
 ]

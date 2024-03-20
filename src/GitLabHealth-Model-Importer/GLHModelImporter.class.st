@@ -206,12 +206,13 @@ GLHModelImporter >> importGroup: aGroupID [
 
 	| result groupResult |
 	('Import group: ' , aGroupID printString) recordInfo.
+
 	result := self glhApi group: aGroupID.
 	groupResult := self parseGroupResult: result.
-	groupResult projects do: [ :project | 
+	groupResult projects do: [ :project |
 		self completeImportProject: project ].
 	self addGroupResultToModel: groupResult.
-	(self subGroupsOf: aGroupID) do: [ :subGroup | 
+	(self subGroupsOf: aGroupID) do: [ :subGroup |
 		groupResult addSubGroup: (self importGroup: subGroup id) ].
 	^ groupResult
 ]
@@ -326,14 +327,15 @@ GLHModelImporter >> parseFileTreeResult: aResult [
 GLHModelImporter >> parseGroupResult: aResult [
 
 	| reader |
+
 	reader := NeoJSONReader on: aResult readStream.
-	reader for: GLHGroup do: [ :mapping | 
+	reader for: GLHGroup do: [ :mapping |
 		mapping mapInstVars.
 		(mapping mapInstVar: #projects) valueSchema: #ArrayOfProjects ].
 	reader mapInstVarsFor: GLHProject.
 	reader
 		for: #ArrayOfProjects
-		customDo: [ :customMappting | 
+		customDo: [ :customMappting |
 		customMappting listOfElementSchema: GLHProject ].
 	^ reader nextAs: GLHGroup
 ]

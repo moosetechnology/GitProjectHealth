@@ -4,6 +4,11 @@ a gitlab merge request
 ## Relations
 ======================
 
+### Parents
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `project` | `GLPHEMergeRequest` | `mergeRequests` | `GLHProject` | |
+
 ### Other
 | Relation | Origin | Opposite | Type | Comment |
 |---|
@@ -628,6 +633,30 @@ GLPHEMergeRequest >> pipeline: anObject [
 	ifNotNil: [ 
 		self attributeAt: #pipeline put: anObject.
 		anObject mergeResquest: self ]
+]
+
+{ #category : #accessing }
+GLPHEMergeRequest >> project [
+	"Relation named: #project type: #GLHProject opposite: #mergeRequests"
+
+	<generated>
+	<container>
+	<FMProperty: #project type: #GLHProject opposite: #mergeRequests>
+	^ self attributeAt: #project ifAbsent: [ nil ]
+]
+
+{ #category : #accessing }
+GLPHEMergeRequest >> project: anObject [
+
+	<generated>
+	self attributeAt: #project put: (FMMultivalueLink on: self update: #mergeRequests from: self project to: anObject).
+]
+
+{ #category : #navigation }
+GLPHEMergeRequest >> projectGroup [
+	<generated>
+	<navigation: 'Project'>
+	^ MooseSpecializedGroup with: self project
 ]
 
 { #category : #accessing }
