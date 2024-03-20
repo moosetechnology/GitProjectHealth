@@ -17,7 +17,7 @@ GLPHModelImporter >> importMergeRequests: aGLHProject [
 	| results parsedResults |
 	results := self glhApi mergeRequestOfProject: aGLHProject id .
 	parsedResults := self parseMergeRequestResult: results.
-	1 halt.
+
 	aGLHProject mergeRequests addAll: parsedResults.
 	
 	self withCommitDiffs ifTrue: [
