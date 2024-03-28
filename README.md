@@ -22,7 +22,7 @@ Metacello new
 
 ### Import
 
-#### Group import
+#### Group import: GitLab
 
 In a playground (`Ctrl+O`, `Ctrl+W`).
 
@@ -41,37 +41,9 @@ glhImporter := GLHModelImporter new
 
 "137 is the ID of the a Group, you can find the number in the webpage of every project and group"
 glhImporter importGroup: 137.
-
 ```
 
-#### More commits extracted
-
-> GitLab API only
-
-You might want to gather more commits for a specific repository.
-To do so, we added the following API
-
-```st
-myProject := ((glhModel allWithType: GLHProject) select: [ :project | project name = '<my projectName>' ]) anyOne.
-
-glhImporter importCommitsOf: myProject withStats: true until: '2023-01-01' asDate.
-```
-
-### Export
-
-To export a svg image
-
-```st
-dritGroup := (glhModel allWithType: GLHGroup) detect: [ :group | group id = 137 ].
-canvas := (GLHGroupVisualization new forGroup: dritGroup).
-canvas open
-canvas svgCairoExporter
-  noFixedShapes;
-  fileName: 'd:/drit-health';
-  export
-```
-
-## Usages GitHub
+#### Group import: GitHub
 
 In a playground (`Ctrl+O`, `Ctrl+W`).
 
@@ -81,6 +53,44 @@ glhModel := GLHModel new.
 githubImporter := GHModelImporter new glhModel: glhModel; privateToken: '<my private token>'; yourself.
 
 githubImporter importGroup: 'moosetechnology'.
+```
+
+#### More commits extracted
+
+> GitLab API only
+
+You might want to gather more commits for a specific repository.
+To do so in GitLab, we added the following API
+
+```st
+myProject := ((glhModel allWithType: GLHProject) select: [ :project | project name = '<my projectName>' ]) anyOne.
+
+glhImporter importCommitsOf: myProject withStats: true until: '2023-01-01' asDate.
+```
+
+### Visualize
+
+To visualize the group "health"
+
+```st
+dritGroup := (glhModel allWithType: GLHGroup) detect: [ :group | group id = 137 ].
+canvas := (GLHGroupVisualization new forGroup: dritGroup).
+canvas open.
+```
+
+### Export
+
+To export the visualization as a svg image
+
+```st
+dritGroup := (glhModel allWithType: GLHGroup) detect: [ :group | group id = 137 ].
+canvas := (GLHGroupVisualization new forGroup: dritGroup).
+canvas open.
+
+canvas svgExporter
+  withoutFixedShapes;
+  fileName: 'drit-group-health';
+  export.
 ```
 
 ## Metamodel

@@ -6,6 +6,7 @@ Class {
 	#superclass : #GLHEntity,
 	#instVars : [
 		'#status => FMProperty',
+		'#runDate => FMProperty',
 		'#project => FMOne type: #GLHProject opposite: #pipelines'
 	],
 	#category : #'GitLabHealth-Model-Entities'
@@ -44,10 +45,26 @@ GLHPipeline >> projectGroup [
 ]
 
 { #category : #accessing }
+GLHPipeline >> runDate [
+
+	<FMProperty: #runDate type: #Object>
+	<generated>
+	<FMComment: 'Date this pipeline was run'>
+	^ runDate
+]
+
+{ #category : #accessing }
+GLHPipeline >> runDate: anObject [
+	<generated>
+	runDate := anObject
+]
+
+{ #category : #accessing }
 GLHPipeline >> status [
 
 	<FMProperty: #status type: #String>
 	<generated>
+	<FMComment: '#success or #failure'>
 	^ status
 ]
 
