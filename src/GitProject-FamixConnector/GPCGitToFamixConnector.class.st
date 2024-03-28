@@ -41,7 +41,7 @@ GPCGitToFamixConnector >> connectCommit: commit [
 GPCGitToFamixConnector >> connectDiff: diff [
 	"I connect a glhDiff with the famix model"
 
-	(famixModel allUsing: FamixTClass)
+	((famixModel allUsing: FamixTClass) reject: #isAnonymousClass)
 	, (famixModel allUsing: FamixTEnum)
 	, (famixModel allWithType: FamixJavaInterface)
 		detect: [ :class |
