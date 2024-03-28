@@ -51,3 +51,45 @@ GPCGitToFamixConnectorTest >> testConnectDiffToJavaClass [
 	self assert: diff onSourceEntity  equals: javaClass.
 	self assert: javaClass appliedDiffs anyOne equals: diff
 ]
+
+{ #category : #tests }
+GPCGitToFamixConnectorTest >> testConnectDiffToJavaEnum [
+
+	| pathUnderTests commit |
+	pathUnderTests := 'a/b/c.java'.
+
+	commit := gitModel newCommit.
+	commit repository: gitRepository.
+	diff := gitModel newDiff.
+	diff new_path: pathUnderTests.
+	commit diffs add: diff.
+
+	javaClass := famixModel newEnum.
+	javaIndexedFileAnchor := famixModel newIndexedFileAnchor.
+	javaIndexedFileAnchor fileName: '../../dede/../' , pathUnderTests.
+	javaClass sourceAnchor: javaIndexedFileAnchor.
+	connector connect.
+	self assert: diff onSourceEntity  equals: javaClass.
+	self assert: javaClass appliedDiffs anyOne equals: diff
+]
+
+{ #category : #tests }
+GPCGitToFamixConnectorTest >> testConnectDiffToJavaInterface [
+
+	| pathUnderTests commit |
+	pathUnderTests := 'a/b/c.java'.
+
+	commit := gitModel newCommit.
+	commit repository: gitRepository.
+	diff := gitModel newDiff.
+	diff new_path: pathUnderTests.
+	commit diffs add: diff.
+
+	javaClass := famixModel newInterface.
+	javaIndexedFileAnchor := famixModel newIndexedFileAnchor.
+	javaIndexedFileAnchor fileName: '../../dede/../' , pathUnderTests.
+	javaClass sourceAnchor: javaIndexedFileAnchor.
+	connector connect.
+	self assert: diff onSourceEntity  equals: javaClass.
+	self assert: javaClass appliedDiffs anyOne equals: diff
+]

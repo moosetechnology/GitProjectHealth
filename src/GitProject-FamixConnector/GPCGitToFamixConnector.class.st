@@ -41,7 +41,7 @@ GPCGitToFamixConnector >> connectCommit: commit [
 GPCGitToFamixConnector >> connectDiff: diff [
 	"I connect a glhDiff with the famix model"
 
-	famixModel allModelClasses
+	(famixModel allUsing: FamixTSourceEntity)
 		detect: [ :class |
 		class sourceAnchor fileName endsWith: diff new_path ]
 		ifFound: [ :class | class appliedDiffs add: diff ]
@@ -75,6 +75,6 @@ GPCGitToFamixConnector >> glhProject: anObject [
 GPCGitToFamixConnector >> resetConnection [
 	"I connect a glhDiff with the famix model"
 
-	famixModel allModelClasses do: [ :class |
+	(famixModel allUsing: FamixTSourceEntity) do: [ :class |
 		class appliedDiffs removeAll ]
 ]
