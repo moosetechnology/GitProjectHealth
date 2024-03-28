@@ -1,19 +1,19 @@
 Extension { #name : #GLHDiff }
 
 { #category : #'*GitProject-FamixConnector-Model-accessing' }
-GLHDiff >> onSourceEntities [
-	"Relation named: #onSourceEntities type: #FamixTSourceEntity opposite: #appliedDiffs"
+GLHDiff >> onSourceEntity [
+	"Relation named: #onSourceEntity type: #FamixTSourceEntity opposite: #appliedDiffs"
 
 	<generated>
 	<container>
-	<FMProperty: #onSourceEntities type: #FamixTSourceEntity opposite: #appliedDiffs>
+	<FMProperty: #onSourceEntity type: #FamixTSourceEntity opposite: #appliedDiffs>
 	<package: #'GitProject-FamixConnector-Model'>
-	^ self attributeAt: #onSourceEntities ifAbsent: [ nil ]
+	^ self attributeAt: #onSourceEntity ifAbsent: [ nil ]
 ]
 
 { #category : #'*GitProject-FamixConnector-Model-accessing' }
-GLHDiff >> onSourceEntities: anObject [
+GLHDiff >> onSourceEntity: anObject [
 
 	<generated>
-	self attributeAt: #onSourceEntities put: (FMMultivalueLink on: self update: #appliedDiffs from: self onSourceEntities to: anObject).
+	self attributeAt: #onSourceEntity put: (FMMultivalueLink on: self update: #appliedDiffs from: self onSourceEntity to: anObject).
 ]

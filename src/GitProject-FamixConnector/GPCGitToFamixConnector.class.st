@@ -41,7 +41,10 @@ GPCGitToFamixConnector >> connectCommit: commit [
 GPCGitToFamixConnector >> connectDiff: diff [
 	"I connect a glhDiff with the famix model"
 
-	self halt
+	famixModel allModelClasses
+		detect: [ :class |
+		class sourceAnchor fileName endsWith: diff new_path ]
+		ifFound: [ :class | class appliedDiffs add: diff ]
 ]
 
 { #category : #accessing }
@@ -66,4 +69,12 @@ GPCGitToFamixConnector >> glhProject [
 GPCGitToFamixConnector >> glhProject: anObject [
 
 	glhProject := anObject
+]
+
+{ #category : #accessing }
+GPCGitToFamixConnector >> resetConnection [
+	"I connect a glhDiff with the famix model"
+
+	famixModel allModelClasses do: [ :class |
+		class appliedDiffs removeAll ]
 ]

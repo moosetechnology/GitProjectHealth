@@ -43,6 +43,6 @@ GPCMetamodelGenerator >> defineClasses [
 GPCMetamodelGenerator >> defineRelations [
 
 	super defineRelations.
-	(glhDiff property: #onSourceEntities)
+	(glhDiff property: #onSourceEntity)
 	*-<> (tSourceEntity property: #appliedDiffs)
 ]
