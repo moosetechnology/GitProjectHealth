@@ -41,7 +41,9 @@ GPCGitToFamixConnector >> connectCommit: commit [
 GPCGitToFamixConnector >> connectDiff: diff [
 	"I connect a glhDiff with the famix model"
 
-	(famixModel allUsing: FamixTSourceEntity)
+	(famixModel allUsing: FamixTClass)
+	, (famixModel allUsing: FamixTEnum)
+	, (famixModel allWithType: FamixJavaInterface)
 		detect: [ :class |
 		class sourceAnchor fileName endsWith: diff new_path ]
 		ifFound: [ :class | class appliedDiffs add: diff ]
