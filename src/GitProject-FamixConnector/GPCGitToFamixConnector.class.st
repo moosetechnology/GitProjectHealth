@@ -41,9 +41,10 @@ GPCGitToFamixConnector >> connectCommit: commit [
 GPCGitToFamixConnector >> connectDiff: diff [
 	"I connect a glhDiff with the famix model"
 
-	((famixModel allUsing: FamixTClass) reject: #isAnonymousClass)
-	, (famixModel allUsing: FamixTEnum)
-	, (famixModel allWithType: FamixJavaInterface)
+	(((famixModel allUsing: FamixTClass) reject: #isAnonymousClass)
+	 , (famixModel allUsing: FamixTEnum)
+	 , (famixModel allWithType: FamixJavaInterface) reject: [ :type |
+		 type sourceAnchor isNil ])
 		detect: [ :class |
 		class sourceAnchor fileName endsWith: diff new_path ]
 		ifFound: [ :class | class appliedDiffs add: diff ]
@@ -78,5 +79,6 @@ GPCGitToFamixConnector >> resetConnection [
 	"I connect a glhDiff with the famix model"
 
 	(famixModel allUsing: FamixTSourceEntity) do: [ :class |
-		class appliedDiffs removeAll ]
+		class appliedDiffs removeAll.
+		class removeAttribute: #appliedDiffs ]
 ]
