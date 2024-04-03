@@ -16,7 +16,7 @@ a gitlab merge request
 | `assignees` | `GLPHEMergeRequest` | `assignedMergeRequests` | `GLHUser` | |
 | `author` | `GLPHEMergeRequest` | `createdMergeRequests` | `GLHUser` | |
 | `closed_by` | `GLPHEMergeRequest` | `closedMergeRequests` | `GLHUser` | |
-| `diff` | `GLPHEMergeRequest` | `mergeRequest` | `GLHDiff` | |
+| `diffs` | `GLPHEMergeRequest` | `mergeRequest` | `GLHDiff` | |
 | `mergeCommit` | `GLPHEMergeRequest` | `commitedMergeRequest` | `GLHCommit` | |
 | `merge_user` | `GLPHEMergeRequest` | `usedMerges` | `GLHUser` | |
 | `merged_by` | `GLPHEMergeRequest` | `mergerOfMergeRequests` | `GLHUser` | |
@@ -153,6 +153,12 @@ GLPHEMergeRequest class >> annotation [
 GLPHEMergeRequest >> addAssignee: anObject [
 	<generated>
 	^ self assignees add: anObject
+]
+
+{ #category : #adding }
+GLPHEMergeRequest >> addDiff: anObject [
+	<generated>
+	^ self diffs add: anObject
 ]
 
 { #category : #adding }
@@ -311,26 +317,20 @@ GLPHEMergeRequest >> detailed_merge_status: anObject [
 ]
 
 { #category : #accessing }
-GLPHEMergeRequest >> diff [
-	"Relation named: #diff type: #GLHDiff opposite: #mergeRequest"
+GLPHEMergeRequest >> diffs [
+	"Relation named: #diffs type: #GLHDiff opposite: #mergeRequest"
 
 	<generated>
-	<FMProperty: #diff type: #GLHDiff opposite: #mergeRequest>
-	^ self attributeAt: #diff ifAbsent: [ nil ]
+	<derived>
+	<FMProperty: #diffs type: #GLHDiff opposite: #mergeRequest>
+	^ self attributeAt: #diffs ifAbsentPut: [ FMMultivalueLink on: self opposite: #mergeRequest: ]
 ]
 
 { #category : #accessing }
-GLPHEMergeRequest >> diff: anObject [
+GLPHEMergeRequest >> diffs: anObject [
 
 	<generated>
-	(self attributeAt: #diff ifAbsentPut: [nil]) == anObject ifTrue: [ ^ anObject ].
-	anObject ifNil: [ | otherSide |
-		otherSide :=  self diff.
-		self attributeAt: #diff put: anObject.
-		otherSide mergeRequest: nil ]
-	ifNotNil: [ 
-		self attributeAt: #diff put: anObject.
-		anObject mergeRequest: self ]
+	self diffs value: anObject
 ]
 
 { #category : #accessing }

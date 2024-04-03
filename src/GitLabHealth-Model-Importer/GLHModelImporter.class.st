@@ -36,6 +36,7 @@ GLHModelImporter >> completeImportProject: aGLHProject [
 		aGLHProject addPipeline: pipeline ].
 	aGLHProject creator: (self importUser: aGLHProject creator_id).
 	aGLHProject repository: GLHRepository new.
+	self glhModel add: aGLHProject .
 	self glhModel add: aGLHProject repository.
 	self importRepository: aGLHProject repository.
 	self importCommits: aGLHProject
@@ -146,11 +147,10 @@ GLHModelImporter >> importDiffOfCommit: aCommit [
 
 	| result diffsResult |
 	aCommit diffs ifNotEmpty: [
-		'Diff of already importer: '
+		'Diff already importer: '
 		, aCommit short_id printString recordInfo.
 		^ aCommit diffs ].
-	('Import diff of commit: ' , aCommit short_id printString)
-		recordInfo.
+	('Import diff of commit: ' , aCommit short_id printString) recordInfo.
 	result := self glhApi
 		          commitDiff: aCommit id
 		          ofProject: aCommit repository project id

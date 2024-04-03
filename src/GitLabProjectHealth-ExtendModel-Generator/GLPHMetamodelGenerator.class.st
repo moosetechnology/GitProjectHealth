@@ -135,10 +135,11 @@ GLPHMetamodelGenerator >> defineRelations [
 	(mergeRequest property: #squashCommit)
 	- (commit property: #squashedMergeRequest).
 
-	(mergeRequest property: #diff) - (diff property: #mergeRequest).
+	(mergeRequest property: #diffs) -* (diff property: #mergeRequest).
 
-	(project property: #mergeRequests) <>-*(mergeRequest property: #project).
-	
+	(project property: #mergeRequests)
+	<>-* (mergeRequest property: #project).
+
 	"DIFF"
 	(diff property: #changes) <>-* (change property: #diff)
 ]

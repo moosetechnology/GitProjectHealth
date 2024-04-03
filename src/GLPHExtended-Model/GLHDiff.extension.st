@@ -56,11 +56,10 @@ GLHDiff >> deletion: anObject [
 
 { #category : #'*GLPHExtended-Model-accessing' }
 GLHDiff >> mergeRequest [
-	"Relation named: #mergeRequest type: #GLPHEMergeRequest opposite: #diff"
+	"Relation named: #mergeRequest type: #GLPHEMergeRequest opposite: #diffs"
 
 	<generated>
-	<derived>
-	<FMProperty: #mergeRequest type: #GLPHEMergeRequest opposite: #diff>
+	<FMProperty: #mergeRequest type: #GLPHEMergeRequest opposite: #diffs>
 	<package: #'GLPHExtended-Model'>
 	^ self attributeAt: #mergeRequest ifAbsent: [ nil ]
 ]
@@ -69,12 +68,5 @@ GLHDiff >> mergeRequest [
 GLHDiff >> mergeRequest: anObject [
 
 	<generated>
-	(self attributeAt: #mergeRequest ifAbsentPut: [nil]) == anObject ifTrue: [ ^ anObject ].
-	anObject ifNil: [ | otherSide |
-		otherSide :=  self mergeRequest.
-		self attributeAt: #mergeRequest put: anObject.
-		otherSide diff: nil ]
-	ifNotNil: [ 
-		self attributeAt: #mergeRequest put: anObject.
-		anObject diff: self ]
+	self attributeAt: #mergeRequest put: (FMMultivalueLink on: self update: #diffs from: self mergeRequest to: anObject).
 ]

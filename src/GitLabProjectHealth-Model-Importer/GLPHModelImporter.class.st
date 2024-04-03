@@ -8,21 +8,62 @@ Class {
 GLPHModelImporter >> completeImportProject: aGLHProject [
 
 	super completeImportProject: aGLHProject.
+	
 	self importMergeRequests: aGLHProject
+	
+]
+
+{ #category : #import }
+GLPHModelImporter >> importChangesForDiff: aGLHDiff [ 
+	|result|
+	('Import changes of diff ' , aGLHDiff printString) recordInfo.
+	result := self parseDiffString: aGLHDiff. 
+	result do: [ :change |
+		aGLHDiff changes add: change ].
+	aGLHDiff mooseModel addAll: aGLHDiff changes.
+
+	^ aGLHDiff changes.
+
+]
+
+{ #category : #'as yet unclassified' }
+GLPHModelImporter >> importDiffOfMergeRequest: aMergeRequest [
+
+	| result diffsResult |
+	
+	aMergeRequest diffs ifNotEmpty: [
+		'Diff of already importer: '
+		, aMergeRequest iid printString recordInfo.
+		^ aMergeRequest diffs ].
+	('Import diff of mergeRequest ' , aMergeRequest iid printString) recordInfo.
+	result := self glhApi
+		          diffsMergeRequestOfProject: (aMergeRequest project_id)
+		          withId: aMergeRequest iid.
+	
+	diffsResult := self parseDiffResult: result.
+	aMergeRequest diffs addAll: diffsResult.
+	aMergeRequest mooseModel addAll: aMergeRequest diffs.
+	
+	aMergeRequest diffs do: [ :diff |
+		self importChangesForDiff: diff.
+		 ].
+	
+	^ diffsResult
 ]
 
 { #category : #import }
 GLPHModelImporter >> importMergeRequests: aGLHProject [
 
 	| results parsedResults |
-	results := self glhApi mergeRequestOfProject: aGLHProject id .
+	results := self glhApi mergeRequestOfProject: aGLHProject id.
 	parsedResults := self parseMergeRequestResult: results.
 
 	aGLHProject mergeRequests addAll: parsedResults.
-	
+	aGLHProject mooseModel addAll: aGLHProject mergeRequests.
+
 	self withCommitDiffs ifTrue: [
-		aGLHProject repository commits do: [ :commit |
-			self importDiffOfCommit: commit ] ]
+		aGLHProject mergeRequests do: [ :mr |
+			self importDiffOfMergeRequest: mr ] ]
 ]
 
 { #category : #'as yet unclassified' }
@@ -34,6 +75,36 @@ GLPHModelImporter >> initialize [
 
 	super initialize.
 	withCommitDiffs := true
+]
+
+{ #category : #parsing }
+GLPHModelImporter >> parseDiffString: aDiff [
+
+	| lines ranges changes lineRangesInfo addedLines deletedLines |
+	lines := aDiff diffString lines.
+	ranges := lines select: [ :line | line beginsWith: #'@@' ].
+
+	changes := (lines collect: [ :line |
+		            | aChange range |
+		            aChange := nil.
+
+		            (line beginsWith: #'@@')
+			            ifTrue: [ lineRangesInfo := line splitOn: ' ' ]
+			            ifFalse: [
+				            (line trim beginsWith: #+) ifTrue: [
+					            aChange := GLPHEAddition new.
+					            aChange linesOfCode: line.
+					            aChange originalLineRange: (lineRangesInfo at: 2).
+					            aChange newLineRange: (lineRangesInfo at: 3) ].
+				            (line trim beginsWith: #-) ifTrue: [
+					            aChange := GLPHEDeletion new.
+					            aChange linesOfCode: line.
+					            aChange originalLineRange: (lineRangesInfo at: 2).
+					            aChange newLineRange: (lineRangesInfo at: 3) ] ].
+
+		            aChange ]) reject: #isNil.
+1 halt.
+	^ changes
 ]
 
 { #category : #parsing }
