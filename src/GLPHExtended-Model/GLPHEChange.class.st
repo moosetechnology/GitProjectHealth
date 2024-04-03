@@ -4,10 +4,10 @@ super class for addition and deletion
 ## Relations
 ======================
 
-### Parents
+### Other
 | Relation | Origin | Opposite | Type | Comment |
 |---|
-| `diff` | `GLPHEChange` | `changes` | `GLHDiff` | |
+| `diffRange` | `GLPHEChange` | `changes` | `GLPHEDiffRange` | |
 
 
 ## Properties
@@ -15,18 +15,19 @@ super class for addition and deletion
 
 | Name | Type | Default value | Comment |
 |---|
-| `linesOfCode` | `String` | nil | |
-| `newLineRange` | `String` | nil | |
-| `originalLineRange` | `String` | nil | |
+| `index` | `Number` | nil | |
+| `relativeIndex` | `Number` | nil | |
+| `sourceCode` | `String` | nil | |
 
 "
 Class {
 	#name : #GLPHEChange,
 	#superclass : #GLPHEEntity,
 	#instVars : [
-		'#linesOfCode => FMProperty',
-		'#newLineRange => FMProperty',
-		'#originalLineRange => FMProperty'
+		'#diffRange => FMOne type: #GLPHEDiffRange opposite: #changes',
+		'#index => FMProperty',
+		'#relativeIndex => FMProperty',
+		'#sourceCode => FMProperty'
 	],
 	#category : #'GLPHExtended-Model-Entities'
 }
@@ -41,67 +42,58 @@ GLPHEChange class >> annotation [
 ]
 
 { #category : #accessing }
-GLPHEChange >> diff [
-	"Relation named: #diff type: #GLHDiff opposite: #changes"
+GLPHEChange >> diffRange [
+	"Relation named: #diffRange type: #GLPHEDiffRange opposite: #changes"
 
 	<generated>
-	<container>
-	<FMProperty: #diff type: #GLHDiff opposite: #changes>
-	^ self attributeAt: #diff ifAbsent: [ nil ]
+	^ diffRange
 ]
 
 { #category : #accessing }
-GLPHEChange >> diff: anObject [
+GLPHEChange >> diffRange: anObject [
 
 	<generated>
-	self attributeAt: #diff put: (FMMultivalueLink on: self update: #changes from: self diff to: anObject).
-]
-
-{ #category : #navigation }
-GLPHEChange >> diffGroup [
-	<generated>
-	<navigation: 'Diff'>
-	^ MooseSpecializedGroup with: self diff
+	diffRange := anObject
 ]
 
 { #category : #accessing }
-GLPHEChange >> linesOfCode [
+GLPHEChange >> index [
 
-	<FMProperty: #linesOfCode type: #String>
+	<FMProperty: #index type: #Number>
 	<generated>
-	^ linesOfCode
+	^ index
 ]
 
 { #category : #accessing }
-GLPHEChange >> linesOfCode: anObject [
+GLPHEChange >> index: anObject [
 	<generated>
-	linesOfCode := anObject
+	index := anObject
 ]
 
 { #category : #accessing }
-GLPHEChange >> newLineRange [
+GLPHEChange >> relativeIndex [
 
-	<FMProperty: #newLineRange type: #String>
+	<FMProperty: #relativeIndex type: #Number>
 	<generated>
-	^ newLineRange
+	^ relativeIndex
 ]
 
 { #category : #accessing }
-GLPHEChange >> newLineRange: anObject [
+GLPHEChange >> relativeIndex: anObject [
 	<generated>
-	newLineRange := anObject
+	relativeIndex := anObject
 ]
 
 { #category : #accessing }
-GLPHEChange >> originalLineRange [
+GLPHEChange >> sourceCode [
 
-	<FMProperty: #originalLineRange type: #String>
+	<FMProperty: #sourceCode type: #String>
 	<generated>
-	^ originalLineRange
+	^ sourceCode
 ]
 
 { #category : #accessing }
-GLPHEChange >> originalLineRange: anObject [
+GLPHEChange >> sourceCode: anObject [
 	<generated>
-	originalLineRange := anObject
+	sourceCode := anObject
 ]

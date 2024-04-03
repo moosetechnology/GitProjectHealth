@@ -12,7 +12,9 @@ Class {
 		'user',
 		'pipeline',
 		'commit',
-		'project'
+		'project',
+		'lineOfCode',
+		'diffRange'
 	],
 	#category : #'GitLabProjectHealth-ExtendModel-Generator'
 }
@@ -34,19 +36,11 @@ GLPHMetamodelGenerator class >> submetamodels [
 
 { #category : #'as yet unclassified' }
 GLPHMetamodelGenerator >> changeProperties [
-	"must parse the range. 
-	originalLineRange = '-120,5' --> change starts at line #120
-	5 is the number of lines in the original file affected by the change"
 
-	change property: #originalLineRange type: #String.
-	change property: #newLineRange type: #String.
-
-	change property: #linesOfCode type: #String.
-
-	addition
-		property: #delimiter
-		type: #String
-		defaultValue: '#+'.
+	change property: #index type: #Number.
+	change property: #relativeIndex type: #Number.
+	change property: #sourceCode type: #String. 
+	addition property: #delimiter type: #String defaultValue: '#+'.
 	deletion property: #delimiter type: #String defaultValue: '#-'
 ]
 
@@ -57,7 +51,6 @@ GLPHMetamodelGenerator >> defineClasses [
 	mergeRequest := builder
 		                newClassNamed: #MergeRequest
 		                comment: 'a gitlab merge request'.
-
 
 	change := builder
 		          newClassNamed: #Change
@@ -71,6 +64,17 @@ GLPHMetamodelGenerator >> defineClasses [
 		            newClassNamed: #Deletion
 		            comment:
 		            'a detected deletion of a line, seen within a diff '.
+
+	lineOfCode := builder
+		              newClassNamed: #LineOfCode
+		              comment: 'a line of code in a diff comparaison '.
+
+	diffRange := builder
+		             newClassNamed: #DiffRange
+		             comment:
+		             'a indicate on which line of code are concerned by a diff (usually declared with @@ oldRange, newRange @@) '.
+
+
 
 	repository := self remoteEntity: #Repository withPrefix: #GLH.
 	file := self remoteEntity: #File withPrefix: #GLH.
@@ -87,17 +91,18 @@ GLPHMetamodelGenerator >> defineHierarchy [
 	super defineHierarchy.
 	(builder ensureClassNamed: #Entity) --|> #TEntityMetaLevelDependency.
 	change <|-- addition.
-	change <|-- deletion
-	
+	change <|-- deletion.
+	change <|-- lineOfCode.
 ]
 
 { #category : #definition }
 GLPHMetamodelGenerator >> defineProperties [
 
 	super defineProperties.
-	
+
 	self changeProperties.
 	self mergeRequestProperties.
+	self diffRangeProperties.
 ]
 
 { #category : #definition }
@@ -141,7 +146,19 @@ GLPHMetamodelGenerator >> defineRelations [
 	<>-* (mergeRequest property: #project).
 
 	"DIFF"
-	(diff property: #changes) <>-* (change property: #diff)
+	(diff property: #diffRanges) <>-* (diffRange property: #diff).
+	(diffRange property: #changes) -* (change property: #diffRange)
+	
+]
+
+{ #category : #'as yet unclassified' }
+GLPHMetamodelGenerator >> diffRangeProperties [
+"must parse the range. 
+	originalLineRange = '-120,5' --> change starts at line #120
+	5 is the number of lines in the original file affected by the change"
+	diffRange property: #originalLineRange type: #String.
+	diffRange property: #newLineRange type: #String.
+	diffRange property: #lineOfCode type: #String
 ]
 
 { #category : #'as yet unclassified' }

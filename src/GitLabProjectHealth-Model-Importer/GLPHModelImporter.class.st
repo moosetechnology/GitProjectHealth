@@ -17,11 +17,8 @@ GLPHModelImporter >> completeImportProject: aGLHProject [
 GLPHModelImporter >> importChangesForDiff: aGLHDiff [ 
 	|result|
 	('Import changes of diff ' , aGLHDiff printString) recordInfo.
-	result := self parseDiffString: aGLHDiff. 
-	result do: [ :change |
-		aGLHDiff changes add: change ].
-	aGLHDiff mooseModel addAll: aGLHDiff changes.
-
+	self parseDiffString: aGLHDiff. 
+	
 	^ aGLHDiff changes.
 
 ]
@@ -80,30 +77,27 @@ GLPHModelImporter >> initialize [
 { #category : #parsing }
 GLPHModelImporter >> parseDiffString: aDiff [
 
-	| lines ranges changes lineRangesInfo addedLines deletedLines |
+	| lines range changes index |
 	lines := aDiff diffString lines.
-	ranges := lines select: [ :line | line beginsWith: #'@@' ].
-
+	index := 0.
 	changes := (lines collect: [ :line |
-		            | aChange range |
-		            aChange := nil.
+		        | aChange |   
 
-		            (line beginsWith: #'@@')
-			            ifTrue: [ lineRangesInfo := line splitOn: ' ' ]
-			            ifFalse: [
-				            (line trim beginsWith: #+) ifTrue: [
-					            aChange := GLPHEAddition new.
-					            aChange linesOfCode: line.
-					            aChange originalLineRange: (lineRangesInfo at: 2).
-					            aChange newLineRange: (lineRangesInfo at: 3) ].
-				            (line trim beginsWith: #-) ifTrue: [
-					            aChange := GLPHEDeletion new.
-					            aChange linesOfCode: line.
-					            aChange originalLineRange: (lineRangesInfo at: 2).
-					            aChange newLineRange: (lineRangesInfo at: 3) ] ].
+		       aChange := GLPHEChange newFrom:line.				      	
+				(line trim beginsWith: #'@@') ifTrue: [ 	
+						range := GLPHEDiffRange newFrom: line. 
+						range diff: aDiff. 
+						aDiff mooseModel add: range. 
+				].
+				
+				aChange diffRange: range.
+				aChange relativeIndex: (index).
+				index := index + 1.
+				aDiff mooseModel add: aChange.
+				aChange 
+		]) reject: #isNil.
+	
 
-		            aChange ]) reject: #isNil.
-1 halt.
 	^ changes
 ]
 
