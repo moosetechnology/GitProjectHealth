@@ -83,6 +83,24 @@ GLHApi >> commitsOfProject: aProjectId [
 		  page: nil
 ]
 
+{ #category : #commits }
+GLHApi >> commitsOfProject: anInteger forRefName: refName since: since [ 
+
+	^ self commitsOfProject: anInteger
+		  forRefName: refName
+		  since: since
+		  until: nil
+		  path: nil
+		  author: nil
+		  all: nil
+		  with_stats: nil
+		  firstParent: nil
+		  order: nil
+		  trailers: nil
+		  perPage: nil
+		  page: nil.
+]
+
 { #category : #'api - commits' }
 GLHApi >> commitsOfProject: aProjectId forRefName: refName since: since until: until path: aPath author: author all: aAllBoolean with_stats: withStateBoolean firstParent: firstParent order: orderString trailers: trailers perPage: aPerPageNumber page: aPageNumber [
 	"https://docs.gitlab.com/ee/api/commits.html#list-repository-commits"

@@ -221,15 +221,15 @@ GLHModelImporter >> importGroup: aGroupID [
 GLHModelImporter >> importRepository: aGLHRepository [
 
 	| resultBranches branches |
-	[ 
+	[
 	resultBranches := self glhApi branchesOfRepository:
 		                  aGLHRepository project id.
 	branches := self parseBranchesResult: resultBranches.
-	branches do: [ :branch | aGLHRepository addBranch: branch ].
-	self withFiles ifTrue: [ 
+	branches do: [ :branch | aGLHRepository addBranch: branch. aGLHRepository mooseModel add: branch.  ].
+	self withFiles ifTrue: [
 		branches do: [ :branch | self importFilesOfBranch: branch ] ] ]
 		on: NeoJSONParseError
-		do: [ 
+		do: [
 		self inform: aGLHRepository project name , ' has no repository' ]
 ]
 

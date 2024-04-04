@@ -4,13 +4,54 @@ Class {
 	#category : #'GitLabProjectHealth-Model-Importer'
 }
 
+{ #category : #commit }
+GLPHModelImporter >> commitsOfProject: aGLHProject forRefName: refName until: toDate [
+
+	| newlyFoundCommit page |
+	page := 0.
+	newlyFoundCommit := { true }.
+	[ newlyFoundCommit isNotEmpty ] whileTrue: [
+		| results parsedResults existingCommits |
+		page := page + 1.
+		('import commit page ' , page printString) recordInfo.
+		results := self glhApi
+			           commitsOfProject: aGLHProject id
+			           forRefName: refName
+			           since: nil
+			           until: nil
+			           path: nil
+			           author: nil
+			           all: nil
+			           with_stats: nil
+			           firstParent: nil
+			           order: nil
+			           trailers: nil
+			           perPage: 100
+			           page: page.
+		parsedResults := self parseCommitsResult: results.
+		existingCommits := aGLHProject mooseModel allWithType: GLHCommit.
+
+		newlyFoundCommit := parsedResults reject: [ :commitParsed |
+			                    (toDate isNil or: [
+				                     commitParsed committed_date
+				                     < toDate asDateAndTime ]) or: [
+				                    existingCommits anySatisfy: [ :existingCommit |
+					                    existingCommit id = commitParsed id ] ] ].
+		aGLHProject mooseModel addAll: newlyFoundCommit.
+		aGLHProject repository commits addAll: newlyFoundCommit ].
+	self withCommitDiffs ifTrue: [
+		aGLHProject repository commits do: [ :commit |
+			self importDiffOfCommit: commit ] ]
+]
+
 { #category : #'private - api' }
 GLPHModelImporter >> completeImportProject: aGLHProject [
 
 	super completeImportProject: aGLHProject.
+
+	self importMergeRequests: aGLHProject.
 	
-	self importMergeRequests: aGLHProject
-	
+
 ]
 
 { #category : #import }
@@ -21,6 +62,77 @@ GLPHModelImporter >> importChangesForDiff: aGLHDiff [
 	
 	^ aGLHDiff changes.
 
+]
+
+{ #category : #import }
+GLPHModelImporter >> importCommitsOfBranch: aGLHBranch [
+
+	| commits |
+	"	result := self glhApi
+		          commitsOfProject: aGLHBranch repository project id
+		          forRefName: aGLHBranch name."
+	commits := self
+		          importCommitsOfBranch: aGLHBranch
+		          forRefName: aGLHBranch name
+		          until: Date today.
+
+	commits do: [ :aCommit |
+		| diffs |
+		('Import diff of commit: ' , aCommit short_id printString)
+			recordInfo.
+		diffs := self importDiffOfCommit: aCommit.
+		aCommit diffs addAll: diffs.
+		aCommit mooseModel addAll: diffs.
+
+		diffs do: [ :diff |
+			| changes |
+			"changes are added into the model during the import"
+			self importChangesForDiff: diff ] ]
+]
+
+{ #category : #commit }
+GLPHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName until: toDate [
+
+	| newlyFoundCommit page |
+	page := 0.
+	newlyFoundCommit := { true }.
+	[ newlyFoundCommit isNotEmpty ] whileTrue: [
+		| results parsedResults existingCommits |
+		page := page + 1.
+		('import commit page ' , page printString) recordInfo.
+		results := self glhApi
+			           commitsOfProject: aGLHBranch repository project id
+			           forRefName: aGLHBranch name
+			           since: nil
+			           until: toDate asDateAndTime asString
+			           path: nil
+			           author: nil
+			           all: nil
+			           with_stats: nil
+			           firstParent: nil
+			           order: nil
+			           trailers: nil
+			           perPage: 100
+			           page: page.
+
+
+		parsedResults := self parseCommitsResult: results.
+		existingCommits := aGLHBranch commits.
+
+
+		newlyFoundCommit := parsedResults reject: [ :commitParsed |
+			                    existingCommits anySatisfy: [ :existingCommit |
+				                    existingCommit id = commitParsed id ] ].
+
+		"newlyFoundCommit := self parseCommitsResult: results."
+
+		aGLHBranch mooseModel addAll: newlyFoundCommit.
+		aGLHBranch commits addAll: newlyFoundCommit ].
+
+	aGLHBranch commits do: [ :commit |
+		commit repository: aGLHBranch repository.
+		commit repository project: aGLHBranch repository project ].
+	^ aGLHBranch commits
 ]
 
 { #category : #'as yet unclassified' }
@@ -67,6 +179,15 @@ GLPHModelImporter >> importMergeRequests: aGLHProject [
 GLPHModelImporter >> importProject: aProjectID [
 ]
 
+{ #category : #'private - api' }
+GLPHModelImporter >> importRepository: aGLHRepository [
+
+	super importRepository: aGLHRepository.
+
+	aGLHRepository branches do: [ :branch |
+		self importCommitsOfBranch: branch ].
+]
+
 { #category : #initialization }
 GLPHModelImporter >> initialize [
 
@@ -77,28 +198,22 @@ GLPHModelImporter >> initialize [
 { #category : #parsing }
 GLPHModelImporter >> parseDiffString: aDiff [
 
-	| lines range changes index |
+	| lines range index |
 	lines := aDiff diffString lines.
 	index := 0.
-	changes := (lines collect: [ :line |
-		        | aChange |   
+	lines do: [ :line |
+		| aChange |
+		aChange := GLPHEChange newFrom: line.
+		(line trim beginsWith: #'@@') ifTrue: [
+			range := GLPHEDiffRange newFrom: line.
+			range diff: aDiff.
+			aDiff mooseModel add: range ].
 
-		       aChange := GLPHEChange newFrom:line.				      	
-				(line trim beginsWith: #'@@') ifTrue: [ 	
-						range := GLPHEDiffRange newFrom: line. 
-						range diff: aDiff. 
-						aDiff mooseModel add: range. 
-				].
-				
-				aChange diffRange: range.
-				aChange relativeIndex: (index).
-				index := index + 1.
-				aDiff mooseModel add: aChange.
-				aChange 
-		]) reject: #isNil.
-	
-
-	^ changes
+		aChange diffRange: range.
+		aChange relativeIndex: index.
+		index := index + 1.
+		aDiff mooseModel add: aChange.
+		aChange ].
 ]
 
 { #category : #parsing }
