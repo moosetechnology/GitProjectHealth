@@ -31,15 +31,14 @@ GLHModelImporter >> beWithouFiles [
 GLHModelImporter >> completeImportProject: aGLHProject [
 
 	('Complete import project: ' , aGLHProject id printString) recordInfo.
-	(self pipelinesOf: aGLHProject id) do: [ :pipeline | 
+	(self pipelinesOf: aGLHProject id) do: [ :pipeline |
 		self glhModel add: pipeline.
 		aGLHProject addPipeline: pipeline ].
 	aGLHProject creator: (self importUser: aGLHProject creator_id).
 	aGLHProject repository: GLHRepository new.
-	self glhModel add: aGLHProject .
+	self glhModel add: aGLHProject.
 	self glhModel add: aGLHProject repository.
 	self importRepository: aGLHProject repository.
-	self importCommits: aGLHProject
 ]
 
 { #category : #private }

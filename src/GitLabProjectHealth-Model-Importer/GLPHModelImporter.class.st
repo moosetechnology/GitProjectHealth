@@ -72,9 +72,9 @@ GLPHModelImporter >> importCommitsOfBranch: aGLHBranch [
 		          commitsOfProject: aGLHBranch repository project id
 		          forRefName: aGLHBranch name."
 	commits := self
-		          importCommitsOfBranch: aGLHBranch
-		          forRefName: aGLHBranch name
-		          until: Date today.
+		           importCommitsOfBranch: aGLHBranch
+		           forRefName: aGLHBranch name
+		           since: Date today - 1 week.
 
 	commits do: [ :aCommit |
 		| diffs |
@@ -88,6 +88,51 @@ GLPHModelImporter >> importCommitsOfBranch: aGLHBranch [
 			| changes |
 			"changes are added into the model during the import"
 			self importChangesForDiff: diff ] ]
+]
+
+{ #category : #commit }
+GLPHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName since: fromDate [
+
+	| newlyFoundCommit page |
+	page := 0.
+	newlyFoundCommit := { true }.
+	[ newlyFoundCommit isNotEmpty ] whileTrue: [
+		| results parsedResults existingCommits |
+		page := page + 1.
+		('import commit page ' , page printString) recordInfo.
+		results := self glhApi
+			           commitsOfProject: aGLHBranch repository project id
+			           forRefName: aGLHBranch name
+			           since: fromDate asDateAndTime asString
+			           until: nil
+			           path: nil
+			           author: nil
+			           all: nil
+			           with_stats: nil
+			           firstParent: nil
+			           order: nil
+			           trailers: nil
+			           perPage: 100
+			           page: page.
+
+
+		parsedResults := self parseCommitsResult: results.
+		existingCommits := aGLHBranch commits.
+
+
+		newlyFoundCommit := parsedResults reject: [ :commitParsed |
+			                    existingCommits anySatisfy: [ :existingCommit |
+				                    existingCommit id = commitParsed id ] ].
+
+		"newlyFoundCommit := self parseCommitsResult: results."
+
+		aGLHBranch mooseModel addAll: newlyFoundCommit.
+		aGLHBranch commits addAll: newlyFoundCommit ].
+
+	aGLHBranch commits do: [ :commit |
+		commit repository: aGLHBranch repository.
+		commit repository project: aGLHBranch repository project ].
+	^ aGLHBranch commits
 ]
 
 { #category : #commit }
