@@ -177,6 +177,13 @@ GLPHModelImporter >> importMergeRequests: aGLHProject [
 
 { #category : #'as yet unclassified' }
 GLPHModelImporter >> importProject: aProjectID [
+		| result projectResult |
+	('Import group: ' , aProjectID printString) recordInfo.
+
+	result := self glhApi project: aProjectID.
+	projectResult := self parseProjectResult: result.
+	
+	^ self completeImportProject: projectResult
 ]
 
 { #category : #'private - api' }
@@ -298,4 +305,15 @@ work_in_progress).
 		mapping decoder: [ :string | DateAndTime fromString: string ] ]."
 	
 	^ reader nextAs: #ArrayOfMergeRequest
+]
+
+{ #category : #parsing }
+GLPHModelImporter >> parseProjectResult: aResult [ 
+		| reader |
+	reader := NeoJSONReader on: aResult readStream.
+	reader for: GLHProject do: [ :mapping |
+		mapping mapInstVars. ].
+"	reader mapInstVarsFor: GLHProject."
+
+	^ reader nextAs: GLHProject
 ]
