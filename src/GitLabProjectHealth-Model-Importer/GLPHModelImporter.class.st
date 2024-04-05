@@ -55,13 +55,12 @@ GLPHModelImporter >> completeImportProject: aGLHProject [
 ]
 
 { #category : #import }
-GLPHModelImporter >> importChangesForDiff: aGLHDiff [ 
-	|result|
-	('Import changes of diff ' , aGLHDiff printString) recordInfo.
-	self parseDiffString: aGLHDiff. 
-	
-	^ aGLHDiff diffRanges .
+GLPHModelImporter >> importChangesForDiff: aGLHDiff [
 
+	('Import changes of diff ' , aGLHDiff printString) recordInfo.
+	self parseDiffString: aGLHDiff.
+
+	^ aGLHDiff diffRanges
 ]
 
 { #category : #import }
@@ -75,8 +74,8 @@ GLPHModelImporter >> importCommitsOfBranch: aGLHBranch [
 		           importCommitsOfBranch: aGLHBranch
 		           forRefName: aGLHBranch name
 		           since: Date today - 3 day.
-		
-	
+
+
 	commits do: [ :aCommit |
 		| diffs |
 		1 halt.

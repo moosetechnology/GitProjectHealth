@@ -79,7 +79,7 @@ GLHModelImporter >> glhModel: anObject [
 
 { #category : #'private - api' }
 GLHModelImporter >> importCommits: aGLHProject [
-
+	"limited to the last 20 commits"
 	| results parsedResults |
 	results := self glhApi
 		           commitsOfProject: aGLHProject id
@@ -98,7 +98,9 @@ GLHModelImporter >> importCommits: aGLHProject [
 	parsedResults := self parseCommitsResult: results.
 	aGLHProject repository mooseModel addAll: parsedResults.
 	aGLHProject repository commits addAll: parsedResults.
-	self withCommitDiffs ifTrue: [ aGLHProject repository commits do: [ :commit | self importDiffOfCommit: commit ] ].
+	self withCommitDiffs ifTrue: [
+		aGLHProject repository commits do: [ :commit |
+			self importDiffOfCommit: commit ] ]
 ]
 
 { #category : #api }
@@ -269,6 +271,7 @@ GLHModelImporter >> parseCommitsResult: result [
 
 	| reader |
 	reader := NeoJSONReader on: result readStream.
+
 	reader for: GLHCommit do: [ :mapping |
 		mapping mapInstVars:
 			#( id short_id title author_name author_email committer_name
@@ -276,6 +279,7 @@ GLHModelImporter >> parseCommitsResult: result [
 		(mapping mapInstVar: #authored_date) valueSchema: DateAndTime.
 		(mapping mapInstVar: #committed_date) valueSchema: DateAndTime.
 		(mapping mapInstVar: #created_at) valueSchema: DateAndTime.
+		(mapping mapInstVar: #parent_ids) valueSchema: #ArrayOfIds.
 		mapping
 			mapProperty: 'stats'
 			getter: [ :el | "Not used" ]
@@ -285,10 +289,16 @@ GLHModelImporter >> parseCommitsResult: result [
 
 	reader for: DateAndTime customDo: [ :mapping |
 		mapping decoder: [ :string | DateAndTime fromString: string ] ].
+
+	reader
+		for: #ArrayOfIds
+		customDo: [ :mapping | mapping decoder: [ :string | string ] ].
+
 	reader
 		for: #ArrayOfCommit
 		customDo: [ :customMappting |
 		customMappting listOfElementSchema: GLHCommit ].
+
 	^ reader nextAs: #ArrayOfCommit
 ]
 

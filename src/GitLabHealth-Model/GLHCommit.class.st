@@ -38,6 +38,7 @@ a commit attached to a repository
 | `deletions` | `Number` | nil | The number of line that git consider deleted|
 | `id` | `String` | nil | |
 | `message` | `String` | nil | |
+| `parent_ids` | `Object` | 'OrderedCollection new' | |
 | `short_id` | `String` | nil | |
 | `title` | `String` | nil | |
 | `web_url` | `String` | nil | |
@@ -62,6 +63,7 @@ Class {
 		'#id => FMProperty',
 		'#message => FMProperty',
 		'#parentCommit => FMOne type: #GLHCommit opposite: #childCommit',
+		'#parent_ids => FMProperty defaultValue: ((OrderedCollection new))',
 		'#repository => FMOne type: #GLHRepository opposite: #commits',
 		'#short_id => FMProperty',
 		'#title => FMProperty',
@@ -316,6 +318,12 @@ GLHCommit >> parentCommit: anObject [
 
 	<generated>
 	parentCommit := anObject
+]
+
+{ #category : #accessing }
+GLHCommit >> parent_ids: anObject [
+	<generated>
+	parent_ids := anObject
 ]
 
 { #category : #accessing }

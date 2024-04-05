@@ -43,6 +43,8 @@ GLHMetamodelGenerator >> branchProperties [
 { #category : #definition }
 GLHMetamodelGenerator >> commitProperties [
 
+	commit property: #parent_ids type: #Object defaultValue: 'OrderedCollection new'.
+
 	commit property: #id type: #String.
 	commit property: #short_id type: #String.
 	commit property: #title type: #String.
@@ -55,6 +57,7 @@ GLHMetamodelGenerator >> commitProperties [
 	commit property: #created_at type: #Object.
 	commit property: #message type: #String.
 	commit property: #web_url type: #String.
+
 
 	(commit property: #additions type: #Number) comment:
 		'The number of line that git consider added'.
@@ -124,14 +127,16 @@ GLHMetamodelGenerator >> defineProperties [
 	project property: #creator_id type: #Number.
 
 	"Pipelines properties"
-	(pipeline property: #status type: #String) comment: '#success or #failure'.
-	(pipeline property: #runDate type: #Object) comment: 'Date this pipeline was run'.
+	(pipeline property: #status type: #String) comment:
+		'#success or #failure'.
+	(pipeline property: #runDate type: #Object) comment:
+		'Date this pipeline was run'.
 
 	self userProperties.
 	self branchProperties.
 	self fileProperties.
 	self commitProperties.
-	 self diffProperties
+	self diffProperties
 ]
 
 { #category : #definition }
