@@ -1,27 +1,71 @@
 "
 a commit attached to a repository
+
+## Relations
+======================
+
+### Parents
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `branch` | `GLHCommit` | `commits` | `GLHBranch` | |
+| `repository` | `GLHCommit` | `commits` | `GLHRepository` | |
+
+### Children
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `diffs` | `GLHCommit` | `commit` | `GLHDiff` | |
+
+### Other
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `childCommit` | `GLHCommit` | `parentCommit` | `GLHCommit` | |
+| `parentCommit` | `GLHCommit` | `childCommit` | `GLHCommit` | |
+
+
+## Properties
+======================
+
+| Name | Type | Default value | Comment |
+|---|
+| `additions` | `Number` | nil | The number of line that git consider added|
+| `author_email` | `String` | nil | |
+| `author_name` | `String` | nil | |
+| `authored_date` | `Object` | nil | |
+| `committed_date` | `Object` | nil | |
+| `committer_email` | `String` | nil | |
+| `committer_name` | `String` | nil | |
+| `created_at` | `Object` | nil | |
+| `deletions` | `Number` | nil | The number of line that git consider deleted|
+| `id` | `String` | nil | |
+| `message` | `String` | nil | |
+| `short_id` | `String` | nil | |
+| `title` | `String` | nil | |
+| `web_url` | `String` | nil | |
+
 "
 Class {
 	#name : #GLHCommit,
 	#superclass : #GLHEntity,
 	#instVars : [
+		'#additions => FMProperty',
+		'#author_email => FMProperty',
+		'#author_name => FMProperty',
+		'#authored_date => FMProperty',
+		'#branch => FMOne type: #GLHBranch opposite: #commits',
+		'#childCommit => FMOne type: #GLHCommit opposite: #parentCommit',
+		'#committed_date => FMProperty',
+		'#committer_email => FMProperty',
+		'#committer_name => FMProperty',
+		'#created_at => FMProperty',
+		'#deletions => FMProperty',
+		'#diffs => FMMany type: #GLHDiff opposite: #commit',
 		'#id => FMProperty',
+		'#message => FMProperty',
+		'#parentCommit => FMOne type: #GLHCommit opposite: #childCommit',
+		'#repository => FMOne type: #GLHRepository opposite: #commits',
 		'#short_id => FMProperty',
 		'#title => FMProperty',
-		'#author_name => FMProperty',
-		'#author_email => FMProperty',
-		'#authored_date => FMProperty',
-		'#committer_name => FMProperty',
-		'#committer_email => FMProperty',
-		'#committed_date => FMProperty',
-		'#created_at => FMProperty',
-		'#message => FMProperty',
-		'#web_url => FMProperty',
-		'#additions => FMProperty',
-		'#deletions => FMProperty',
-		'#repository => FMOne type: #GLHRepository opposite: #commits',
-		'#branch => FMOne type: #GLHBranch opposite: #commits',
-		'#diffs => FMMany type: #GLHDiff opposite: #commit'
+		'#web_url => FMProperty'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }
@@ -119,6 +163,22 @@ GLHCommit >> branchGroup [
 	<generated>
 	<navigation: 'Branch'>
 	^ MooseSpecializedGroup with: self branch
+]
+
+{ #category : #accessing }
+GLHCommit >> childCommit [
+	"Relation named: #childCommit type: #GLHCommit opposite: #parentCommit"
+
+	<generated>
+	<derived>
+	^ childCommit
+]
+
+{ #category : #accessing }
+GLHCommit >> childCommit: anObject [
+
+	<generated>
+	childCommit := anObject
 ]
 
 { #category : #accessing }
@@ -241,6 +301,21 @@ GLHCommit >> message [
 GLHCommit >> message: anObject [
 	<generated>
 	message := anObject
+]
+
+{ #category : #accessing }
+GLHCommit >> parentCommit [
+	"Relation named: #parentCommit type: #GLHCommit opposite: #childCommit"
+
+	<generated>
+	^ parentCommit
+]
+
+{ #category : #accessing }
+GLHCommit >> parentCommit: anObject [
+
+	<generated>
+	parentCommit := anObject
 ]
 
 { #category : #accessing }

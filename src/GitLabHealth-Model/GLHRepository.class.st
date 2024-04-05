@@ -1,5 +1,22 @@
 "
 A git repository
+
+## Relations
+======================
+
+### Parents
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `project` | `GLHRepository` | `repository` | `GLHProject` | |
+
+### Children
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `branches` | `GLHRepository` | `repository` | `GLHBranch` | |
+| `commits` | `GLHRepository` | `repository` | `GLHCommit` | |
+
+
+
 "
 Class {
 	#name : #GLHRepository,

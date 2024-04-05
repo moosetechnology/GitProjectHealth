@@ -60,7 +60,7 @@ GLPHModelImporter >> importChangesForDiff: aGLHDiff [
 	('Import changes of diff ' , aGLHDiff printString) recordInfo.
 	self parseDiffString: aGLHDiff. 
 	
-	^ aGLHDiff changes.
+	^ aGLHDiff diffRanges .
 
 ]
 
@@ -74,19 +74,19 @@ GLPHModelImporter >> importCommitsOfBranch: aGLHBranch [
 	commits := self
 		           importCommitsOfBranch: aGLHBranch
 		           forRefName: aGLHBranch name
-		           since: Date today - 1 week.
-
+		           since: Date today - 3 day.
+		
+	
 	commits do: [ :aCommit |
 		| diffs |
+		1 halt.
 		('Import diff of commit: ' , aCommit short_id printString)
 			recordInfo.
 		diffs := self importDiffOfCommit: aCommit.
 		aCommit diffs addAll: diffs.
 		aCommit mooseModel addAll: diffs.
 
-		diffs do: [ :diff |
-			| changes |
-			"changes are added into the model during the import"
+		diffs do: [ :diff | "changes are added into the model during the import"
 			self importChangesForDiff: diff ] ]
 ]
 
@@ -119,19 +119,18 @@ GLPHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName since
 		parsedResults := self parseCommitsResult: results.
 		existingCommits := aGLHBranch commits.
 
-
 		newlyFoundCommit := parsedResults reject: [ :commitParsed |
 			                    existingCommits anySatisfy: [ :existingCommit |
 				                    existingCommit id = commitParsed id ] ].
 
-		"newlyFoundCommit := self parseCommitsResult: results."
-
 		aGLHBranch mooseModel addAll: newlyFoundCommit.
 		aGLHBranch commits addAll: newlyFoundCommit ].
 
-	aGLHBranch commits do: [ :commit |
+	"	(aGLHBranch commits reject: #isNil) do: [ :commit |
+		1 halt.
 		commit repository: aGLHBranch repository.
 		commit repository project: aGLHBranch repository project ].
+"
 	^ aGLHBranch commits
 ]
 

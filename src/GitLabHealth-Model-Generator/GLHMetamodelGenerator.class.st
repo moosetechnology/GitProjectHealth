@@ -145,10 +145,12 @@ GLHMetamodelGenerator >> defineRelations [
 	(project property: #repository) <>- (repository property: #project).
 	(repository property: #branches) <>-* (branch property: #repository).
 	(branch property: #files) <>-* (file property: #branch).
-	(fileDirectory property: #files) <>-* (file property: #directoryOwner).
+	(fileDirectory property: #files)
+	<>-* (file property: #directoryOwner).
 	(repository property: #commits) <>-* (commit property: #repository).
 	(branch property: #commits) <>-* (commit property: #branch).
-	(commit property: #diffs) <>-* (diff property: #commit)
+	(commit property: #diffs) <>-* (diff property: #commit).
+	(commit property: #parentCommit) - (commit property: #childCommit)
 ]
 
 { #category : #definition }

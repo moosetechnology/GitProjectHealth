@@ -1,5 +1,28 @@
 "
 A git branch
+
+## Relations
+======================
+
+### Parents
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `repository` | `GLHBranch` | `branches` | `GLHRepository` | |
+
+### Children
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `commits` | `GLHBranch` | `branch` | `GLHCommit` | |
+| `files` | `GLHBranch` | `branch` | `GLHFile` | |
+
+
+## Properties
+======================
+
+| Name | Type | Default value | Comment |
+|---|
+| `name` | `String` | nil | |
+
 "
 Class {
 	#name : #GLHBranch,

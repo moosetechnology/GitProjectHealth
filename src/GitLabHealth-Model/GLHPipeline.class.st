@@ -1,5 +1,23 @@
 "
 A GitLab Pipeline execution
+
+## Relations
+======================
+
+### Parents
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `project` | `GLHPipeline` | `pipelines` | `GLHProject` | |
+
+
+## Properties
+======================
+
+| Name | Type | Default value | Comment |
+|---|
+| `runDate` | `Object` | nil | Date this pipeline was run|
+| `status` | `String` | nil | #success or #failure|
+
 "
 Class {
 	#name : #GLHPipeline,

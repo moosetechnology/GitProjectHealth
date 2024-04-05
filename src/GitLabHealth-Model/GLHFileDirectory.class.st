@@ -1,5 +1,16 @@
 "
 A file directory
+
+## Relations
+======================
+
+### Children
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `files` | `GLHFileDirectory` | `directoryOwner` | `GLHFile` | |
+
+
+
 "
 Class {
 	#name : #GLHFileDirectory,

@@ -1,5 +1,42 @@
 "
 A GitLab User
+
+## Relations
+======================
+
+### Other
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `createdProjects` | `GLHUser` | `creator` | `GLHProject` | |
+
+
+## Properties
+======================
+
+| Name | Type | Default value | Comment |
+|---|
+| `avatar_url` | `String` | nil | |
+| `bio` | `String` | nil | |
+| `bot` | `String` | nil | |
+| `created_at` | `String` | nil | |
+| `followers` | `String` | nil | |
+| `following` | `String` | nil | |
+| `id` | `Number` | nil | |
+| `job_title` | `String` | nil | |
+| `linkedin` | `String` | nil | |
+| `location` | `String` | nil | |
+| `name` | `String` | nil | |
+| `organization` | `String` | nil | |
+| `pronouns` | `String` | nil | |
+| `public_email` | `String` | nil | |
+| `skype` | `String` | nil | |
+| `state` | `String` | nil | |
+| `twitter` | `String` | nil | |
+| `username` | `String` | nil | |
+| `web_url` | `String` | nil | |
+| `website_url` | `String` | nil | |
+| `work_information` | `String` | nil | |
+
 "
 Class {
 	#name : #GLHUser,

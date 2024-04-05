@@ -1,5 +1,33 @@
 "
 A GitLab Group
+
+## Relations
+======================
+
+### Parents
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `group` | `GLHGroup` | `subGroups` | `GLHGroup` | |
+
+### Children
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `projects` | `GLHGroup` | `group` | `GLHProject` | |
+| `subGroups` | `GLHGroup` | `group` | `GLHGroup` | |
+
+
+## Properties
+======================
+
+| Name | Type | Default value | Comment |
+|---|
+| `avatar_url` | `String` | nil | |
+| `description` | `String` | nil | |
+| `id` | `Number` | nil | |
+| `name` | `String` | nil | Basic name of the entity, not full reference.|
+| `visibility` | `String` | nil | |
+| `web_url` | `String` | nil | |
+
 "
 Class {
 	#name : #GLHGroup,
