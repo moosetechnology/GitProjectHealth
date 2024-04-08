@@ -8,6 +8,7 @@ a commit attached to a repository
 | Relation | Origin | Opposite | Type | Comment |
 |---|
 | `branch` | `GLHCommit` | `commits` | `GLHBranch` | |
+| `commitCreator` | `GLHCommit` | `commits` | `GLHUser` | |
 | `repository` | `GLHCommit` | `commits` | `GLHRepository` | |
 
 ### Children
@@ -38,6 +39,7 @@ a commit attached to a repository
 | `deletions` | `Number` | nil | The number of line that git consider deleted|
 | `id` | `String` | nil | |
 | `message` | `String` | nil | |
+| `name` | `String` | nil | Basic name of the entity, not full reference.|
 | `parent_ids` | `Object` | 'OrderedCollection new' | |
 | `short_id` | `String` | nil | |
 | `title` | `String` | nil | |
@@ -47,6 +49,8 @@ a commit attached to a repository
 Class {
 	#name : #GLHCommit,
 	#superclass : #GLHEntity,
+	#traits : 'FamixTNamedEntity',
+	#classTraits : 'FamixTNamedEntity classTrait',
 	#instVars : [
 		'#additions => FMProperty',
 		'#author_email => FMProperty',
@@ -54,6 +58,7 @@ Class {
 		'#authored_date => FMProperty',
 		'#branch => FMOne type: #GLHBranch opposite: #commits',
 		'#childCommits => FMMany type: #GLHCommit opposite: #parentCommits',
+		'#commitCreator => FMOne type: #GLHUser opposite: #commits',
 		'#committed_date => FMProperty',
 		'#committer_email => FMProperty',
 		'#committer_name => FMProperty',
@@ -192,6 +197,29 @@ GLHCommit >> childCommits: anObject [
 
 	<generated>
 	childCommits value: anObject
+]
+
+{ #category : #accessing }
+GLHCommit >> commitCreator [
+	"Relation named: #commitCreator type: #GLHUser opposite: #commits"
+
+	<generated>
+	<container>
+	^ commitCreator
+]
+
+{ #category : #accessing }
+GLHCommit >> commitCreator: anObject [
+
+	<generated>
+	commitCreator := anObject
+]
+
+{ #category : #navigation }
+GLHCommit >> commitCreatorGroup [
+	<generated>
+	<navigation: 'CommitCreator'>
+	^ MooseSpecializedGroup with: self commitCreator
 ]
 
 { #category : #accessing }

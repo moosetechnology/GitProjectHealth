@@ -103,6 +103,7 @@ GLHMetamodelGenerator >> defineHierarchy [
 	group --|> #TNamedEntity.
 	project --|> #TNamedEntity.
 	user --|> #TNamedEntity.
+	commit --|> #TNamedEntity.
 ]
 
 { #category : #definition }

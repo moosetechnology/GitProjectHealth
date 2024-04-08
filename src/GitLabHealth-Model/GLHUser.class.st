@@ -4,6 +4,11 @@ A GitLab User
 ## Relations
 ======================
 
+### Children
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `commits` | `GLHUser` | `commitCreator` | `GLHCommit` | |
+
 ### Other
 | Relation | Origin | Opposite | Type | Comment |
 |---|
@@ -25,8 +30,8 @@ A GitLab User
 | `job_title` | `String` | nil | |
 | `linkedin` | `String` | nil | |
 | `location` | `String` | nil | |
-| `name` | `String` | nil | |
 | `name` | `String` | nil | Basic name of the entity, not full reference.|
+| `name` | `String` | nil | |
 | `organization` | `String` | nil | |
 | `pronouns` | `String` | nil | |
 | `public_email` | `String` | nil | |
@@ -48,6 +53,7 @@ Class {
 		'#avatar_url => FMProperty',
 		'#bio => FMProperty',
 		'#bot => FMProperty',
+		'#commits => FMMany type: #GLHCommit opposite: #commitCreator',
 		'#createdProjects => FMMany type: #GLHProject opposite: #creator',
 		'#created_at => FMProperty',
 		'#followers => FMProperty',
@@ -78,6 +84,12 @@ GLHUser class >> annotation [
 	<package: #'GitLabHealth-Model'>
 	<generated>
 	^ self
+]
+
+{ #category : #adding }
+GLHUser >> addCommit: anObject [
+	<generated>
+	^ self commits add: anObject
 ]
 
 { #category : #adding }
@@ -126,6 +138,29 @@ GLHUser >> bot [
 GLHUser >> bot: anObject [
 	<generated>
 	bot := anObject
+]
+
+{ #category : #accessing }
+GLHUser >> commits [
+	"Relation named: #commits type: #GLHCommit opposite: #commitCreator"
+
+	<generated>
+	<derived>
+	^ commits
+]
+
+{ #category : #accessing }
+GLHUser >> commits: anObject [
+
+	<generated>
+	commits value: anObject
+]
+
+{ #category : #navigation }
+GLHUser >> commitsGroup [
+	<generated>
+	<navigation: 'Commits'>
+	^ MooseSpecializedGroup withAll: self commits asSet
 ]
 
 { #category : #accessing }

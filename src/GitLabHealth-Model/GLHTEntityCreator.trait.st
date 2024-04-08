@@ -33,6 +33,13 @@ GLHTEntityCreator >> newCommit [
 ]
 
 { #category : #'entity creation' }
+GLHTEntityCreator >> newCommitNamed: aName [
+
+	<generated>
+	^ self add: (GLHCommit named: aName)
+]
+
+{ #category : #'entity creation' }
 GLHTEntityCreator >> newDiff [
 
 	<generated>

@@ -77,7 +77,7 @@ GLPHModelImporter >> importCommitsChainFromCommit: aCollection [
 			parentCommit ifNotNil: [ 
 				
 				commit parentCommits add: parentCommit. 
-				parentCommit childCommits add: commit. 
+				"self haltIf: [commit childCommits size = 2]."
 				 ].
 			 ]
 		
@@ -109,7 +109,6 @@ GLPHModelImporter >> importCommitsOfBranch: aGLHBranch [
 		('Import diff of commit: ' , aCommit short_id printString)
 			recordInfo.
 		diffs := self importDiffOfCommit: aCommit.
-		aCommit diffs addAll: diffs.
 		aCommit mooseModel addAll: diffs.
 
 		diffs do: [ :diff | "changes are added into the model during the import"
@@ -285,8 +284,9 @@ GLPHModelImporter >> parseDiffString: aDiff [
 		
 		(line trim beginsWith: #'@@') ifTrue: [
 			range := GLPHEDiffRange newFrom: line.
-			range diff: aDiff.
-			aDiff mooseModel add: range ].
+			self glhModel add: range.
+			aDiff diffRanges add: range.
+			 ].
 		
 		self withCommitDiffs ifTrue: [
 		aChange := GLPHEChange newFrom: line.
