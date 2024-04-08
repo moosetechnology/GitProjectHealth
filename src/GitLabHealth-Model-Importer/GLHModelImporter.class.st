@@ -238,12 +238,13 @@ GLHModelImporter >> importRepository: aGLHRepository [
 GLHModelImporter >> importUser: aUserID [
 
 	| result userResult |
-	(glhModel allWithType: GLHUser) detect: [ :user | user id = aUserID ] ifFound: [ :user | ^ user ].
-	('Import user: ' , aUserID printString) recordInfo.
-	result := self glhApi user: aUserID.
-	userResult := self parseUserResult: result.
-	glhModel add: userResult.
-	^ userResult
+	^ (glhModel allWithType: GLHUser) detect: [ :user | user id = aUserID ] ifNone: [ 
+		('Import user: ' , aUserID printString) recordInfo.
+		result := self glhApi user: aUserID.
+		userResult := self parseUserResult: result.
+		glhModel add: userResult.
+	^ userResult ].
+	
 ]
 
 { #category : #initialization }
