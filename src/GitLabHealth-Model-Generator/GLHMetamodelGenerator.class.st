@@ -157,7 +157,7 @@ GLHMetamodelGenerator >> defineRelations [
 	(branch property: #commits) <>-* (commit property: #branch).
 	
 	(commit property: #diffs) <>-* (diff property: #commit).
-	"(user property: #commits) <>-* (commit property: #commiter)."
+	(user property: #commits) <>-* (commit property: #commitCreator).
 	(commit property: #parentCommits) *-* (commit property: #childCommits)
 ]
 

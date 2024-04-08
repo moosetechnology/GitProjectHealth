@@ -76,8 +76,8 @@ GLPHModelImporter >> importCommitsChainFromCommit: aCollection [
 			parentCommit := (model allWithType: GLHCommit) detect: [:c | c id = parentId] ifNone: [nil].
 			parentCommit ifNotNil: [ 
 				
-				commit parentCommit: parentCommit. 
-				parentCommit childCommit: commit. 
+				commit parentCommits add: parentCommit. 
+				parentCommit childCommits add: commit. 
 				 ].
 			 ]
 		
@@ -103,7 +103,7 @@ GLPHModelImporter >> importCommitsOfBranch: aGLHBranch [
 
 	commits do: [ :aCommit |
 		| diffs |
-		1 halt.
+
 		aCommit repository: aGLHBranch repository.
 		
 		('Import diff of commit: ' , aCommit short_id printString)
