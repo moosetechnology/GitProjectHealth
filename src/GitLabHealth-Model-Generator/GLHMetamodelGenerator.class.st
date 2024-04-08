@@ -102,6 +102,7 @@ GLHMetamodelGenerator >> defineHierarchy [
 	
 	group --|> #TNamedEntity.
 	project --|> #TNamedEntity.
+	user --|> #TNamedEntity.
 ]
 
 { #category : #definition }
@@ -154,8 +155,10 @@ GLHMetamodelGenerator >> defineRelations [
 	<>-* (file property: #directoryOwner).
 	(repository property: #commits) <>-* (commit property: #repository).
 	(branch property: #commits) <>-* (commit property: #branch).
+	
 	(commit property: #diffs) <>-* (diff property: #commit).
-	(commit property: #parentCommit) - (commit property: #childCommit)
+	"(user property: #commits) <>-* (commit property: #commiter)."
+	(commit property: #parentCommits) *-* (commit property: #childCommits)
 ]
 
 { #category : #definition }

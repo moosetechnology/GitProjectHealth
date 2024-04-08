@@ -18,8 +18,8 @@ a commit attached to a repository
 ### Other
 | Relation | Origin | Opposite | Type | Comment |
 |---|
-| `childCommit` | `GLHCommit` | `parentCommit` | `GLHCommit` | |
-| `parentCommit` | `GLHCommit` | `childCommit` | `GLHCommit` | |
+| `childCommits` | `GLHCommit` | `parentCommits` | `GLHCommit` | |
+| `parentCommits` | `GLHCommit` | `childCommits` | `GLHCommit` | |
 
 
 ## Properties
@@ -53,7 +53,7 @@ Class {
 		'#author_name => FMProperty',
 		'#authored_date => FMProperty',
 		'#branch => FMOne type: #GLHBranch opposite: #commits',
-		'#childCommit => FMOne type: #GLHCommit opposite: #parentCommit',
+		'#childCommits => FMMany type: #GLHCommit opposite: #parentCommits',
 		'#committed_date => FMProperty',
 		'#committer_email => FMProperty',
 		'#committer_name => FMProperty',
@@ -62,7 +62,7 @@ Class {
 		'#diffs => FMMany type: #GLHDiff opposite: #commit',
 		'#id => FMProperty',
 		'#message => FMProperty',
-		'#parentCommit => FMOne type: #GLHCommit opposite: #childCommit',
+		'#parentCommits => FMMany type: #GLHCommit opposite: #childCommits',
 		'#parent_ids => FMProperty defaultValue: ((OrderedCollection new))',
 		'#repository => FMOne type: #GLHRepository opposite: #commits',
 		'#short_id => FMProperty',
@@ -82,9 +82,21 @@ GLHCommit class >> annotation [
 ]
 
 { #category : #adding }
+GLHCommit >> addChildCommit: anObject [
+	<generated>
+	^ self childCommits add: anObject
+]
+
+{ #category : #adding }
 GLHCommit >> addDiff: anObject [
 	<generated>
 	^ self diffs add: anObject
+]
+
+{ #category : #adding }
+GLHCommit >> addParentCommit: anObject [
+	<generated>
+	^ self parentCommits add: anObject
 ]
 
 { #category : #accessing }
@@ -168,19 +180,18 @@ GLHCommit >> branchGroup [
 ]
 
 { #category : #accessing }
-GLHCommit >> childCommit [
-	"Relation named: #childCommit type: #GLHCommit opposite: #parentCommit"
+GLHCommit >> childCommits [
+	"Relation named: #childCommits type: #GLHCommit opposite: #parentCommits"
 
 	<generated>
-	<derived>
-	^ childCommit
+	^ childCommits
 ]
 
 { #category : #accessing }
-GLHCommit >> childCommit: anObject [
+GLHCommit >> childCommits: anObject [
 
 	<generated>
-	childCommit := anObject
+	childCommits value: anObject
 ]
 
 { #category : #accessing }
@@ -306,18 +317,19 @@ GLHCommit >> message: anObject [
 ]
 
 { #category : #accessing }
-GLHCommit >> parentCommit [
-	"Relation named: #parentCommit type: #GLHCommit opposite: #childCommit"
+GLHCommit >> parentCommits [
+	"Relation named: #parentCommits type: #GLHCommit opposite: #childCommits"
 
 	<generated>
-	^ parentCommit
+	<derived>
+	^ parentCommits
 ]
 
 { #category : #accessing }
-GLHCommit >> parentCommit: anObject [
+GLHCommit >> parentCommits: anObject [
 
 	<generated>
-	parentCommit := anObject
+	parentCommits value: anObject
 ]
 
 { #category : #accessing }

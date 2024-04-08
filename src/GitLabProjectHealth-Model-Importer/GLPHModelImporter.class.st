@@ -63,6 +63,27 @@ GLPHModelImporter >> importChangesForDiff: aGLHDiff [
 	^ aGLHDiff diffRanges
 ]
 
+{ #category : #commit }
+GLPHModelImporter >> importCommitsChainFromCommit: aCollection [ 
+	
+	aCollection do: [ :commit |
+		| model|
+		
+
+		model := commit mooseModel. 
+		commit parent_ids do: [:parentId |
+			|parentCommit|
+			parentCommit := (model allWithType: GLHCommit) detect: [:c | c id = parentId] ifNone: [nil].
+			parentCommit ifNotNil: [ 
+				
+				commit parentCommit: parentCommit. 
+				parentCommit childCommit: commit. 
+				 ].
+			 ]
+		
+		 ]
+]
+
 { #category : #import }
 GLPHModelImporter >> importCommitsOfBranch: aGLHBranch [
 
@@ -73,12 +94,18 @@ GLPHModelImporter >> importCommitsOfBranch: aGLHBranch [
 	commits := self
 		           importCommitsOfBranch: aGLHBranch
 		           forRefName: aGLHBranch name
-		           since: Date today - 3 day.
+		           since: Date today - 1 week.
 
+
+
+	
+	self importCommitsChainFromCommit: commits.   
 
 	commits do: [ :aCommit |
 		| diffs |
 		1 halt.
+		aCommit repository: aGLHBranch repository.
+		
 		('Import diff of commit: ' , aCommit short_id printString)
 			recordInfo.
 		diffs := self importDiffOfCommit: aCommit.
@@ -247,23 +274,29 @@ GLPHModelImporter >> initialize [
 
 { #category : #parsing }
 GLPHModelImporter >> parseDiffString: aDiff [
+	"parse diff string to create entities for each lines"
 
 	| lines range index |
 	lines := aDiff diffString lines.
 	index := 0.
+	range := nil.
 	lines do: [ :line |
 		| aChange |
-		aChange := GLPHEChange newFrom: line.
+		
 		(line trim beginsWith: #'@@') ifTrue: [
 			range := GLPHEDiffRange newFrom: line.
 			range diff: aDiff.
 			aDiff mooseModel add: range ].
-
+		
+		self withCommitDiffs ifTrue: [
+		aChange := GLPHEChange newFrom: line.
 		aChange diffRange: range.
 		aChange relativeIndex: index.
 		index := index + 1.
 		aDiff mooseModel add: aChange.
-		aChange ].
+		].
+		
+	].
 ]
 
 { #category : #parsing }

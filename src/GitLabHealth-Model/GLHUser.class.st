@@ -26,6 +26,7 @@ A GitLab User
 | `linkedin` | `String` | nil | |
 | `location` | `String` | nil | |
 | `name` | `String` | nil | |
+| `name` | `String` | nil | Basic name of the entity, not full reference.|
 | `organization` | `String` | nil | |
 | `pronouns` | `String` | nil | |
 | `public_email` | `String` | nil | |
@@ -41,29 +42,31 @@ A GitLab User
 Class {
 	#name : #GLHUser,
 	#superclass : #GLHEntity,
+	#traits : 'FamixTNamedEntity',
+	#classTraits : 'FamixTNamedEntity classTrait',
 	#instVars : [
-		'#id => FMProperty',
-		'#username => FMProperty',
-		'#name => FMProperty',
-		'#state => FMProperty',
 		'#avatar_url => FMProperty',
-		'#web_url => FMProperty',
-		'#created_at => FMProperty',
 		'#bio => FMProperty',
-		'#location => FMProperty',
-		'#public_email => FMProperty',
-		'#skype => FMProperty',
-		'#linkedin => FMProperty',
-		'#twitter => FMProperty',
-		'#website_url => FMProperty',
-		'#organization => FMProperty',
-		'#job_title => FMProperty',
-		'#pronouns => FMProperty',
 		'#bot => FMProperty',
-		'#work_information => FMProperty',
+		'#createdProjects => FMMany type: #GLHProject opposite: #creator',
+		'#created_at => FMProperty',
 		'#followers => FMProperty',
 		'#following => FMProperty',
-		'#createdProjects => FMMany type: #GLHProject opposite: #creator'
+		'#id => FMProperty',
+		'#job_title => FMProperty',
+		'#linkedin => FMProperty',
+		'#location => FMProperty',
+		'#name => FMProperty',
+		'#organization => FMProperty',
+		'#pronouns => FMProperty',
+		'#public_email => FMProperty',
+		'#skype => FMProperty',
+		'#state => FMProperty',
+		'#twitter => FMProperty',
+		'#username => FMProperty',
+		'#web_url => FMProperty',
+		'#website_url => FMProperty',
+		'#work_information => FMProperty'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }

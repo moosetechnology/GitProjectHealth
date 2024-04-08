@@ -96,10 +96,14 @@ GLHModelImporter >> importCommits: aGLHProject [
 		           perPage: nil
 		           page: nil.
 	parsedResults := self parseCommitsResult: results.
-	aGLHProject repository mooseModel addAll: parsedResults.
-	aGLHProject repository commits addAll: parsedResults.
+	aGLHProject mooseModel addAll: parsedResults.
+	
+	parsedResults do: [ :commit |
+		 commit repository: aGLHProject repository.
+		].
+	
 	self withCommitDiffs ifTrue: [
-		aGLHProject repository commits do: [ :commit |
+		parsedResults do: [ :commit |
 			self importDiffOfCommit: commit ] ]
 ]
 
@@ -138,6 +142,8 @@ GLHModelImporter >> importCommitsOf: aGLHProject withStats: aBoolean until: toDa
 					                    existingCommit id = commitParsed id ] ] ].
 		aGLHProject mooseModel addAll: newlyFoundCommit.
 		aGLHProject repository commits addAll: newlyFoundCommit ].
+	
+	
 	self withCommitDiffs ifTrue: [
 		aGLHProject repository commits do: [ :commit |
 			self importDiffOfCommit: commit ] ]
@@ -243,7 +249,7 @@ GLHModelImporter >> importUser: aUserID [
 		result := self glhApi user: aUserID.
 		userResult := self parseUserResult: result.
 		glhModel add: userResult.
-	^ userResult ].
+	 userResult ].
 	
 ]
 

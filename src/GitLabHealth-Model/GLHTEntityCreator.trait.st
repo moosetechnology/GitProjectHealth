@@ -108,3 +108,10 @@ GLHTEntityCreator >> newUser [
 	<generated>
 	^ self add: GLHUser new
 ]
+
+{ #category : #'entity creation' }
+GLHTEntityCreator >> newUserNamed: aName [
+
+	<generated>
+	^ self add: (GLHUser named: aName)
+]
