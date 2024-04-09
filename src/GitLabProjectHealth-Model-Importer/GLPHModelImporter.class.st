@@ -67,17 +67,11 @@ GLPHModelImporter >> importChangesForDiff: aGLHDiff [
 GLPHModelImporter >> importCommitsChainFromCommit: aCollection [ 
 	
 	aCollection do: [ :commit |
-		| model|
-		
-
-		model := commit mooseModel. 
 		commit parent_ids do: [:parentId |
 			|parentCommit|
-			parentCommit := (model allWithType: GLHCommit) detect: [:c | c id = parentId] ifNone: [nil].
+			parentCommit := (self glhModel allWithType: GLHCommit) detect: [:c | c id = parentId] ifNone: [nil].
 			parentCommit ifNotNil: [ 
-				
-				commit parentCommits add: parentCommit. 
-				"self haltIf: [commit childCommits size = 2]."
+				parentCommit childCommits detect: [ :c | c id = commit id ] ifNone: [parentCommit addChildCommit: commit.].
 				 ].
 			 ]
 		
