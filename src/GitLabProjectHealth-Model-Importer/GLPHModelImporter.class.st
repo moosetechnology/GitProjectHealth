@@ -90,18 +90,31 @@ GLPHModelImporter >> importCommitsOfBranch: aGLHBranch [
 		           forRefName: aGLHBranch name
 		           since: withCommitsSince.
 
-	
-	self chainsCommitsFrom: commits.   
+
+	self glhModel addAll: (commits reject: [ :commitParsed |
+			 (self glhModel allWithType: GLHCommit) anySatisfy: [
+				 :existingCommit | existingCommit id = commitParsed id ] ]).
+
+
+	self chainsCommitsFrom: commits.
+
+
 
 	commits do: [ :aCommit |
 		| diffs |
 
+		(self importUserByUsername: aCommit author_name) commits
+			add: aCommit
+			unless: [ :existingCommit :newCommit |
+			existingCommit id = newCommit id ].
+
+		"(self importUserByUsername: aCommit author_name) addCommit: aCommit."
 		aCommit repository: aGLHBranch repository.
-		
+
 		('Import diff of commit: ' , aCommit short_id printString)
 			recordInfo.
 		diffs := self importDiffOfCommit: aCommit.
-		aCommit mooseModel addAll: diffs.
+		self glhModel addAll: diffs.
 
 		diffs do: [ :diff | "changes are added into the model during the import"
 			self importChangesForDiff: diff ] ]
@@ -139,8 +152,6 @@ GLPHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName since
 		newlyFoundCommit := parsedResults reject: [ :commitParsed |
 			                    existingCommits anySatisfy: [ :existingCommit |
 				                    existingCommit id = commitParsed id ] ].
-
-		aGLHBranch mooseModel addAll: newlyFoundCommit.
 		aGLHBranch commits addAll: newlyFoundCommit ].
 
 	"	(aGLHBranch commits reject: #isNil) do: [ :commit |
@@ -187,7 +198,6 @@ GLPHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName until
 
 		"newlyFoundCommit := self parseCommitsResult: results."
 
-		aGLHBranch mooseModel addAll: newlyFoundCommit.
 		aGLHBranch commits addAll: newlyFoundCommit ].
 
 	aGLHBranch commits do: [ :commit |
@@ -254,6 +264,34 @@ GLPHModelImporter >> importRepository: aGLHRepository [
 
 	aGLHRepository branches do: [ :branch |
 		self importCommitsOfBranch: branch ].
+]
+
+{ #category : #user }
+GLPHModelImporter >> importUserByEmail: anUsername [ 
+	^ (self glhModel allWithType: GLHUser) detect: [ :user | user username = anUsername ] ifNone: [ 
+		
+		 ]
+]
+
+{ #category : #user }
+GLPHModelImporter >> importUserByUsername: anUsername [
+
+	^ (self glhModel allWithType: GLHUser)
+		  detect: [ :user | user username = anUsername ]
+		  ifNone: [
+			  | result userResult userId searchResult |
+			  ('Import user with username: ' , anUsername printString)
+				  recordInfo.
+			  result := self glhApi usersSearchByUsername: anUsername.
+			  searchResult := NeoJSONReader fromString: result.
+			  searchResult ifEmpty: [ GLHUser new ] ifNotEmpty: [
+				  userId := searchResult first at: #id.
+				  (self glhModel allWithType: GLHUser)
+					  detect: [ :user | user id = userId ]
+					  ifNone: [
+						  userResult := self parseUserResult: (self glhApi user: userId).
+						  glhModel add: userResult.
+						  userResult ] ] ]
 ]
 
 { #category : #initialization }

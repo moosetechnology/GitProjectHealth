@@ -117,3 +117,9 @@ GLPHApi >> project: aProjectID [
 	^ self client get:
 		  self baseAPIUrl , '/projects/' , aProjectID printString
 ]
+
+{ #category : #user }
+GLPHApi >> usersSearchByUsername: aUserName [ 
+
+	^ self client get: self baseAPIUrl , '/users?search=' , (aUserName replaceAllRegex: ' ' with:  '+').
+]

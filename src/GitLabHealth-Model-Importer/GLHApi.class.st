@@ -261,3 +261,9 @@ GLHApi >> user: aUserID [
 
 	^ self client get: self baseAPIUrl , '/users/' , aUserID printString
 ]
+
+{ #category : #api }
+GLHApi >> userWithUsername: anUsername [
+
+	^ self client get: self baseAPIUrl , '/users?username=' , anUsername
+]

@@ -165,7 +165,7 @@ GLHModelImporter >> importDiffOfCommit: aCommit [
 		          unidiff: true.
 	diffsResult := self parseDiffResult: result.
 	aCommit diffs addAll: diffsResult.
-	aCommit mooseModel addAll: diffsResult.
+	self glhModel addAll: diffsResult.
 	^ diffsResult
 ]
 
@@ -258,7 +258,8 @@ GLHModelImporter >> importUser: aUserID [
 GLHModelImporter >> initialize [
 
 	withFiles := false.
-	withCommitDiffs := false
+	withCommitDiffs := false.
+	withCommitsSince := (Date today - 1 week) asDateAndTime. 
 ]
 
 { #category : #private }
