@@ -5,6 +5,21 @@ Class {
 }
 
 { #category : #commit }
+GLPHModelImporter >> chainsCommitsFrom: commitsCollection [
+
+	commitsCollection do: [ :commit |
+		commit parent_ids do: [ :parentId |
+			| parentCommit |
+			parentCommit := (self glhModel allWithType: GLHCommit)
+				                detect: [ :c | c id = parentId ]
+				                ifNone: [ nil ].
+			parentCommit ifNotNil: [
+				parentCommit childCommits
+					detect: [ :c | c id = commit id ]
+					ifNone: [ parentCommit addChildCommit: commit ] ] ] ]
+]
+
+{ #category : #commit }
 GLPHModelImporter >> commitsOfProject: aGLHProject forRefName: refName until: toDate [
 
 	| newlyFoundCommit page |
@@ -63,21 +78,6 @@ GLPHModelImporter >> importChangesForDiff: aGLHDiff [
 	^ aGLHDiff diffRanges
 ]
 
-{ #category : #commit }
-GLPHModelImporter >> importCommitsChainFromCommit: aCollection [ 
-	
-	aCollection do: [ :commit |
-		commit parent_ids do: [:parentId |
-			|parentCommit|
-			parentCommit := (self glhModel allWithType: GLHCommit) detect: [:c | c id = parentId] ifNone: [nil].
-			parentCommit ifNotNil: [ 
-				parentCommit childCommits detect: [ :c | c id = commit id ] ifNone: [parentCommit addChildCommit: commit.].
-				 ].
-			 ]
-		
-		 ]
-]
-
 { #category : #import }
 GLPHModelImporter >> importCommitsOfBranch: aGLHBranch [
 
@@ -88,12 +88,10 @@ GLPHModelImporter >> importCommitsOfBranch: aGLHBranch [
 	commits := self
 		           importCommitsOfBranch: aGLHBranch
 		           forRefName: aGLHBranch name
-		           since: Date today - 1 week.
-
-
+		           since: withCommitsSince.
 
 	
-	self importCommitsChainFromCommit: commits.   
+	self chainsCommitsFrom: commits.   
 
 	commits do: [ :aCommit |
 		| diffs |
@@ -386,4 +384,12 @@ GLPHModelImporter >> parseProjectResult: aResult [
 "	reader mapInstVarsFor: GLHProject."
 
 	^ reader nextAs: GLHProject
+]
+
+{ #category : #accessing }
+GLPHModelImporter >> withCommitsSince: someDays [
+	"substract the current date with a given number of days. Use to retrieve the commits submit in the last giving days"
+	"(GLPHModelImporter new withCommitsSince: 1 week ) >>> (Date today - 1 week) asDateAndTime"
+	"(GLPHModelImporter new withCommitsSince: 30 day ) >>> (Date today - 30 day) asDateAndTime"
+	withCommitsSince := (Date today - someDays) asDateAndTime
 ]
