@@ -14,9 +14,12 @@ GLPHModelImporter >> chainsCommitsFrom: commitsCollection [
 				                detect: [ :c | c id = parentId ]
 				                ifNone: [ nil ].
 			parentCommit ifNotNil: [
-				parentCommit childCommits
+			
+				parentCommit childCommits add: commit unless: [ :existing :new | existing id = new id ].
+					
+				"parentCommit childCommits
 					detect: [ :c | c id = commit id ]
-					ifNone: [ parentCommit addChildCommit: commit ] ] ] ]
+					ifNone: [ parentCommit addChildCommit: commit ] "] ] ]
 ]
 
 { #category : #commit }
@@ -70,15 +73,6 @@ GLPHModelImporter >> completeImportProject: aGLHProject [
 ]
 
 { #category : #import }
-GLPHModelImporter >> importChangesForDiff: aGLHDiff [
-
-	('Import changes of diff ' , aGLHDiff printString) recordInfo.
-	self parseDiffString: aGLHDiff.
-
-	^ aGLHDiff diffRanges
-]
-
-{ #category : #import }
 GLPHModelImporter >> importCommitsOfBranch: aGLHBranch [
 
 	| commits |
@@ -90,51 +84,58 @@ GLPHModelImporter >> importCommitsOfBranch: aGLHBranch [
 		           forRefName: aGLHBranch name
 		           since: withCommitsSince.
 
-
-	self glhModel addAll: (commits reject: [ :commitParsed |
-			 (self glhModel allWithType: GLHCommit) anySatisfy: [
-				 :existingCommit | existingCommit id = commitParsed id ] ]).
-
+	
 
 	self chainsCommitsFrom: commits.
 
-
-
 	commits do: [ :aCommit |
 		| diffs |
-
 		(self importUserByUsername: aCommit author_name) commits
 			add: aCommit
 			unless: [ :existingCommit :newCommit |
 			existingCommit id = newCommit id ].
 
-		"(self importUserByUsername: aCommit author_name) addCommit: aCommit."
 		aCommit repository: aGLHBranch repository.
 
 		('Import diff of commit: ' , aCommit short_id printString)
 			recordInfo.
+
 		diffs := self importDiffOfCommit: aCommit.
-		self glhModel addAll: diffs.
+		self glhModel addAll: diffs unless: [ :existing :new |
+			existing diffString size = new diffString size and: [
+				existing diffString = new diffString ] ].
 
 		diffs do: [ :diff | "changes are added into the model during the import"
-			self importChangesForDiff: diff ] ]
+			self importDiffRangesForDiff: diff ] ]
 ]
 
 { #category : #commit }
 GLPHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName since: fromDate [
 
+	^ self
+		  importCommitsOfBranch: aGLHBranch
+		  forRefName: refName
+		  since: fromDate
+		  until: nil
+]
+
+{ #category : #commit }
+GLPHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName since: fromDate until: toDate [
+
 	| newlyFoundCommit page |
 	page := 0.
 	newlyFoundCommit := { true }.
 	[ newlyFoundCommit isNotEmpty ] whileTrue: [
-		| results parsedResults existingCommits |
+		| results |
 		page := page + 1.
 		('import commit page ' , page printString) recordInfo.
 		results := self glhApi
 			           commitsOfProject: aGLHBranch repository project id
 			           forRefName: aGLHBranch name
-			           since: fromDate asDateAndTime asString
-			           until: nil
+			           since:
+			           (fromDate ifNotNil: [ fromDate asDateAndTime asString ])
+			           until:
+			           (toDate ifNotNil: [ toDate asDateAndTime asString ])
 			           path: nil
 			           author: nil
 			           all: nil
@@ -145,90 +146,70 @@ GLPHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName since
 			           perPage: 100
 			           page: page.
 
+		newlyFoundCommit := self parseCommitsResult: results.
+		aGLHBranch commits
+			addAll: newlyFoundCommit
+			unless: self blockForEntitiesWithIdEquality ].
 
-		parsedResults := self parseCommitsResult: results.
-		existingCommits := aGLHBranch commits.
+	self glhModel
+		addAll: aGLHBranch commits
+		unless: [ :old :new | old id = new id ].
 
-		newlyFoundCommit := parsedResults reject: [ :commitParsed |
-			                    existingCommits anySatisfy: [ :existingCommit |
-				                    existingCommit id = commitParsed id ] ].
-		aGLHBranch commits addAll: newlyFoundCommit ].
-
-	"	(aGLHBranch commits reject: #isNil) do: [ :commit |
-		1 halt.
-		commit repository: aGLHBranch repository.
-		commit repository project: aGLHBranch repository project ].
-"
 	^ aGLHBranch commits
 ]
 
 { #category : #commit }
 GLPHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName until: toDate [
 
-	| newlyFoundCommit page |
-	page := 0.
-	newlyFoundCommit := { true }.
-	[ newlyFoundCommit isNotEmpty ] whileTrue: [
-		| results parsedResults existingCommits |
-		page := page + 1.
-		('import commit page ' , page printString) recordInfo.
-		results := self glhApi
-			           commitsOfProject: aGLHBranch repository project id
-			           forRefName: aGLHBranch name
-			           since: nil
-			           until: toDate asDateAndTime asString
-			           path: nil
-			           author: nil
-			           all: nil
-			           with_stats: nil
-			           firstParent: nil
-			           order: nil
-			           trailers: nil
-			           perPage: 100
-			           page: page.
-
-
-		parsedResults := self parseCommitsResult: results.
-		existingCommits := aGLHBranch commits.
-
-
-		newlyFoundCommit := parsedResults reject: [ :commitParsed |
-			                    existingCommits anySatisfy: [ :existingCommit |
-				                    existingCommit id = commitParsed id ] ].
-
-		"newlyFoundCommit := self parseCommitsResult: results."
-
-		aGLHBranch commits addAll: newlyFoundCommit ].
-
-	aGLHBranch commits do: [ :commit |
-		commit repository: aGLHBranch repository.
-		commit repository project: aGLHBranch repository project ].
-	^ aGLHBranch commits
+	^ self
+		  importCommitsOfBranch: aGLHBranch
+		  forRefName: refName
+		  since: nil
+		  until: toDate 
 ]
 
 { #category : #'as yet unclassified' }
 GLPHModelImporter >> importDiffOfMergeRequest: aMergeRequest [
 
 	| result diffsResult |
-	
 	aMergeRequest diffs ifNotEmpty: [
 		'Diff of already importer: '
 		, aMergeRequest iid printString recordInfo.
 		^ aMergeRequest diffs ].
-	('Import diff of mergeRequest ' , aMergeRequest iid printString) recordInfo.
+	('Import diff of mergeRequest ' , aMergeRequest iid printString)
+		recordInfo.
 	result := self glhApi
-		          diffsMergeRequestOfProject: (aMergeRequest project_id)
+		          diffsMergeRequestOfProject: aMergeRequest project_id
 		          withId: aMergeRequest iid.
-	
+
 	diffsResult := self parseDiffResult: result.
-	aMergeRequest diffs addAll: diffsResult.
-	aMergeRequest mooseModel addAll: aMergeRequest diffs.
+
+
+	aMergeRequest diffs
+		addAll: diffsResult
+		unless: self blockForDifffEquality.
+	self glhModel
+		addAll: aMergeRequest diffs
+		unless: self blockForDifffEquality.
+
+	aMergeRequest diffs do: [ :diff | self importDiffRangesForDiff: diff ].
+
+	^ aMergeRequest diffs
+]
+
+{ #category : #import }
+GLPHModelImporter >> importDiffRangesForDiff: aGLHDiff [
+
+	| diffRanges |
+	('Import changes of diff ' , aGLHDiff printString) recordInfo.
+	diffRanges := self parseDiffString: aGLHDiff.
 	
-	aMergeRequest diffs do: [ :diff |
-		self importChangesForDiff: diff.
-		 ].
-	
-	^ diffsResult
+	self glhModel addAll: diffRanges unless: [ :existing :new |
+		(existing diff mooseID = new diff mooseID and: [
+			 existing originalLineRange = new originalLineRange ]) and: [
+			existing newLineRange = new newLineRange ] ].
+
+	^ aGLHDiff diffRanges
 ]
 
 { #category : #import }
@@ -311,22 +292,37 @@ GLPHModelImporter >> parseDiffString: aDiff [
 	range := nil.
 	lines do: [ :line |
 		| aChange |
-		
 		(line trim beginsWith: #'@@') ifTrue: [
 			range := GLPHEDiffRange newFrom: line.
-			self glhModel add: range.
-			aDiff diffRanges add: range.
-			 ].
-		
+
+			aDiff diffRanges add: range unless: [ :existing :new |
+				existing originalLineRange = new originalLineRange and: [
+					existing newLineRange = new newLineRange ] ]
+
+			"	self glhModel 
+				add: range 
+				unless: [:existing :new | ((existing diff mooseID = new diff mooseID) 
+					and: [existing originalLineRange = new originalLineRange]) 
+					and: [ existing newLineRange = new newLineRange  ] 
+					]." ].
+
 		self withCommitDiffs ifTrue: [
-		aChange := GLPHEChange newFrom: line.
-		aChange diffRange: range.
-		aChange relativeIndex: index.
-		index := index + 1.
-		aDiff mooseModel add: aChange.
-		].
-		
-	].
+			aChange := GLPHEChange newFrom: line.
+			aChange relativeIndex: index.
+			range changes add: aChange unless: [ :existing :new |
+				existing sourceCode = new sourceCode and: [
+					existing index = new index ] ].
+			"self glhModel add: aChange ."
+			index := index + 1 ] ].
+
+
+	aDiff diffRanges do: [ :diffRange |
+		self glhModel addAll: diffRange changes unless: [ :existing :new |
+			(existing diffRange mooseID = new diffRange mooseID and: [
+				 existing sourceCode = new sourceCode ]) and: [
+				existing index = new index ] ] ].
+	
+^ aDiff diffRanges.
 ]
 
 { #category : #parsing }

@@ -28,6 +28,20 @@ GLHModelImporter >> beWithouFiles [
 	withFiles := false
 ]
 
+{ #category : #equality }
+GLHModelImporter >> blockForDifffEquality [
+	^ [ :existing :new |
+			existing diffString size = new diffString size and: [
+				existing diffString = new diffString ] ]
+]
+
+{ #category : #equality }
+GLHModelImporter >> blockForEntitiesWithIdEquality [
+
+	^ [ :existing :new |
+	  existing id = new id ]
+]
+
 { #category : #'private - api' }
 GLHModelImporter >> completeImportProject: aGLHProject [
 
@@ -155,8 +169,7 @@ GLHModelImporter >> importDiffOfCommit: aCommit [
 
 	| result diffsResult |
 	aCommit diffs ifNotEmpty: [
-		'Diff already importer: '
-		, aCommit short_id printString recordInfo.
+		'Diff already importer: ' , aCommit short_id printString recordInfo.
 		^ aCommit diffs ].
 	('Import diff of commit: ' , aCommit short_id printString) recordInfo.
 	result := self glhApi
@@ -164,9 +177,9 @@ GLHModelImporter >> importDiffOfCommit: aCommit [
 		          ofProject: aCommit repository project id
 		          unidiff: true.
 	diffsResult := self parseDiffResult: result.
-	aCommit diffs addAll: diffsResult.
-	self glhModel addAll: diffsResult.
-	^ diffsResult
+
+	aCommit diffs addAll: diffsResult unless: self blockForDifffEquality .
+	^ aCommit diffs
 ]
 
 { #category : #'private - api' }
