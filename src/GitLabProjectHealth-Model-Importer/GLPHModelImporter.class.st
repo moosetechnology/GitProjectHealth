@@ -149,7 +149,7 @@ GLPHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName since
 		newlyFoundCommit := self parseCommitsResult: results.
 		aGLHBranch commits
 			addAll: newlyFoundCommit
-			unless: self blockForEntitiesWithIdEquality ].
+			unless: (self blockEqualityOn: #id) ].
 
 	self glhModel
 		addAll: aGLHBranch commits
@@ -187,10 +187,10 @@ GLPHModelImporter >> importDiffOfMergeRequest: aMergeRequest [
 
 	aMergeRequest diffs
 		addAll: diffsResult
-		unless: self blockForDifffEquality.
+		unless: self blockForDiffEquality.
 	self glhModel
 		addAll: aMergeRequest diffs
-		unless: self blockForDifffEquality.
+		unless: self blockForDiffEquality.
 
 	aMergeRequest diffs do: [ :diff | self importDiffRangesForDiff: diff ].
 
@@ -219,8 +219,9 @@ GLPHModelImporter >> importMergeRequests: aGLHProject [
 	results := self glhApi mergeRequestOfProject: aGLHProject id.
 	parsedResults := self parseMergeRequestResult: results.
 
-	aGLHProject mergeRequests addAll: parsedResults.
-	aGLHProject mooseModel addAll: aGLHProject mergeRequests.
+	1 halt.
+	aGLHProject mergeRequests addAll: parsedResults unless: self blockOnIdEquality .
+	self glhModel addAll: aGLHProject mergeRequests unless: self blockOnIdEquality.
 
 	self withCommitDiffs ifTrue: [
 		aGLHProject mergeRequests do: [ :mr |
@@ -248,19 +249,12 @@ GLPHModelImporter >> importRepository: aGLHRepository [
 ]
 
 { #category : #user }
-GLPHModelImporter >> importUserByEmail: anUsername [ 
-	^ (self glhModel allWithType: GLHUser) detect: [ :user | user username = anUsername ] ifNone: [ 
-		
-		 ]
-]
-
-{ #category : #user }
 GLPHModelImporter >> importUserByUsername: anUsername [
 
 	^ (self glhModel allWithType: GLHUser)
 		  detect: [ :user | user username = anUsername ]
 		  ifNone: [
-			  | result userResult userId searchResult |
+			  | result userId searchResult |
 			  ('Import user with username: ' , anUsername printString)
 				  recordInfo.
 			  result := self glhApi usersSearchByUsername: anUsername.
@@ -270,9 +264,8 @@ GLPHModelImporter >> importUserByUsername: anUsername [
 				  (self glhModel allWithType: GLHUser)
 					  detect: [ :user | user id = userId ]
 					  ifNone: [
-						  userResult := self parseUserResult: (self glhApi user: userId).
-						  glhModel add: userResult.
-						  userResult ] ] ]
+						  self importUser: userId.
+						   ] ] ]
 ]
 
 { #category : #initialization }

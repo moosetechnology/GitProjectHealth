@@ -28,18 +28,30 @@ GLHModelImporter >> beWithouFiles [
 	withFiles := false
 ]
 
+{ #category : #'as yet unclassified' }
+GLHModelImporter >> blockEqualityOn: aSymbol [
+	^ [ :existing :new |
+	  (existing perform: aSymbol) = (new perform: aSymbol) ]
+]
+
 { #category : #equality }
-GLHModelImporter >> blockForDifffEquality [
+GLHModelImporter >> blockForDiffEquality [
 	^ [ :existing :new |
 			existing diffString size = new diffString size and: [
 				existing diffString = new diffString ] ]
 ]
 
 { #category : #equality }
-GLHModelImporter >> blockForEntitiesWithIdEquality [
+GLHModelImporter >> blockOnIdEquality [
 
 	^ [ :existing :new |
 	  existing id = new id ]
+]
+
+{ #category : #equality }
+GLHModelImporter >> blockOnNameEquality [
+
+	^ self blockEqualityOn: #name
 ]
 
 { #category : #'private - api' }
@@ -178,7 +190,7 @@ GLHModelImporter >> importDiffOfCommit: aCommit [
 		          unidiff: true.
 	diffsResult := self parseDiffResult: result.
 
-	aCommit diffs addAll: diffsResult unless: self blockForDifffEquality .
+	aCommit diffs addAll: diffsResult unless: self blockForDiffEquality .
 	^ aCommit diffs
 ]
 
@@ -191,14 +203,15 @@ GLHModelImporter >> importDirectoryFiles: aDirectoryFile OfBranch: aBranch [
 		          ofBranch: aBranch name
 		          andPath: aDirectoryFile path , '/'.
 	apiFiles := self parseFileTreeResult: result.
-	files := apiFiles collect: [ :apiFile | 
+	files := apiFiles collect: [ :apiFile |
 		         self convertApiFileAsFile: apiFile ].
-	files do: [ :file | 
+	files do: [ :file |
+		
 		self glhModel add: file.
 		aDirectoryFile addFile: file ].
 	files
 		select: [ :file | file isKindOf: GLHFileDirectory ]
-		thenCollect: [ :file | 
+		thenCollect: [ :file |
 		self importDirectoryFiles: file OfBranch: aBranch ]
 ]
 
@@ -246,7 +259,15 @@ GLHModelImporter >> importRepository: aGLHRepository [
 	resultBranches := self glhApi branchesOfRepository:
 		                  aGLHRepository project id.
 	branches := self parseBranchesResult: resultBranches.
-	branches do: [ :branch | aGLHRepository addBranch: branch. self glhModel add: branch.  ].
+	
+
+	aGLHRepository branches addAll: branches unless: self blockOnNameEquality.
+	self glhModel addAll: branches unless: self blockOnNameEquality.
+	
+	"branches do: [ :branch |
+		aGLHRepository addBranch: branch.
+		self glhModel add: branch ]."
+	
 	self withFiles ifTrue: [
 		branches do: [ :branch | self importFilesOfBranch: branch ] ] ]
 		on: NeoJSONParseError
@@ -258,13 +279,14 @@ GLHModelImporter >> importRepository: aGLHRepository [
 GLHModelImporter >> importUser: aUserID [
 
 	| result userResult |
-	^ (glhModel allWithType: GLHUser) detect: [ :user | user id = aUserID ] ifNone: [ 
-		('Import user: ' , aUserID printString) recordInfo.
-		result := self glhApi user: aUserID.
-		userResult := self parseUserResult: result.
-		glhModel add: userResult.
-	 userResult ].
-	
+	^ (glhModel allWithType: GLHUser)
+		  detect: [ :user | user id = aUserID ]
+		  ifNone: [
+			  ('Import user: ' , aUserID printString) recordInfo.
+			  result := self glhApi user: aUserID.
+			  userResult := self parseUserResult: result.
+			  glhModel add: userResult unless: self blockOnIdEquality.
+			  userResult ]
 ]
 
 { #category : #initialization }
