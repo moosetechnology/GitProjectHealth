@@ -1,18 +1,18 @@
 Extension { #name : #GLPHEChange }
 
 { #category : #'*GLPHExtended-Model-Extension' }
-GLPHEChange class >> createFrom: aDiffLine [ 
+GLPHEChange class >> createFrom: aDiffLine [
 	"Factory a Change from a loc"
-	|aChange|
-	aChange := nil. 
-	(aDiffLine beginsWith: #'@@') ifTrue: [ 
-		|infos|
-		aChange := GLPHELineOfCode newFromLoCRange: aDiffLine.  
-		1 halt. 
+
+	| aChange |
+	aChange := nil.
+	(aDiffLine beginsWith: #'@@') ifTrue: [
+		| infos |
+		aChange := GLPHELineOfCode newFromLoCRange: aDiffLine.
+
 		infos := (aDiffLine splitOn: '@@') copyWithoutFirst.
-		infos := aDiffLine splitOn: ' ' .
-	].
-	^ aChange. 
+		infos := aDiffLine splitOn: ' ' ].
+	^ aChange
 ]
 
 { #category : #'*GLPHExtended-Model-Extension' }

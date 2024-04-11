@@ -99,11 +99,12 @@ GLHMetamodelGenerator >> defineHierarchy [
 	(builder ensureClassNamed: #Entity) --|> #TEntityMetaLevelDependency.
 	fileDirectory --|> file.
 	fileBlob --|> file.
-	
+
 	group --|> #TNamedEntity.
 	project --|> #TNamedEntity.
 	user --|> #TNamedEntity.
 	commit --|> #TNamedEntity.
+	diff --|> #TNamedEntity
 ]
 
 { #category : #definition }

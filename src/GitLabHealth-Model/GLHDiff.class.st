@@ -17,6 +17,7 @@ The diff of a commit
 |---|
 | `deleted_file` | `Boolean` | false | Is the file of the diff has been removed|
 | `diffString` | `String` | nil | The string presenting the diff. It should follow the [Detailed-Unified](https://www.gnu.org/software/diffutils/manual/html_node/Detailed-Unified.html) format|
+| `name` | `String` | nil | Basic name of the entity, not full reference.|
 | `new_file` | `Boolean` | false | Is the file of the diff is a new file|
 | `new_path` | `String` | nil | The path to the file in the resulted repository commitish|
 | `old_path` | `String` | nil | The path to the file in the origin repository commitish|
@@ -26,14 +27,16 @@ The diff of a commit
 Class {
 	#name : #GLHDiff,
 	#superclass : #GLHEntity,
+	#traits : 'FamixTNamedEntity',
+	#classTraits : 'FamixTNamedEntity classTrait',
 	#instVars : [
+		'#commit => FMOne type: #GLHCommit opposite: #diffs',
+		'#deleted_file => FMProperty defaultValue: false',
 		'#diffString => FMProperty',
+		'#new_file => FMProperty defaultValue: false',
 		'#new_path => FMProperty',
 		'#old_path => FMProperty',
-		'#new_file => FMProperty defaultValue: false',
-		'#renamed_file => FMProperty defaultValue: false',
-		'#deleted_file => FMProperty defaultValue: false',
-		'#commit => FMOne type: #GLHCommit opposite: #diffs'
+		'#renamed_file => FMProperty defaultValue: false'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }
@@ -98,6 +101,16 @@ GLHDiff >> diffString [
 GLHDiff >> diffString: anObject [
 	<generated>
 	diffString := anObject
+]
+
+{ #category : #'as yet unclassified' }
+GLHDiff >> inspectionGLHDiff [
+
+	<inspectorPresentationOrder: 3 title: 'Files Impacted'>
+	| canvas |
+	canvas := RSCommitDiff canvasFor: self.
+
+	^ canvas asPresenter
 ]
 
 { #category : #accessing }

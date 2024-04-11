@@ -47,6 +47,13 @@ GLHTEntityCreator >> newDiff [
 ]
 
 { #category : #'entity creation' }
+GLHTEntityCreator >> newDiffNamed: aName [
+
+	<generated>
+	^ self add: (GLHDiff named: aName)
+]
+
+{ #category : #'entity creation' }
 GLHTEntityCreator >> newFile [
 
 	<generated>
