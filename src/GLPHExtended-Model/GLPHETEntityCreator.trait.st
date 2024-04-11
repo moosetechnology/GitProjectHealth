@@ -59,3 +59,10 @@ GLPHETEntityCreator >> newMergeRequest [
 	<generated>
 	^ self add: GLPHEMergeRequest new
 ]
+
+{ #category : #'entity creation' }
+GLPHETEntityCreator >> newMergeRequestNamed: aName [
+
+	<generated>
+	^ self add: (GLPHEMergeRequest named: aName)
+]

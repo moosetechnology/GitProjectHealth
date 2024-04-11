@@ -17,8 +17,9 @@ a gitlab merge request
 | `author` | `GLPHEMergeRequest` | `createdMergeRequests` | `GLHUser` | |
 | `closed_by` | `GLPHEMergeRequest` | `closedMergeRequests` | `GLHUser` | |
 | `diffs` | `GLPHEMergeRequest` | `mergeRequest` | `GLHDiff` | |
-| `mergeCommit` | `GLPHEMergeRequest` | `commitedMergeRequest` | `GLHCommit` | |
+| `mergeRequestCommit` | `GLPHEMergeRequest` | `commitedMergeRequest` | `GLHCommit` | |
 | `merge_user` | `GLPHEMergeRequest` | `usedMerges` | `GLHUser` | |
+| `mergedCommit` | `GLPHEMergeRequest` | `commitedMergeRequest` | `GLHCommit` | |
 | `merged_by` | `GLPHEMergeRequest` | `mergerOfMergeRequests` | `GLHUser` | |
 | `pipeline` | `GLPHEMergeRequest` | `mergeResquest` | `GLHPipeline` | |
 | `reviewers` | `GLPHEMergeRequest` | `reviewedMergeResquest` | `GLHUser` | |
@@ -52,6 +53,7 @@ a gitlab merge request
 | `merge_when_pipeline_succeeds` | `Boolean` | nil | |
 | `merged_at` | `String` | nil | |
 | `milestone` | `String` | nil | |
+| `name` | `String` | nil | Basic name of the entity, not full reference.|
 | `project_id` | `Number` | nil | |
 | `reference` | `String` | nil | |
 | `references_full` | `String` | nil | |
@@ -85,6 +87,8 @@ a gitlab merge request
 Class {
 	#name : #GLPHEMergeRequest,
 	#superclass : #GLPHEEntity,
+	#traits : 'FamixTNamedEntity',
+	#classTraits : 'FamixTNamedEntity classTrait',
 	#instVars : [
 		'#blocking_discussions_resolved => FMProperty',
 		'#changes_count => FMProperty',
@@ -488,25 +492,25 @@ GLPHEMergeRequest >> latest_build_started_at: anObject [
 ]
 
 { #category : #accessing }
-GLPHEMergeRequest >> mergeCommit [
-	"Relation named: #mergeCommit type: #GLHCommit opposite: #commitedMergeRequest"
+GLPHEMergeRequest >> mergeRequestCommit [
+	"Relation named: #mergeRequestCommit type: #GLHCommit opposite: #commitedMergeRequest"
 
 	<generated>
-	<FMProperty: #mergeCommit type: #GLHCommit opposite: #commitedMergeRequest>
-	^ self attributeAt: #mergeCommit ifAbsent: [ nil ]
+	<FMProperty: #mergeRequestCommit type: #GLHCommit opposite: #commitedMergeRequest>
+	^ self attributeAt: #mergeRequestCommit ifAbsent: [ nil ]
 ]
 
 { #category : #accessing }
-GLPHEMergeRequest >> mergeCommit: anObject [
+GLPHEMergeRequest >> mergeRequestCommit: anObject [
 
 	<generated>
-	(self attributeAt: #mergeCommit ifAbsentPut: [nil]) == anObject ifTrue: [ ^ anObject ].
+	(self attributeAt: #mergeRequestCommit ifAbsentPut: [nil]) == anObject ifTrue: [ ^ anObject ].
 	anObject ifNil: [ | otherSide |
-		otherSide :=  self mergeCommit.
-		self attributeAt: #mergeCommit put: anObject.
+		otherSide :=  self mergeRequestCommit.
+		self attributeAt: #mergeRequestCommit put: anObject.
 		otherSide commitedMergeRequest: nil ]
 	ifNotNil: [ 
-		self attributeAt: #mergeCommit put: anObject.
+		self attributeAt: #mergeRequestCommit put: anObject.
 		anObject commitedMergeRequest: self ]
 ]
 
@@ -566,6 +570,29 @@ GLPHEMergeRequest >> merge_when_pipeline_succeeds [
 GLPHEMergeRequest >> merge_when_pipeline_succeeds: anObject [
 	<generated>
 	merge_when_pipeline_succeeds := anObject
+]
+
+{ #category : #accessing }
+GLPHEMergeRequest >> mergedCommit [
+	"Relation named: #mergedCommit type: #GLHCommit opposite: #commitedMergeRequest"
+
+	<generated>
+	<FMProperty: #mergedCommit type: #GLHCommit opposite: #commitedMergeRequest>
+	^ self attributeAt: #mergedCommit ifAbsent: [ nil ]
+]
+
+{ #category : #accessing }
+GLPHEMergeRequest >> mergedCommit: anObject [
+
+	<generated>
+	(self attributeAt: #mergedCommit ifAbsentPut: [nil]) == anObject ifTrue: [ ^ anObject ].
+	anObject ifNil: [ | otherSide |
+		otherSide :=  self mergedCommit.
+		self attributeAt: #mergedCommit put: anObject.
+		otherSide commitedMergeRequest: nil ]
+	ifNotNil: [ 
+		self attributeAt: #mergedCommit put: anObject.
+		anObject commitedMergeRequest: self ]
 ]
 
 { #category : #accessing }

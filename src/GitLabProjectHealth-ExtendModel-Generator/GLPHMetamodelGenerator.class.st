@@ -75,7 +75,6 @@ GLPHMetamodelGenerator >> defineClasses [
 		             'a indicate on which line of code are concerned by a diff (usually declared with @@ oldRange, newRange @@) '.
 
 
-
 	repository := self remoteEntity: #Repository withPrefix: #GLH.
 	file := self remoteEntity: #File withPrefix: #GLH.
 	diff := self remoteEntity: #Diff withPrefix: #GLH.
@@ -92,7 +91,7 @@ GLPHMetamodelGenerator >> defineHierarchy [
 	(builder ensureClassNamed: #Entity) --|> #TEntityMetaLevelDependency.
 	change <|-- addition.
 	change <|-- deletion.
-	change <|-- lineOfCode.
+	change <|-- lineOfCode. mergeRequest --|> #TNamedEntity
 ]
 
 { #category : #definition }
@@ -134,7 +133,10 @@ GLPHMetamodelGenerator >> defineRelations [
 	(mergeRequest property: #pipeline)
 	- (pipeline property: #mergeResquest).
 
-	(mergeRequest property: #mergeCommit)
+	(mergeRequest property: #mergedCommit)
+	- (commit property: #commitedMergeRequest).
+	
+	(mergeRequest property: #mergeRequestCommit)
 	- (commit property: #commitedMergeRequest).
 
 	(mergeRequest property: #squashCommit)
@@ -148,7 +150,6 @@ GLPHMetamodelGenerator >> defineRelations [
 	"DIFF"
 	(diff property: #diffRanges) <>-* (diffRange property: #diff).
 	(diffRange property: #changes) -* (change property: #diffRange)
-	
 ]
 
 { #category : #'as yet unclassified' }

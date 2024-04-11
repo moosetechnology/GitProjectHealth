@@ -72,6 +72,21 @@ GLPHModelImporter >> completeImportProject: aGLHProject [
 
 ]
 
+{ #category : #'as yet unclassified' }
+GLPHModelImporter >> importCommitOfProject: anProject withId: anID [
+	|commit result|
+	
+	
+	anID ifNil: [ ^ nil ]. 
+	
+	result := self glhApi commit: anID ofProject: anProject id.
+	commit := (self parseCommitsResult: ('[',result,']'))first. 
+	
+	self glhModel add: commit unless: (self blockOnIdEquality ). 
+	
+	^commit 
+]
+
 { #category : #import }
 GLPHModelImporter >> importCommitsOfBranch: aGLHBranch [
 
@@ -168,6 +183,25 @@ GLPHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName until
 		  until: toDate 
 ]
 
+{ #category : #importer }
+GLPHModelImporter >> importCommitsOfMergeResquest: aGLPHEMergeRequest [
+	|foundCommits|
+	foundCommits := OrderedCollection new. 
+	
+	aGLPHEMergeRequest mergeRequestCommit: ((self
+			 importCommitOfProject: aGLPHEMergeRequest project
+			 withId: aGLPHEMergeRequest sha) ifNotNil: [:commit | foundCommits add: commit]).
+	
+	aGLPHEMergeRequest mergedCommit: ((self
+			 importCommitOfProject: aGLPHEMergeRequest project
+			 withId: aGLPHEMergeRequest merge_commit_sha) ifNotNil: [:commit | foundCommits add: commit]).
+	aGLPHEMergeRequest squashCommit: ((self
+			 importCommitOfProject: aGLPHEMergeRequest project
+			 withId: aGLPHEMergeRequest squash_commit_sha) ifNotNil: [:commit | foundCommits add: commit]).
+			
+	self chainsCommitsFrom: foundCommits.
+]
+
 { #category : #'as yet unclassified' }
 GLPHModelImporter >> importDiffOfMergeRequest: aMergeRequest [
 
@@ -219,9 +253,19 @@ GLPHModelImporter >> importMergeRequests: aGLHProject [
 	results := self glhApi mergeRequestOfProject: aGLHProject id.
 	parsedResults := self parseMergeRequestResult: results.
 
-	1 halt.
-	aGLHProject mergeRequests addAll: parsedResults unless: self blockOnIdEquality .
-	self glhModel addAll: aGLHProject mergeRequests unless: self blockOnIdEquality.
+	aGLHProject mergeRequests
+		addAll: parsedResults
+		unless: self blockOnIdEquality.
+	self glhModel
+		addAll: aGLHProject mergeRequests
+		unless: self blockOnIdEquality.
+
+
+
+	"gets it related commits"
+	aGLHProject mergeRequests do: [ :mr |
+		self importCommitsOfMergeResquest: mr ].
+
 
 	self withCommitDiffs ifTrue: [
 		aGLHProject mergeRequests do: [ :mr |
