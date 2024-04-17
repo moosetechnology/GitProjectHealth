@@ -236,7 +236,7 @@ GLHModelImporter >> importRepository: aGLHRepository [
 GLHModelImporter >> importUser: aUserID [
 
 	| result userResult |
-	(glhModel allWithType: GLHUser) detect: [ :user | user id = aUserID ] ifFound: [ :user | ^ user ].
+	(glhModel allWithType: GLHUser) asOrderedCollection detect: [ :user | user id = aUserID ] ifFound: [ :user | ^ user ].
 	('Import user: ' , aUserID printString) recordInfo.
 	result := self glhApi user: aUserID.
 	userResult := self parseUserResult: result.
@@ -344,9 +344,15 @@ GLHModelImporter >> parsePipelinesResult: result [
 	| reader |
 	reader := NeoJSONReader on: result readStream.
 	reader mapInstVarsFor: GLHPipeline.
+	reader for: GLHPipeline do: [ :mapping |
+		mapping
+			mapProperty: #created_at
+			getter: [ :object | #ignore ]
+			setter: [ :object :value |
+			object runDate: (DateAndTime fromString: value) ] ].
 	reader
 		for: #ArrayOfPipelines
-		customDo: [ :customMappting | 
+		customDo: [ :customMappting |
 		customMappting listOfElementSchema: GLHPipeline ].
 	^ reader nextAs: #ArrayOfPipelines
 ]

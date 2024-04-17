@@ -228,20 +228,20 @@ GHModelImporter >> parsePipelinesResult: pipelineOverview [
 
 	| reader |
 	reader := NeoJSONReader on: pipelineOverview readStream.
-	reader for: GHAPIPipelineOverview do: [ :mapping | 
+	reader for: GHAPIPipelineOverview do: [ :mapping |
 		mapping mapInstVar: #total_count to: #total_count.
 		(mapping mapInstVar: #workflow_runs) valueSchema: #ArrayOfPipelines ].
 	reader
 		for: #ArrayOfPipelines
-		customDo: [ :customMappting | 
+		customDo: [ :customMappting |
 		customMappting listOfElementSchema: GLHPipeline ].
-	reader
-		for: GLHPipeline
-		do: [ :mapping |
-			mapping
-				mapInstVar: #status to: #conclusion ;
-				mapProperty: #run_started_at getter: [ :object | #ignore ] setter: [ :object : value | object runDate: (DateAndTime fromString: value) ]
-		].
+	reader for: GLHPipeline do: [ :mapping |
+		mapping
+			mapInstVar: #status to: #conclusion;
+			mapProperty: #run_started_at
+			getter: [ :object | #ignore ]
+			setter: [ :object :value |
+				object runDate: (DateAndTime fromString: value) ] ].
 	^ reader nextAs: GHAPIPipelineOverview
 ]
 
