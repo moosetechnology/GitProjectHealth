@@ -1,13 +1,39 @@
 "
 A GitLab Pipeline execution
+
+## Relations
+======================
+
+### Parents
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `project` | `GLHPipeline` | `pipelines` | `GLHProject` | |
+
+### Children
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `jobs` | `GLHPipeline` | `pipeline` | `GLHJob` | |
+
+
+## Properties
+======================
+
+| Name | Type | Default value | Comment |
+|---|
+| `id` | `String` | nil | The id of the pipeline|
+| `runDate` | `Object` | nil | Date this pipeline was run|
+| `status` | `String` | nil | #success or #failure|
+
 "
 Class {
 	#name : #GLHPipeline,
 	#superclass : #GLHEntity,
 	#instVars : [
-		'#status => FMProperty',
+		'#id => FMProperty',
+		'#jobs => FMMany type: #GLHJob opposite: #pipeline',
+		'#project => FMOne type: #GLHProject opposite: #pipelines',
 		'#runDate => FMProperty',
-		'#project => FMOne type: #GLHProject opposite: #pipelines'
+		'#status => FMProperty'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }
@@ -19,6 +45,50 @@ GLHPipeline class >> annotation [
 	<package: #'GitLabHealth-Model'>
 	<generated>
 	^ self
+]
+
+{ #category : #adding }
+GLHPipeline >> addJob: anObject [
+	<generated>
+	^ self jobs add: anObject
+]
+
+{ #category : #accessing }
+GLHPipeline >> id [
+
+	<FMProperty: #id type: #String>
+	<generated>
+	<FMComment: 'The id of the pipeline'>
+	^ id
+]
+
+{ #category : #accessing }
+GLHPipeline >> id: anObject [
+	<generated>
+	id := anObject
+]
+
+{ #category : #accessing }
+GLHPipeline >> jobs [
+	"Relation named: #jobs type: #GLHJob opposite: #pipeline"
+
+	<generated>
+	<derived>
+	^ jobs
+]
+
+{ #category : #accessing }
+GLHPipeline >> jobs: anObject [
+
+	<generated>
+	jobs value: anObject
+]
+
+{ #category : #navigation }
+GLHPipeline >> jobsGroup [
+	<generated>
+	<navigation: 'Jobs'>
+	^ MooseSpecializedGroup withAll: self jobs asSet
 ]
 
 { #category : #accessing }

@@ -1,5 +1,23 @@
 "
 A file
+
+## Relations
+======================
+
+### Parents
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `branch` | `GLHFile` | `files` | `GLHBranch` | |
+| `directoryOwner` | `GLHFile` | `files` | `GLHFileDirectory` | |
+
+
+## Properties
+======================
+
+| Name | Type | Default value | Comment |
+|---|
+| `name` | `String` | nil | |
+
 "
 Class {
 	#name : #GLHFile,

@@ -13,7 +13,8 @@ Class {
 		'fileDirectory',
 		'commit',
 		'commitStats',
-		'diff'
+		'diff',
+		'job'
 	],
 	#category : #'GitLabHealth-Model-Generator'
 }
@@ -86,7 +87,9 @@ GLHMetamodelGenerator >> defineClasses [
 	commit := builder
 		          newClassNamed: #Commit
 		          comment: 'a commit attached to a repository'.
-	diff := builder newClassNamed: #Diff comment: 'The diff of a commit'
+	diff := builder newClassNamed: #Diff comment: 'The diff of a commit'.
+	
+	job := builder newClassNamed: #Job comment: 'A CI Job'
 ]
 
 { #category : #definition }
@@ -96,9 +99,10 @@ GLHMetamodelGenerator >> defineHierarchy [
 	(builder ensureClassNamed: #Entity) --|> #TEntityMetaLevelDependency.
 	fileDirectory --|> file.
 	fileBlob --|> file.
-	
+
 	group --|> #TNamedEntity.
 	project --|> #TNamedEntity.
+	job --|> #TNamedEntity
 ]
 
 { #category : #definition }
@@ -124,14 +128,19 @@ GLHMetamodelGenerator >> defineProperties [
 	project property: #creator_id type: #Number.
 
 	"Pipelines properties"
-	(pipeline property: #status type: #String) comment: '#success or #failure'.
-	(pipeline property: #runDate type: #Object) comment: 'Date this pipeline was run'.
+	(pipeline property: #status type: #String) comment:
+		'#success or #failure'.
+	(pipeline property: #runDate type: #Object) comment:
+		'Date this pipeline was run'.
+	(pipeline property: #id type: #String) comment:
+		'The id of the pipeline'.
 
 	self userProperties.
 	self branchProperties.
 	self fileProperties.
 	self commitProperties.
-	 self diffProperties
+	self diffProperties.
+	self jobProperties
 ]
 
 { #category : #definition }
@@ -145,10 +154,14 @@ GLHMetamodelGenerator >> defineRelations [
 	(project property: #repository) <>- (repository property: #project).
 	(repository property: #branches) <>-* (branch property: #repository).
 	(branch property: #files) <>-* (file property: #branch).
-	(fileDirectory property: #files) <>-* (file property: #directoryOwner).
+	(fileDirectory property: #files)
+	<>-* (file property: #directoryOwner).
 	(repository property: #commits) <>-* (commit property: #repository).
 	(branch property: #commits) <>-* (commit property: #branch).
-	(commit property: #diffs) <>-* (diff property: #commit)
+	(commit property: #diffs) <>-* (diff property: #commit).
+	(commit property: #jobs) <>-* (job property: #commit).
+	(pipeline property: #jobs) <>-* (job property: #pipeline).
+	(user property: #jobs) <>-* (job property: #user)
 ]
 
 { #category : #definition }
@@ -178,6 +191,16 @@ GLHMetamodelGenerator >> diffProperties [
 GLHMetamodelGenerator >> fileProperties [
 
 	file property: #name type: #String
+]
+
+{ #category : #definition }
+GLHMetamodelGenerator >> jobProperties [
+
+	job property: #id type: #Number.
+	job property: #allow_failure type: #Boolean.
+	job property: #web_url type: #String.
+	job property: #duration type: #Object.
+	job property: #allow_failure type: #Boolean
 ]
 
 { #category : #definition }

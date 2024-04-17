@@ -1,5 +1,42 @@
 "
 A GitLab Project
+
+## Relations
+======================
+
+### Parents
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `group` | `GLHProject` | `projects` | `GLHGroup` | |
+
+### Children
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `pipelines` | `GLHProject` | `project` | `GLHPipeline` | |
+| `repository` | `GLHProject` | `project` | `GLHRepository` | |
+
+### Other
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `creator` | `GLHProject` | `createdProjects` | `GLHUser` | |
+
+
+## Properties
+======================
+
+| Name | Type | Default value | Comment |
+|---|
+| `archived` | `Boolean` | nil | |
+| `archived` | `Boolean` | nil | |
+| `avatar_url` | `String` | nil | |
+| `creator_id` | `Number` | nil | |
+| `description` | `String` | nil | |
+| `id` | `Number` | nil | |
+| `name` | `String` | nil | Basic name of the entity, not full reference.|
+| `readme_url` | `String` | nil | |
+| `topics` | `Object` | nil | |
+| `web_url` | `String` | nil | |
+
 "
 Class {
 	#name : #GLHProject,

@@ -1,5 +1,7 @@
 "
 A file blob
+
+
 "
 Class {
 	#name : #GLHFileBlob,

@@ -181,6 +181,14 @@ GLHApi >> initialize [
 			 yourself)
 ]
 
+{ #category : #'api - jobs' }
+GLHApi >> jobsOfProject: aProjectID ofPipelines: aPipelineID [
+
+	^ self client get:
+		  self baseAPIUrl , '/projects/' , aProjectID printString
+		  , '/pipelines/' , aPipelineID printString , '/jobs'
+]
+
 { #category : #api }
 GLHApi >> pipelinesOfProject: aProjectID [
 	^ self client get: self baseAPIUrl , '/projects/' , aProjectID printString, '/pipelines'

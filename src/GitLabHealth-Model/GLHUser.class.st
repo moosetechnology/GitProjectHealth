@@ -1,5 +1,47 @@
 "
 A GitLab User
+
+## Relations
+======================
+
+### Children
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `jobs` | `GLHUser` | `user` | `GLHJob` | |
+
+### Other
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `createdProjects` | `GLHUser` | `creator` | `GLHProject` | |
+
+
+## Properties
+======================
+
+| Name | Type | Default value | Comment |
+|---|
+| `avatar_url` | `String` | nil | |
+| `bio` | `String` | nil | |
+| `bot` | `String` | nil | |
+| `created_at` | `String` | nil | |
+| `followers` | `String` | nil | |
+| `following` | `String` | nil | |
+| `id` | `Number` | nil | |
+| `job_title` | `String` | nil | |
+| `linkedin` | `String` | nil | |
+| `location` | `String` | nil | |
+| `name` | `String` | nil | |
+| `organization` | `String` | nil | |
+| `pronouns` | `String` | nil | |
+| `public_email` | `String` | nil | |
+| `skype` | `String` | nil | |
+| `state` | `String` | nil | |
+| `twitter` | `String` | nil | |
+| `username` | `String` | nil | |
+| `web_url` | `String` | nil | |
+| `website_url` | `String` | nil | |
+| `work_information` | `String` | nil | |
+
 "
 Class {
 	#name : #GLHUser,
@@ -26,7 +68,8 @@ Class {
 		'#work_information => FMProperty',
 		'#followers => FMProperty',
 		'#following => FMProperty',
-		'#createdProjects => FMMany type: #GLHProject opposite: #creator'
+		'#createdProjects => FMMany type: #GLHProject opposite: #creator',
+		'#jobs => FMMany type: #GLHJob opposite: #user'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }
@@ -44,6 +87,12 @@ GLHUser class >> annotation [
 GLHUser >> addCreatedProject: anObject [
 	<generated>
 	^ self createdProjects add: anObject
+]
+
+{ #category : #adding }
+GLHUser >> addJob: anObject [
+	<generated>
+	^ self jobs add: anObject
 ]
 
 { #category : #accessing }
@@ -172,6 +221,29 @@ GLHUser >> job_title [
 GLHUser >> job_title: anObject [
 	<generated>
 	job_title := anObject
+]
+
+{ #category : #accessing }
+GLHUser >> jobs [
+	"Relation named: #jobs type: #GLHJob opposite: #user"
+
+	<generated>
+	<derived>
+	^ jobs
+]
+
+{ #category : #accessing }
+GLHUser >> jobs: anObject [
+
+	<generated>
+	jobs value: anObject
+]
+
+{ #category : #navigation }
+GLHUser >> jobsGroup [
+	<generated>
+	<navigation: 'Jobs'>
+	^ MooseSpecializedGroup withAll: self jobs asSet
 ]
 
 { #category : #accessing }

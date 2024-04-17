@@ -1,5 +1,27 @@
 "
 The diff of a commit
+
+## Relations
+======================
+
+### Parents
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `commit` | `GLHDiff` | `diffs` | `GLHCommit` | |
+
+
+## Properties
+======================
+
+| Name | Type | Default value | Comment |
+|---|
+| `deleted_file` | `Boolean` | false | Is the file of the diff has been removed|
+| `diffString` | `String` | nil | The string presenting the diff. It should follow the [Detailed-Unified](https://www.gnu.org/software/diffutils/manual/html_node/Detailed-Unified.html) format|
+| `new_file` | `Boolean` | false | Is the file of the diff is a new file|
+| `new_path` | `String` | nil | The path to the file in the resulted repository commitish|
+| `old_path` | `String` | nil | The path to the file in the origin repository commitish|
+| `renamed_file` | `Boolean` | false | Is the file of the diff has been renamed (see old_path/new_path) file|
+
 "
 Class {
 	#name : #GLHDiff,

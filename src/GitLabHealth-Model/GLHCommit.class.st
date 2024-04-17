@@ -1,5 +1,42 @@
 "
 a commit attached to a repository
+
+## Relations
+======================
+
+### Parents
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `branch` | `GLHCommit` | `commits` | `GLHBranch` | |
+| `repository` | `GLHCommit` | `commits` | `GLHRepository` | |
+
+### Children
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `diffs` | `GLHCommit` | `commit` | `GLHDiff` | |
+| `jobs` | `GLHCommit` | `commit` | `GLHJob` | |
+
+
+## Properties
+======================
+
+| Name | Type | Default value | Comment |
+|---|
+| `additions` | `Number` | nil | The number of line that git consider added|
+| `author_email` | `String` | nil | |
+| `author_name` | `String` | nil | |
+| `authored_date` | `Object` | nil | |
+| `committed_date` | `Object` | nil | |
+| `committer_email` | `String` | nil | |
+| `committer_name` | `String` | nil | |
+| `created_at` | `Object` | nil | |
+| `deletions` | `Number` | nil | The number of line that git consider deleted|
+| `id` | `String` | nil | |
+| `message` | `String` | nil | |
+| `short_id` | `String` | nil | |
+| `title` | `String` | nil | |
+| `web_url` | `String` | nil | |
+
 "
 Class {
 	#name : #GLHCommit,
@@ -21,7 +58,8 @@ Class {
 		'#deletions => FMProperty',
 		'#repository => FMOne type: #GLHRepository opposite: #commits',
 		'#branch => FMOne type: #GLHBranch opposite: #commits',
-		'#diffs => FMMany type: #GLHDiff opposite: #commit'
+		'#diffs => FMMany type: #GLHDiff opposite: #commit',
+		'#jobs => FMMany type: #GLHJob opposite: #commit'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }
@@ -39,6 +77,12 @@ GLHCommit class >> annotation [
 GLHCommit >> addDiff: anObject [
 	<generated>
 	^ self diffs add: anObject
+]
+
+{ #category : #adding }
+GLHCommit >> addJob: anObject [
+	<generated>
+	^ self jobs add: anObject
 ]
 
 { #category : #accessing }
@@ -227,6 +271,29 @@ GLHCommit >> id [
 GLHCommit >> id: anObject [
 	<generated>
 	id := anObject
+]
+
+{ #category : #accessing }
+GLHCommit >> jobs [
+	"Relation named: #jobs type: #GLHJob opposite: #commit"
+
+	<generated>
+	<derived>
+	^ jobs
+]
+
+{ #category : #accessing }
+GLHCommit >> jobs: anObject [
+
+	<generated>
+	jobs value: anObject
+]
+
+{ #category : #navigation }
+GLHCommit >> jobsGroup [
+	<generated>
+	<navigation: 'Jobs'>
+	^ MooseSpecializedGroup withAll: self jobs asSet
 ]
 
 { #category : #accessing }

@@ -1,6 +1,8 @@
 "
 This trait is used by Famix models.
 It provides an API for creating entities and adding them to the model.
+
+
 "
 Trait {
 	#name : #GLHTEntityCreator,
@@ -70,6 +72,20 @@ GLHTEntityCreator >> newGroupNamed: aName [
 
 	<generated>
 	^ self add: (GLHGroup named: aName)
+]
+
+{ #category : #'entity creation' }
+GLHTEntityCreator >> newJob [
+
+	<generated>
+	^ self add: GLHJob new
+]
+
+{ #category : #'entity creation' }
+GLHTEntityCreator >> newJobNamed: aName [
+
+	<generated>
+	^ self add: (GLHJob named: aName)
 ]
 
 { #category : #'entity creation' }

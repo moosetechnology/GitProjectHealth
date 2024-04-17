@@ -31,9 +31,10 @@ GLHModelImporter >> beWithouFiles [
 GLHModelImporter >> completeImportProject: aGLHProject [
 
 	('Complete import project: ' , aGLHProject id printString) recordInfo.
-	(self pipelinesOf: aGLHProject id) do: [ :pipeline | 
+	(self pipelinesOf: aGLHProject id) do: [ :pipeline |
 		self glhModel add: pipeline.
-		aGLHProject addPipeline: pipeline ].
+		aGLHProject addPipeline: pipeline.
+		self importJobsOf: pipeline ].
 	aGLHProject creator: (self importUser: aGLHProject creator_id).
 	aGLHProject repository: GLHRepository new.
 	self glhModel add: aGLHProject repository.
@@ -216,6 +217,18 @@ GLHModelImporter >> importGroup: aGroupID [
 	^ groupResult
 ]
 
+{ #category : #api }
+GLHModelImporter >> importJobsOf: aPipeline [
+
+	| result jobs |
+	result := self glhApi
+		          jobsOfProject: aPipeline project id
+		          ofPipelines: aPipeline id.
+	jobs := self parseJobsResult: result.
+	jobs do: [ :job | aPipeline addJob: job ].
+	self glhModel addAll: jobs
+]
+
 { #category : #'private - api' }
 GLHModelImporter >> importRepository: aGLHRepository [
 
@@ -336,6 +349,26 @@ GLHModelImporter >> parseGroupResult: aResult [
 		customDo: [ :customMappting | 
 		customMappting listOfElementSchema: GLHProject ].
 	^ reader nextAs: GLHGroup
+]
+
+{ #category : #private }
+GLHModelImporter >> parseJobsResult: result [
+
+	| reader |
+	reader := NeoJSONReader on: result readStream.
+	reader for: GLHJob do: [ :mapping |
+		mapping mapInstVars: #( id allow_failure web_url name ).
+
+		mapping
+			mapProperty: #user
+			getter: [ :object | #ignore ]
+			setter: [ :object :value | object user: (self importUser: (value at: #id)) ] ].
+
+	reader
+		for: #ArrayOfGLHJob
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHJob ].
+	^ reader nextAs: #ArrayOfGLHJob
 ]
 
 { #category : #private }
