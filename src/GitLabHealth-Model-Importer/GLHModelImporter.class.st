@@ -362,7 +362,14 @@ GLHModelImporter >> parseJobsResult: result [
 		mapping
 			mapProperty: #user
 			getter: [ :object | #ignore ]
-			setter: [ :object :value | object user: (self importUser: (value at: #id)) ] ].
+			setter: [ :object :value |
+			object user: (self importUser: (value at: #id)) ].
+
+		mapping
+			mapProperty: #duration
+			getter: [ :object | #ignore ]
+			setter: [ :object :value |
+			value ifNotNil: [ object duration: value seconds ] ] ].
 
 	reader
 		for: #ArrayOfGLHJob
