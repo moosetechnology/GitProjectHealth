@@ -10,6 +10,23 @@ Class {
 	#category : #'GitLabHealth-Model-Importer'
 }
 
+{ #category : #'private - api' }
+GLHModelImporter >> addCommits: commitsList toRepository: aProjectRepository [
+	"I take a list of GLHCommit. But some might have been parsed but are already on the model..."
+
+	"I return the list of added commits"
+
+	| existingCommits newlyFoundCommit |
+	existingCommits := aProjectRepository mooseModel allWithType:
+		                   GLHCommit.
+	newlyFoundCommit := commitsList reject: [ :commitParsed |
+		                    existingCommits anySatisfy: [ :existingCommit |
+			                    existingCommit id = commitParsed id ] ].
+	aProjectRepository mooseModel addAll: newlyFoundCommit.
+	aProjectRepository commits addAll: newlyFoundCommit.
+	^ newlyFoundCommit
+]
+
 { #category : #private }
 GLHModelImporter >> addGroupResultToModel: groupResult [
 
@@ -31,15 +48,36 @@ GLHModelImporter >> beWithouFiles [
 GLHModelImporter >> completeImportProject: aGLHProject [
 
 	('Complete import project: ' , aGLHProject id printString) recordInfo.
-	(self pipelinesOf: aGLHProject id) do: [ :pipeline |
-		self glhModel add: pipeline.
-		aGLHProject addPipeline: pipeline.
-		self importJobsOf: pipeline ].
+
 	aGLHProject creator: (self importUser: aGLHProject creator_id).
 	aGLHProject repository: GLHRepository new.
 	self glhModel add: aGLHProject repository.
 	self importRepository: aGLHProject repository.
-	self importCommits: aGLHProject
+	self importCommits: aGLHProject.
+	(self pipelinesOf: aGLHProject id) do: [ :pipeline |
+		self glhModel add: pipeline.
+		aGLHProject addPipeline: pipeline.
+		self importJobsOf: pipeline ]
+]
+
+{ #category : #private }
+GLHModelImporter >> configureReaderForCommit: reader [
+
+	reader for: DateAndTime customDo: [ :mapping |
+		mapping decoder: [ :string | DateAndTime fromString: string ] ].
+	reader for: GLHCommit do: [ :mapping |
+		mapping mapInstVars:
+			#( id short_id title author_name author_email committer_name
+			   committer_email message web_url ).
+		(mapping mapInstVar: #authored_date) valueSchema: DateAndTime.
+		(mapping mapInstVar: #committed_date) valueSchema: DateAndTime.
+		(mapping mapInstVar: #created_at) valueSchema: DateAndTime.
+		mapping
+			mapProperty: 'stats'
+			getter: [ :el | "Not used" ]
+			setter: [ :commit :value |
+				commit deletions: (value at: #deletions).
+				commit additions: (value at: #additions) ] ]
 ]
 
 { #category : #private }
@@ -79,6 +117,24 @@ GLHModelImporter >> glhModel: anObject [
 ]
 
 { #category : #'private - api' }
+GLHModelImporter >> importCommit: aCommitID ofProject: aGLHProject [
+
+	| result parsedResult |
+	(glhModel allWithType: GLHCommit) asOrderedCollection
+		detect: [ :commit | commit id = aCommitID ]
+		ifFound: [ :commit | ^ commit ].
+	result := self glhApi
+		          commit: aCommitID
+		          ofProject: aGLHProject id
+		          withStat: false.
+	parsedResult := self parseCommitResult: result.
+	self
+		addCommits: { parsedResult }
+		toRepository: aGLHProject repository.
+	^ parsedResult
+]
+
+{ #category : #'private - api' }
 GLHModelImporter >> importCommits: aGLHProject [
 
 	| results parsedResults |
@@ -97,9 +153,10 @@ GLHModelImporter >> importCommits: aGLHProject [
 		           perPage: nil
 		           page: nil.
 	parsedResults := self parseCommitsResult: results.
-	aGLHProject repository mooseModel addAll: parsedResults.
-	aGLHProject repository commits addAll: parsedResults.
-	self withCommitDiffs ifTrue: [ aGLHProject repository commits do: [ :commit | self importDiffOfCommit: commit ] ].
+	self addCommits: parsedResults toRepository: aGLHProject repository. 
+	self withCommitDiffs ifTrue: [
+		aGLHProject repository commits do: [ :commit |
+			self importDiffOfCommit: commit ] ]
 ]
 
 { #category : #api }
@@ -209,9 +266,10 @@ GLHModelImporter >> importGroup: aGroupID [
 	('Import group: ' , aGroupID printString) recordInfo.
 	result := self glhApi group: aGroupID.
 	groupResult := self parseGroupResult: result.
+	self addGroupResultToModel: groupResult.
 	groupResult projects do: [ :project | 
 		self completeImportProject: project ].
-	self addGroupResultToModel: groupResult.
+
 	(self subGroupsOf: aGroupID) do: [ :subGroup | 
 		groupResult addSubGroup: (self importGroup: subGroup id) ].
 	^ groupResult
@@ -224,7 +282,7 @@ GLHModelImporter >> importJobsOf: aPipeline [
 	result := self glhApi
 		          jobsOfProject: aPipeline project id
 		          ofPipelines: aPipeline id.
-	jobs := self parseJobsResult: result.
+	jobs := self parseJobsResult: result ofProject: aPipeline project.
 	jobs do: [ :job | aPipeline addJob: job ].
 	self glhModel addAll: jobs
 ]
@@ -278,26 +336,20 @@ GLHModelImporter >> parseBranchesResult: result [
 ]
 
 { #category : #private }
+GLHModelImporter >> parseCommitResult: result [
+
+	| reader |
+	reader := NeoJSONReader on: result readStream.
+	self configureReaderForCommit: reader.
+	^ reader nextAs: GLHCommit
+]
+
+{ #category : #private }
 GLHModelImporter >> parseCommitsResult: result [
 
 	| reader |
 	reader := NeoJSONReader on: result readStream.
-	reader for: GLHCommit do: [ :mapping |
-		mapping mapInstVars:
-			#( id short_id title author_name author_email committer_name
-			   committer_email message web_url ).
-		(mapping mapInstVar: #authored_date) valueSchema: DateAndTime.
-		(mapping mapInstVar: #committed_date) valueSchema: DateAndTime.
-		(mapping mapInstVar: #created_at) valueSchema: DateAndTime.
-		mapping
-			mapProperty: 'stats'
-			getter: [ :el | "Not used" ]
-			setter: [ :commit :value |
-				commit deletions: (value at: #deletions).
-				commit additions: (value at: #additions) ] ].
-
-	reader for: DateAndTime customDo: [ :mapping |
-		mapping decoder: [ :string | DateAndTime fromString: string ] ].
+	self configureReaderForCommit: reader.
 	reader
 		for: #ArrayOfCommit
 		customDo: [ :customMappting |
@@ -352,7 +404,7 @@ GLHModelImporter >> parseGroupResult: aResult [
 ]
 
 { #category : #private }
-GLHModelImporter >> parseJobsResult: result [
+GLHModelImporter >> parseJobsResult: result ofProject: aProject [
 
 	| reader |
 	reader := NeoJSONReader on: result readStream.
@@ -364,6 +416,14 @@ GLHModelImporter >> parseJobsResult: result [
 			getter: [ :object | #ignore ]
 			setter: [ :object :value |
 			object user: (self importUser: (value at: #id)) ].
+
+		mapping
+			mapProperty: #commit
+			getter: [ :object | #ignore ]
+			setter: [ :object :value |
+				value ifNotNil: [
+					object commit:
+						(self importCommit: (value at: #id) ofProject: aProject) ] ].
 
 		mapping
 			mapProperty: #duration
