@@ -63,9 +63,27 @@ GLHModelImporter >> completeImportProject: aGLHProject [
 		aGLHProject addPipeline: pipeline ].
 	aGLHProject creator: (self importUser: aGLHProject creator_id).
 	aGLHProject repository: GLHRepository new.
-	self glhModel add: aGLHProject.
+	self glhModel add: aGLHProject unless: (self blockEqualityOn: #id).
 	self glhModel add: aGLHProject repository.
-	self importRepository: aGLHProject repository.
+	self importRepository: aGLHProject repository
+]
+
+{ #category : #'as yet unclassified' }
+GLHModelImporter >> completeImportedCommit: aCommit [
+
+	| diffs |
+	(self importUserByUsername: aCommit author_name) commits
+		add: aCommit
+		unless: [ :existingCommit :newCommit |
+		existingCommit id = newCommit id ].
+
+	('Import diff of commit: ' , aCommit short_id printString) recordInfo.
+
+	self withCommitDiffs ifTrue: [
+		diffs := self importDiffOfCommit: aCommit.
+		self glhModel addAll: diffs unless: self blockForDiffEquality ].
+
+	^ aCommit
 ]
 
 { #category : #private }
@@ -107,6 +125,7 @@ GLHModelImporter >> glhModel: anObject [
 { #category : #'private - api' }
 GLHModelImporter >> importCommits: aGLHProject [
 	"limited to the last 20 commits"
+
 	| results parsedResults |
 	results := self glhApi
 		           commitsOfProject: aGLHProject id
@@ -123,15 +142,74 @@ GLHModelImporter >> importCommits: aGLHProject [
 		           perPage: nil
 		           page: nil.
 	parsedResults := self parseCommitsResult: results.
-	aGLHProject mooseModel addAll: parsedResults.
-	
+	self glhModel addAll: parsedResults unless: self blockOnIdEquality.
+
 	parsedResults do: [ :commit |
-		 commit repository: aGLHProject repository.
-		].
-	
+		commit repository: aGLHProject repository ].
+
+
 	self withCommitDiffs ifTrue: [
 		parsedResults do: [ :commit |
+
 			self importDiffOfCommit: commit ] ]
+]
+
+{ #category : #'as yet unclassified' }
+GLHModelImporter >> importCommitsFollowing: aCommit upToDays: aNumberOfDay [
+	"import the 'n' commits of a project starting from an initial 'aCommit' commit. 
+	Lazy import does not import the entities inside the model"
+
+	| date |
+	date := aCommit created_at asDateAndTime.
+
+	^ self
+		  importCommitsOfBranch: aCommit branch
+		  forRefName: aCommit branch name
+		  since: date
+		  until: (date + aNumberOfDay day)
+]
+
+{ #category : #commit }
+GLHModelImporter >> importCommitsOProject: aProject since: fromDate until: toDate [
+
+	| newlyFoundCommit page foundCommit |
+	page := 0.
+	foundCommit := OrderedCollection new.
+	newlyFoundCommit := { true }.
+	[ newlyFoundCommit isNotEmpty ] whileTrue: [
+		| results |
+		page := page + 1.
+		('import commit page ' , page printString) recordInfo.
+		results := self glhApi
+			           commitsOfProject: aProject id
+			           forRefName: nil
+			           since:
+			           (fromDate ifNotNil: [ fromDate asDateAndTime asString ])
+			           until:
+			           (toDate ifNotNil: [ toDate asDateAndTime asString ])
+			           path: nil
+			           author: nil
+			           all: nil
+			           with_stats: nil
+			           firstParent: nil
+			           order: nil
+			           trailers: nil
+			           perPage: 100
+			           page: page.
+
+		newlyFoundCommit := self parseCommitsResult: results.
+		newlyFoundCommit do: [ :c |
+			c repository: aProject repository. 
+			 ].
+		aProject repository commits
+			addAll: newlyFoundCommit
+			unless: self blockOnIdEquality.
+		foundCommit addAll: newlyFoundCommit ].
+
+	self glhModel addAll: foundCommit unless: self blockOnIdEquality.
+
+
+	^ foundCommit
 ]
 
 { #category : #api }
@@ -176,6 +254,71 @@ GLHModelImporter >> importCommitsOf: aGLHProject withStats: aBoolean until: toDa
 			self importDiffOfCommit: commit ] ]
 ]
 
+{ #category : #commit }
+GLHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName since: fromDate [
+
+	^ self
+		  importCommitsOfBranch: aGLHBranch
+		  forRefName: aGLHBranch name
+		  since: fromDate
+		  until: nil
+]
+
+{ #category : #commit }
+GLHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName since: fromDate until: toDate [
+
+	| newlyFoundCommit page foundCommit|
+	page := 0.
+	foundCommit := OrderedCollection new. 
+	newlyFoundCommit := { true }.
+	[ newlyFoundCommit isNotEmpty ] whileTrue: [
+		| results |
+		page := page + 1.
+		('import commit page ' , page printString) recordInfo.
+		results := self glhApi
+			           commitsOfProject: aGLHBranch repository project id
+			           forRefName: aGLHBranch name
+			           since:
+			           (fromDate ifNotNil: [ fromDate asDateAndTime asString ])
+			           until:
+			           (toDate ifNotNil: [ toDate asDateAndTime asString ])
+			           path: nil
+			           author: nil
+			           all: nil
+			           with_stats: nil
+			           firstParent: nil
+			           order: nil
+			           trailers: nil
+			           perPage: 100
+			           page: page.
+
+		newlyFoundCommit := self parseCommitsResult: results.
+	aGLHBranch commits
+			addAll: newlyFoundCommit
+			unless: self blockOnIdEquality.
+	foundCommit addAll: newlyFoundCommit.  
+			].
+
+	self glhModel
+		addAll: aGLHBranch commits
+		unless: self blockOnIdEquality.
+
+	"self withCommitDiffs ifTrue: [
+		aGLHBranch commits: [ :commit | self importDiffOfCommit: commit ] ]."
+
+	^ foundCommit
+]
+
+{ #category : #commit }
+GLHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName until: toDate [
+
+	^ self
+		  importCommitsOfBranch: aGLHBranch
+		  forRefName: aGLHBranch name
+		  since: nil
+		  until: toDate
+]
+
 { #category : #api }
 GLHModelImporter >> importDiffOfCommit: aCommit [
 
@@ -190,7 +333,8 @@ GLHModelImporter >> importDiffOfCommit: aCommit [
 		          unidiff: true.
 	diffsResult := self parseDiffResult: result.
 
-	aCommit diffs addAll: diffsResult unless: self blockForDiffEquality .
+	aCommit diffs addAll: diffsResult unless: self blockForDiffEquality.
+
 	^ aCommit diffs
 ]
 
@@ -287,6 +431,26 @@ GLHModelImporter >> importUser: aUserID [
 			  userResult := self parseUserResult: result.
 			  glhModel add: userResult unless: self blockOnIdEquality.
 			  userResult ]
+]
+
+{ #category : #user }
+GLHModelImporter >> importUserByUsername: anUsername [
+
+	^ (self glhModel allWithType: GLHUser)
+		  detect: [ :user | user username = anUsername ]
+		  ifNone: [
+			  | result userId searchResult |
+			  ('Import user with username: ' , anUsername printString)
+				  recordInfo.
+			  result := self glhApi usersSearchByUsername: anUsername.
+			  searchResult := NeoJSONReader fromString: result.
+			  searchResult ifEmpty: [ GLHUser new ] ifNotEmpty: [
+				  userId := searchResult first at: #id.
+				  (self glhModel allWithType: GLHUser)
+					  detect: [ :user | user id = userId ]
+					  ifNone: [
+						  self importUser: userId.
+						   ] ] ]
 ]
 
 { #category : #initialization }

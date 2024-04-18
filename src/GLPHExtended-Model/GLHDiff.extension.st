@@ -8,7 +8,10 @@ GLHDiff >> diffRanges [
 	<derived>
 	<FMProperty: #diffRanges type: #GLPHEDiffRange opposite: #diff>
 	<package: #'GLPHExtended-Model'>
-	^ self attributeAt: #diffRanges ifAbsentPut: [ FMMultivalueLink on: self opposite: #diff: ]
+
+	^ self
+		  attributeAt: #diffRanges
+		  ifAbsentPut: [ FMMultivalueLink on: self opposite: #diff: ]
 ]
 
 { #category : #'*GLPHExtended-Model-accessing' }

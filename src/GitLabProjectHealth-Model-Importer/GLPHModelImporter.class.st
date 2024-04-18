@@ -4,6 +4,15 @@ Class {
 	#category : #'GitLabProjectHealth-Model-Importer'
 }
 
+{ #category : #'as yet unclassified' }
+GLPHModelImporter >> blockForDiffRangeEquality [ 
+
+^ [ :existing :new |
+		(existing diff mooseID = new diff mooseID and: [
+			 existing originalLineRange = new originalLineRange ]) and: [
+			existing newLineRange = new newLineRange ] ]
+]
+
 { #category : #commit }
 GLPHModelImporter >> chainsCommitsFrom: commitsCollection [
 
@@ -14,12 +23,15 @@ GLPHModelImporter >> chainsCommitsFrom: commitsCollection [
 				                detect: [ :c | c id = parentId ]
 				                ifNone: [ nil ].
 			parentCommit ifNotNil: [
-			
-				parentCommit childCommits add: commit unless: [ :existing :new | existing id = new id ].
+				parentCommit childCommits
+					add: commit
+					unless: [ :existing :new | existing id = new id ].
 					
+		^ commitsCollection
+
 				"parentCommit childCommits
 					detect: [ :c | c id = commit id ]
-					ifNone: [ parentCommit addChildCommit: commit ] "] ] ]
+					ifNone: [ parentCommit addChildCommit: commit ] " ] ] ]
 ]
 
 { #category : #commit }
@@ -55,8 +67,8 @@ GLPHModelImporter >> commitsOfProject: aGLHProject forRefName: refName until: to
 				                     < toDate asDateAndTime ]) or: [
 				                    existingCommits anySatisfy: [ :existingCommit |
 					                    existingCommit id = commitParsed id ] ] ].
-		aGLHProject mooseModel addAll: newlyFoundCommit.
-		aGLHProject repository commits addAll: newlyFoundCommit ].
+		self glhModel addAll: newlyFoundCommit unless: self blockOnIdEquality.
+		aGLHProject repository commits addAll: newlyFoundCommit unless: self blockOnIdEquality  ].
 	self withCommitDiffs ifTrue: [
 		aGLHProject repository commits do: [ :commit |
 			self importDiffOfCommit: commit ] ]
@@ -74,17 +86,21 @@ GLPHModelImporter >> completeImportProject: aGLHProject [
 
 { #category : #'as yet unclassified' }
 GLPHModelImporter >> importCommitOfProject: anProject withId: anID [
-	|commit result|
-	
-	
-	anID ifNil: [ ^ nil ]. 
-	
+
+	| commit result |
+	anID ifNil: [ ^ nil ].
+
 	result := self glhApi commit: anID ofProject: anProject id.
-	commit := (self parseCommitsResult: ('[',result,']'))first. 
+	commit := (self parseCommitsResult: '[' , result , ']') first.
+
+	self glhModel add: commit unless: self blockOnIdEquality.
+	commit repository: anProject repository  . 
 	
-	self glhModel add: commit unless: (self blockOnIdEquality ). 
+	self withCommitDiffs ifTrue: [ 
+		self importDiffOfCommit: commit.
+		 ].
 	
-	^commit 
+	^ commit
 ]
 
 { #category : #import }
@@ -99,107 +115,49 @@ GLPHModelImporter >> importCommitsOfBranch: aGLHBranch [
 		           forRefName: aGLHBranch name
 		           since: withCommitsSince.
 
-	
-
 	self chainsCommitsFrom: commits.
 
 	commits do: [ :aCommit |
-		| diffs |
-		(self importUserByUsername: aCommit author_name) commits
-			add: aCommit
-			unless: [ :existingCommit :newCommit |
-			existingCommit id = newCommit id ].
-
 		aCommit repository: aGLHBranch repository.
-
-		('Import diff of commit: ' , aCommit short_id printString)
-			recordInfo.
-
-		diffs := self importDiffOfCommit: aCommit.
-		self glhModel addAll: diffs unless: [ :existing :new |
-			existing diffString size = new diffString size and: [
-				existing diffString = new diffString ] ].
-
-		diffs do: [ :diff | "changes are added into the model during the import"
-			self importDiffRangesForDiff: diff ] ]
-]
-
-{ #category : #commit }
-GLPHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName since: fromDate [
-
-	^ self
-		  importCommitsOfBranch: aGLHBranch
-		  forRefName: refName
-		  since: fromDate
-		  until: nil
-]
-
-{ #category : #commit }
-GLPHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName since: fromDate until: toDate [
-
-	| newlyFoundCommit page |
-	page := 0.
-	newlyFoundCommit := { true }.
-	[ newlyFoundCommit isNotEmpty ] whileTrue: [
-		| results |
-		page := page + 1.
-		('import commit page ' , page printString) recordInfo.
-		results := self glhApi
-			           commitsOfProject: aGLHBranch repository project id
-			           forRefName: aGLHBranch name
-			           since:
-			           (fromDate ifNotNil: [ fromDate asDateAndTime asString ])
-			           until:
-			           (toDate ifNotNil: [ toDate asDateAndTime asString ])
-			           path: nil
-			           author: nil
-			           all: nil
-			           with_stats: nil
-			           firstParent: nil
-			           order: nil
-			           trailers: nil
-			           perPage: 100
-			           page: page.
-
-		newlyFoundCommit := self parseCommitsResult: results.
-		aGLHBranch commits
-			addAll: newlyFoundCommit
-			unless: (self blockEqualityOn: #id) ].
-
-	self glhModel
-		addAll: aGLHBranch commits
-		unless: [ :old :new | old id = new id ].
-
-	^ aGLHBranch commits
-]
-
-{ #category : #commit }
-GLPHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName until: toDate [
-
-	^ self
-		  importCommitsOfBranch: aGLHBranch
-		  forRefName: refName
-		  since: nil
-		  until: toDate 
+		self completeImportedCommit: aCommit. 
+		 ]
 ]
 
 { #category : #importer }
 GLPHModelImporter >> importCommitsOfMergeResquest: aGLPHEMergeRequest [
-	|foundCommits|
-	foundCommits := OrderedCollection new. 
-	
+
+	| foundCommits |
+	foundCommits := OrderedCollection new.
+
+	"the founds commits are added to the model during their respective import"
 	aGLPHEMergeRequest mergeRequestCommit: ((self
-			 importCommitOfProject: aGLPHEMergeRequest project
-			 withId: aGLPHEMergeRequest sha) ifNotNil: [:commit | foundCommits add: commit]).
-	
+			  importCommitOfProject: aGLPHEMergeRequest project
+			  withId: aGLPHEMergeRequest sha) ifNotNil: [ :commit |
+			 foundCommits add: commit ]).
+
 	aGLPHEMergeRequest mergedCommit: ((self
-			 importCommitOfProject: aGLPHEMergeRequest project
-			 withId: aGLPHEMergeRequest merge_commit_sha) ifNotNil: [:commit | foundCommits add: commit]).
+			  importCommitOfProject: aGLPHEMergeRequest project
+			  withId: aGLPHEMergeRequest merge_commit_sha) ifNotNil: [ :commit |
+			 foundCommits add: commit ]).
+
 	aGLPHEMergeRequest squashCommit: ((self
-			 importCommitOfProject: aGLPHEMergeRequest project
-			 withId: aGLPHEMergeRequest squash_commit_sha) ifNotNil: [:commit | foundCommits add: commit]).
-			
-	self chainsCommitsFrom: foundCommits.
+			  importCommitOfProject: aGLPHEMergeRequest project
+			  withId: aGLPHEMergeRequest squash_commit_sha) ifNotNil: [ :commit |
+			 foundCommits add: commit ]).
+
+	
+	self chainsCommitsFrom: foundCommits
+]
+
+{ #category : #api }
+GLPHModelImporter >> importDiffOfCommit: aCommit [
+
+	super importDiffOfCommit: aCommit.
+	
+	"changes are added into the model during the import"
+	aCommit diffs do: [ :diff | self importDiffRangesForDiff: diff ].
+
+	^ aCommit diffs
 ]
 
 { #category : #'as yet unclassified' }
@@ -236,12 +194,11 @@ GLPHModelImporter >> importDiffRangesForDiff: aGLHDiff [
 
 	| diffRanges |
 	('Import changes of diff ' , aGLHDiff printString) recordInfo.
+	"the import of 'diffRanges' entites is technically done inside the parseDiffString"
 	diffRanges := self parseDiffString: aGLHDiff.
 	
-	self glhModel addAll: diffRanges unless: [ :existing :new |
-		(existing diff mooseID = new diff mooseID and: [
-			 existing originalLineRange = new originalLineRange ]) and: [
-			existing newLineRange = new newLineRange ] ].
+	self glhModel addAll: diffRanges unless: self blockForDiffRangeEquality .
+	aGLHDiff diffRanges addAll: diffRanges unless: self blockForDiffRangeEquality .
 
 	^ aGLHDiff diffRanges
 ]
@@ -256,10 +213,10 @@ GLPHModelImporter >> importMergeRequests: aGLHProject [
 	aGLHProject mergeRequests
 		addAll: parsedResults
 		unless: self blockOnIdEquality.
+	
 	self glhModel
 		addAll: aGLHProject mergeRequests
 		unless: self blockOnIdEquality.
-
 
 
 	"gets it related commits"
@@ -292,26 +249,6 @@ GLPHModelImporter >> importRepository: aGLHRepository [
 		self importCommitsOfBranch: branch ].
 ]
 
-{ #category : #user }
-GLPHModelImporter >> importUserByUsername: anUsername [
-
-	^ (self glhModel allWithType: GLHUser)
-		  detect: [ :user | user username = anUsername ]
-		  ifNone: [
-			  | result userId searchResult |
-			  ('Import user with username: ' , anUsername printString)
-				  recordInfo.
-			  result := self glhApi usersSearchByUsername: anUsername.
-			  searchResult := NeoJSONReader fromString: result.
-			  searchResult ifEmpty: [ GLHUser new ] ifNotEmpty: [
-				  userId := searchResult first at: #id.
-				  (self glhModel allWithType: GLHUser)
-					  detect: [ :user | user id = userId ]
-					  ifNone: [
-						  self importUser: userId.
-						   ] ] ]
-]
-
 { #category : #initialization }
 GLPHModelImporter >> initialize [
 
@@ -332,16 +269,11 @@ GLPHModelImporter >> parseDiffString: aDiff [
 		(line trim beginsWith: #'@@') ifTrue: [
 			range := GLPHEDiffRange newFrom: line.
 
-			aDiff diffRanges add: range unless: [ :existing :new |
-				existing originalLineRange = new originalLineRange and: [
-					existing newLineRange = new newLineRange ] ]
-
-			"	self glhModel 
-				add: range 
-				unless: [:existing :new | ((existing diff mooseID = new diff mooseID) 
-					and: [existing originalLineRange = new originalLineRange]) 
-					and: [ existing newLineRange = new newLineRange  ] 
-					]." ].
+			aDiff diffRanges
+				add: range
+				unless: [ :existing :new | 
+					existing originalLineRange = new originalLineRange and: [
+						existing newLineRange = new newLineRange ] ] ].
 
 		self withCommitDiffs ifTrue: [
 			aChange := GLPHEChange newFrom: line.
@@ -349,7 +281,6 @@ GLPHModelImporter >> parseDiffString: aDiff [
 			range changes add: aChange unless: [ :existing :new |
 				existing sourceCode = new sourceCode and: [
 					existing index = new index ] ].
-			"self glhModel add: aChange ."
 			index := index + 1 ] ].
 
 
@@ -358,8 +289,8 @@ GLPHModelImporter >> parseDiffString: aDiff [
 			(existing diffRange mooseID = new diffRange mooseID and: [
 				 existing sourceCode = new sourceCode ]) and: [
 				existing index = new index ] ] ].
-	
-^ aDiff diffRanges.
+
+	^ aDiff diffRanges
 ]
 
 { #category : #parsing }

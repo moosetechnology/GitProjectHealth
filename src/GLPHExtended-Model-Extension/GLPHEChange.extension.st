@@ -16,6 +16,15 @@ GLPHEChange class >> createFrom: aDiffLine [
 ]
 
 { #category : #'*GLPHExtended-Model-Extension' }
+GLPHEChange >> name [
+
+	<FMProperty: #name type: #String>
+	<generated>
+	<FMComment: 'Basic name of the entity, not full reference.'>
+	^ sourceCode 
+]
+
+{ #category : #'*GLPHExtended-Model-Extension' }
 GLPHEChange class >> newFrom: aDiffLine [
 	"Factory a Change from a loc"
 

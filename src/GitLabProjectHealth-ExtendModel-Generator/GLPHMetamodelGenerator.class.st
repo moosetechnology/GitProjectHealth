@@ -89,9 +89,11 @@ GLPHMetamodelGenerator >> defineHierarchy [
 
 	super defineHierarchy.
 	(builder ensureClassNamed: #Entity) --|> #TEntityMetaLevelDependency.
-	change <|-- addition.
+	change --|> #TNamedEntity.
+	 change <|-- addition.
 	change <|-- deletion.
-	change <|-- lineOfCode. mergeRequest --|> #TNamedEntity
+	change <|-- lineOfCode.
+	mergeRequest --|> #TNamedEntity
 ]
 
 { #category : #definition }
@@ -135,7 +137,7 @@ GLPHMetamodelGenerator >> defineRelations [
 
 	(mergeRequest property: #mergedCommit)
 	- (commit property: #commitedMergeRequest).
-	
+
 	(mergeRequest property: #mergeRequestCommit)
 	- (commit property: #commitedMergeRequest).
 
@@ -148,6 +150,7 @@ GLPHMetamodelGenerator >> defineRelations [
 	<>-* (mergeRequest property: #project).
 
 	"DIFF"
+	(diff property: #file) <>-* (file property: #diffs).
 	(diff property: #diffRanges) <>-* (diffRange property: #diff).
 	(diffRange property: #changes) -* (change property: #diffRange)
 ]

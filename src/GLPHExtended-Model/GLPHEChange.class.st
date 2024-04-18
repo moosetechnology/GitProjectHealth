@@ -23,6 +23,8 @@ super class for addition and deletion
 Class {
 	#name : #GLPHEChange,
 	#superclass : #GLPHEEntity,
+	#traits : 'FamixTNamedEntity',
+	#classTraits : 'FamixTNamedEntity classTrait',
 	#instVars : [
 		'#diffRange => FMOne type: #GLPHEDiffRange opposite: #changes',
 		'#index => FMProperty',

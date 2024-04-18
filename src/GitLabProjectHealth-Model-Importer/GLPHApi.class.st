@@ -5,9 +5,16 @@ Class {
 }
 
 { #category : #commit }
-GLPHApi >> commitsOfProject: anInteger forRefName: refName [ 
-	
-	^ self commitsOfProject: anInteger
+GLPHApi >> commitsOfProject: anInteger forRefName: refName [
+
+	self
+		deprecated: 'Use #unknow instead'
+		on: '12 April 2024'
+		in:
+		'Pharo-11.0.0+build.726.sha.aece1b5473acf3830a0e082c1bc3a15d4ff3522b (64 Bit)'.
+
+	^ self
+		  commitsOfProject: anInteger
 		  forRefName: refName
 		  since: nil
 		  until: nil
@@ -19,13 +26,20 @@ GLPHApi >> commitsOfProject: anInteger forRefName: refName [
 		  order: nil
 		  trailers: nil
 		  perPage: nil
-		  page: nil.
+		  page: nil
 ]
 
 { #category : #commits }
-GLPHApi >> commitsOfProject: anInteger forRefName: refName since: since [ 
+GLPHApi >> commitsOfProject: anInteger forRefName: refName since: since [
 
-	^ self commitsOfProject: anInteger
+	self
+		deprecated: 'Use #unknow instead'
+		on: '12 April 2024'
+		in:
+		'Pharo-11.0.0+build.726.sha.aece1b5473acf3830a0e082c1bc3a15d4ff3522b (64 Bit)'.
+
+	^ self
+		  commitsOfProject: anInteger
 		  forRefName: refName
 		  since: since
 		  until: nil
@@ -37,13 +51,18 @@ GLPHApi >> commitsOfProject: anInteger forRefName: refName since: since [
 		  order: nil
 		  trailers: nil
 		  perPage: nil
-		  page: nil.
+		  page: nil
 ]
 
 { #category : #commit }
 GLPHApi >> commitsOfProject: aGLHProject forRefName: refName until: toDate [
 
 	| newlyFoundCommit page |
+	self
+		deprecated: 'Use #unknow instead'
+		on: '11 April 2024'
+		in:
+		'Pharo-11.0.0+build.726.sha.aece1b5473acf3830a0e082c1bc3a15d4ff3522b (64 Bit)'.
 	page := 0.
 	newlyFoundCommit := { true }.
 	[ newlyFoundCommit isNotEmpty ] whileTrue: [
@@ -78,7 +97,6 @@ GLPHApi >> commitsOfProject: aGLHProject forRefName: refName until: toDate [
 	self withCommitDiffs ifTrue: [
 		aGLHProject repository commits do: [ :commit |
 			self importDiffOfCommit: commit ] ]
-
 ]
 
 { #category : #'as yet unclassified' }
