@@ -2,6 +2,7 @@ documentor := FamixUMLDocumentor new.
 documentor
     model: GLHModel;
     beWithStubs;
+    excludeClasses: { GLHModel. TEntityMetaLevelDependency. Object };
     generate.
 
 'gitproject.puml' asFileReference writeStreamDo: [ :stream |
