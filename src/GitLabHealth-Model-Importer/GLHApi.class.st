@@ -183,6 +183,23 @@ GLHApi >> editProject: aProjectID usingDictionary: aDictionaryOfNewParam [
 	^ self client put
 ]
 
+{ #category : #'api - repository files' }
+GLHApi >> getFileBlameForProject: aProjectId andFilePath: aFilePath inRef: aRef fromLine: rangeStart toLine: rangeEnd [
+	"filePath is converted here. So give a path such as ""path/to/file.md"""
+
+	"https://docs.gitlab.com/ee/api/repository_files.html#get-file-blame-from-repository"
+
+	self client url:
+		self baseAPIUrl , '/projects/' , aProjectId printString
+		, '/repository/files/' , (aFilePath withoutPrefix: '/') urlEncoded
+		, '/blame'.
+	self client queryAt: #ref put: aRef.
+	self client queryAt: #'range[start]' put: rangeStart.
+	self client queryAt: #'range[end]' put: rangeEnd.
+
+	^ self client get
+]
+
 { #category : #api }
 GLHApi >> group: aGroupID [
 
