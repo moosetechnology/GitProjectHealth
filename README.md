@@ -97,76 +97,7 @@ canvas svgExporter
 
 Here is the metamodel used in this project
 
-```mermaid
-classDiagram
-    class Group {
-        avatar_url
-        name
-        id
-        web_url
-        description
-        visibility
-    }
-    class Repository
-    class Branch {
-        name
-    }
-    class FileDirectory {
-        name
-    }
-    class Pipeline {
-        status
-    }
-    class FileBlob {
-        name
-    }
-    class File {
-        name
-    }
-    class Project {
-        creator_id
-        avatar_url
-        name
-        id
-        readme_url
-        web_url
-        archived
-        description
-    }
-    class User {
-        created_at
-        pronouns
-        twitter
-        linkedin
-        avatar_url
-        name
-        id
-        work_information
-        bot
-        job_title
-        public_email
-        following
-        web_url
-        bio
-        website_url
-        skype
-        username
-        state
-        followers
-        organization
-        location
-    }
-    File <|-- FileDirectory
-    File <|-- FileBlob
-    Group *-- Group : group
-    Repository *-- Branch : repository
-    Project *-- Pipeline : project
-    Branch *-- File : branch
-    FileDirectory *-- File : directoryOwner
-    Repository -- Project : repository
-    Group *-- Project : group
-    User -- Project : creator
-```
+![GitProject meta-model png](https://raw.githubusercontent.com/moosetechnology/GitProjectHealth/v1/doc/gitproject.png)
 
 ## Contributor
 
