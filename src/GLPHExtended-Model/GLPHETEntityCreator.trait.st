@@ -33,6 +33,13 @@ GLPHETEntityCreator >> newChange [
 ]
 
 { #category : #'entity creation' }
+GLPHETEntityCreator >> newChangeNamed: aName [
+
+	<generated>
+	^ self add: (GLPHEChange named: aName)
+]
+
+{ #category : #'entity creation' }
 GLPHETEntityCreator >> newDeletion [
 
 	<generated>

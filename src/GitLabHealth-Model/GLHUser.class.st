@@ -30,8 +30,8 @@ A GitLab User
 | `job_title` | `String` | nil | |
 | `linkedin` | `String` | nil | |
 | `location` | `String` | nil | |
-| `name` | `String` | nil | Basic name of the entity, not full reference.|
 | `name` | `String` | nil | |
+| `name` | `String` | nil | Basic name of the entity, not full reference.|
 | `organization` | `String` | nil | |
 | `pronouns` | `String` | nil | |
 | `public_email` | `String` | nil | |

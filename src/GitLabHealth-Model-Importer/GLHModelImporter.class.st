@@ -122,6 +122,25 @@ GLHModelImporter >> glhModel: anObject [
 	glhModel := anObject
 ]
 
+{ #category : #'as yet unclassified' }
+GLHModelImporter >> importCommitOfProject: anProject withId: anID [
+
+	| commit result |
+	anID ifNil: [ ^ nil ].
+
+	result := self glhApi commit: anID ofProject: anProject id.
+	commit := (self parseCommitsResult: '[' , result , ']') first.
+
+	self glhModel add: commit unless: self blockOnIdEquality.
+	commit repository: anProject repository  . 
+	
+	self withCommitDiffs ifTrue: [ 
+		self importDiffOfCommit: commit.
+		 ].
+	
+	^ commit
+]
+
 { #category : #'private - api' }
 GLHModelImporter >> importCommits: aGLHProject [
 	"limited to the last 20 commits"
@@ -395,6 +414,59 @@ GLHModelImporter >> importGroup: aGroupID [
 	^ groupResult
 ]
 
+{ #category : #commit }
+GLHModelImporter >> importParentCommitsOfCommit: aGLHCommit forOnly: number [
+
+	| parentsIds commits |
+	commits := OrderedCollection new.
+	number = 0 ifTrue: [
+		^ commits
+			  add: aGLHCommit;
+			  yourself ].
+
+	parentsIds := aGLHCommit parent_ids.
+
+
+
+	commits addAll: (parentsIds collect: [ :id |
+			 self
+				 importCommitOfProject: aGLHCommit repository project
+				 withId: id.
+			 (self selectEntityType: GLHCommit overAttribut: #id equalTo: id)
+				 first ]).
+
+
+
+	^ commits , (commits collect: [ :parentCommit |
+		   self
+			   importParentCommitsOfCommit: parentCommit
+			   forOnly: number - 1 ]) flatten
+]
+
+{ #category : #commit }
+GLHModelImporter >> importParentCommitsOfCommit: aGLHCommit since: aDate [
+
+	| parentsIds commits |
+	commits := OrderedCollection new.
+	aGLHCommit created_at asDateAndTime < aDate asDateAndTime ifTrue: [
+		 
+		^ commits
+			  add: aGLHCommit;
+			  yourself ].
+
+	parentsIds := aGLHCommit parent_ids.
+
+	commits addAll: (parentsIds collect: [ :id |
+			 self
+				 importCommitOfProject: aGLHCommit repository project
+				 withId: id ]).
+
+
+	^ (commits collect: [ :parentCommit |
+		   self importParentCommitsOfCommit: parentCommit since: aDate ])
+		  flatten
+]
+
 { #category : #'private - api' }
 GLHModelImporter >> importRepository: aGLHRepository [
 
@@ -599,6 +671,13 @@ GLHModelImporter >> pipelinesOf: aProjectID [
 	('Search pipelines of: ' , aProjectID printString) recordInfo.
 	result := self glhApi pipelinesOfProject: aProjectID.
 	^ self parsePipelinesResult: result
+]
+
+{ #category : #'as yet unclassified' }
+GLHModelImporter >> selectEntityType: aType overAttribut: aSelector equalTo: value [
+
+	^ (self glhModel allWithType: aType)
+		select: [ :entity | (entity perform: aSelector) = value ]
 ]
 
 { #category : #'private - api' }

@@ -299,7 +299,6 @@ GLHCommit >> diffs [
 
 	<generated>
 	<derived>
-
 	^ diffs
 ]
 

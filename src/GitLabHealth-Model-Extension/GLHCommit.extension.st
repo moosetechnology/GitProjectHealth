@@ -3,9 +3,19 @@ Extension { #name : #GLHCommit }
 { #category : #'*GitLabHealth-Model-Extension' }
 GLHCommit >> inspectionGLHCommit [
 
-	<inspectorPresentationOrder: 3 title: 'Commit Hierachy'>
+	<inspectorPresentationOrder: 3 title: 'Commit Hierarchy'>
 	| canvas |
-	canvas := RSCommit canvasHierarchyFor: self.
+	canvas := RSCommit canvasHierarchyFor:  self.
+
+	^ canvas asPresenter
+]
+
+{ #category : #'*GitLabHealth-Model-Extension' }
+GLHCommit >> inspectionGLHCommitChildren [
+
+	<inspectorPresentationOrder: 3 title: 'Commit Children'>
+	| canvas |
+	canvas := RSCommit canvasCompleteHierachyFor: self.
 
 	^ canvas asPresenter
 ]
@@ -22,10 +32,6 @@ GLHCommit >> inspectionGLHCommitFileImpacts [
 
 { #category : #'*GitLabHealth-Model-Extension' }
 GLHCommit >> name [
-
-	<FMProperty: #name type: #String>
-	<generated>
-	<FMComment: 'Basic name of the entity, not full reference.'>
 	^ message ifNil: [ 'Commit#' , short_id ]
 ]
 

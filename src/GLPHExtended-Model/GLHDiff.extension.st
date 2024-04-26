@@ -8,10 +8,7 @@ GLHDiff >> diffRanges [
 	<derived>
 	<FMProperty: #diffRanges type: #GLPHEDiffRange opposite: #diff>
 	<package: #'GLPHExtended-Model'>
-
-	^ self
-		  attributeAt: #diffRanges
-		  ifAbsentPut: [ FMMultivalueLink on: self opposite: #diff: ]
+	^ self attributeAt: #diffRanges ifAbsentPut: [ FMMultivalueLink on: self opposite: #diff: ]
 ]
 
 { #category : #'*GLPHExtended-Model-accessing' }
@@ -19,6 +16,24 @@ GLHDiff >> diffRanges: anObject [
 
 	<generated>
 	self diffRanges value: anObject
+]
+
+{ #category : #'*GLPHExtended-Model-accessing' }
+GLHDiff >> file [
+	"Relation named: #file type: #GLHFile opposite: #diffs"
+
+	<generated>
+	<derived>
+	<FMProperty: #file type: #GLHFile opposite: #diffs>
+	<package: #'GLPHExtended-Model'>
+	^ self attributeAt: #file ifAbsentPut: [ FMMultivalueLink on: self opposite: #diffs: ]
+]
+
+{ #category : #'*GLPHExtended-Model-accessing' }
+GLHDiff >> file: anObject [
+
+	<generated>
+	self file value: anObject
 ]
 
 { #category : #'*GLPHExtended-Model-accessing' }

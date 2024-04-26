@@ -18,9 +18,6 @@ GLPHEChange class >> createFrom: aDiffLine [
 { #category : #'*GLPHExtended-Model-Extension' }
 GLPHEChange >> name [
 
-	<FMProperty: #name type: #String>
-	<generated>
-	<FMComment: 'Basic name of the entity, not full reference.'>
 	^ sourceCode 
 ]
 

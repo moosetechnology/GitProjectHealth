@@ -17,6 +17,10 @@ GLPHModelImporter >> blockForDiffRangeEquality [
 GLPHModelImporter >> chainsCommitsFrom: commitsCollection [
 
 	commitsCollection do: [ :commit |
+		
+		self haltIf: [
+			commit id = 'f6fcfae70cf6a8506c90de7e33270cd95a35f260' ].
+
 		commit parent_ids do: [ :parentId |
 			| parentCommit |
 			parentCommit := (self glhModel allWithType: GLHCommit)
@@ -26,12 +30,8 @@ GLPHModelImporter >> chainsCommitsFrom: commitsCollection [
 				parentCommit childCommits
 					add: commit
 					unless: [ :existing :new | existing id = new id ].
-					
-		^ commitsCollection
-
-				"parentCommit childCommits
-					detect: [ :c | c id = commit id ]
-					ifNone: [ parentCommit addChildCommit: commit ] " ] ] ]
+				 ] ] ].
+	^ commitsCollection
 ]
 
 { #category : #commit }
@@ -82,25 +82,6 @@ GLPHModelImporter >> completeImportProject: aGLHProject [
 	self importMergeRequests: aGLHProject.
 	
 
-]
-
-{ #category : #'as yet unclassified' }
-GLPHModelImporter >> importCommitOfProject: anProject withId: anID [
-
-	| commit result |
-	anID ifNil: [ ^ nil ].
-
-	result := self glhApi commit: anID ofProject: anProject id.
-	commit := (self parseCommitsResult: '[' , result , ']') first.
-
-	self glhModel add: commit unless: self blockOnIdEquality.
-	commit repository: anProject repository  . 
-	
-	self withCommitDiffs ifTrue: [ 
-		self importDiffOfCommit: commit.
-		 ].
-	
-	^ commit
 ]
 
 { #category : #import }
