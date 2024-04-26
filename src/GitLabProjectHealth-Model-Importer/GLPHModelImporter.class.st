@@ -18,8 +18,6 @@ GLPHModelImporter >> chainsCommitsFrom: commitsCollection [
 
 	commitsCollection do: [ :commit |
 		
-		self haltIf: [
-			commit id = 'f6fcfae70cf6a8506c90de7e33270cd95a35f260' ].
 
 		commit parent_ids do: [ :parentId |
 			| parentCommit |
