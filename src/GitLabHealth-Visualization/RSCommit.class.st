@@ -61,7 +61,7 @@ RSCommit >> allChildrenShapesFrom: aGLHCommit into: dic [
 	sum := RSGroup new.
 
 	children addAll: (aGLHCommit childCommits collect: [ :child |
-			 dic at: child put: (self shapeForCommit: child) ]).
+			 dic at: child put: (self shapeForCommit: child withColor: self childColor) ]).
 
 	(children do: [ :commit |
 		 self allChildrenShapesFrom: commit model into: dic ]) flattened
@@ -100,19 +100,20 @@ RSCommit >> buildCommitCompleteHierachyCanvas [
 				                   ifPresent: [ shape ] ]) reject: #isNil) asSet ])
 		                flattened.
 
-
 	shape2change do: [ :composite |
 		(composite children select: [ :b | b class = RSBox ]) color:
 			Color red ].
 
 
+	parents addAll: (aCommit parentCommits collect: [ :c |
+			 self shapeForCommit: c withColor: self parentColor ]).
+
 
 	"canvas addAllShapes: commitShape , parents , children."
-	self createLinesBetweenCommits: commitShape , children.
+	self createLinesBetweenCommits: parents , commitShape , children.
 
-	canvas addAll: commitShape , children.
-	RSHorizontalTreeLayout new
-		on: canvas nodes.
+	canvas addAll: parents, commitShape , children.
+	RSHorizontalTreeLayout new on: canvas nodes.
 
 	canvas @ RSCanvasController.
 
@@ -297,7 +298,7 @@ RSCommit >> buildDiffCanvas [
 { #category : #color }
 RSCommit >> childColor [
 
-	^ Color green
+	^ Color lightGreen
 ]
 
 { #category : #accessing }
@@ -364,7 +365,7 @@ RSCommit >> createLinesBetweenCommits: shapes [
 { #category : #color }
 RSCommit >> defaultColor [
 
-	^ Color lightBlue
+	^ Color lightOrange 
 ]
 
 { #category : #initialization }
@@ -375,7 +376,8 @@ RSCommit >> initialize [
 
 { #category : #color }
 RSCommit >> parentColor [
-	^ Color gray.
+
+	^ Color gray
 ]
 
 { #category : #shape }
