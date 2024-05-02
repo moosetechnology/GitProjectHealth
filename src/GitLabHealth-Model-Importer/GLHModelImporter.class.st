@@ -98,6 +98,13 @@ GLHModelImporter >> convertApiFileAsFile: aAPIFile [
 		  yourself
 ]
 
+{ #category : #'as yet unclassified' }
+GLHModelImporter >> detectEntityType: aType overAttribut: aSelector equalTo: value [
+
+	^ (self glhModel allWithType: aType) detect: [ :entity |
+		  (entity perform: aSelector) = value ] ifNone: [ nil ]. 
+]
+
 { #category : #accessing }
 GLHModelImporter >> glhApi [
 
@@ -128,16 +135,22 @@ GLHModelImporter >> importCommitOfProject: anProject withId: anID [
 	| commit result |
 	anID ifNil: [ ^ nil ].
 
-	result := self glhApi commit: anID ofProject: anProject id.
-	commit := (self parseCommitsResult: '[' , result , ']') first.
+	commit := (self
+		           detectEntityType: GLHCommit
+		           overAttribut: #id
+		           equalTo: anID) ifNil: [
+		          result := self glhApi commit: anID ofProject: anProject id.
+		          commit := (self parseCommitsResult: '[' , result , ']')
+			                    first.
 
-	self glhModel add: commit unless: self blockOnIdEquality.
-	commit repository: anProject repository  . 
-	
-	self withCommitDiffs ifTrue: [ 
-		self importDiffOfCommit: commit.
-		 ].
-	
+		          self glhModel add: commit unless: self blockOnIdEquality.
+		          commit repository: anProject repository.
+
+		          commit ].
+
+  self withCommitDiffs ifTrue: [
+			          self importDiffOfCommit: commit ].
+
 	^ commit
 ]
 
@@ -426,15 +439,12 @@ GLHModelImporter >> importParentCommitsOfCommit: aGLHCommit forOnly: number [
 
 	parentsIds := aGLHCommit parent_ids.
 
-
-
 	commits addAll: (parentsIds collect: [ :id |
 			 self
 				 importCommitOfProject: aGLHCommit repository project
 				 withId: id.
 			 (self selectEntityType: GLHCommit overAttribut: #id equalTo: id)
 				 first ]).
-
 
 
 	^ commits , (commits collect: [ :parentCommit |
