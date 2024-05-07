@@ -12,24 +12,64 @@ Class {
 { #category : #'as yet unclassified' }
 CodeChurnAnalyzer >> analyseChurn [
 
-	|commitFiles|
-	
+	| commitFiles churn|
 	commitFiles := self impactedFilesInFollowUpCommitsOf: fromCommit.
+
+	churn := self computeChurnOnFiles: commitFiles. 
 	
-	commitFiles associations do: [ :assoc |
-		|file impactedCommits ranges|
+]
+
+{ #category : #churn }
+CodeChurnAnalyzer >> computeChurnOnFiles: aCollection [ 
+	
+	|changesDic perFileChanges  churns |
+	
+	"1 -> (a GLPHEChange -> NumberOfChurnDetected)"
+	changesDic := Dictionary new. 
+	
+	
+	perFileChanges := aCollection associations collect: [ :assoc |
+		
+		(assoc key -> (self computeSpecificChurnOf: assoc value )). 
+		 ] .
+	
+	 churns := perFileChanges collect: [ :assoc |
+		|churn file results|
+		
 		file := assoc key.
-		impactedCommits := assoc value. 
-		1 halt. 
-		ranges := impactedCommits collect: [ :range | 
-			ranges
-			]
+		results := assoc value. 
+		churn := ((results values select: [ :a | a value > 1 ] )size)/(results values sum: [ :a | a value ]).
+		(file -> churn)
+		 ].
+	
+	^ {(#churns -> churns).
+			(#details -> perFileChanges)} asDictionary 
+]
+
+{ #category : #churn }
+CodeChurnAnalyzer >> computeSpecificChurnOf: commit2Changes [ 
+	|changesDic|
+	"1 -> (a GLPHEChange -> NumberOfChurnDetected)"
+	changesDic := OrderedDictionary new. 
+	
+	commit2Changes do: [ :entry |
+		|commit diffRanges|
+		commit := entry key.
+		diffRanges := entry value. 
+		
+		diffRanges do: [ :diff |
+			|from upTo|
 			
+			from := (diff originalLineRange copyFrom: (diff originalLineRange indexOf: $-)+1 to: (diff originalLineRange indexOf: $,)-1 ) asString asNumber    .
+			self insertDiff: diff into: changesDic startingFrom: from. 
+			
+			 ].
+		
 		 ].
 	
 	
-	1 halt. 
 	
+	^ self sortChangeDic: changesDic.
 ]
 
 { #category : #accessing }
@@ -66,9 +106,32 @@ CodeChurnAnalyzer >> initialize [
 	
 ]
 
+{ #category : #insertion }
+CodeChurnAnalyzer >> insertDiff: aGLPHEDiffRange into: fileChangesDic startingFrom: from [ 
+	|index|
+	index := from. 
+	aGLPHEDiffRange changes do: [ :aChange |
+	
+		aChange isAddition ifTrue: [ 
+			fileChangesDic at: index ifPresent: [ :current | 
+			 
+			current key add: aChange.
+			current value: current value + 1.  ] ifAbsentPut: [((OrderedCollection new add: aChange; yourself) -> 1 ) ].
+			 ].
+		
+		aChange isDeletion ifFalse: [ index := index + 1 ]. 
+		
+		 ]
+]
+
 { #category : #'as yet unclassified' }
 CodeChurnAnalyzer >> onModel: agitHealthModel [
 	glModel := agitHealthModel
+]
+
+{ #category : #sorting }
+CodeChurnAnalyzer >> sortChangeDic: aCollection [ 
+	^ (aCollection associations sortAscending: [ :e | e key ] ) asOrderedDictionary 
 ]
 
 { #category : #visiting }

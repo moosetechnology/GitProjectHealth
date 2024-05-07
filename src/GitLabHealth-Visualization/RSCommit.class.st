@@ -136,8 +136,8 @@ RSCommit >> buildCommitDiffFileImpact [
 
 
 
-	RSVerticalLineLayout new
-		gapSize: 5 ;
+	RSVerticalLineLayout  new
+		gapSize: 5;
 		on: shapes.
 
 

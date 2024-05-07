@@ -16,6 +16,18 @@ GLPHEChange class >> createFrom: aDiffLine [
 ]
 
 { #category : #'*GLPHExtended-Model-Extension' }
+GLPHEChange >> isAddition [
+
+	^ false
+]
+
+{ #category : #'*GLPHExtended-Model-Extension' }
+GLPHEChange >> isDeletion [
+
+	^ false
+]
+
+{ #category : #'*GLPHExtended-Model-Extension' }
 GLPHEChange >> name [
 
 	^ sourceCode 
