@@ -12,11 +12,11 @@ Class {
 { #category : #'as yet unclassified' }
 CodeChurnAnalyzer >> analyseChurn [
 
-	| commitFiles churn|
+	| commitFiles churn |
 	commitFiles := self impactedFilesInFollowUpCommitsOf: fromCommit.
 
-	churn := self computeChurnOnFiles: commitFiles. 
-	
+	churn := self computeChurnOnFiles: commitFiles.
+	^ churn. 
 ]
 
 { #category : #churn }
