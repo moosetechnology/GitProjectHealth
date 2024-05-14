@@ -53,7 +53,8 @@ CodeChurnAnalyzer >> computeSpecificChurnOf: commit2Changes [
 	"1 -> (a GLPHEChange -> NumberOfChurnDetected)"
 	changesDic := OrderedDictionary new. 
 	
-	commit2Changes do: [ :entry |
+	
+	(commit2Changes sortAscending: [ :assoc | assoc key created_at ]) do: [ :entry |
 		|commit diffRanges|
 		commit := entry key.
 		diffRanges := entry value. 
@@ -61,7 +62,8 @@ CodeChurnAnalyzer >> computeSpecificChurnOf: commit2Changes [
 		diffRanges do: [ :diff |
 			|from upTo|
 			
-			from := (diff originalLineRange copyFrom: (diff originalLineRange indexOf: $-)+1 to: (diff originalLineRange indexOf: $,)-1 ) asString asNumber    .
+			from := (diff originalLineRange copyFrom: (diff originalLineRange indexOf: $-)+1 to: (diff originalLineRange indexOf: $,)-1 ) asString asNumber.
+			(from = 0) ifTrue:[from := 1].
 			self insertDiff: diff into: changesDic startingFrom: from. 
 			
 			 ].
