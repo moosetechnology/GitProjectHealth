@@ -38,7 +38,8 @@ CodeChurnAnalyzer >> computeChurnOnFiles: aCollection [
 		
 		file := assoc key.
 		results := assoc value. 
-		churn := ((results values select: [ :a | a value > 1 ] )size)/(results values sum: [ :a | a value ]).
+		results values ifEmpty: [ churn := nil. ] ifNotEmpty: [ churn := ((results values select: [ :a | a value > 1 ] )size) / (results values sum: [ :a | a value ]) . ].
+		
 		(file -> churn)
 		 ].
 	
@@ -87,7 +88,7 @@ CodeChurnAnalyzer >> impactedFilesInFollowUpCommitsOf: aGLHCommit [
 
 	| commitFiles |
 	commitFiles := (fromCommit diffs collect: [ :diff |
-		                diff new_path -> Set new ])
+		                diff new_path -> (Set new add: (aGLHCommit -> (diff diffRanges) ); yourself) ])
 		               asDictionary.
 
 	self

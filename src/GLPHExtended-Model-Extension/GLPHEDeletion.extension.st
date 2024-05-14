@@ -7,5 +7,5 @@ GLPHEDeletion >> isAddition [
 
 { #category : #'*GLPHExtended-Model-Extension' }
 GLPHEDeletion >> isDeletion [ 
-	^ false. 
+	^ true. 
 ]

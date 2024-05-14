@@ -239,15 +239,21 @@ GLPHModelImporter >> initialize [
 GLPHModelImporter >> parseDiffString: aDiff [
 	"parse diff string to create entities for each lines"
 
-	| lines range index |
+	| lines range index firstChangeRange|
 	lines := aDiff diffString lines.
 	index := 0.
 	range := nil.
+	
+	
+	
+	lines := self filterCommitChanges: lines. 
+	
 	lines do: [ :line |
 		| aChange |
+		firstChangeRange := false. 
 		(line trim beginsWith: #'@@') ifTrue: [
 			range := GLPHEDiffRange newFrom: line.
-
+			firstChangeRange := true.
 			aDiff diffRanges
 				add: range
 				unless: [ :existing :new | 
@@ -255,14 +261,20 @@ GLPHModelImporter >> parseDiffString: aDiff [
 						existing newLineRange = new newLineRange ] ] ].
 
 		self withCommitDiffs ifTrue: [
-			aChange := GLPHEChange newFrom: line.
+			
+			firstChangeRange ifFalse: [ 
+				aChange := GLPHEChange newFrom: line.
 			aChange relativeIndex: index.
 			range changes add: aChange unless: [ :existing :new |
 				existing sourceCode = new sourceCode and: [
 					existing index = new index ] ].
-			index := index + 1 ] ].
+			index := index + 1
+				 ].
+			
+			 ] 
+	].
 
-
+	"add changes to the diff range"
 	aDiff diffRanges do: [ :diffRange |
 		self glhModel addAll: diffRange changes unless: [ :existing :new |
 			(existing diffRange mooseID = new diffRange mooseID and: [

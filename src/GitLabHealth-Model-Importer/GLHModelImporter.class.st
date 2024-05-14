@@ -105,6 +105,20 @@ GLHModelImporter >> detectEntityType: aType overAttribut: aSelector equalTo: val
 		  (entity perform: aSelector) = value ] ifNone: [ nil ]. 
 ]
 
+{ #category : #'as yet unclassified' }
+GLHModelImporter >> filterCommitChanges: aCollection [ 
+	|changes|
+	
+	"reject file infos"
+	changes := aCollection.
+	changes := changes reject: [ :line | line matchesRegex:  '---.*' ].
+	changes := changes reject: [ :line | line matchesRegex:  '\+\+\+.*' ].
+	changes := changes reject: [ :line | line matchesRegex:  '\\ No newline at end of file' ].
+		
+
+^ changes. 
+]
+
 { #category : #accessing }
 GLHModelImporter >> glhApi [
 
@@ -526,13 +540,20 @@ GLHModelImporter >> importUserByUsername: anUsername [
 				  recordInfo.
 			  result := self glhApi usersSearchByUsername: anUsername.
 			  searchResult := NeoJSONReader fromString: result.
-			  searchResult ifEmpty: [ GLHUser new ] ifNotEmpty: [
+			
+				((searchResult at: #message) includesSubstring: '403 Forbidden') ifTrue: [ 
+						GLHUser new username: anUsername.
+					 ] ifFalse: [
+					searchResult ifEmpty: [ GLHUser new ] ifNotEmpty: [
 				  userId := searchResult first at: #id.
 				  (self glhModel allWithType: GLHUser)
 					  detect: [ :user | user id = userId ]
 					  ifNone: [
 						  self importUser: userId.
-						   ] ] ]
+						   ] ]
+					].
+			
+			   ]
 ]
 
 { #category : #initialization }
