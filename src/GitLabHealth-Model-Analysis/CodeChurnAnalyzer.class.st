@@ -38,7 +38,7 @@ CodeChurnAnalyzer >> computeChurnOnFiles: aCollection [
 		
 		file := assoc key.
 		results := assoc value. 
-		results values ifEmpty: [ churn := nil. ] ifNotEmpty: [ churn := ((results values select: [ :a | a value > 1 ] )size) / (results values sum: [ :a | a value ]) . ].
+		results values ifEmpty: [ churn := nil. ] ifNotEmpty: [ churn := ((results values select: [ :a | a value > 1 ] )sum: [ :a | a value ]) / (results values sum: [ :a | a value ]) . ].
 		
 		(file -> churn)
 		 ].
