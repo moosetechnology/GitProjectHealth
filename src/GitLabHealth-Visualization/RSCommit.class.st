@@ -79,7 +79,7 @@ RSCommit >> buildCommitCompleteHierachyCanvas [
 	dic := Dictionary new.
 
 
-	churnAnalyzer := CodeChurnAnalyzer new fromCommit: aCommit.
+	churnAnalyzer := GitAnalyzer new fromCommit: aCommit.
 	files2Commits := churnAnalyzer impactedFilesInFollowUpCommitsOf:
 		                 aCommit.
 	files2Commits := files2Commits select: [ :entry |

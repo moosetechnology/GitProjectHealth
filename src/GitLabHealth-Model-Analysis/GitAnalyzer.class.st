@@ -1,5 +1,5 @@
 Class {
-	#name : #CodeChurnAnalyzer,
+	#name : #GitAnalyzer,
 	#superclass : #Object,
 	#instVars : [
 		'glModel',
@@ -10,7 +10,19 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
-CodeChurnAnalyzer >> analyseChurn [
+GitAnalyzer >> analyseAmandment [
+	"return the first commit that modify the same lines of code as the fromCommit"
+
+	| churn res |
+	churn := self analyseChurn.
+
+	res := self firstAmandmentFromChrun: churn.
+
+	^ res
+]
+
+{ #category : #'as yet unclassified' }
+GitAnalyzer >> analyseChurn [
 
 	| commitFiles churn |
 	commitFiles := self impactedFilesInFollowUpCommitsOf: fromCommit.
@@ -20,7 +32,7 @@ CodeChurnAnalyzer >> analyseChurn [
 ]
 
 { #category : #churn }
-CodeChurnAnalyzer >> computeChurnOnFiles: aCollection [ 
+GitAnalyzer >> computeChurnOnFiles: aCollection [ 
 	
 	|changesDic perFileChanges  churns |
 	
@@ -48,7 +60,7 @@ CodeChurnAnalyzer >> computeChurnOnFiles: aCollection [
 ]
 
 { #category : #churn }
-CodeChurnAnalyzer >> computeSpecificChurnOf: commit2Changes [ 
+GitAnalyzer >> computeSpecificChurnOf: commit2Changes [ 
 	|changesDic|
 	"1 -> (a GLPHEChange -> NumberOfChurnDetected)"
 	changesDic := OrderedDictionary new. 
@@ -76,17 +88,40 @@ CodeChurnAnalyzer >> computeSpecificChurnOf: commit2Changes [
 ]
 
 { #category : #accessing }
-CodeChurnAnalyzer >> fromCommit: aCommit [
+GitAnalyzer >> firstAmandmentFromChrun: aChurnAnalysis [ 
+	|details whereChangesOccurs firstCommitsPerFile|
+	
+	whereChangesOccurs := (aChurnAnalysis at: #churns ) select: [ :file | file value > 0 ].
+	
+	details := whereChangesOccurs collect: [ :file |
+		((aChurnAnalysis at: #details) detect: [ :entry | entry key = file key] )
+		 ].
+	
+	firstCommitsPerFile := details collect: [ :perFile |
+		|changes firstCommits first|
+		changes := perFile value.
+		changes := changes select: [ :line2changes | line2changes value value > 1  ].
+		firstCommits := (changes collect: [ :line2changes |  line2changes key second diffRange diff commit ]) values. 
+		first := (firstCommits sortAscending: [:c | c created_at ]) first.
+		 ].
+	
+
+	^ (firstCommitsPerFile sortAscending: [:c | c created_at ]) first. 
+
+]
+
+{ #category : #accessing }
+GitAnalyzer >> fromCommit: aCommit [
 	fromCommit := aCommit. 
 ]
 
 { #category : #accessing }
-CodeChurnAnalyzer >> glhImporter: anImporter [
+GitAnalyzer >> glhImporter: anImporter [
 	glhImporter := anImporter .
 ]
 
 { #category : #'as yet unclassified' }
-CodeChurnAnalyzer >> impactedFilesInFollowUpCommitsOf: aGLHCommit [
+GitAnalyzer >> impactedFilesInFollowUpCommitsOf: aGLHCommit [
 
 	| commitFiles |
 	commitFiles := (fromCommit diffs collect: [ :diff |
@@ -101,7 +136,7 @@ CodeChurnAnalyzer >> impactedFilesInFollowUpCommitsOf: aGLHCommit [
 ]
 
 { #category : #initialization }
-CodeChurnAnalyzer >> initialize [
+GitAnalyzer >> initialize [
 
 	glModel := GLPHEModel new.
 	fromCommit := GLHCommit new.
@@ -110,7 +145,7 @@ CodeChurnAnalyzer >> initialize [
 ]
 
 { #category : #insertion }
-CodeChurnAnalyzer >> insertDiff: aGLPHEDiffRange into: fileChangesDic startingFrom: from [ 
+GitAnalyzer >> insertDiff: aGLPHEDiffRange into: fileChangesDic startingFrom: from [ 
 	|index|
 	index := from. 
 	aGLPHEDiffRange changes do: [ :aChange |
@@ -128,17 +163,17 @@ CodeChurnAnalyzer >> insertDiff: aGLPHEDiffRange into: fileChangesDic startingFr
 ]
 
 { #category : #'as yet unclassified' }
-CodeChurnAnalyzer >> onModel: agitHealthModel [
+GitAnalyzer >> onModel: agitHealthModel [
 	glModel := agitHealthModel
 ]
 
 { #category : #sorting }
-CodeChurnAnalyzer >> sortChangeDic: aCollection [ 
+GitAnalyzer >> sortChangeDic: aCollection [ 
 	^ (aCollection associations sortAscending: [ :e | e key ] ) asOrderedDictionary 
 ]
 
 { #category : #visiting }
-CodeChurnAnalyzer >> visitChildCommits: commits lookingForFiles: commitFiles [
+GitAnalyzer >> visitChildCommits: commits lookingForFiles: commitFiles [
 
 	commits ifEmpty: [ ^ commitFiles ].
 

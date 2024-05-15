@@ -2,19 +2,20 @@
 A CodeChurnAnalyzerTest is a test class for testing the behavior of CodeChurnAnalyzer
 "
 Class {
-	#name : #CodeChurnAnalyzerTest,
+	#name : #GitAnalyzerTest,
 	#superclass : #TestCase,
 	#instVars : [
 		'glphModel',
 		'glphApi',
 		'glhImporter',
-		'projects'
+		'projects',
+		'res'
 	],
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #running }
-CodeChurnAnalyzerTest >> setUp [
+GitAnalyzerTest >> setUp [
 
 	| since |
 	super setUp.
@@ -45,8 +46,53 @@ glhImporter importCommitsOProject: projects first since: (since asDate ) until: 
 	
 ]
 
+{ #category : #test }
+GitAnalyzerTest >> testAnalyseAmandment [
+
+	| myCommits mondayCommit tuesdayCommit wednesdayCommit |
+	glhImporter withCommitDiffs: true.
+
+	"commit chain 
+	mondayCommit -> tuesdayCommit -> wednesdayCommit
+	"
+
+	wednesdayCommit := glhImporter
+		                   importCommitOfProject: projects first id
+		                   withId:
+		                   'f298ec312f81032b611a890f993d98096ab3bbc1'.
+		
+	mondayCommit := glhImporter
+		                   importCommitOfProject: projects first id
+		                   withId:
+		                   '8a6f665118e6fcfa468d7cce1a7e944ba65812ab'.
+		
+	tuesdayCommit  := glhImporter
+		                   importCommitOfProject: projects first id
+		                   withId:
+		                   '2c7308c727560dd425ef78f9a95ca7650d164bed'.
+
+	myCommits := { mondayCommit . tuesdayCommit . wednesdayCommit } asSet .
+
+	glhImporter chainsCommitsFrom: myCommits.
+
+	myCommits do: [ :c | glhImporter completeImportedCommit: c ].
+
+	mondayCommit := myCommits detect: [ :c |
+		                c id = '8a6f665118e6fcfa468d7cce1a7e944ba65812ab' ].
+
+	res := GitAnalyzer new
+		                 fromCommit: mondayCommit;
+		                 glhImporter: glhImporter;
+		                 onModel: glphModel;
+		                 analyseAmandment.
+
+
+
+	self assert: res = tuesdayCommit equals: true. 
+]
+
 { #category : #tests }
-CodeChurnAnalyzerTest >> testChurnMetric [
+GitAnalyzerTest >> testChurnMetric [
 
 	| myCommits res wednesdayCommit mondayCommit|
 	glhImporter withCommitDiffs: true.
@@ -65,7 +111,7 @@ CodeChurnAnalyzerTest >> testChurnMetric [
 
 	mondayCommit := myCommits detect: [ :c | c id = '8a6f665118e6fcfa468d7cce1a7e944ba65812ab' ].
 
-	res := CodeChurnAnalyzer new
+	res := GitAnalyzer new
 		fromCommit: mondayCommit;
 		glhImporter: glhImporter;
 		onModel: glphModel;
