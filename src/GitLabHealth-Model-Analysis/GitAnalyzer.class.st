@@ -34,7 +34,30 @@ GitAnalyzer >> analyseChurn [
 { #category : #'as yet unclassified' }
 GitAnalyzer >> analyseMergeResquestValidation: aGLHPMergeRequest [
 
-	1 halt. 
+	|creationDate mergedDate response|
+	
+	response := { 
+		 #id_merge_resquest -> aGLHPMergeRequest iid. 
+		 #id_merge_commit -> nil.
+		 #created_at ->  aGLHPMergeRequest created_at.
+		 #merged_at -> nil .
+		 #duration ->  nil.
+		 #status -> (aGLHPMergeRequest merge_status)} asDictionary .  
+	 
+	
+	creationDate := aGLHPMergeRequest created_at asDateAndTime.
+
+	mergedDate := aGLHPMergeRequest merged_at ifNil: [ 
+		
+		^ response 
+		
+		 ].
+	
+	^ response at: #duration put: (mergedDate - creationDate); 
+					at: #id_merge_commit put: aGLHPMergeRequest merge_commit_sha  ; 
+					at: #merged_at put: aGLHPMergeRequest merged_at;
+					yourself. 
+
 ]
 
 { #category : #churn }

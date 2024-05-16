@@ -294,7 +294,7 @@ GLPHModelImporter >> parseMergeRequestResult: result [
 	reader for: #ArrayOfMergeRequest customDo: [ :customMappting |
 		customMappting listOfElementSchema: GLPHEMergeRequest ].
 
-	"declare la liste des pro"
+	"declare la liste des properties"
 	reader for: GLPHEMergeRequest do: [ :mapping |
 		mapping mapInstVars:
 			#( blocking_discussions_resolved changes_count description
@@ -312,23 +312,21 @@ GLPHModelImporter >> parseMergeRequestResult: result [
 			   time_stats_time_estimate time_stats_total_time_spent
 			   title updated_at upvotes user_notes_count web_url work_in_progress ).
 			(mapping mapInstVar: #created_at) valueSchema: DateAndTime.
+			(mapping mapInstVar: #updated_at) valueSchema: DateAndTime.
+			(mapping mapInstVar: #merged_at) valueSchema: DateAndTime.
 			(mapping mapInstVar: #closed_at) valueSchema: DateAndTime.
-		"		(mapping mapInstVar: #closed_at) valueSchema: DateAndTime.
-		(mapping mapInstVar: #created_at) valueSchema: DateAndTime.
+		"		
 		(mapping mapInstVar: #assignee) valueSchema: GLHUser.
 		(mapping mapInstVar: #author) valueSchema: GLHUser.
 		(mapping mapInstVar: #closed_by) valueSchema: GLHUser.
 		(mapping mapInstVar: #mergeCommit) valueSchema: GLHCommit."
 
-		"	mapping
-			mapProperty: 'stats'
-			getter: [ :el | ""Not used"" ]
-			setter: [ :commit :value |
-				commit deletions: (value at: #deletions).
-				commit additions: (value at: #additions) ]
-" ].
-	"	reader for: DateAndTime customDo: [ :mapping |
-		mapping decoder: [ :string | DateAndTime fromString: string ] ]."
+	 ].
+
+		"indique ce que doit faire le reader lorsqu'il parse une DateAndTime object"
+		reader for: DateAndTime customDo: [ :mapping |
+		mapping decoder: [ :string | string ifNil: [nil] ifNotNil: [ DateAndTime fromString: string ]   ] ].
+
 
 	^ reader nextAs: #ArrayOfMergeRequest
 ]

@@ -33,8 +33,8 @@ a gitlab merge request
 |---|
 | `blocking_discussions_resolved` | `Boolean` | nil | |
 | `changes_count` | `String` | nil | |
-| `closed_at` | `String` | nil | |
-| `created_at` | `String` | nil | |
+| `closed_at` | `Object` | nil | |
+| `created_at` | `Object` | nil | |
 | `description` | `String` | nil | |
 | `detailed_merge_status` | `String` | nil | |
 | `discussion_locked` | `String` | nil | |
@@ -51,7 +51,7 @@ a gitlab merge request
 | `merge_commit_sha` | `String` | nil | |
 | `merge_status` | `String` | nil | |
 | `merge_when_pipeline_succeeds` | `Boolean` | nil | |
-| `merged_at` | `String` | nil | |
+| `merged_at` | `Object` | nil | |
 | `milestone` | `String` | nil | |
 | `name` | `String` | nil | Basic name of the entity, not full reference.|
 | `project_id` | `Number` | nil | |
@@ -77,7 +77,7 @@ a gitlab merge request
 | `time_stats_time_estimate` | `Number` | nil | |
 | `time_stats_total_time_spent` | `Number` | nil | |
 | `title` | `String` | nil | |
-| `updated_at` | `String` | nil | |
+| `updated_at` | `Object` | nil | |
 | `upvotes` | `Number` | nil | |
 | `user_notes_count` | `Number` | nil | |
 | `web_url` | `String` | nil | |
@@ -251,7 +251,7 @@ GLPHEMergeRequest >> changes_count: anObject [
 { #category : #accessing }
 GLPHEMergeRequest >> closed_at [
 
-	<FMProperty: #closed_at type: #String>
+	<FMProperty: #closed_at type: #Object>
 	<generated>
 	^ closed_at
 ]
@@ -281,7 +281,7 @@ GLPHEMergeRequest >> closed_by: anObject [
 { #category : #accessing }
 GLPHEMergeRequest >> created_at [
 
-	<FMProperty: #created_at type: #String>
+	<FMProperty: #created_at type: #Object>
 	<generated>
 	^ created_at
 ]
@@ -598,7 +598,7 @@ GLPHEMergeRequest >> mergedCommit: anObject [
 { #category : #accessing }
 GLPHEMergeRequest >> merged_at [
 
-	<FMProperty: #merged_at type: #String>
+	<FMProperty: #merged_at type: #Object>
 	<generated>
 	^ merged_at
 ]
@@ -1051,7 +1051,7 @@ GLPHEMergeRequest >> title: anObject [
 { #category : #accessing }
 GLPHEMergeRequest >> updated_at [
 
-	<FMProperty: #updated_at type: #String>
+	<FMProperty: #updated_at type: #Object>
 	<generated>
 	^ updated_at
 ]
