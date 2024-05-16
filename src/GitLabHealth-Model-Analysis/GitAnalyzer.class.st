@@ -24,11 +24,17 @@ GitAnalyzer >> analyseAmandment [
 { #category : #'as yet unclassified' }
 GitAnalyzer >> analyseChurn [
 
-	| commitFiles churn |
+	| commitFiles |
 	commitFiles := self impactedFilesInFollowUpCommitsOf: fromCommit.
 
-	churn := self computeChurnOnFiles: commitFiles.
-	^ churn. 
+	^ self computeChurnOnFiles: commitFiles.
+	
+]
+
+{ #category : #'as yet unclassified' }
+GitAnalyzer >> analyseMergeResquestValidation: aGLHPMergeRequest [
+
+	1 halt. 
 ]
 
 { #category : #churn }

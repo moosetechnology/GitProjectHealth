@@ -174,10 +174,10 @@ GLPHMetamodelGenerator >> mergeRequestProperties [
 	mergeRequest property: #title type: #String.
 	mergeRequest property: #description type: #String.
 	mergeRequest property: #state type: #String.
-	mergeRequest property: #created_at type: #String.
-	mergeRequest property: #updated_at type: #String.
-	mergeRequest property: #merged_at type: #String.
-	mergeRequest property: #closed_at type: #String.
+	mergeRequest property: #created_at type: #Object.
+	mergeRequest property: #updated_at type: #Object.
+	mergeRequest property: #merged_at type: #Object.
+	mergeRequest property: #closed_at type: #Object.
 	mergeRequest property: #target_branch type: #String.
 	mergeRequest property: #source_branch type: #String.
 	mergeRequest property: #user_notes_count type: #Number.
