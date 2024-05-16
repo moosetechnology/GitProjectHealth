@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'glModel',
 		'fromCommit',
-		'glhImporter'
+		'glhImporter',
+		'onProject'
 	],
 	#category : #'GitLabHealth-Model-Analysis'
 }
@@ -29,6 +30,26 @@ GitAnalyzer >> analyseChurn [
 
 	^ self computeChurnOnFiles: commitFiles.
 	
+]
+
+{ #category : #'as yet unclassified' }
+GitAnalyzer >> analyseCommitFrequencySince: since until: until [ 
+
+	| commits response |
+	response := {
+		            (#numberOfCommit -> nil).
+		            (#frequency -> nil) } asDictionary.
+
+	commits := glhImporter
+		           importCommitsOProject: onProject
+		           since: since
+		           until: until.
+
+	commits := self arrangeCommitsByDate: commits.
+	commits := (commits associations sortAscending: [ :entry |
+		            entry key asDate ]) asOrderedDictionary.
+
+	^ commits
 ]
 
 { #category : #'as yet unclassified' }
@@ -58,6 +79,19 @@ GitAnalyzer >> analyseMergeResquestValidation: aGLHPMergeRequest [
 					at: #merged_at put: aGLHPMergeRequest merged_at;
 					yourself. 
 
+]
+
+{ #category : #filter }
+GitAnalyzer >> arrangeCommitsByDate: commits [ 
+	|date2commits|
+	date2commits := Dictionary new. 
+	
+	commits do: [ :commit |
+		|date|
+		date := commit created_at asDate. 
+		date2commits at: date printString ifPresent: [ :v | v add: commit ] ifAbsentPut: [ OrderedCollection new add: commit; yourself. ].
+		 ].
+	^ date2commits. 
 ]
 
 { #category : #churn }
@@ -169,8 +203,8 @@ GitAnalyzer >> initialize [
 
 	glModel := GLPHEModel new.
 	fromCommit := GLHCommit new.
-	glhImporter := GLPHModelImporter new. 
-	
+	glhImporter := GLPHModelImporter new.
+	onProject:= GLHProject new. 
 ]
 
 { #category : #insertion }
@@ -194,6 +228,11 @@ GitAnalyzer >> insertDiff: aGLPHEDiffRange into: fileChangesDic startingFrom: fr
 { #category : #'as yet unclassified' }
 GitAnalyzer >> onModel: agitHealthModel [
 	glModel := agitHealthModel
+]
+
+{ #category : #accessing }
+GitAnalyzer >> onProject: aGLHProject [ 
+	onProject := aGLHProject
 ]
 
 { #category : #sorting }

@@ -60,7 +60,6 @@ GitAnalyzerTest >> testAnalyseAmandment [
 	"commit chain 
 	mondayCommit -> tuesdayCommit -> wednesdayCommit
 	"
-
 	wednesdayCommit := glhImporter
 		                   importCommitOfProject: projects first id
 		                   withId:
@@ -94,6 +93,25 @@ GitAnalyzerTest >> testAnalyseAmandment [
 
 
 	self assert: res = tuesdayCommit equals: true
+]
+
+{ #category : #test }
+GitAnalyzerTest >> testAnalyseCommitFrequencySinceUntil [
+
+	| res from since |
+	
+	from := '13 May 2024'.
+	since := '16 May 2024'.
+	
+	res := gitAnalyzer
+		       onProject: projects first;
+		       analyseCommitFrequencySince: from asDate
+		       until: since asDate.
+
+	
+	
+	self assert: (res at: from) size equals: 1.
+	self assert: (res at: '14 May 2024') size equals: 4.
 ]
 
 { #category : #test }
