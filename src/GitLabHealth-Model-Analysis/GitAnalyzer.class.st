@@ -213,7 +213,8 @@ GitAnalyzer >> initialize [
 	glModel := GLPHEModel new.
 	fromCommit := GLHCommit new.
 	glhImporter := GLPHModelImporter new.
-	onProject:= GLHProject new. 
+	onProject := GLHProject new.
+	maxChildCommits := -1 
 ]
 
 { #category : #insertion }
