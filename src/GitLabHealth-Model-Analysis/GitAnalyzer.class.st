@@ -5,7 +5,8 @@ Class {
 		'glModel',
 		'fromCommit',
 		'glhImporter',
-		'onProject'
+		'onProject',
+		'maxChildCommits'
 	],
 	#category : #'GitLabHealth-Model-Analysis'
 }
@@ -26,10 +27,11 @@ GitAnalyzer >> analyseAmandment [
 GitAnalyzer >> analyseChurn [
 
 	| commitFiles |
-	commitFiles := self impactedFilesInFollowUpCommitsOf: fromCommit.
+	commitFiles := self
+		               impactedFilesInFollowUpCommitsOf: fromCommit
+		               withMaxCommits: self maxChildCommits.
 
-	^ self computeChurnOnFiles: commitFiles.
-	
+	^ self computeChurnOnFiles: commitFiles
 ]
 
 { #category : #'as yet unclassified' }
@@ -186,14 +188,21 @@ GitAnalyzer >> glhImporter: anImporter [
 { #category : #'as yet unclassified' }
 GitAnalyzer >> impactedFilesInFollowUpCommitsOf: aGLHCommit [
 
+	^ self impactedFilesInFollowUpCommitsOf:  aGLHCommit withMaxCommits: -1 
+]
+
+{ #category : #churn }
+GitAnalyzer >> impactedFilesInFollowUpCommitsOf: aGLHCommit withMaxCommits: max [
+
 	| commitFiles |
 	commitFiles := (fromCommit diffs collect: [ :diff |
-		                diff new_path -> (Set new add: (aGLHCommit -> (diff diffRanges) ); yourself) ])
-		               asDictionary.
+		                diff new_path -> (Set new
+			                 add: aGLHCommit -> diff diffRanges;
+			                 yourself) ]) asDictionary.
 
 	self
 		visitChildCommits: fromCommit childCommits
-		lookingForFiles: commitFiles.
+		lookingForFiles: commitFiles upto: max.
 
 	^ commitFiles
 ]
@@ -225,6 +234,16 @@ GitAnalyzer >> insertDiff: aGLPHEDiffRange into: fileChangesDic startingFrom: fr
 		 ]
 ]
 
+{ #category : #accessing }
+GitAnalyzer >> maxChildCommit: max [ 
+	maxChildCommits := max
+]
+
+{ #category : #accessing }
+GitAnalyzer >> maxChildCommits [
+	^ maxChildCommits
+]
+
 { #category : #'as yet unclassified' }
 GitAnalyzer >> onModel: agitHealthModel [
 	glModel := agitHealthModel
@@ -243,7 +262,14 @@ GitAnalyzer >> sortChangeDic: aCollection [
 { #category : #visiting }
 GitAnalyzer >> visitChildCommits: commits lookingForFiles: commitFiles [
 
+	^ self visitChildCommits:  commits lookingForFiles: commitFiles upto: -1 
+]
+
+{ #category : #visiting }
+GitAnalyzer >> visitChildCommits: commits lookingForFiles: commitFiles upto: nCommits [
+
 	commits ifEmpty: [ ^ commitFiles ].
+	(nCommits = 0) ifTrue: [ ^ commitFiles ].
 
 	commits do: [ :commit |
 		| files |
@@ -257,7 +283,8 @@ GitAnalyzer >> visitChildCommits: commits lookingForFiles: commitFiles [
 
 		self
 			visitChildCommits: commit childCommits
-			lookingForFiles: commitFiles ].
+			lookingForFiles: commitFiles
+			upto: nCommits - 1 ].
 
 	^ commitFiles
 ]
