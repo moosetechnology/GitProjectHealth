@@ -75,20 +75,20 @@ GLHModelImporter >> completeImportProject: aGLHProject [
 { #category : #'as yet unclassified' }
 GLHModelImporter >> completeImportedCommit: aCommit [
 
-	| diffs |
+	| diffs addedCommit |
+	addedCommit := (self importUserByUsername: aCommit author_name)
+		               commits
+		               add: aCommit
+		               unless: [ :existingCommit :newCommit |
+		               existingCommit id = newCommit id ].
 
-	(self importUserByUsername: aCommit author_name) commits
-		add: aCommit
-		unless: [ :existingCommit :newCommit |
-		existingCommit id = newCommit id ].
-
-	('Import diff of commit: ' , aCommit short_id printString) recordInfo.
+	('Import diff of commit: ' , addedCommit short_id printString) recordInfo.
 
 	self withCommitDiffs ifTrue: [
-		diffs := self importDiffOfCommit: aCommit.
+		diffs := self importDiffOfCommit: addedCommit.
 		self glhModel addAll: diffs unless: self blockForDiffEquality ].
 
-	^ aCommit
+	^ addedCommit
 ]
 
 { #category : #private }
@@ -240,7 +240,7 @@ GLHModelImporter >> importCommitsOProject: aProject since: fromDate until: toDat
 			           (toDate ifNotNil: [ toDate asDateAndTime asString ])
 			           path: nil
 			           author: nil
-			           all: nil
+			           all: true
 			           with_stats: nil
 			           firstParent: nil
 			           order: nil
@@ -258,10 +258,8 @@ GLHModelImporter >> importCommitsOProject: aProject since: fromDate until: toDat
 			unless: self blockOnIdEquality.
 		foundCommit addAll: newlyFoundCommit ].
 
-	self glhModel addAll: foundCommit unless: self blockOnIdEquality.
+	^ self glhModel addAll: foundCommit unless: self blockOnIdEquality.
 
-
-	^ foundCommit
 ]
 
 { #category : #api }

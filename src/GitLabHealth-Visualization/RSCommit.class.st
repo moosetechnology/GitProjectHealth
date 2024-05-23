@@ -70,7 +70,7 @@ RSCommit >> allChildrenShapesFrom: aGLHCommit into: dic [
 { #category : #canvas }
 RSCommit >> buildCommitCompleteHierachyCanvas [
 
-	| shapes parents children commitShape dic churnAnalyzer files2Commits shape2change |
+	| shapes parents children commitShape dic churnAnalyzer files2Commits shape2change allCommitShps |
 	canvas := RSCanvas new.
 	shapes := RSGroup new.
 	parents := RSGroup new.
@@ -109,10 +109,25 @@ RSCommit >> buildCommitCompleteHierachyCanvas [
 			 self shapeForCommit: c withColor: self parentColor ]).
 
 
-	"canvas addAllShapes: commitShape , parents , children."
-	self createLinesBetweenCommits: parents , commitShape , children.
+	allCommitShps := parents , commitShape , children.
+	
+	allCommitShps do: [ :shp |
+		|commit|
+		commit := shp model.
+		(commit commitCreator = commitShape first model commitCreator) ifTrue: [ 
+			(shp children detect: [ :c | c class = RSBox ]) border: (RSBorder new
+				   width: 5;
+				   color: self defaultColor ;
+				   yourself). 
+			 ].
+		 ].
+	
+	
 
-	canvas addAll: parents, commitShape , children.
+	"canvas addAllShapes: commitShape , parents , children."
+	self createLinesBetweenCommits: allCommitShps.
+
+	canvas addAll: allCommitShps.
 	RSHorizontalTreeLayout new on: canvas nodes.
 
 	canvas @ RSCanvasController.
@@ -389,35 +404,17 @@ RSCommit >> shapeForCommit: aGLHCommit [
 { #category : #shape }
 RSCommit >> shapeForCommit: aGLHCommit withColor: color [
 
-	| box group label impactedFiles |
+	| box group labelTitle labelCommiter impactedFiles |
 	group := RSGroup new.
 	impactedFiles := RSGroup new.
-	label := RSLabel new
-		         text: (aGLHCommit name truncateWithElipsisTo: 30);
-		         yourself.
+	labelTitle := RSLabel new
+		              text: (aGLHCommit name truncateWithElipsisTo: 40);
+		              yourself.
 
-	"aGLHCommit diffsGroup do: [ :diff |
-		impactedFiles add:
-			(RSCommitDiff new
-				 shapeForDiffRange: diff
-				 withColor: Color lightBlue) ].
-	RSVerticalLineLayout new alignCenter on: impactedFiles.
-
-
-	box := RSBox new
-		       height:
-			       (impactedFiles sum: [ :composite | composite height ]);
-		       width: (impactedFiles max: [ :composite | composite width ]);
-		       color: color.
-
-	group
-		add: label;
-		add: (RSComposite new shapes: (RSGroup new
-						  add: box;
-						  addAll: impactedFiles;
-						  yourself)).
-	RSVerticalLineLayout new alignCenter on: group.
-	"
+	labelCommiter := RSLabel new
+		                 text: 'by ',
+			                 (aGLHCommit author_name truncateWithElipsisTo: 50);
+		                 yourself.
 
 	box := RSBox new
 		       height: 50;
@@ -425,8 +422,9 @@ RSCommit >> shapeForCommit: aGLHCommit withColor: color [
 		       color: color.
 
 	group
-		add: label;
-		add: box.
+		add: labelTitle;
+		add: box;
+		add: labelCommiter.
 
 	RSVerticalLineLayout new alignCenter on: group.
 

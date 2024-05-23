@@ -1,19 +1,9 @@
 Extension { #name : #GLHCommit }
 
 { #category : #'*GitLabHealth-Model-Extension' }
-GLHCommit >> inspectionGLHCommit [
-
-	<inspectorPresentationOrder: 3 title: 'Commit Hierarchy'>
-	| canvas |
-	canvas := RSCommit canvasHierarchyFor:  self.
-
-	^ canvas asPresenter
-]
-
-{ #category : #'*GitLabHealth-Model-Extension' }
 GLHCommit >> inspectionGLHCommitChildren [
 
-	<inspectorPresentationOrder: 3 title: 'Commit Children'>
+	<inspectorPresentationOrder: 3 title: 'Commits Tree'>
 	| canvas |
 	canvas := RSCommit canvasCompleteHierachyFor: self.
 

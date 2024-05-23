@@ -4,18 +4,24 @@ Extension { #name : #MooseAbstractGroup }
 MooseAbstractGroup >> add: anElmt unless: aConditionAsBlock [
 	"()>>>"
 
-	self addAll: { anElmt } unless: aConditionAsBlock
-	
-	
+	^ (self addAll: { anElmt } unless: aConditionAsBlock) first
 ]
 
 { #category : #'*GitLabHealth-Model-Extension' }
 MooseAbstractGroup >> addAll: anElmtCollection ofType: aType unless: aConditionAsBlock [
 	"()>>>"
 
-	self addAll: (anElmtCollection reject: [ :anElmt |
-			 (self allWithType: aType) anySatisfy: [ :existingElmt |
-				 aConditionAsBlock value: existingElmt value: anElmt ] ])
+	| addedElement |
+	addedElement := anElmtCollection reject: [ :anElmt |
+		                (self allWithType: aType) anySatisfy: [
+			                :existingElmt |
+			                aConditionAsBlock value: existingElmt value: anElmt ] ].
+
+	self addAll: addedElement.
+	
+	^ (self allWithType: aType) select: [ :existingElmt |
+		  anElmtCollection anySatisfy: [ :anElmt |
+			  aConditionAsBlock value: anElmt value: existingElmt ] ]
 ]
 
 { #category : #'*GitLabHealth-Model-Extension' }
@@ -23,8 +29,8 @@ MooseAbstractGroup >> addAll: anElmtCollection unless: aConditionAsBlock [
 	"()>>>"
 
 	anElmtCollection ifEmpty: [ ^ self ].
-	self
+	^ self
 		addAll: anElmtCollection
 		ofType: anElmtCollection first class
-		unless: aConditionAsBlock.	
+		unless: aConditionAsBlock
 ]
