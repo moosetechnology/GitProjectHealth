@@ -61,17 +61,22 @@ GLHModelImporter >> completeImportProject: aGLHProject [
 	(self pipelinesOf: aGLHProject id) do: [ :pipeline |
 		self glhModel add: pipeline.
 		aGLHProject addPipeline: pipeline ].
-	aGLHProject creator: (self importUser: aGLHProject creator_id).
+
+	"aGLHProject creator: (self importUser: aGLHProject creator_id)."
+
+	((self importUser: aGLHProject creator_id)) addCreatedProject: aGLHProject.
 	aGLHProject repository: GLHRepository new.
 	self glhModel add: aGLHProject unless: (self blockEqualityOn: #id).
 	self glhModel add: aGLHProject repository.
-	self importRepository: aGLHProject repository
+	self importRepository: aGLHProject repository.
+	^ aGLHProject
 ]
 
 { #category : #'as yet unclassified' }
 GLHModelImporter >> completeImportedCommit: aCommit [
 
 	| diffs |
+
 	(self importUserByUsername: aCommit author_name) commits
 		add: aCommit
 		unless: [ :existingCommit :newCommit |
@@ -245,8 +250,9 @@ GLHModelImporter >> importCommitsOProject: aProject since: fromDate until: toDat
 
 		newlyFoundCommit := self parseCommitsResult: results.
 		newlyFoundCommit do: [ :c |
-			c repository: aProject repository. 
-			 ].
+
+			c repository: aProject repository ].
+
 		aProject repository commits
 			addAll: newlyFoundCommit
 			unless: self blockOnIdEquality.
@@ -262,6 +268,9 @@ GLHModelImporter >> importCommitsOProject: aProject since: fromDate until: toDat
 GLHModelImporter >> importCommitsOf: aGLHProject withStats: aBoolean until: toDate [
 
 	| newlyFoundCommit page |
+	
+	self deprecated: [  ] .
+	
 	page := 0.
 	newlyFoundCommit := { true }.
 	[ newlyFoundCommit isNotEmpty ] whileTrue: [
@@ -293,8 +302,8 @@ GLHModelImporter >> importCommitsOf: aGLHProject withStats: aBoolean until: toDa
 					                    existingCommit id = commitParsed id ] ] ].
 		aGLHProject mooseModel addAll: newlyFoundCommit.
 		aGLHProject repository commits addAll: newlyFoundCommit ].
-	
-	
+
+
 	self withCommitDiffs ifTrue: [
 		aGLHProject repository commits do: [ :commit |
 			self importDiffOfCommit: commit ] ]
@@ -522,11 +531,15 @@ GLHModelImporter >> importUser: aUserID [
 	^ (glhModel allWithType: GLHUser)
 		  detect: [ :user | user id = aUserID ]
 		  ifNone: [
+		
 			  ('Import user: ' , aUserID printString) recordInfo.
 			  result := self glhApi user: aUserID.
 			  userResult := self parseUserResult: result.
 			  glhModel add: userResult unless: self blockOnIdEquality.
-			  userResult ]
+			  self flag:
+				  'please optimize by changing add:unless: so it return the add elmnt'.
+			  (glhModel allWithType: GLHUser) detect: [ :user |
+				  user id = aUserID ] ]
 ]
 
 { #category : #user }
@@ -541,7 +554,7 @@ GLHModelImporter >> importUserByUsername: anUsername [
 			  result := self glhApi usersSearchByUsername: anUsername.
 			  searchResult := NeoJSONReader fromString: result.
 			
-				((searchResult at: #message) includesSubstring: '403 Forbidden') ifTrue: [ 
+				(searchResult class = Dictionary and: [((searchResult at: #message) includesSubstring: '403 Forbidden')]) ifTrue: [ 
 						GLHUser new username: anUsername.
 					 ] ifFalse: [
 					searchResult ifEmpty: [ GLHUser new ] ifNotEmpty: [

@@ -61,16 +61,16 @@ GitAnalyzerTest >> testAnalyseAmandment [
 	mondayCommit -> tuesdayCommit -> wednesdayCommit
 	"
 	wednesdayCommit := glhImporter
-		                   importCommitOfProject: projects first 
+		                   importCommitOfProject: projects first
 		                   withId:
 		                   'f298ec312f81032b611a890f993d98096ab3bbc1'.
 
 	mondayCommit := glhImporter
-		                importCommitOfProject: projects first 
+		                importCommitOfProject: projects first
 		                withId: '8a6f665118e6fcfa468d7cce1a7e944ba65812ab'.
 
 	tuesdayCommit := glhImporter
-		                 importCommitOfProject: projects first 
+		                 importCommitOfProject: projects first
 		                 withId: '2c7308c727560dd425ef78f9a95ca7650d164bed'.
 
 	myCommits := {
@@ -89,6 +89,7 @@ GitAnalyzerTest >> testAnalyseAmandment [
 		       fromCommit: mondayCommit;
 		       glhImporter: glhImporter;
 		       onModel: glphModel;
+				
 		       analyseAmandment.
 
 

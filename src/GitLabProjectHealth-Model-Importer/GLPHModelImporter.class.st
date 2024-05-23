@@ -79,6 +79,8 @@ GLPHModelImporter >> completeImportProject: aGLHProject [
 
 	self importMergeRequests: aGLHProject.
 	
+	^ aGLHProject 
+	
 
 ]
 
@@ -244,7 +246,8 @@ GLPHModelImporter >> parseDiffString: aDiff [
 	index := 0.
 	range := nil.
 	
-	
+	(lines ifEmpty: [ ^ aDiff diffRanges  ]).
+	(lines first beginsWith: '@@') ifFalse:  [ ^ aDiff diffRanges  ].
 	
 	lines := self filterCommitChanges: lines. 
 	

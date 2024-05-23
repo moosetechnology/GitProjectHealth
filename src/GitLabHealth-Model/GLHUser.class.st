@@ -88,7 +88,9 @@ GLHUser class >> annotation [
 
 { #category : #adding }
 GLHUser >> addCommit: anObject [
+
 	<generated>
+
 	^ self commits add: anObject
 ]
 
