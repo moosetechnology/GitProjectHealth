@@ -115,7 +115,7 @@ GitAnalyzer >> computeChurnOnFiles: aCollection [
 		
 		file := assoc key.
 		results := assoc value. 
-		results values ifEmpty: [ churn := nil. ] ifNotEmpty: [ churn := ((results values select: [ :a | a value > 1 ] )sum: [ :a | a value ]) / (results values sum: [ :a | a value ]) . ].
+		results values ifEmpty: [ churn := -1. ] ifNotEmpty: [ churn := ((results values select: [ :a | a value > 1 ] )sum: [ :a | a value ]) / (results values sum: [ :a | a value ]) . ].
 		
 		(file -> churn)
 		 ].
@@ -171,7 +171,7 @@ GitAnalyzer >> firstAmandmentFromChrun: aChurnAnalysis [
 		 ].
 	
 
-	^ (firstCommitsPerFile sortAscending: [:c | c created_at ]) first. 
+	^ (firstCommitsPerFile sortAscending: [:c | c created_at ]) ifEmpty: nil ifNotEmpty: [ :v | v first ]  . 
 
 ]
 

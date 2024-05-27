@@ -210,6 +210,56 @@ GLPHModelImporter >> importMergeRequests: aGLHProject [
 			self importDiffOfMergeRequest: mr ] ]
 ]
 
+{ #category : #import }
+GLPHModelImporter >> importMergeRequests: aGLHProject since: fromDate until: toDate [
+
+	| newlyFoundMR page foundMR |
+	page := 0.
+	foundMR := OrderedCollection new.
+	newlyFoundMR := { true }.
+	[ newlyFoundMR isNotEmpty ] whileTrue: [
+		| results |
+		page := page + 1.
+		('import merge request page ' , page printString) recordInfo.
+		results := self glhApi
+			           mergeRequestsOfProject: aGLHProject id
+			           createdAfter:
+			           (fromDate ifNotNil: [ fromDate asDateAndTime asString ])
+			           createdBefore:
+			           (toDate ifNotNil: [ toDate asDateAndTime asString ])
+			           authorId: nil
+			           authorUsername: nil
+			           scope: 'all'
+			           orderBy: 'created_at'
+			           page: page.
+
+		newlyFoundMR := self parseMergeRequestResult: results.
+		"newlyFoundMR do: [ :mr | 
+			""1 halt. mr project: aGLHProject"".
+			aGLHProject mergeRequests add: mr unless: self blockOnIdEquality. 
+			 ]."
+		"TODO : pourquoi le merge resquest est rajouté dans le model ??? "
+		"newlyFoundMR = (self glhModel allWithType: GLPHEMergeRequest) first .
+		newlyFoundMR = aGLHProject mergeRequests first."
+		
+		newlyFoundMR := aGLHProject mergeRequests
+			addAll: newlyFoundMR
+			unless: self blockOnIdEquality.
+		foundMR addAll: newlyFoundMR ].
+
+
+	"gets it related commits"
+	aGLHProject mergeRequests do: [ :mr |
+		self importCommitsOfMergeResquest: mr ].
+
+
+	self withCommitDiffs ifTrue: [
+		aGLHProject mergeRequests do: [ :mr |
+			self importDiffOfMergeRequest: mr ] ].
+	
+	^ foundMR 
+]
+
 { #category : #'as yet unclassified' }
 GLPHModelImporter >> importProject: aProjectID [
 		| result projectResult |
