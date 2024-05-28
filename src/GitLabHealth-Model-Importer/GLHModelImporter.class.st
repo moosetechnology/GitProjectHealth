@@ -241,7 +241,7 @@ GLHModelImporter >> importCommitsOProject: aProject since: fromDate until: toDat
 			           path: nil
 			           author: nil
 			           all: true
-			           with_stats: nil
+			           with_stats: true
 			           firstParent: nil
 			           order: nil
 			           trailers: nil
@@ -257,6 +257,7 @@ GLHModelImporter >> importCommitsOProject: aProject since: fromDate until: toDat
 			addAll: newlyFoundCommit
 			unless: self blockOnIdEquality.
 		foundCommit addAll: newlyFoundCommit ].
+
 
 	^ self glhModel addAll: foundCommit unless: self blockOnIdEquality.
 
@@ -529,15 +530,11 @@ GLHModelImporter >> importUser: aUserID [
 	^ (glhModel allWithType: GLHUser)
 		  detect: [ :user | user id = aUserID ]
 		  ifNone: [
-		
 			  ('Import user: ' , aUserID printString) recordInfo.
 			  result := self glhApi user: aUserID.
 			  userResult := self parseUserResult: result.
 			  glhModel add: userResult unless: self blockOnIdEquality.
-			  self flag:
-				  'please optimize by changing add:unless: so it return the add elmnt'.
-			  (glhModel allWithType: GLHUser) detect: [ :user |
-				  user id = aUserID ] ]
+			   ]
 ]
 
 { #category : #user }

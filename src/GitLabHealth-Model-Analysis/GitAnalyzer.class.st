@@ -26,12 +26,26 @@ GitAnalyzer >> analyseAmandment [
 { #category : #'as yet unclassified' }
 GitAnalyzer >> analyseChurn [
 
-	| commitFiles |
+	| commitFiles totalContribution childCommits |
+	childCommits := OrderedCollection new.
+
+	totalContribution := self
+		                     visitChildCommits: fromCommit childCommits
+		                     toStoreThemIn: childCommits
+		                     upto: self maxChildCommits.
+	totalContribution := totalContribution sum: [ :commit |
+		                     commit additions ].
+
+
 	commitFiles := self
 		               impactedFilesInFollowUpCommitsOf: fromCommit
 		               withMaxCommits: self maxChildCommits.
 
-	^ self computeChurnOnFiles: commitFiles
+
+
+	^ (self computeChurnOnFiles: commitFiles)
+		  at: #totalContribution
+		  ifAbsentPut: totalContribution; yourself. 
 ]
 
 { #category : #'as yet unclassified' }
@@ -288,4 +302,21 @@ GitAnalyzer >> visitChildCommits: commits lookingForFiles: commitFiles upto: nCo
 			upto: nCommits - 1 ].
 
 	^ commitFiles
+]
+
+{ #category : #visiting }
+GitAnalyzer >> visitChildCommits: commits toStoreThemIn: commitsFound upto: nCommits [
+
+	commits ifEmpty: [ ^ commitsFound ].
+	nCommits = 0 ifTrue: [ ^ commitsFound ].
+
+	commits do: [ :commit |
+		commitsFound add: commit.
+
+		self
+			visitChildCommits: commit childCommits
+			toStoreThemIn: commitsFound
+			upto: nCommits - 1 ].
+
+	^ commitsFound
 ]

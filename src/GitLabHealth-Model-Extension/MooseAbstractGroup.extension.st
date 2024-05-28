@@ -28,7 +28,7 @@ MooseAbstractGroup >> addAll: anElmtCollection ofType: aType unless: aConditionA
 MooseAbstractGroup >> addAll: anElmtCollection unless: aConditionAsBlock [
 	"()>>>"
 
-	anElmtCollection ifEmpty: [ ^ self ].
+	anElmtCollection ifEmpty: [ ^ {} ].
 	^ self
 		addAll: anElmtCollection
 		ofType: anElmtCollection first class
