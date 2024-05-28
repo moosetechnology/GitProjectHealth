@@ -249,9 +249,7 @@ GLHModelImporter >> importCommitsOProject: aProject since: fromDate until: toDat
 			           page: page.
 
 		newlyFoundCommit := self parseCommitsResult: results.
-		newlyFoundCommit do: [ :c |
-
-			c repository: aProject repository ].
+		newlyFoundCommit do: [ :c | c repository: aProject repository ].
 
 		aProject repository commits
 			addAll: newlyFoundCommit
@@ -259,8 +257,7 @@ GLHModelImporter >> importCommitsOProject: aProject since: fromDate until: toDat
 		foundCommit addAll: newlyFoundCommit ].
 
 
-	^ self glhModel addAll: foundCommit unless: self blockOnIdEquality.
-
+	^ self glhModel addAll: foundCommit unless: self blockOnIdEquality
 ]
 
 { #category : #api }

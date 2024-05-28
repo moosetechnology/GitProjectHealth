@@ -179,9 +179,8 @@ GLPHModelImporter >> importDiffRangesForDiff: aGLHDiff [
 	diffRanges := self parseDiffString: aGLHDiff.
 	
 	self glhModel addAll: diffRanges unless: self blockForDiffRangeEquality .
-	aGLHDiff diffRanges addAll: diffRanges unless: self blockForDiffRangeEquality .
+	^ aGLHDiff diffRanges addAll: diffRanges unless: self blockForDiffRangeEquality .
 
-	^ aGLHDiff diffRanges
 ]
 
 { #category : #import }
@@ -297,9 +296,10 @@ GLPHModelImporter >> parseDiffString: aDiff [
 	range := nil.
 	
 	(lines ifEmpty: [ ^ aDiff diffRanges  ]).
+	lines := self filterCommitChanges: lines. 
 	(lines first beginsWith: '@@') ifFalse:  [ ^ aDiff diffRanges  ].
 	
-	lines := self filterCommitChanges: lines. 
+	
 	
 	lines do: [ :line |
 		| aChange |
