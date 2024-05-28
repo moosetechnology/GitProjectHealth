@@ -14,52 +14,74 @@ Class {
 }
 
 { #category : #churn }
-GitMetric4User >> codeChurnSince: since until: until onACommitWindowOf: commitLimit overA: aDateWeekMonthOrYear [ 
-	|commits res groupedByDate|
-	
-	groupedByDate := OrderedDictionary new. 
-	gitAnalyzer := GitAnalyzer new glhImporter: glhImporter; onModel: glhModel;  maxChildCommit: commitLimit. 
-	
-	commits := self loadCommitOfProjects: itsProjects keys since: since until: until.
+GitMetric4User >> codeChurnSince: since until: until onACommitWindowOf: commitLimit overA: aDateWeekMonthOrYear [
+
+	| commits res groupedByDate |
+	groupedByDate := OrderedDictionary new.
+	gitAnalyzer := GitAnalyzer new
+		               glhImporter: glhImporter;
+		               onModel: glhModel;
+		               maxChildCommit: commitLimit.
+
+	commits := self
+		           loadCommitOfProjects: itsProjects keys
+		           since: since
+		           until: until.
 	commits := commits reject: [ :commit | commit commitCreator ~= user ].
-	
-	
+
+
 	"for each commit, we get its churn result (a dictionnary)"
 	res := commits collect: [ :commit |
-		|overDate|
-			commit -> (gitAnalyzer fromCommit: commit; analyseChurn).
-		 ].
-	
-	
+		       commit -> (gitAnalyzer
+			        fromCommit: commit;
+			        analyseChurn) ].
+
+
 	res do: [ :assoc |
-		|commit churnResult sumChurn overDate contribution fraction|
+		| commit churnResult sumChurn overDate contribution fraction |
 		commit := assoc key.
 		churnResult := assoc value.
 		sumChurn := (churnResult at: #churns) sum: [ :churn |
-			|numerator|
-			numerator := churn value asFraction numerator.
-			self flag: 'must investigate what does it mean to have a -1 in churn'.
-			(numerator = -1) ifTrue: [ 0 ] ifFalse: [ numerator ] . 
-			 ].
-		contribution := (churnResult at: #totalContribution).
-		
-		fraction := (sumChurn / contribution).
-		overDate := self transformDate: commit created_at to: aDateWeekMonthOrYear. 
-		groupedByDate at: overDate printString 
-			ifPresent: [ :array | array add:  fraction. ] 
-			ifAbsentPut: [ OrderedCollection new add: fraction; yourself  ].	
-		 ].
-	
-	groupedByDate :=  groupedByDate collect: [ :churns |
-		|totalChurn totalContribution|
-		totalChurn := churns sum: [ :churn | churn asFraction numerator ].
-		totalContribution := churns sum: [ :churn | churn asFraction denominator ].
-		totalChurn / totalContribution.
-		 ]. 
-	
-	
+			            | numerator |
+			            numerator := churn value asFraction numerator.
+			            self flag:
+				            'must investigate what does it mean to have a -1 in churn'.
+			            numerator = -1
+				            ifTrue: [ 0 ]
+				            ifFalse: [ numerator ] ].
+		contribution := churnResult at: #totalContribution.
 
-	^ groupedByDate.
+		fraction := sumChurn / contribution.
+		overDate := self
+			            transformDate: commit created_at
+			            to: aDateWeekMonthOrYear.
+		groupedByDate
+			at: overDate printString
+			ifPresent: [ :array | array add: fraction ]
+			ifAbsentPut: [
+				OrderedCollection new
+					add: fraction;
+					yourself ] ].
+
+	groupedByDate := groupedByDate collect: [ :churns |
+		                 | totalChurn totalContribution |
+		                 totalChurn := churns sum: [ :churn |
+			                               churn asFraction numerator ].
+		                 totalContribution := churns sum: [ :churn |
+			                                      churn asFraction denominator ].
+		                 totalChurn / totalContribution ].
+
+
+
+	^ {
+		  (#details -> groupedByDate).
+		  (#totalChurn -> (groupedByDate sum: [ :frac | frac numerator ])).
+		  (#avgChurn -> ((groupedByDate sum: [ :frac | frac numerator ]) / groupedByDate keys size) ) .
+		  (#overEach -> aDateWeekMonthOrYear name).
+		  (#forOver -> (groupedByDate keys size printString
+		    , aDateWeekMonthOrYear printString)).
+		  (#userCommits -> commits size).
+		  (#churnWindow -> commitLimit) } asDictionary
 ]
 
 { #category : #'as yet unclassified' }
