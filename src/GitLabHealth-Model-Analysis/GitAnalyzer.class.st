@@ -48,6 +48,13 @@ GitAnalyzer >> analyseChurn [
 		  ifAbsentPut: totalContribution; yourself. 
 ]
 
+{ #category : #commit }
+GitAnalyzer >> analyseCommitContribution [
+	
+	^ { (#addition -> fromCommit additions).
+	  (#deletion -> fromCommit deletions). } asDictionary 
+]
+
 { #category : #'as yet unclassified' }
 GitAnalyzer >> analyseCommitFrequencySince: since until: until [ 
 

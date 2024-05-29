@@ -16,7 +16,8 @@ Class {
 { #category : #churn }
 GitMetric4User >> codeChurnSince: since until: until onACommitWindowOf: commitLimit overA: aDateWeekMonthOrYear [
 
-	| commits res groupedByDate |
+	| commits res groupedByDate totalContributions|
+	totalContributions := OrderedCollection new. 
 	groupedByDate := OrderedDictionary new.
 	gitAnalyzer := GitAnalyzer new
 		               glhImporter: glhImporter;
@@ -50,7 +51,8 @@ GitMetric4User >> codeChurnSince: since until: until onACommitWindowOf: commitLi
 				            ifTrue: [ 0 ]
 				            ifFalse: [ numerator ] ].
 		contribution := churnResult at: #totalContribution.
-
+		totalContributions add:contribution.
+	
 		fraction := sumChurn / contribution.
 		overDate := self
 			            transformDate: commit created_at
@@ -75,13 +77,62 @@ GitMetric4User >> codeChurnSince: since until: until onACommitWindowOf: commitLi
 
 	^ {
 		  (#details -> groupedByDate).
+			(#totalContribution -> totalContributions sum).
 		  (#totalChurn -> (groupedByDate sum: [ :frac | frac numerator ])).
-		  (#avgChurn -> ((groupedByDate sum: [ :frac | frac numerator ]) / groupedByDate keys size) ) .
+		  (#avgChurn -> ((groupedByDate sum: [ :frac | frac numerator ])
+		    / groupedByDate keys size ifEmpty: 1)).
 		  (#overEach -> aDateWeekMonthOrYear name).
 		  (#forOver -> (groupedByDate keys size printString
 		    , aDateWeekMonthOrYear printString)).
 		  (#userCommits -> commits size).
 		  (#churnWindow -> commitLimit) } asDictionary
+]
+
+{ #category : #'as yet unclassified' }
+GitMetric4User >> codeContributionsSince: since until: until overA: aDateWeekMonthOrYear [
+	|commits contributions groupedByDate|
+
+
+	groupedByDate := OrderedDictionary new. 
+	gitAnalyzer := GitAnalyzer new onModel: glhModel; glhImporter: glhImporter. 
+	
+	commits := self
+		           loadCommitOfProjects: itsProjects keys
+		           since: since
+		           until: until.
+	commits := commits reject: [ :commit | commit commitCreator ~= user ].
+	
+	contributions := commits collect: [ :commit |
+		       commit -> (gitAnalyzer
+			        fromCommit: commit;
+			        analyseCommitContribution) ].
+		
+	contributions do: [ :assoc |
+		|dateOver|
+		dateOver := self transformDate: (assoc key created_at) to: aDateWeekMonthOrYear.
+		groupedByDate at: (dateOver printString) ifPresent: [ :v | v add: assoc value ] ifAbsentPut: [ OrderedCollection new add: assoc value; yourself ]. 
+		 ]. 
+	
+	groupedByDate := groupedByDate collect: [ :contribs |
+		|totalAdd totalDele|
+		totalAdd := contribs sum: [ :v | v at: #addition ]. 
+		totalDele := contribs sum: [ :v | v at: #deletion ]. 
+		{ (#addition -> totalAdd).  (#deletion -> totalDele) } asDictionary 
+		 ].
+	
+	
+	^ { 
+	 	(#overEach -> aDateWeekMonthOrYear name).
+		(#forOver -> (groupedByDate keys size printString
+		    , aDateWeekMonthOrYear printString)).
+		(#avgAddition -> ((groupedByDate values sum: [ :v | v at: #addition ]) / (groupedByDate keys size)) asFloat ).
+		(#avgDeletion -> (((groupedByDate values sum: [ :v | v at: #deletion ]) / (groupedByDate keys size)) asFloat) ).
+		(#details -> groupedByDate).
+		(#userCommits -> commits size).
+		} asDictionary 
+	
+	
+	
 ]
 
 { #category : #'as yet unclassified' }
