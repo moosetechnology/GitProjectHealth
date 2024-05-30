@@ -243,7 +243,8 @@ GitMetric4User >> commitFrequencySince: since until: until overA: aDateWeekMonth
 	^ {
 		  (#averageFrac -> (total / periods)).
 		  (#averageFloat -> (total / periods) asFloat).
-		  (#forOver
+			(#userCommit -> total).  
+		(#forOver
 		   ->
 		   (aggregate keys size printString
 		    , aDateWeekMonthOrYear printString)).
@@ -372,8 +373,8 @@ GitMetric4User >> delayUntilFirstChurnSince: since until: until overA: aDateWeek
 	avg := res values sum / res keys size.
 
 	^ {
-		  (#avg -> avg).
-		  (#periode -> aDateWeekMonthOrYear name).
+		  (#avgDelay -> avg).
+		  (#overEach -> aDateWeekMonthOrYear name).
 		  (#forOver -> (groupedByDate keys size printString
 		    , aDateWeekMonthOrYear printString)).
 		  (#details -> groupedByDate) } asDictionary
@@ -451,7 +452,7 @@ GitMetric4User >> loadProjects: aCollection [
 { #category : #metrics }
 GitMetric4User >> mergeRequestDurationSince: since until: until overA: aDateWeekMonthOrYear [
 
-	| mergeRequest res groupedByDate avg |
+	| mergeRequest res groupedByDate filterGroups avg |
 	groupedByDate := self
 		                 setupGroupedDateFrom: since
 		                 to: until
@@ -489,19 +490,30 @@ GitMetric4User >> mergeRequestDurationSince: since until: until overA: aDateWeek
 					add: (dic at: #duration);
 					yourself ] ].
 
-	groupedByDate associations do: [ :assoc |
+
+	filterGroups := groupedByDate reject: [ :array | array isEmpty ].
+
+	filterGroups associations do: [
+		:assoc |
 		| sum denominator |
+		
+
 		denominator := assoc value size.
+
 		sum := assoc value sum: [ :v |
 			       v ifNil: [
 				       denominator := denominator - 1.
 				       0 asDuration ] ].
-		assoc value: sum / denominator ].
+		denominator = 0 ifTrue: [ denominator := 1 ].
+
+		filterGroups at: assoc key put:  sum / denominator ].
 
 
-
-	avg := (groupedByDate values sum: [ :v | v ])
-	       / groupedByDate keys size.
+	filterGroups keys ifEmpty: [ avg := 0 ] ifNotEmpty: [ 
+		avg := (filterGroups values sum )
+	       / filterGroups keys size.
+		
+		 ].
 
 
 	^ {
@@ -514,36 +526,58 @@ GitMetric4User >> mergeRequestDurationSince: since until: until overA: aDateWeek
 ]
 
 { #category : #setup }
-GitMetric4User >> setupGroupedDateFrom: since to: until over: aDateWeekMonthOrYear [ 
-	|groupedByDate start end|
+GitMetric4User >> setupGroupedDateFrom: since to: until over: aDateWeekMonthOrYear [
 
-	groupedByDate := OrderedDictionary new. 
-	
+	| groupedByDate start end over increment|
+	groupedByDate := OrderedDictionary new.
+
+	increment := 1.
 	start := self transformDate: since to: aDateWeekMonthOrYear.
 	end := self transformDate: until to: aDateWeekMonthOrYear.
-	 
-	groupedByDate at: (start printString) ifAbsentPut: [ OrderedCollection new ]. 
-	
-	[(groupedByDate keys last) asDateAndTime < end] whileTrue: [ 
-		|index over|
-		
-		over := (aDateWeekMonthOrYear name asLowercase) asSymbol.
-		(over = #date) ifTrue: [ over := #day ]. 
-		index := (groupedByDate keys last asDateAndTime) + (1 perform: over ) . 
-		index := self transformDate: index to: aDateWeekMonthOrYear.
-		groupedByDate at: (index printString) ifAbsentPut: [ OrderedCollection new ].
-		
-		 ] .
 
-	groupedByDate at: (end printString) ifAbsentPut: [ OrderedCollection new ]. 
+	groupedByDate
+		at: start printString
+		ifAbsentPut: [ OrderedCollection new ].
 	
-^ groupedByDate 
+	over := aDateWeekMonthOrYear name asLowercase asSymbol.
+		over = #date ifTrue: [ over := #day ].
+		over = #month ifTrue: [ increment := 32. over := #day ].
+		 
+
+	[ groupedByDate keys last asDateAndTime < end ] whileTrue: [
+		| index  |
+		index := groupedByDate keys last asDateAndTime + (increment perform: over).
+		index := self transformDate: index to: aDateWeekMonthOrYear.
+		groupedByDate
+			at: index printString
+			ifAbsentPut: [ OrderedCollection new ] ].
+	
+	
+	over = #day ifTrue: [ 
+		groupedByDate keys do: [ :date |
+			|aWeekday|
+			 aWeekday := date asDate weekday. 
+			((aWeekday =  #Sunday) or: [ aWeekday = #Saturday ] )ifTrue: [ 
+				groupedByDate removeKey: date. 
+				 ] 
+			 ].
+		 ].
+	
+
+	groupedByDate
+		at: end printString
+		ifAbsentPut: [ OrderedCollection new ].
+
+	^ groupedByDate
 ]
 
 { #category : #'as yet unclassified' }
 GitMetric4User >> transformDate: date to: aWeekOrMonthOrYear [
-	^ (date asDate perform:
-				             ('as' , aWeekOrMonthOrYear name) asSymbol) asDate
+
+	aWeekOrMonthOrYear = Month ifTrue: [ ^ date asDate month asDate ].
+
+	^ (date asDate perform: ('as' , aWeekOrMonthOrYear name) asSymbol)
+		  asDate
 ]
 
 { #category : #accessing }
