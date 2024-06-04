@@ -81,7 +81,7 @@ GitMetric4User >> codeChurnSince: since until: until onACommitWindowOf: commitLi
 
 	^ {
 		  (#details -> groupedByDate).
-		  (#totalContribution -> totalContributions sum).
+		  (#totalContribution -> (totalContributions ifEmpty: [ 0 ] ifNotEmpty: [ totalContributions sum ]) ).
 		  (#totalChurn -> (groupedByDate sum: [ :frac | frac numerator ])).
 		  (#avgChurn -> ((groupedByDate sum: [ :frac | frac numerator ])
 		    / (groupedByDate keys ifEmpty: [ 1 ] ifNotEmpty: [ groupedByDate keys size ]) )).
@@ -96,6 +96,9 @@ GitMetric4User >> codeChurnSince: since until: until onACommitWindowOf: commitLi
 GitMetric4User >> codeContributionsSince: since until: until overA: aDateWeekMonthOrYear [
 
 	| commits contributions groupedByDate |
+	
+		glhImporter withCommitDiffs: false.
+	
 		groupedByDate := self
 		                 setupGroupedDateFrom: since
 		                 to: until
@@ -137,6 +140,7 @@ GitMetric4User >> codeContributionsSince: since until: until overA: aDateWeekMon
 			                 (#addition -> totalAdd).
 			                 (#deletion -> totalDele) } asDictionary ].
 
+		glhImporter withCommitDiffs: true.
 
 	^ {
 		  (#overEach -> aDateWeekMonthOrYear name).
@@ -160,8 +164,6 @@ GitMetric4User >> commentsContributionsSince: since until: until overA: aDateWee
 		                 setupGroupedDateFrom: since
 		                 to: until
 		                 over: aDateWeekMonthOrYear.
-
-
 
 	gitAnalyzer := GitAnalyzer new
 		               onModel: glhModel;
@@ -193,7 +195,6 @@ GitMetric4User >> commentsContributionsSince: since until: until overA: aDateWee
 					yourself ] ].
 
 	groupedByDate := groupedByDate collect: [ :contribs |
-		                 
 		                 contribs
 			                 ifNotEmpty: [ contribs sum ]
 			                 ifEmpty: [ 0 ] ].
@@ -426,18 +427,26 @@ GitMetric4User >> loadCommitOfProjects: aCollection since: aTimespan [
 { #category : #churn }
 GitMetric4User >> loadCommitOfProjects: aCollection since: since until: until [
 
-	| commits |
-	commits := (aCollection collect: [ :id |
-		            glhImporter
-			            importCommitsOProject: (itsProjects at: id)
-			            since: since
-			            until: until ]) flattened first.
+	| allCommits |
+	allCommits := itsCommits
+		              at: since printString , '-' , until printString
+		              ifPresent: [ :c | c ]
+		              ifAbsentPut: [
+			              | commits |
+			              commits := (aCollection collect: [ :id |
+				                          glhImporter
+					                          importCommitsOProject:
+					                          (itsProjects at: id)
+					                          since: since
+					                          until: until ]) flattened.
+			              commits := commits flatCollect: [ :c | c ].
+			              commits ].
 
-	commits do: [ :commit | glhImporter completeImportedCommit: commit ].
-	
-	glhImporter chainsCommitsFrom: commits. 
+	allCommits do: [ :commit |	glhImporter completeImportedCommit: commit ].
 
-	^ commits
+	glhImporter chainsCommitsFrom: allCommits.
+
+	^ allCommits
 ]
 
 { #category : #loading }

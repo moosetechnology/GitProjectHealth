@@ -157,6 +157,10 @@ GLPHApi >> project: aProjectID [
 
 { #category : #user }
 GLPHApi >> usersSearchByUsername: aUserName [ 
-
-	^ self client get: self baseAPIUrl , '/users?search=' , (aUserName replaceAllRegex: ' ' with:  '+').
+	|name|
+	
+	name := (aUserName splitOn: ' ') collect: [:part | part urlEncoded].
+	name := '+' join: name.
+	
+	^ self client get: self baseAPIUrl , '/users?search=' , name 
 ]

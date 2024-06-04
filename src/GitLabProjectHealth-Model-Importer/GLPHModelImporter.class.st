@@ -16,19 +16,31 @@ GLPHModelImporter >> blockForDiffRangeEquality [
 { #category : #commit }
 GLPHModelImporter >> chainsCommitsFrom: commitsCollection [
 
+	|dic|
+	
+	dic := ((self glhModel allWithType: GLHCommit) collect: [ :commit |
+		(commit id) -> commit. 	
+		 ]) asSet asDictionary .
+
 	commitsCollection do: [ :commit |
 		
 
 		commit parent_ids do: [ :parentId |
-			| parentCommit |
-			parentCommit := (self glhModel allWithType: GLHCommit)
+		"	| parentCommit |"
+			
+"			parentCommit := (self glhModel allWithType: GLHCommit)
 				                detect: [ :c | c id = parentId ]
 				                ifNone: [ nil ].
 			parentCommit ifNotNil: [
 				parentCommit childCommits
 					add: commit
 					unless: [ :existing :new | existing id = new id ].
-				 ] ] ].
+				 ] "
+			
+			dic at: parentId ifPresent: [:parentCommit | parentCommit  childCommits add: commit	unless: self blockOnIdEquality] ifAbsent: [].
+			
+			] 
+		].
 	^ commitsCollection
 ]
 
@@ -176,9 +188,8 @@ GLPHModelImporter >> importDiffRangesForDiff: aGLHDiff [
 	| diffRanges |
 	('Import changes of diff ' , aGLHDiff printString) recordInfo.
 	"the import of 'diffRanges' entites is technically done inside the parseDiffString"
-	diffRanges := self parseDiffString: aGLHDiff.
 	
-	self glhModel addAll: diffRanges unless: self blockForDiffRangeEquality .
+	diffRanges := self glhModel addAll: (self parseDiffString: aGLHDiff) unless: self blockForDiffRangeEquality .
 	^ aGLHDiff diffRanges addAll: diffRanges unless: self blockForDiffRangeEquality .
 
 ]
@@ -307,7 +318,7 @@ GLPHModelImporter >> parseDiffString: aDiff [
 		(line trim beginsWith: #'@@') ifTrue: [
 			range := GLPHEDiffRange newFrom: line.
 			firstChangeRange := true.
-			aDiff diffRanges
+			range := aDiff diffRanges
 				add: range
 				unless: [ :existing :new | 
 					existing originalLineRange = new originalLineRange and: [
@@ -318,7 +329,7 @@ GLPHModelImporter >> parseDiffString: aDiff [
 			firstChangeRange ifFalse: [ 
 				aChange := GLPHEChange newFrom: line.
 			aChange relativeIndex: index.
-			range changes add: aChange unless: [ :existing :new |
+			aChange := range changes add: aChange unless: [ :existing :new |
 				existing sourceCode = new sourceCode and: [
 					existing index = new index ] ].
 			index := index + 1

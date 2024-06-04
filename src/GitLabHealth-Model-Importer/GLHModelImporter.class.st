@@ -75,18 +75,29 @@ GLHModelImporter >> completeImportProject: aGLHProject [
 { #category : #'as yet unclassified' }
 GLHModelImporter >> completeImportedCommit: aCommit [
 
-	| diffs addedCommit |
-	addedCommit := (self importUserByUsername: aCommit author_name)
+	| addedCommit |
+	
+	addedCommit := aCommit.
+	
+	addedCommit commitCreator ifNil: [
+			addedCommit := (self importUserByUsername: aCommit author_name)
 		               commits
 		               add: aCommit
 		               unless: [ :existingCommit :newCommit |
 		               existingCommit id = newCommit id ].
+		 ].
+	
 
 	('Import diff of commit: ' , addedCommit short_id printString) recordInfo.
 
 	self withCommitDiffs ifTrue: [
-		diffs := self importDiffOfCommit: addedCommit.
-		self glhModel addAll: diffs unless: self blockForDiffEquality ].
+		|diffs|
+		addedCommit diffs ifEmpty: [ 
+			diffs := self importDiffOfCommit: addedCommit.
+			self glhModel addAll: diffs unless: self blockForDiffEquality
+			 ] 
+		
+		 ].
 
 	^ addedCommit
 ]
@@ -249,12 +260,11 @@ GLHModelImporter >> importCommitsOProject: aProject since: fromDate until: toDat
 			           page: page.
 
 		newlyFoundCommit := self parseCommitsResult: results.
-		newlyFoundCommit do: [ :c | c repository: aProject repository ].
+		"newlyFoundCommit do: [ :c | c repository: aProject repository ]."
 
-		aProject repository commits
+		foundCommit addAll: (aProject repository commits
 			addAll: newlyFoundCommit
-			unless: self blockOnIdEquality.
-		foundCommit addAll: newlyFoundCommit ].
+			unless: self blockOnIdEquality). ].
 
 
 	^ self glhModel addAll: foundCommit unless: self blockOnIdEquality
@@ -384,9 +394,8 @@ GLHModelImporter >> importDiffOfCommit: aCommit [
 		          unidiff: true.
 	diffsResult := self parseDiffResult: result.
 
-	aCommit diffs addAll: diffsResult unless: self blockForDiffEquality.
+	^ aCommit diffs addAll: diffsResult unless: self blockForDiffEquality.
 
-	^ aCommit diffs
 ]
 
 { #category : #'private - api' }
@@ -524,41 +533,43 @@ GLHModelImporter >> importRepository: aGLHRepository [
 GLHModelImporter >> importUser: aUserID [
 
 	| result userResult |
-	^ (glhModel allWithType: GLHUser)
-		  detect: [ :user | user id = aUserID ]
-		  ifNone: [
-			  ('Import user: ' , aUserID printString) recordInfo.
-			  result := self glhApi user: aUserID.
-			  userResult := self parseUserResult: result.
-			  glhModel add: userResult unless: self blockOnIdEquality.
-			   ]
+	
+	 result := self glhApi user: aUserID.
+	 userResult := self parseUserResult: result.
+	 ^ glhModel add: userResult unless: self blockOnIdEquality .
 ]
 
 { #category : #user }
 GLHModelImporter >> importUserByUsername: anUsername [
-
-	^ (self glhModel allWithType: GLHUser)
-		  detect: [ :user | user username = anUsername ]
-		  ifNone: [
+	|dicUsername|
+	
+	dicUsername := ((self glhModel allWithType: GLHUser) collect: [ :user |
+		user username -> user.
+		 ]) asSet asDictionary.
+	
+	^ dicUsername at: anUsername
+		  ifPresent: [ :user | user ]
+		  ifAbsent: [
 			  | result userId searchResult |
 			  ('Import user with username: ' , anUsername printString)
 				  recordInfo.
 			  result := self glhApi usersSearchByUsername: anUsername.
 			  searchResult := NeoJSONReader fromString: result.
-			
-				(searchResult class = Dictionary and: [((searchResult at: #message) includesSubstring: '403 Forbidden')]) ifTrue: [ 
-						GLHUser new username: anUsername.
-					 ] ifFalse: [
-					searchResult ifEmpty: [ GLHUser new ] ifNotEmpty: [
-				  userId := searchResult first at: #id.
-				  (self glhModel allWithType: GLHUser)
-					  detect: [ :user | user id = userId ]
-					  ifNone: [
-						  self importUser: userId.
-						   ] ]
-					].
-			
-			   ]
+
+			  (searchResult class = Dictionary and: [
+				   (searchResult at: #message) includesSubstring: '403 Forbidden' ])
+				  ifTrue: [ GLHUser new username: anUsername ]
+				  ifFalse: [
+					  searchResult
+						  ifEmpty: [ GLHUser new username: anUsername; yourself ]
+						  ifNotEmpty: [
+							
+							  userId := searchResult first at: #id.
+							  (self glhModel allWithType: GLHUser)
+								  detect: [ :user | user id = userId ]
+								  ifNone: [ self importUser: userId ] .
+								
+								] ] ]
 ]
 
 { #category : #initialization }
