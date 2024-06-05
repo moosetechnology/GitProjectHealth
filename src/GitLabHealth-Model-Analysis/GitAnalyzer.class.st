@@ -175,7 +175,7 @@ GitAnalyzer >> computeSpecificChurnOf: commit2Changes [
 		diffRanges do: [ :diff |
 			|from upTo|
 			
-			from := (diff originalLineRange copyFrom: (diff originalLineRange indexOf: $-)+1 to: (diff originalLineRange indexOf: $,)-1 ) asString asNumber.
+			from := (diff originalLineRange copyFrom: (diff originalLineRange indexOf: $-)+1 to: (diff originalLineRange indexOf: $, ifAbsent: [ diff originalLineRange size + 1 ] )-1 ) asString asNumber.
 			(from = 0) ifTrue:[from := 1].
 			self insertDiff: diff into: changesDic startingFrom: from. 
 			
