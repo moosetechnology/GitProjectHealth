@@ -450,10 +450,10 @@ GitMetric4User >> loadCommitOfProjects: aCollection since: since until: until [
 ]
 
 { #category : #loading }
-GitMetric4User >> loadProjects: aCollection [
+GitMetric4User >> loadProjects: projectIds [
 
-	aCollection do: [ :id |
-		itsProjects at: id ifAbsentPut: (glhImporter importProject: id) ].
+	projectIds do: [ :id |
+		itsProjects at: id ifAbsentPut: [ glhImporter importProject: id ] ].
 
 	^ itsProjects
 ]

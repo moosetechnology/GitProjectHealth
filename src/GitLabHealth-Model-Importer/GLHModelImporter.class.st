@@ -57,14 +57,15 @@ GLHModelImporter >> blockOnNameEquality [
 { #category : #'private - api' }
 GLHModelImporter >> completeImportProject: aGLHProject [
 
-	('Complete import project: ' , aGLHProject id printString) recordInfo.
-	(self pipelinesOf: aGLHProject id) do: [ :pipeline |
-		self glhModel add: pipeline.
-		aGLHProject addPipeline: pipeline ].
+	('Complete import of project: ' , aGLHProject id printString)
+		recordInfo.
+
+	self importPipelinesOfProject: aGLHProject.
 
 	"aGLHProject creator: (self importUser: aGLHProject creator_id)."
 
-	((self importUser: aGLHProject creator_id)) addCreatedProject: aGLHProject.
+	(self importUser: aGLHProject creator_id) addCreatedProject:
+		aGLHProject.
 	aGLHProject repository: GLHRepository new.
 	self glhModel add: aGLHProject unless: (self blockEqualityOn: #id).
 	self glhModel add: aGLHProject repository.
@@ -165,6 +166,9 @@ GLHModelImporter >> importCommitOfProject: anProject withId: anID [
 	| commit result |
 	anID ifNil: [ ^ nil ].
 
+	('looking for commit ' , anID printString , ' in project : '
+	 , anProject id printString) recordInfo.
+
 	commit := (self
 		           detectEntityType: GLHCommit
 		           overAttribut: #id
@@ -178,8 +182,7 @@ GLHModelImporter >> importCommitOfProject: anProject withId: anID [
 
 		          commit ].
 
-  self withCommitDiffs ifTrue: [
-			          self importDiffOfCommit: commit ].
+	self withCommitDiffs ifTrue: [ self importDiffOfCommit: commit ].
 
 	^ commit
 ]
@@ -506,22 +509,36 @@ GLHModelImporter >> importParentCommitsOfCommit: aGLHCommit since: aDate [
 ]
 
 { #category : #'private - api' }
+GLHModelImporter >> importPipelinesOfProject: aGLHProject [
+
+	(self pipelinesOf: aGLHProject id) do: [ :pipeline |
+		self glhModel add: pipeline.
+		aGLHProject addPipeline: pipeline ]
+]
+
+{ #category : #'private - api' }
 GLHModelImporter >> importRepository: aGLHRepository [
 
 	| resultBranches branches |
 	[
+	('import the repository of project ' , aGLHRepository project name)
+		recordInfo.
+
 	resultBranches := self glhApi branchesOfRepository:
 		                  aGLHRepository project id.
 	branches := self parseBranchesResult: resultBranches.
-	
 
-	aGLHRepository branches addAll: branches unless: self blockOnNameEquality.
+	('import the branches of project ') recordInfo.
+
+	aGLHRepository branches
+		addAll: branches
+		unless: self blockOnNameEquality.
 	self glhModel addAll: branches unless: self blockOnNameEquality.
-	
+
 	"branches do: [ :branch |
 		aGLHRepository addBranch: branch.
 		self glhModel add: branch ]."
-	
+
 	self withFiles ifTrue: [
 		branches do: [ :branch | self importFilesOfBranch: branch ] ] ]
 		on: NeoJSONParseError
@@ -533,10 +550,10 @@ GLHModelImporter >> importRepository: aGLHRepository [
 GLHModelImporter >> importUser: aUserID [
 
 	| result userResult |
-	
-	 result := self glhApi user: aUserID.
-	 userResult := self parseUserResult: result.
-	 ^ glhModel add: userResult unless: self blockOnIdEquality .
+	('Import user with id:  ', aUserID printString) recordInfo.
+	result := self glhApi user: aUserID.
+	userResult := self parseUserResult: result.
+	^ glhModel add: userResult unless: self blockOnIdEquality
 ]
 
 { #category : #user }

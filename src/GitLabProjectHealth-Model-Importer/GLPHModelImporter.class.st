@@ -16,31 +16,22 @@ GLPHModelImporter >> blockForDiffRangeEquality [
 { #category : #commit }
 GLPHModelImporter >> chainsCommitsFrom: commitsCollection [
 
-	|dic|
+	| dic |
+	
+	('Chains ', commitsCollection size printString , ' commits') recordInfo.
 	
 	dic := ((self glhModel allWithType: GLHCommit) collect: [ :commit |
-		(commit id) -> commit. 	
-		 ]) asSet asDictionary .
+		        commit id -> commit ]) asSet asDictionary.
 
 	commitsCollection do: [ :commit |
-		
-
-		commit parent_ids do: [ :parentId |
-		"	| parentCommit |"
-			
-"			parentCommit := (self glhModel allWithType: GLHCommit)
-				                detect: [ :c | c id = parentId ]
-				                ifNone: [ nil ].
-			parentCommit ifNotNil: [
-				parentCommit childCommits
-					add: commit
-					unless: [ :existing :new | existing id = new id ].
-				 ] "
-			
-			dic at: parentId ifPresent: [:parentCommit | parentCommit  childCommits add: commit	unless: self blockOnIdEquality] ifAbsent: [].
-			
-			] 
-		].
+		commit parent_ids do: [ :parentId | 
+			dic
+				at: parentId
+				ifPresent: [ :parentCommit |
+					parentCommit childCommits
+						add: commit
+						unless: self blockOnIdEquality ]
+				ifAbsent: [  ] ] ].
 	^ commitsCollection
 ]
 
@@ -89,11 +80,13 @@ GLPHModelImporter >> completeImportProject: aGLHProject [
 
 	super completeImportProject: aGLHProject.
 
-	self importMergeRequests: aGLHProject.
-	
-	^ aGLHProject 
-	
+	"for this initial import, with only look at some but not all MR"
+	self
+		importMergeRequests: aGLHProject
+		since: DateAndTime today
+		until: DateAndTime now.
 
+	^ aGLHProject
 ]
 
 { #category : #import }
@@ -122,24 +115,31 @@ GLPHModelImporter >> importCommitsOfMergeResquest: aGLPHEMergeRequest [
 	| foundCommits |
 	foundCommits := OrderedCollection new.
 
+	('Import commit sha of MR:  ' , aGLPHEMergeRequest iid printString)
+		recordInfo.
 	"the founds commits are added to the model during their respective import"
 	aGLPHEMergeRequest mergeRequestCommit: ((self
 			  importCommitOfProject: aGLPHEMergeRequest project
 			  withId: aGLPHEMergeRequest sha) ifNotNil: [ :commit |
 			 foundCommits add: commit ]).
 
+	('Import commit merge_commit_sha of MR:  '
+	 , aGLPHEMergeRequest iid printString) recordInfo.
 	aGLPHEMergeRequest mergedCommit: ((self
 			  importCommitOfProject: aGLPHEMergeRequest project
 			  withId: aGLPHEMergeRequest merge_commit_sha) ifNotNil: [ :commit |
 			 foundCommits add: commit ]).
 
+	('Import commit squash_commit_sha of MR:  '
+	 , aGLPHEMergeRequest iid printString) recordInfo.
 	aGLPHEMergeRequest squashCommit: ((self
 			  importCommitOfProject: aGLPHEMergeRequest project
 			  withId: aGLPHEMergeRequest squash_commit_sha) ifNotNil: [ :commit |
 			 foundCommits add: commit ]).
 
-	
-	self chainsCommitsFrom: foundCommits
+
+	self chainsCommitsFrom: foundCommits.
+	^ foundCommits
 ]
 
 { #category : #api }
@@ -161,7 +161,7 @@ GLPHModelImporter >> importDiffOfMergeRequest: aMergeRequest [
 		'Diff of already importer: '
 		, aMergeRequest iid printString recordInfo.
 		^ aMergeRequest diffs ].
-	('Import diff of mergeRequest ' , aMergeRequest iid printString)
+	('Import diff commits of MR ' , aMergeRequest iid printString)
 		recordInfo.
 	result := self glhApi
 		          diffsMergeRequestOfProject: aMergeRequest project_id
@@ -186,25 +186,36 @@ GLPHModelImporter >> importDiffOfMergeRequest: aMergeRequest [
 GLPHModelImporter >> importDiffRangesForDiff: aGLHDiff [
 
 	| diffRanges |
+	aGLHDiff diffRanges ifNotEmpty: [
+		('Diffs already imported for ' , aGLHDiff printString) recordInfo.
+		^ aGLHDiff diffRanges ].
+
 	('Import changes of diff ' , aGLHDiff printString) recordInfo.
 	"the import of 'diffRanges' entites is technically done inside the parseDiffString"
-	
-	diffRanges := self glhModel addAll: (self parseDiffString: aGLHDiff) unless: self blockForDiffRangeEquality .
-	^ aGLHDiff diffRanges addAll: diffRanges unless: self blockForDiffRangeEquality .
 
+
+	diffRanges := self glhModel
+		              addAll: (self parseDiffString: aGLHDiff)
+		              unless: self blockForDiffRangeEquality.
+	^ aGLHDiff diffRanges
+		  addAll: diffRanges
+		  unless: self blockForDiffRangeEquality
 ]
 
 { #category : #import }
 GLPHModelImporter >> importMergeRequests: aGLHProject [
 
 	| results parsedResults |
+	
+	('Import merge request of Project:  ' , aGLHProject id printString) recordInfo.
+	
 	results := self glhApi mergeRequestOfProject: aGLHProject id.
 	parsedResults := self parseMergeRequestResult: results.
 
 	aGLHProject mergeRequests
 		addAll: parsedResults
 		unless: self blockOnIdEquality.
-	
+
 	self glhModel
 		addAll: aGLHProject mergeRequests
 		unless: self blockOnIdEquality.
@@ -224,13 +235,15 @@ GLPHModelImporter >> importMergeRequests: aGLHProject [
 GLPHModelImporter >> importMergeRequests: aGLHProject since: fromDate until: toDate [
 
 	| newlyFoundMR page foundMR |
+	('import MR of Project ' , aGLHProject id) recordInfo.
+
 	page := 0.
 	foundMR := OrderedCollection new.
 	newlyFoundMR := { true }.
 	[ newlyFoundMR isNotEmpty ] whileTrue: [
 		| results |
 		page := page + 1.
-		('import merge request page ' , page printString) recordInfo.
+		('import MR page ' , page printString) recordInfo.
 		results := self glhApi
 			           mergeRequestsOfProject: aGLHProject id
 			           createdAfter:
@@ -243,18 +256,10 @@ GLPHModelImporter >> importMergeRequests: aGLHProject since: fromDate until: toD
 			           orderBy: 'created_at'
 			           page: page.
 
-		newlyFoundMR := self parseMergeRequestResult: results.
-		"newlyFoundMR do: [ :mr | 
-			""1 halt. mr project: aGLHProject"".
-			aGLHProject mergeRequests add: mr unless: self blockOnIdEquality. 
-			 ]."
-		"TODO : pourquoi le merge resquest est rajouté dans le model ??? "
-		"newlyFoundMR = (self glhModel allWithType: GLPHEMergeRequest) first .
-		newlyFoundMR = aGLHProject mergeRequests first."
-		
+
 		newlyFoundMR := aGLHProject mergeRequests
-			addAll: newlyFoundMR
-			unless: self blockOnIdEquality.
+			                addAll: (self parseMergeRequestResult: results)
+			                unless: self blockOnIdEquality.
 		foundMR addAll: newlyFoundMR ].
 
 
@@ -266,18 +271,19 @@ GLPHModelImporter >> importMergeRequests: aGLHProject since: fromDate until: toD
 	self withCommitDiffs ifTrue: [
 		aGLHProject mergeRequests do: [ :mr |
 			self importDiffOfMergeRequest: mr ] ].
-	
-	^ foundMR 
+
+	^ foundMR
 ]
 
 { #category : #'as yet unclassified' }
 GLPHModelImporter >> importProject: aProjectID [
-		| result projectResult |
-	('Import group: ' , aProjectID printString) recordInfo.
+
+	| result projectResult |
+	('Import project with id:  ' , aProjectID printString) recordInfo.
 
 	result := self glhApi project: aProjectID.
 	projectResult := self parseProjectResult: result.
-	
+
 	^ self completeImportProject: projectResult
 ]
 
