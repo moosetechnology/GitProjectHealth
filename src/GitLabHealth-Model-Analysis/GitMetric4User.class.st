@@ -370,8 +370,9 @@ GitMetric4User >> delayUntilFirstChurnSince: since until: until overA: aDateWeek
 			       (filtered sum: [ :v | v asDuration ]) / filtered size ] ].
 
 	res := res reject: #isNil.
+	
+	res ifEmpty: [ avg:= nil ] ifNotEmpty: [ avg := res values sum / res keys size. ].
 
-	avg := res values sum / res keys size.
 
 	^ {
 		  (#avgDelay -> avg).
