@@ -235,7 +235,7 @@ GLPHModelImporter >> importMergeRequests: aGLHProject [
 GLPHModelImporter >> importMergeRequests: aGLHProject since: fromDate until: toDate [
 
 	| newlyFoundMR page foundMR |
-	('import MR of Project ' , aGLHProject id) recordInfo.
+	('import MR of Project ' , aGLHProject id printString) recordInfo.
 
 	page := 0.
 	foundMR := OrderedCollection new.

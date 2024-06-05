@@ -56,7 +56,7 @@ GitMetric4User >> codeChurnSince: since until: until onACommitWindowOf: commitLi
 		contribution := churnResult at: #totalContribution.
 		totalContributions add: contribution.
 
-		fraction := sumChurn / contribution.
+		fraction := sumChurn / ((contribution = 0) ifTrue: [1] ifFalse: [contribution ]) .
 		overDate := self
 			            transformDate: commit created_at
 			            to: aDateWeekMonthOrYear.
@@ -347,7 +347,7 @@ GitMetric4User >> delayUntilFirstChurnSince: since until: until overA: aDateWeek
 		       | durationFromA2B |
 		       commits4Date collect: [ :commitA |
 			       | commitB |
-			       commitB := gitAnalyzer
+			       commitB := GitAnalyzer new
 				                  glhImporter: glhImporter;
 				                  onModel: glhModel;
 				                  fromCommit: commitA;
@@ -479,7 +479,13 @@ GitMetric4User >> mergeRequestDurationSince: since until: until overA: aDateWeek
 	mergeRequest := mergeRequest values flattened.
 
 	mergeRequest ifEmpty: [
-		^ { (#totalMergeRequest -> mergeRequest size) } asDictionary ].
+		^ {
+		  (#avgDuration -> nil).
+		  (#overEach -> aDateWeekMonthOrYear name).
+		  (#forOver -> (groupedByDate keys size printString
+		    , aDateWeekMonthOrYear printString)).
+		  (#totalMergeRequest -> 0).
+		  (#details -> nil) } asDictionary ].
 
 	res := mergeRequest collect: [ :mr |
 		       gitAnalyzer analyseMergeResquestValidation: mr ].
@@ -502,11 +508,8 @@ GitMetric4User >> mergeRequestDurationSince: since until: until overA: aDateWeek
 
 	filterGroups := groupedByDate reject: [ :array | array isEmpty ].
 
-	filterGroups associations do: [
-		:assoc |
+	filterGroups associations do: [ :assoc |
 		| sum denominator |
-		
-
 		denominator := assoc value size.
 
 		sum := assoc value sum: [ :v |
@@ -515,14 +518,13 @@ GitMetric4User >> mergeRequestDurationSince: since until: until overA: aDateWeek
 				       0 asDuration ] ].
 		denominator = 0 ifTrue: [ denominator := 1 ].
 
-		filterGroups at: assoc key put:  sum / denominator ].
+		filterGroups at: assoc key put: sum / denominator ].
 
 
-	filterGroups keys ifEmpty: [ avg := 0 ] ifNotEmpty: [ 
-		avg := (filterGroups values sum )
-	       / filterGroups keys size.
-		
-		 ].
+	filterGroups keys
+		ifEmpty: [ avg := 0 ]
+		ifNotEmpty: [
+		avg := filterGroups values sum / filterGroups keys size ].
 
 
 	^ {
