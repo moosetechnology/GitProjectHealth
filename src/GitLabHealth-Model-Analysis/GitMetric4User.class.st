@@ -78,7 +78,7 @@ GitMetric4User >> codeChurnSince: since until: until onACommitWindowOf: commitLi
 							 totalContribution = 0 ifTrue: [ totalChurn / 1] ifFalse: [ totalChurn / totalContribution  ]
 		                  ].
 
-1 halt. 
+
 
 	^ {
 		  (#details -> groupedByDate).
@@ -472,7 +472,7 @@ GitMetric4User >> loadMergeRequestsOfProjects: aCollection since: since until: u
 					                importMergeRequests: (itsProjects at: id)
 					                since: since
 					                until: until ]) flattened.
-			         mr := mr flatCollect: [ :c | c ].
+			        " mr := mr flatCollect: [ :c | c ]."
 			         mr ].
 
 
