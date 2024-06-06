@@ -78,14 +78,16 @@ GitMetric4User >> codeChurnSince: since until: until onACommitWindowOf: commitLi
 							 totalContribution = 0 ifTrue: [ totalChurn / 1] ifFalse: [ totalChurn / totalContribution  ]
 		                  ].
 
-
+1 halt. 
 
 	^ {
 		  (#details -> groupedByDate).
 		  (#totalContribution -> (totalContributions ifEmpty: [ 0 ] ifNotEmpty: [ totalContributions sum ]) ).
 		  (#totalChurn -> (groupedByDate sum: [ :frac | frac numerator ])).
-		  (#avgChurn -> ((groupedByDate sum: [ :frac | frac numerator ])
-		    / (groupedByDate keys ifEmpty: [ 1 ] ifNotEmpty: [ groupedByDate keys size ]) )).
+		  "(#avgChurn -> ((groupedByDate sum: [ :frac | frac numerator ])
+		    / (groupedByDate keys ifEmpty: [ 1 ] ifNotEmpty: [ groupedByDate keys size ]) ))."
+		  (#churn -> ((groupedByDate sum: [ :frac | frac numerator ]) ->
+		     (groupedByDate sum: [ :frac | frac denominator ]))).
 		  (#overEach -> aDateWeekMonthOrYear name).
 		  (#forOver -> (groupedByDate keys size printString
 		    , aDateWeekMonthOrYear printString)).
