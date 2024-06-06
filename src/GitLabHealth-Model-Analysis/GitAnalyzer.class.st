@@ -50,17 +50,21 @@ GitAnalyzer >> analyseChurn [
 
 { #category : #'as yet unclassified' }
 GitAnalyzer >> analyseCommentContributions [
-	|additions comments|
-	
-	additions := (fromCommit diffs collect: [:diff | 
-		diff diffRanges collect: [ :range | 
-			range changes select: [ :change | 
-				change class = GLPHEAddition. ] ] ]) flattened collect: [ :add | add sourceCode] . 
-	
-	additions := additions collect: [ :codeSource | (codeSource withoutPrefix: '+') trim  ].
-	additions := additions select: [ :codeSource | codeSource beginsWithAnyOf: { '//' . '/*' . '*' . '*/' } ].
-	
-	^ additions size 
+
+	| additions |
+	additions := (fromCommit diffs collect: [ :diff |
+		              diff diffRanges collect: [ :range |
+			              range changes select: [ :change |
+				              change class = GLPHEAddition ] ] ]) flattened
+		             collect: [ :add | add sourceCode ].
+
+	additions := additions collect: [ :codeSource |
+		             (codeSource withoutPrefix: '+') trim ].
+	additions := additions select: [ :codeSource |
+		             codeSource beginsWithAnyOf:
+			             { '#'. '//'. '/*'. '*'. '*/' } ].
+
+	^ additions size
 ]
 
 { #category : #commit }
