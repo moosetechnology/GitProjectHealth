@@ -8,7 +8,8 @@ Class {
 		'itsCommits',
 		'gitAnalyzer',
 		'glhModel',
-		'glhImporter'
+		'glhImporter',
+		'itsMergeRequests'
 	],
 	#category : #'GitLabHealth-Model-Analysis'
 }
@@ -400,7 +401,8 @@ GitMetric4User >> initialize [
 	user := GLHUser new.
 	itsProjects := Dictionary new.
 	itsCommits := Dictionary new.
-	itsGroups := Dictionary new
+	itsGroups := Dictionary new.
+	itsMergeRequests := Dictionary new
 ]
 
 { #category : #accessing }
@@ -450,6 +452,31 @@ GitMetric4User >> loadCommitOfProjects: aCollection since: since until: until [
 	^ allCommits
 ]
 
+{ #category : #churn }
+GitMetric4User >> loadMergeRequestsOfProjects: aCollection since: since until: until [
+
+	| allMr |
+	itsMergeRequests ifNil: [ itsMergeRequests := Dictionary new ].
+
+
+
+	allMr := itsMergeRequests
+		         at: since printString , '-' , until printString
+		         ifPresent: [ :c | c ]
+		         ifAbsentPut: [
+			         | mr |
+			         mr := (aCollection collect: [ :id |
+				                glhImporter
+					                importMergeRequests: (itsProjects at: id)
+					                since: since
+					                until: until ]) flattened.
+			         mr := mr flatCollect: [ :c | c ].
+			         mr ].
+
+
+	^ allMr
+]
+
 { #category : #loading }
 GitMetric4User >> loadProjects: projectIds [
 
@@ -472,21 +499,20 @@ GitMetric4User >> mergeRequestDurationSince: since until: until overA: aDateWeek
 		               glhImporter: glhImporter;
 		               onModel: glhModel.
 
-	mergeRequest := itsProjects collect: [ :project |
-		                glhImporter
-			                importMergeRequests: project
-			                since: since
-			                until: until ].
-	mergeRequest := mergeRequest values flattened.
+	mergeRequest := self
+		                loadMergeRequestsOfProjects: itsProjects keys
+		                since: since
+		                until: until.
+	
 
 	mergeRequest ifEmpty: [
 		^ {
-		  (#avgDuration -> nil).
-		  (#overEach -> aDateWeekMonthOrYear name).
-		  (#forOver -> (groupedByDate keys size printString
-		    , aDateWeekMonthOrYear printString)).
-		  (#totalMergeRequest -> 0).
-		  (#details -> nil) } asDictionary ].
+			  (#avgDuration -> nil).
+			  (#overEach -> aDateWeekMonthOrYear name).
+			  (#forOver -> (groupedByDate keys size printString
+			    , aDateWeekMonthOrYear printString)).
+			  (#totalMergeRequest -> 0).
+			  (#details -> nil) } asDictionary ].
 
 	res := mergeRequest collect: [ :mr |
 		       gitAnalyzer analyseMergeResquestValidation: mr ].
