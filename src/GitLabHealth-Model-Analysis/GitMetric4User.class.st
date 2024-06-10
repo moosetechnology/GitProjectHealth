@@ -18,6 +18,10 @@ Class {
 GitMetric4User >> codeChurnSince: since until: until onACommitWindowOf: commitLimit overA: aDateWeekMonthOrYear [
 
 	| commits res groupedByDate totalContributions |
+	
+		('GitMetric4User: code churn')
+		recordInfo.
+	
 	totalContributions := OrderedCollection new.
 		groupedByDate := self
 		                 setupGroupedDateFrom: since
@@ -100,6 +104,8 @@ GitMetric4User >> codeContributionsSince: since until: until overA: aDateWeekMon
 
 	| commits contributions groupedByDate |
 	
+			('GitMetric4User: code contribution') recordInfo.
+	
 		glhImporter withCommitDiffs: false.
 	
 		groupedByDate := self
@@ -163,6 +169,9 @@ GitMetric4User >> codeContributionsSince: since until: until overA: aDateWeekMon
 GitMetric4User >> commentsContributionsSince: since until: until overA: aDateWeekMonthOrYear [
 
 	| commits contributions groupedByDate |
+	
+				('GitMetric4User: comment contribution') recordInfo.
+	
 	groupedByDate := self
 		                 setupGroupedDateFrom: since
 		                 to: until
@@ -218,6 +227,9 @@ GitMetric4User >> commentsContributionsSince: since until: until overA: aDateWee
 GitMetric4User >> commitFrequencySince: since until: until overA: aDateWeekMonthOrYear [
 
 	| all aggregate periods total groupedByDate |
+	
+	('GitMetric4User: commit frequency') recordInfo.	
+	
 	groupedByDate := self
 		                 setupGroupedDateFrom: since
 		                 to: until
@@ -260,6 +272,7 @@ GitMetric4User >> commitFrequencySince: since until: until overA: aDateWeekMonth
 GitMetric4User >> commitsProducedOnProject: projectId since: sinceDate until: untilDate [
 
 	| frequencies |
+	
 	
 	gitAnalyzer := GitAnalyzer new 
 	glhImporter: glhImporter; 
@@ -318,6 +331,9 @@ GitMetric4User >> commitsProducedOnProject: aProjectId since: since until: until
 GitMetric4User >> delayUntilFirstChurnSince: since until: until overA: aDateWeekMonthOrYear [
 
 	| commits groupedByDate res avg |
+	
+		('GitMetric4User: delay until first churn') recordInfo.	
+	
 	groupedByDate := self
 		                 setupGroupedDateFrom: since
 		                 to: until

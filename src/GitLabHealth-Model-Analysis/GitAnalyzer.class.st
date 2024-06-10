@@ -16,6 +16,10 @@ GitAnalyzer >> analyseAmandment [
 	"return the first commit that modify the same lines of code as the fromCommit"
 
 	| churn res |
+	
+	('GitAnalyzer, analyse amandment onProject: ', onProject printString )
+		recordInfo.
+	
 	churn := self analyseChurn.
 
 	res := self firstAmandmentFromChrun: churn.
@@ -27,6 +31,10 @@ GitAnalyzer >> analyseAmandment [
 GitAnalyzer >> analyseChurn [
 
 	| commitFiles totalContribution childCommits |
+	
+	('GitAnalyzer, analyse chrun onProject: ', onProject printString )
+		recordInfo.
+	
 	childCommits := OrderedCollection new.
 
 	totalContribution := self
@@ -52,6 +60,10 @@ GitAnalyzer >> analyseChurn [
 GitAnalyzer >> analyseCommentContributions [
 
 	| additions |
+	
+	('GitAnalyzer, analyse comment contributions onProject: ', onProject printString )
+		recordInfo.
+	
 	additions := (fromCommit diffs collect: [ :diff |
 		              diff diffRanges collect: [ :range |
 			              range changes select: [ :change |
@@ -70,6 +82,10 @@ GitAnalyzer >> analyseCommentContributions [
 { #category : #commit }
 GitAnalyzer >> analyseCommitContribution [
 	
+	
+	('GitAnalyzer, analyse commit contribution of: ', fromCommit printString )
+		recordInfo.
+	
 	^ { (#addition -> fromCommit additions).
 	  (#deletion -> fromCommit deletions). } asDictionary 
 ]
@@ -78,6 +94,10 @@ GitAnalyzer >> analyseCommitContribution [
 GitAnalyzer >> analyseCommitFrequencySince: since until: until [ 
 
 	| commits response |
+	
+	('GitAnalyzer, analyse commit Frequency on: ', onProject printString )
+		recordInfo.
+	
 	response := {
 		            (#numberOfCommit -> nil).
 		            (#frequency -> nil) } asDictionary.
@@ -98,6 +118,10 @@ GitAnalyzer >> analyseCommitFrequencySince: since until: until [
 GitAnalyzer >> analyseMergeResquestValidation: aGLHPMergeRequest [
 
 	|creationDate mergedDate response|
+	
+	
+	('GitAnalyzer, analyse merge request delay of: ', aGLHPMergeRequest printString )
+		recordInfo.
 	
 	response := { 
 		 #id_merge_resquest -> aGLHPMergeRequest iid. 
