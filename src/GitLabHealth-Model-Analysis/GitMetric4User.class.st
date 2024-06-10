@@ -354,6 +354,7 @@ GitMetric4User >> delayUntilFirstChurnSince: since until: until overA: aDateWeek
 				                  glhImporter: glhImporter;
 				                  onModel: glhModel;
 				                  fromCommit: commitA;
+										maxChildCommit: 5;
 				                  analyseAmandment.
 
 			       durationFromA2B := commitB
