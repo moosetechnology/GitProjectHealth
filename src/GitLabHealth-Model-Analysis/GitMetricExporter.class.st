@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'glhImporter',
 		'beforeExp',
-		'duringExp'
+		'duringExp',
+		'label'
 	],
 	#category : #'GitLabHealth-Model-Analysis'
 }
@@ -187,7 +188,9 @@ GitMetricExporter >> exportFor: usersWithProjects over: aCollectionOfDateWeekMon
 		over := period.
 
 		file := (FileLocator home
-		         / ('IA4Code-DRIT-' , over printString , '-'
+		         /
+			         ('IA4Code-' , label printString , '-' , over printString
+			          , '-'
 			          , (DateAndTime now printString replaceAll: $: with: $-)
 			          , '.csv')) asFileReference.
 
@@ -202,7 +205,9 @@ GitMetricExporter >> exportFor: usersWithProjects over: aCollectionOfDateWeekMon
 			aStream << ('(B): ' , beforeExp printString)
 			<< OSPlatform current lineEnding.
 			aStream << ('(D): ' , duringExp printString)
-			<< OSPlatform current lineEnding ] ]
+			<< OSPlatform current lineEnding ] ].
+
+	'Done computing' recordInfo
 ]
 
 { #category : #accessing }
