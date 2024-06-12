@@ -5,7 +5,8 @@ Class {
 		'glhImporter',
 		'beforeExp',
 		'duringExp',
-		'label'
+		'label',
+		'entities'
 	],
 	#category : #'GitLabHealth-Model-Analysis'
 }
@@ -14,6 +15,19 @@ Class {
 GitMetricExporter >> beforeDic: aDictionnarySinceUntil [
 
 	beforeExp := aDictionnarySinceUntil
+]
+
+{ #category : #'as yet unclassified' }
+GitMetricExporter >> constructFilePath: over [
+
+	| file |
+	file := (FileLocator home
+	         /
+		         ('IA4Code-' , label printString , '-' , over printString
+		          , '-'
+		          , (DateAndTime now printString replaceAll: $: with: $-)
+		          , '.csv')) asFileReference.
+	^ file
 ]
 
 { #category : #'as yet unclassified' }
@@ -30,23 +44,17 @@ GitMetricExporter >> exportFor: usersWithProjects [
 { #category : #'as yet unclassified' }
 GitMetricExporter >> exportFor: usersWithProjects over: aCollectionOfDateWeekMonthOrYear [
 
-	| over entities file exportBrowserModel |
+	entities ifNil: [
+		self initEntitiesFromUserProjects: usersWithProjects ].
+
+	self exportFor: aCollectionOfDateWeekMonthOrYear. 
+]
+
+{ #category : #'as yet unclassified' }
+GitMetricExporter >> exportOver: aCollectionOfDateWeekMonthOrYear [
+
+	| over file exportBrowserModel |
 	over := Date.
-
-
-	entities := usersWithProjects associations collect: [ :assoc |
-		            | username projects metrics |
-		            username := assoc key.
-		            projects := assoc value.
-
-		            metrics := GitMetric4User new.
-		            metrics
-			            glhImporter: glhImporter;
-			            findUserNamed: username.
-		            metrics loadProjects: projects.
-
-		            metrics ].
-
 
 
 	exportBrowserModel := MiExportModel new.
@@ -57,7 +65,6 @@ GitMetricExporter >> exportFor: usersWithProjects over: aCollectionOfDateWeekMon
 	exportBrowserModel
 		addColumnForQuery: [ :metrics | metrics user name printString ]
 		withName: #'User name'.
-
 
 	"Code Contribution "
 	exportBrowserModel
@@ -186,13 +193,7 @@ GitMetricExporter >> exportFor: usersWithProjects over: aCollectionOfDateWeekMon
 
 	aCollectionOfDateWeekMonthOrYear do: [ :period |
 		over := period.
-
-		file := (FileLocator home
-		         /
-			         ('IA4Code-' , label printString , '-' , over printString
-			          , '-'
-			          , (DateAndTime now printString replaceAll: $: with: $-)
-			          , '.csv')) asFileReference.
+		file := self constructFilePath: over.
 
 		file writeStreamDo: [ :aStream |
 			aStream
@@ -213,4 +214,29 @@ GitMetricExporter >> exportFor: usersWithProjects over: aCollectionOfDateWeekMon
 { #category : #accessing }
 GitMetricExporter >> glhImporter: anImporter [
 	glhImporter := anImporter. 
+]
+
+{ #category : #'as yet unclassified' }
+GitMetricExporter >> initEntitiesFromUserProjects: usersWithProjects [
+
+	entities := (usersWithProjects associations collect: [ :assoc |
+			 | username projects metrics |
+			 username := assoc key.
+			 projects := assoc value.
+
+			 metrics := GitMetric4User new.
+			 metrics
+				 glhImporter: glhImporter;
+				 findUserNamed: username.
+			 metrics loadProjects: projects.
+
+			 metrics ]).
+
+	^ self
+]
+
+{ #category : #initialization }
+GitMetricExporter >> initialize [
+
+
 ]
