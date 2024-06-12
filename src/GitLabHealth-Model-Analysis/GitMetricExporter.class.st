@@ -74,6 +74,7 @@ GitMetricExporter >> exportOver: aCollectionOfDateWeekMonthOrYear [
 				  until: (beforeExp at: #until)
 				  overA: over) at: #avgAddition) printString ]
 		withName: #'(B) code additions (avg)'.
+
 	exportBrowserModel
 		addColumnForQuery: [ :metrics |
 			((metrics
@@ -84,6 +85,7 @@ GitMetricExporter >> exportOver: aCollectionOfDateWeekMonthOrYear [
 
 	exportBrowserModel
 		addColumnForQuery: [ :metrics |
+			Smalltalk snapshot: true andQuit: false.
 			((metrics
 				  codeContributionsSince: (duringExp at: #since)
 				  until: (duringExp at: #until)
@@ -119,6 +121,7 @@ GitMetricExporter >> exportOver: aCollectionOfDateWeekMonthOrYear [
 	"comment contribution "
 	exportBrowserModel
 		addColumnForQuery: [ :metrics |
+			Smalltalk snapshot: true andQuit: false.
 			((metrics
 				  commentsContributionsSince: (beforeExp at: #since)
 				  until: (beforeExp at: #until)
@@ -137,6 +140,7 @@ GitMetricExporter >> exportOver: aCollectionOfDateWeekMonthOrYear [
 	"merge Request Duration "
 	exportBrowserModel
 		addColumnForQuery: [ :metrics |
+			Smalltalk snapshot: true andQuit: false.
 			((metrics
 				  mergeRequestDurationSince: (beforeExp at: #since)
 				  until: (beforeExp at: #until)
@@ -239,4 +243,9 @@ GitMetricExporter >> initEntitiesFromUserProjects: usersWithProjects [
 GitMetricExporter >> initialize [
 
 
+]
+
+{ #category : #accessing }
+GitMetricExporter >> label: aString [ 
+	label := aString
 ]
