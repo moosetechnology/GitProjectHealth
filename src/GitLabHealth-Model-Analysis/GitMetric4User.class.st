@@ -226,7 +226,7 @@ GitMetric4User >> commentsContributionsSince: since until: until overA: aDateWee
 { #category : #metrics }
 GitMetric4User >> commitFrequencySince: since until: until overA: aDateWeekMonthOrYear [
 
-	| all aggregate periods total groupedByDate |
+	| all aggregate periods total groupedByDate userCommits|
 	
 	('GitMetric4User: commit frequency') recordInfo.	
 	
@@ -234,8 +234,26 @@ GitMetric4User >> commitFrequencySince: since until: until overA: aDateWeekMonth
 		                 setupGroupedDateFrom: since
 		                 to: until
 		                 over: aDateWeekMonthOrYear.
+		
+		
+	userCommits := self loadCommitOfProjects: (itsProjects keys) since: since until: 	until. 
+	userCommits := userCommits reject: [ :c | c  commitCreator ~= user ]. 
+	
+	userCommits do: [ :c |
+		| dateOver |
+		dateOver := self
+			            transformDate: c created_at
+			            to: aDateWeekMonthOrYear.
+		groupedByDate at: dateOver printString ifPresent: [:v | v add: c]. 
+		 ].
 
-	aggregate := OrderedDictionary new.
+
+	periods := groupedByDate keys size.
+	total := groupedByDate values sum: [ :commits | commits size ].
+	
+
+
+	"aggregate := OrderedDictionary new.
 
 	all := itsProjects keys collect: [ :id |
 		       self
@@ -254,7 +272,7 @@ GitMetric4User >> commitFrequencySince: since until: until overA: aDateWeekMonth
 
 	periods := aggregate keys size.
 	total := aggregate values sum: [ :commits | commits size ].
-
+"
 
 	^ {
 		  (#averageFrac -> (total / periods)).
@@ -262,10 +280,10 @@ GitMetric4User >> commitFrequencySince: since until: until overA: aDateWeekMonth
 			(#userCommit -> total).  
 		(#forOver
 		   ->
-		   (aggregate keys size printString
+		   (groupedByDate keys size printString
 		    , aDateWeekMonthOrYear printString)).
 		  (#periode -> aDateWeekMonthOrYear name).
-		  (#details -> aggregate) } asOrderedDictionary
+		  (#details -> groupedByDate) } asOrderedDictionary
 ]
 
 { #category : #'as yet unclassified' }
@@ -306,6 +324,7 @@ GitMetric4User >> commitsProducedOnProject: aProjectId since: since until: until
 
 	| frequency aggregatedFrequencies |
 	aggregatedFrequencies := self setupGroupedDateFrom: since to: until  over: aWeekOrMonthOrYear.
+	
 	frequency := self
 		             commitsProducedOnProject: aProjectId
 		             since: since

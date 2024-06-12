@@ -91,6 +91,25 @@ GitAnalyzer >> analyseCommitContribution [
 ]
 
 { #category : #'as yet unclassified' }
+GitAnalyzer >> analyseCommitFrequencyFromCommits: initialCommits [
+
+	| commits response |
+	
+	('GitAnalyzer, analyse commit Frequency on: ', onProject printString )
+		recordInfo.
+	
+	response := {  (#numberOfCommit -> nil).
+		            (#frequency -> nil) } asDictionary.
+
+
+	commits := self arrangeCommitsByDate: initialCommits.
+	commits := (commits associations sortAscending: [ :entry |
+		            entry key asDate ]) asOrderedDictionary.
+
+	^ commits
+]
+
+{ #category : #'as yet unclassified' }
 GitAnalyzer >> analyseCommitFrequencySince: since until: until [ 
 
 	| commits response |
