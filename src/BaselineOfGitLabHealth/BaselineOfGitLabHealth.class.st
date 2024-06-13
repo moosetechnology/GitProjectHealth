@@ -55,14 +55,11 @@ BaselineOfGitLabHealth >> definePackages: spec [
 		package: 'GLPHExtended-Model-Extension'
 		with: [ spec requires: #( 'GLPHExtended-Model' ) ];
 		package: 'GitLabHealth-Model-Analysis';
-		package: 'GitLabHealth-Model-Analysis-Tests' with: [spec requires: #('GitLabHealth-Model-Analysis')];
+		package: 'GitLabHealth-Model-Analysis-Tests'
+		with: [ spec requires: #( 'GitLabHealth-Model-Analysis' ) ];
 		package: 'GitLabHealth-Visualization';
 		package: 'GitLabProjectHealth-ExtendModel-Generator';
 		package: 'GitLabProjectHealth-Model-Importer';
-		package: 'GitLabProjectHealth-Model-Importer-Test' with: [spec requires: #('GitLabProjectHealth-Model-Importer') ].
-		
-	
-
-
-
+		package: 'GitLabProjectHealth-Model-Importer-Tests'
+		with: [ spec requires: #( 'GitLabProjectHealth-Model-Importer' ) ]
 ]
