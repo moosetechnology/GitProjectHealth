@@ -249,11 +249,18 @@ Smalltalk snapshot: true andQuit: true.
 
 ```bash
 git clone https://github.com/moosetechnology/GitProjectHealth.git
+cd GitProjectHealth
 git checkout GLPH-importer-new-changes
 
 sudo docker build -t code-churn-pharo .
 sudo docker run  code-churn-pharo &
 ```
+locate and retrieve csv output files: 
+```bash
+sudo docker ps
+sudo docker exec -it <container-id> find / -type f -name 'IA4Code*.csv' 2>/dev/null
+```
+
 
 
 
