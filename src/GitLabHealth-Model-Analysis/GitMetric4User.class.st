@@ -443,11 +443,6 @@ GitMetric4User >> initialize [
 	itsMergeRequests := Dictionary new
 ]
 
-{ #category : #accessing }
-GitMetric4User >> itsCommits [
-	^ user commits
-]
-
 { #category : #churn }
 GitMetric4User >> loadCommitOfProjects: aCollection since: aTimespan [
 	|commits|
@@ -462,7 +457,7 @@ GitMetric4User >> loadCommitOfProjects: aCollection since: aTimespan [
 		glhImporter completeImportedCommit: commit. 
 		 ].
 
-	^ self itsCommits.
+	^ self userCommits.
 ]
 
 { #category : #churn }
@@ -664,4 +659,9 @@ GitMetric4User >> user [
 { #category : #accessing }
 GitMetric4User >> user: anUser [
 	user := anUser. 
+]
+
+{ #category : #accessing }
+GitMetric4User >> userCommits [
+	^ user commits
 ]

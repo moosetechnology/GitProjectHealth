@@ -35,6 +35,11 @@ GitMetricExporter >> duringDic: aDictionnarySinceUntil [
 	duringExp := aDictionnarySinceUntil
 ]
 
+{ #category : #accessing }
+GitMetricExporter >> entities: aCollection [ 
+	entities := aCollection
+]
+
 { #category : #'as yet unclassified' }
 GitMetricExporter >> exportFor: usersWithProjects [
 
