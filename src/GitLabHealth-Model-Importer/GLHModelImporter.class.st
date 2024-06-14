@@ -76,7 +76,6 @@ GLHModelImporter >> blockOnNameEquality [
 { #category : #'private - api' }
 GLHModelImporter >> completeImportProject: aGLHProject [
 
-
 	('Complete import of project: ' , aGLHProject id printString)
 		recordInfo.
 

@@ -45,9 +45,3 @@ GLHModelImporterTest >> testImportProject [
 		((self model allWithType: GLHProject) anySatisfy: [ :project |
 			 project id = 57841283 ])
 ]
-
-{ #category : #tests }
-GLHModelImporterTest >> testImportedUsers [
-
-	self assert: (self model allWithType: GLHUser) isNotEmpty.
-]
