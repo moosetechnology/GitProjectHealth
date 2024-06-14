@@ -6,7 +6,6 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'baseAPIUrl',
-		'privateToken',
 		'client'
 	],
 	#category : #'GitLabHealth-Model-Importer'
@@ -45,6 +44,21 @@ GLHApi >> client: anObject [
 ]
 
 { #category : #'api - commits' }
+GLHApi >> commit: commitSHA ofProject: aProjectId [
+
+	self client path: (String streamContents: [ :str |
+			 str
+				 << self baseAPIUrl;
+				 << '/projects/';
+				 << aProjectId asString;
+				 << '/repository/commits/';
+				 << commitSHA asString;
+				 << '' ]).
+
+	^ self client get
+]
+
+{ #category : #'api - commits' }
 GLHApi >> commit: commitSHA ofProject: aProjectId withStat: stats [
 
 	self client path: (String streamContents: [ :str |
@@ -61,23 +75,6 @@ GLHApi >> commit: commitSHA ofProject: aProjectId withStat: stats [
 
 	^ self client get
 ]
-
-{ #category : #'api - commits' }
-GLHApi >> commit: commitSHA ofProject: aProjectId [
-
-	self client path: (String streamContents: [ :str |
-			 str
-				 << self baseAPIUrl;
-				 << '/projects/';
-				 << aProjectId asString;
-				 << '/repository/commits/';
-				 << commitSHA asString;
-				 << '' ]).
-
-	^ self client get
-]
-
-
 
 { #category : #'api - commits' }
 GLHApi >> commitDiff: commitSHA ofProject: aProjectId unidiff: unidiff [

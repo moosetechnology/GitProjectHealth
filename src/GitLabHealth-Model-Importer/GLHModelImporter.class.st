@@ -212,6 +212,24 @@ GLHModelImporter >> glhModel: anObject [
 	glhModel := anObject
 ]
 
+{ #category : #'private - api' }
+GLHModelImporter >> importCommit: aCommitID ofProject: aGLHProject [
+
+	| result parsedResult |
+	(glhModel allWithType: GLHCommit) asOrderedCollection
+		detect: [ :commit | commit id = aCommitID ]
+		ifFound: [ :commit | ^ commit ].
+	result := self glhApi
+		          commit: aCommitID
+		          ofProject: aGLHProject id
+		          withStat: false.
+	parsedResult := self parseCommitResult: result.
+	self
+		addCommits: { parsedResult }
+		toRepository: aGLHProject repository.
+	^ parsedResult
+]
+
 { #category : #'as yet unclassified' }
 GLHModelImporter >> importCommitOfProject: anProject withId: anID [
 
@@ -237,24 +255,6 @@ GLHModelImporter >> importCommitOfProject: anProject withId: anID [
 	self withCommitDiffs ifTrue: [ self importDiffOfCommit: commit ].
 
 	^ commit
-]
-
-{ #category : #'private - api' }
-GLHModelImporter >> importCommit: aCommitID ofProject: aGLHProject [
-
-	| result parsedResult |
-	(glhModel allWithType: GLHCommit) asOrderedCollection
-		detect: [ :commit | commit id = aCommitID ]
-		ifFound: [ :commit | ^ commit ].
-	result := self glhApi
-		          commit: aCommitID
-		          ofProject: aGLHProject id
-		          withStat: false.
-	parsedResult := self parseCommitResult: result.
-	self
-		addCommits: { parsedResult }
-		toRepository: aGLHProject repository.
-	^ parsedResult
 ]
 
 { #category : #'private - api' }
@@ -529,6 +529,19 @@ GLHModelImporter >> importGroup: aGroupID [
 	^ groupResult
 ]
 
+{ #category : #api }
+GLHModelImporter >> importJobsOf: aPipeline [
+
+	| result jobs |
+	result := self glhApi
+		          jobsOfProject: aPipeline project id
+		          ofPipelines: aPipeline id.
+	jobs := self parseJobsResult: result ofProject: aPipeline project.
+	jobs do: [ :job | aPipeline addJob: job ].
+	self glhModel addAll: jobs
+
+]
+
 { #category : #commit }
 GLHModelImporter >> importParentCommitsOfCommit: aGLHCommit forOnly: number [
 
@@ -585,19 +598,6 @@ GLHModelImporter >> importPipelinesOfProject: aGLHProject [
 	(self pipelinesOf: aGLHProject id) do: [ :pipeline |
 		self glhModel add: pipeline.
 		aGLHProject addPipeline: pipeline ]
-]
-
-{ #category : #api }
-GLHModelImporter >> importJobsOf: aPipeline [
-
-	| result jobs |
-	result := self glhApi
-		          jobsOfProject: aPipeline project id
-		          ofPipelines: aPipeline id.
-	jobs := self parseJobsResult: result ofProject: aPipeline project.
-	jobs do: [ :job | aPipeline addJob: job ].
-	self glhModel addAll: jobs
-
 ]
 
 { #category : #'private - api' }
