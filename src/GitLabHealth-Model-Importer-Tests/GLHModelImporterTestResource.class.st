@@ -3,7 +3,6 @@ Class {
 	#superclass : #MooseModelTestResource,
 	#instVars : [
 		'glphApi',
-		'since',
 		'glhImporter'
 	],
 	#category : #'GitLabHealth-Model-Importer-Tests'
@@ -18,8 +17,6 @@ GLHModelImporterTestResource >> importModel [
 		           privateToken: '';
 		           baseAPIUrl: 'https://gitlab.com/api/v4';
 		           yourself.
-
-	since := Date today - 2 day.
 
 	glhImporter := GLHModelImporter new
 		               glhApi: glphApi;
