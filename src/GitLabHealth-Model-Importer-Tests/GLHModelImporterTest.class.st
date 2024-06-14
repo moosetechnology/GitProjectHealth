@@ -20,6 +20,12 @@ GLHModelImporterTest class >> resources [
 ]
 
 { #category : #running }
+GLHModelImporterTest >> glhImporter [
+
+	^ self class resources first current glhImporter
+]
+
+{ #category : #running }
 GLHModelImporterTest >> model [
 
 	^ self class resources first current model
@@ -32,6 +38,19 @@ GLHModelImporterTest >> testImportBranch [
 	testCodeChurnRepository := (self model allWithType: GLHGroup) anyOne
 		                           projects anyOne repository.
 	self assert: testCodeChurnRepository branches isNotEmpty
+]
+
+{ #category : #tests }
+GLHModelImporterTest >> testImportCommits [
+
+	| projectTestCodeChurn |
+	projectTestCodeChurn := (self model allWithType: GLHProject) detect: [
+		                        :project | project id = 57841283 ].
+	self glhImporter importCommits: projectTestCodeChurn.
+
+	self
+		assert: projectTestCodeChurn repository commits last author_name
+		equals: 'Nicolas Hlad'
 ]
 
 { #category : #tests }

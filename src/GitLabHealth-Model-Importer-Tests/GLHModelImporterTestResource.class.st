@@ -9,6 +9,12 @@ Class {
 }
 
 { #category : #setup }
+GLHModelImporterTestResource >> glhImporter [
+
+	^ glhImporter
+]
+
+{ #category : #setup }
 GLHModelImporterTestResource >> importModel [
 
 	model := GLPHEModel new.
