@@ -11,6 +11,23 @@ Class {
 	#category : #'GitLabHealth-Model-Importer'
 }
 
+{ #category : #'private - api' }
+GLHModelImporter >> addCommits: commitsList toRepository: aProjectRepository [
+	"I take a list of GLHCommit. But some might have been parsed but are already on the model..."
+
+	"I return the list of added commits"
+
+	| existingCommits newlyFoundCommit |
+	existingCommits := aProjectRepository mooseModel allWithType:
+		                   GLHCommit.
+	newlyFoundCommit := commitsList reject: [ :commitParsed |
+		                    existingCommits anySatisfy: [ :existingCommit |
+			                    existingCommit id = commitParsed id ] ].
+	aProjectRepository mooseModel addAll: newlyFoundCommit.
+	aProjectRepository commits addAll: newlyFoundCommit.
+	^ newlyFoundCommit
+]
+
 { #category : #private }
 GLHModelImporter >> addGroupResultToModel: groupResult [
 
@@ -57,6 +74,7 @@ GLHModelImporter >> blockOnNameEquality [
 { #category : #'private - api' }
 GLHModelImporter >> completeImportProject: aGLHProject [
 
+
 	('Complete import of project: ' , aGLHProject id printString)
 		recordInfo.
 
@@ -66,10 +84,12 @@ GLHModelImporter >> completeImportProject: aGLHProject [
 
 	(self importUser: aGLHProject creator_id) addCreatedProject:
 		aGLHProject.
+
 	aGLHProject repository: GLHRepository new.
 	self glhModel add: aGLHProject unless: (self blockEqualityOn: #id).
 	self glhModel add: aGLHProject repository.
 	self importRepository: aGLHProject repository.
+
 	^ aGLHProject
 ]
 
@@ -101,6 +121,38 @@ GLHModelImporter >> completeImportedCommit: aCommit [
 		 ].
 
 	^ addedCommit
+]
+
+{ #category : #private }
+GLHModelImporter >> configureReaderForCommit: reader [
+
+  	reader for: GLHCommit do: [ :mapping |
+		mapping mapInstVars:
+			#( id short_id title author_name author_email committer_name
+			   committer_email message web_url ).
+		(mapping mapInstVar: #authored_date) valueSchema: DateAndTime.
+		(mapping mapInstVar: #committed_date) valueSchema: DateAndTime.
+		(mapping mapInstVar: #created_at) valueSchema: DateAndTime.
+		(mapping mapInstVar: #parent_ids) valueSchema: #ArrayOfIds.
+		mapping
+			mapProperty: 'stats'
+			getter: [ :el | "Not used" ]
+			setter: [ :commit :value |
+				commit deletions: (value at: #deletions).
+				commit additions: (value at: #additions) ] ].
+
+	reader for: DateAndTime customDo: [ :mapping |
+		mapping decoder: [ :string | DateAndTime fromString: string ] ].
+
+	reader
+		for: #ArrayOfIds
+		customDo: [ :mapping | mapping decoder: [ :string | string ] ].
+  
+	reader
+		for: #ArrayOfCommit
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHCommit ].
+
 ]
 
 { #category : #private }
@@ -188,6 +240,24 @@ GLHModelImporter >> importCommitOfProject: anProject withId: anID [
 ]
 
 { #category : #'private - api' }
+GLHModelImporter >> importCommit: aCommitID ofProject: aGLHProject [
+
+	| result parsedResult |
+	(glhModel allWithType: GLHCommit) asOrderedCollection
+		detect: [ :commit | commit id = aCommitID ]
+		ifFound: [ :commit | ^ commit ].
+	result := self glhApi
+		          commit: aCommitID
+		          ofProject: aGLHProject id
+		          withStat: false.
+	parsedResult := self parseCommitResult: result.
+	self
+		addCommits: { parsedResult }
+		toRepository: aGLHProject repository.
+	^ parsedResult
+]
+
+{ #category : #'private - api' }
 GLHModelImporter >> importCommits: aGLHProject [
 	"limited to the last 20 commits"
 
@@ -211,7 +281,6 @@ GLHModelImporter >> importCommits: aGLHProject [
 
 	parsedResults do: [ :commit |
 		commit repository: aGLHProject repository ].
-
 
 	self withCommitDiffs ifTrue: [
 		parsedResults do: [ :commit |
@@ -450,11 +519,13 @@ GLHModelImporter >> importGroup: aGroupID [
 
 	result := self glhApi group: aGroupID.
 	groupResult := self parseGroupResult: result.
+
 	groupResult projects do: [ :project |
 		self completeImportProject: project ].
 	self addGroupResultToModel: groupResult.
 	(self subGroupsOf: aGroupID) do: [ :subGroup |
-		groupResult addSubGroup: (self importGroup: subGroup id) ].
+
+	  groupResult addSubGroup: (self importGroup: subGroup id) ].
 	^ groupResult
 ]
 
@@ -516,6 +587,19 @@ GLHModelImporter >> importPipelinesOfProject: aGLHProject [
 		aGLHProject addPipeline: pipeline ]
 ]
 
+{ #category : #api }
+GLHModelImporter >> importJobsOf: aPipeline [
+
+	| result jobs |
+	result := self glhApi
+		          jobsOfProject: aPipeline project id
+		          ofPipelines: aPipeline id.
+	jobs := self parseJobsResult: result ofProject: aPipeline project.
+	jobs do: [ :job | aPipeline addJob: job ].
+	self glhModel addAll: jobs
+
+]
+
 { #category : #'private - api' }
 GLHModelImporter >> importRepository: aGLHRepository [
 
@@ -550,7 +634,9 @@ GLHModelImporter >> importRepository: aGLHRepository [
 GLHModelImporter >> importUser: aUserID [
 
 	| result userResult |
-	('Import user with id:  ', aUserID printString) recordInfo.
+
+	(glhModel allWithType: GLHUser) asOrderedCollection detect: [ :user | user id = aUserID ] ifFound: [ :user | ^ user ].
+	('Import user: ' , aUserID printString) recordInfo.
 	result := self glhApi user: aUserID.
 	userResult := self parseUserResult: result.
 	^ glhModel add: userResult unless: self blockOnIdEquality
@@ -611,7 +697,7 @@ GLHModelImporter >> parseBranchesResult: result [
 ]
 
 { #category : #private }
-GLHModelImporter >> parseCommitsResult: result [
+GLHModelImporter >> parseCommitResult: result [
 
 	| reader |
 	reader := NeoJSONReader on: result readStream.
@@ -638,6 +724,38 @@ GLHModelImporter >> parseCommitsResult: result [
 		for: #ArrayOfIds
 		customDo: [ :mapping | mapping decoder: [ :string | string ] ].
 
+
+	^ reader nextAs: GLHCommit
+]
+
+{ #category : #private }
+GLHModelImporter >> parseCommitsResult: result [
+
+	| reader |
+	reader := NeoJSONReader on: result readStream.
+
+  	reader for: GLHCommit do: [ :mapping |
+		mapping mapInstVars:
+			#( id short_id title author_name author_email committer_name
+			   committer_email message web_url ).
+		(mapping mapInstVar: #authored_date) valueSchema: DateAndTime.
+		(mapping mapInstVar: #committed_date) valueSchema: DateAndTime.
+		(mapping mapInstVar: #created_at) valueSchema: DateAndTime.
+		(mapping mapInstVar: #parent_ids) valueSchema: #ArrayOfIds.
+		mapping
+			mapProperty: 'stats'
+			getter: [ :el | "Not used" ]
+			setter: [ :commit :value |
+				commit deletions: (value at: #deletions).
+				commit additions: (value at: #additions) ] ].
+
+	reader for: DateAndTime customDo: [ :mapping |
+		mapping decoder: [ :string | DateAndTime fromString: string ] ].
+
+	reader
+		for: #ArrayOfIds
+		customDo: [ :mapping | mapping decoder: [ :string | string ] ].
+  
 	reader
 		for: #ArrayOfCommit
 		customDo: [ :customMappting |
@@ -694,14 +812,55 @@ GLHModelImporter >> parseGroupResult: aResult [
 ]
 
 { #category : #private }
+GLHModelImporter >> parseJobsResult: result ofProject: aProject [
+
+	| reader |
+	reader := NeoJSONReader on: result readStream.
+	reader for: GLHJob do: [ :mapping |
+		mapping mapInstVars: #( id allow_failure web_url name ).
+
+		mapping
+			mapProperty: #user
+			getter: [ :object | #ignore ]
+			setter: [ :object :value |
+			object user: (self importUser: (value at: #id)) ].
+
+		mapping
+			mapProperty: #commit
+			getter: [ :object | #ignore ]
+			setter: [ :object :value |
+				value ifNotNil: [
+					object commit:
+						(self importCommit: (value at: #id) ofProject: aProject) ] ].
+
+		mapping
+			mapProperty: #duration
+			getter: [ :object | #ignore ]
+			setter: [ :object :value |
+			value ifNotNil: [ object duration: value seconds ] ] ].
+
+	reader
+		for: #ArrayOfGLHJob
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHJob ].
+	^ reader nextAs: #ArrayOfGLHJob
+]
+
+{ #category : #private }
 GLHModelImporter >> parsePipelinesResult: result [
 
 	| reader |
 	reader := NeoJSONReader on: result readStream.
 	reader mapInstVarsFor: GLHPipeline.
+	reader for: GLHPipeline do: [ :mapping |
+		mapping
+			mapProperty: #created_at
+			getter: [ :object | #ignore ]
+			setter: [ :object :value |
+			object runDate: (DateAndTime fromString: value) ] ].
 	reader
 		for: #ArrayOfPipelines
-		customDo: [ :customMappting | 
+		customDo: [ :customMappting |
 		customMappting listOfElementSchema: GLHPipeline ].
 	^ reader nextAs: #ArrayOfPipelines
 ]

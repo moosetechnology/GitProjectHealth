@@ -89,6 +89,20 @@ GLHTEntityCreator >> newGroupNamed: aName [
 ]
 
 { #category : #'entity creation' }
+GLHTEntityCreator >> newJob [
+
+	<generated>
+	^ self add: GLHJob new
+]
+
+{ #category : #'entity creation' }
+GLHTEntityCreator >> newJobNamed: aName [
+
+	<generated>
+	^ self add: (GLHJob named: aName)
+]
+
+{ #category : #'entity creation' }
 GLHTEntityCreator >> newPipeline [
 
 	<generated>

@@ -5,9 +5,8 @@ A GitLab User
 ======================
 
 ### Children
-| Relation | Origin | Opposite | Type | Comment |
-|---|
-| `commits` | `GLHUser` | `commitCreator` | `GLHCommit` | |
+
+
 
 ### Other
 | Relation | Origin | Opposite | Type | Comment |
@@ -31,7 +30,6 @@ A GitLab User
 | `linkedin` | `String` | nil | |
 | `location` | `String` | nil | |
 | `name` | `String` | nil | |
-| `name` | `String` | nil | Basic name of the entity, not full reference.|
 | `organization` | `String` | nil | |
 | `pronouns` | `String` | nil | |
 | `public_email` | `String` | nil | |
@@ -72,7 +70,16 @@ Class {
 		'#username => FMProperty',
 		'#web_url => FMProperty',
 		'#website_url => FMProperty',
-		'#work_information => FMProperty'
+		'#organization => FMProperty',
+		'#job_title => FMProperty',
+		'#pronouns => FMProperty',
+		'#bot => FMProperty',
+		'#work_information => FMProperty',
+		'#followers => FMProperty',
+		'#following => FMProperty',
+		'#createdProjects => FMMany type: #GLHProject opposite: #creator',
+		'#jobs => FMMany type: #GLHJob opposite: #user'
+
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }
@@ -98,6 +105,12 @@ GLHUser >> addCommit: anObject [
 GLHUser >> addCreatedProject: anObject [
 	<generated>
 	^ self createdProjects add: anObject
+]
+
+{ #category : #adding }
+GLHUser >> addJob: anObject [
+	<generated>
+	^ self jobs add: anObject
 ]
 
 { #category : #accessing }
@@ -249,6 +262,29 @@ GLHUser >> job_title [
 GLHUser >> job_title: anObject [
 	<generated>
 	job_title := anObject
+]
+
+{ #category : #accessing }
+GLHUser >> jobs [
+	"Relation named: #jobs type: #GLHJob opposite: #user"
+
+	<generated>
+	<derived>
+	^ jobs
+]
+
+{ #category : #accessing }
+GLHUser >> jobs: anObject [
+
+	<generated>
+	jobs value: anObject
+]
+
+{ #category : #navigation }
+GLHUser >> jobsGroup [
+	<generated>
+	<navigation: 'Jobs'>
+	^ MooseSpecializedGroup withAll: self jobs asSet
 ]
 
 { #category : #accessing }

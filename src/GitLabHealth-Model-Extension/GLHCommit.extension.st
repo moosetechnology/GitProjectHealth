@@ -28,5 +28,14 @@ GLHCommit >> name [
 { #category : #'*GitLabHealth-Model-Extension' }
 GLHCommit >> parent_ids [
 	
-	^ parent_ids 
+	^ parent_ids
+]
+
+{ #category : #'*GitLabHealth-Model-Extension' }
+GLHCommit >> displayStringOn: aStream [
+
+	aStream
+		<< self short_id;
+		<< ' ';
+		<< self message
 ]
