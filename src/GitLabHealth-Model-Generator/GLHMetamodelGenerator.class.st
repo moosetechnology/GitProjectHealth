@@ -169,7 +169,7 @@ GLHMetamodelGenerator >> defineRelations [
 	
 	(commit property: #diffs) <>-* (diff property: #commit).
 	(user property: #commits) <>-* (commit property: #commitCreator).
-	(commit property: #parentCommits) *-* (commit property: #childCommits)
+	(commit property: #parentCommits) *-* (commit property: #childCommits).
 	(commit property: #jobs) <>-* (job property: #commit).
 	(pipeline property: #jobs) <>-* (job property: #pipeline).
 	(user property: #jobs) <>-* (job property: #user)
