@@ -10,7 +10,10 @@ SmalltalkCISpec {
     }
   ],
   #testing: {
-    #packages : [ 'GitLab*' ],
-    #failOnZeroTests : false
+    #packages : [ 'GitLab*', 'GLPH.*', 'GitHub.*' ],
+    #coverage : {
+      #packages : [ 'GitLab.*', 'GLPH.*', 'GitHub.*' ],
+      #format : #lcov
+    }
   }
 }
