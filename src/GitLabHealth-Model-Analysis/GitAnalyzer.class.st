@@ -31,29 +31,21 @@ GitAnalyzer >> analyseAmandment [
 GitAnalyzer >> analyseChurn [
 
 	| commitFiles totalContribution childCommits |
-	
-	('GitAnalyzer, analyse chrun onProject: ', onProject printString )
+	('GitAnalyzer, analyse chrun onProject: ' , onProject printString)
 		recordInfo.
-	
 	childCommits := OrderedCollection new.
-
 	totalContribution := self
 		                     visitChildCommits: fromCommit childCommits
 		                     toStoreThemIn: childCommits
 		                     upto: self maxChildCommits.
-	totalContribution := totalContribution sum: [ :commit |
-		                     commit additions ].
-
-
+	totalContribution := totalContribution sum: [ :commit | "nil if merge request commit"
+		                     commit additions ifNil: [ 0 ] ].
 	commitFiles := self
 		               impactedFilesInFollowUpCommitsOf: fromCommit
 		               withMaxCommits: self maxChildCommits.
-
-
-
 	^ (self computeChurnOnFiles: commitFiles)
-		  at: #totalContribution
-		  ifAbsentPut: totalContribution; yourself. 
+		  at: #totalContribution ifAbsentPut: totalContribution;
+		  yourself
 ]
 
 { #category : #'as yet unclassified' }
