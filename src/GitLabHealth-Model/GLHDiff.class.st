@@ -26,14 +26,16 @@ The diff of a commit
 Class {
 	#name : #GLHDiff,
 	#superclass : #GLHEntity,
+	#traits : 'FamixTNamedEntity',
+	#classTraits : 'FamixTNamedEntity classTrait',
 	#instVars : [
+		'#commit => FMOne type: #GLHCommit opposite: #diffs',
+		'#deleted_file => FMProperty defaultValue: false',
 		'#diffString => FMProperty',
+		'#new_file => FMProperty defaultValue: false',
 		'#new_path => FMProperty',
 		'#old_path => FMProperty',
-		'#new_file => FMProperty defaultValue: false',
-		'#renamed_file => FMProperty defaultValue: false',
-		'#deleted_file => FMProperty defaultValue: false',
-		'#commit => FMOne type: #GLHCommit opposite: #diffs'
+		'#renamed_file => FMProperty defaultValue: false'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }
@@ -98,6 +100,16 @@ GLHDiff >> diffString [
 GLHDiff >> diffString: anObject [
 	<generated>
 	diffString := anObject
+]
+
+{ #category : #'as yet unclassified' }
+GLHDiff >> inspectionGLHDiff [
+
+	<inspectorPresentationOrder: 3 title: 'Files Impacted'>
+	| canvas |
+	canvas := RSCommitDiff canvasFor: self.
+
+	^ canvas asPresenter
 ]
 
 { #category : #accessing }

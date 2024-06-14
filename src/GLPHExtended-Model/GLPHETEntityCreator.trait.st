@@ -33,6 +33,13 @@ GLPHETEntityCreator >> newChange [
 ]
 
 { #category : #'entity creation' }
+GLPHETEntityCreator >> newChangeNamed: aName [
+
+	<generated>
+	^ self add: (GLPHEChange named: aName)
+]
+
+{ #category : #'entity creation' }
 GLPHETEntityCreator >> newDeletion [
 
 	<generated>
@@ -40,8 +47,29 @@ GLPHETEntityCreator >> newDeletion [
 ]
 
 { #category : #'entity creation' }
+GLPHETEntityCreator >> newDiffRange [
+
+	<generated>
+	^ self add: GLPHEDiffRange new
+]
+
+{ #category : #'entity creation' }
+GLPHETEntityCreator >> newLineOfCode [
+
+	<generated>
+	^ self add: GLPHELineOfCode new
+]
+
+{ #category : #'entity creation' }
 GLPHETEntityCreator >> newMergeRequest [
 
 	<generated>
 	^ self add: GLPHEMergeRequest new
+]
+
+{ #category : #'entity creation' }
+GLPHETEntityCreator >> newMergeRequestNamed: aName [
+
+	<generated>
+	^ self add: (GLPHEMergeRequest named: aName)
 ]

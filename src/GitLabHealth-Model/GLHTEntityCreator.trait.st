@@ -33,10 +33,24 @@ GLHTEntityCreator >> newCommit [
 ]
 
 { #category : #'entity creation' }
+GLHTEntityCreator >> newCommitNamed: aName [
+
+	<generated>
+	^ self add: (GLHCommit named: aName)
+]
+
+{ #category : #'entity creation' }
 GLHTEntityCreator >> newDiff [
 
 	<generated>
 	^ self add: GLHDiff new
+]
+
+{ #category : #'entity creation' }
+GLHTEntityCreator >> newDiffNamed: aName [
+
+	<generated>
+	^ self add: (GLHDiff named: aName)
 ]
 
 { #category : #'entity creation' }
@@ -121,4 +135,11 @@ GLHTEntityCreator >> newUser [
 
 	<generated>
 	^ self add: GLHUser new
+]
+
+{ #category : #'entity creation' }
+GLHTEntityCreator >> newUserNamed: aName [
+
+	<generated>
+	^ self add: (GLHUser named: aName)
 ]

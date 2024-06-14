@@ -5,9 +5,8 @@ A GitLab User
 ======================
 
 ### Children
-| Relation | Origin | Opposite | Type | Comment |
-|---|
-| `jobs` | `GLHUser` | `user` | `GLHJob` | |
+
+
 
 ### Other
 | Relation | Origin | Opposite | Type | Comment |
@@ -46,20 +45,30 @@ A GitLab User
 Class {
 	#name : #GLHUser,
 	#superclass : #GLHEntity,
+	#traits : 'FamixTNamedEntity',
+	#classTraits : 'FamixTNamedEntity classTrait',
 	#instVars : [
-		'#id => FMProperty',
-		'#username => FMProperty',
-		'#name => FMProperty',
-		'#state => FMProperty',
 		'#avatar_url => FMProperty',
-		'#web_url => FMProperty',
-		'#created_at => FMProperty',
 		'#bio => FMProperty',
+		'#bot => FMProperty',
+		'#commits => FMMany type: #GLHCommit opposite: #commitCreator',
+		'#createdProjects => FMMany type: #GLHProject opposite: #creator',
+		'#created_at => FMProperty',
+		'#followers => FMProperty',
+		'#following => FMProperty',
+		'#id => FMProperty',
+		'#job_title => FMProperty',
+		'#linkedin => FMProperty',
 		'#location => FMProperty',
+		'#name => FMProperty',
+		'#organization => FMProperty',
+		'#pronouns => FMProperty',
 		'#public_email => FMProperty',
 		'#skype => FMProperty',
-		'#linkedin => FMProperty',
+		'#state => FMProperty',
 		'#twitter => FMProperty',
+		'#username => FMProperty',
+		'#web_url => FMProperty',
 		'#website_url => FMProperty',
 		'#organization => FMProperty',
 		'#job_title => FMProperty',
@@ -70,6 +79,7 @@ Class {
 		'#following => FMProperty',
 		'#createdProjects => FMMany type: #GLHProject opposite: #creator',
 		'#jobs => FMMany type: #GLHJob opposite: #user'
+
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }
@@ -81,6 +91,14 @@ GLHUser class >> annotation [
 	<package: #'GitLabHealth-Model'>
 	<generated>
 	^ self
+]
+
+{ #category : #adding }
+GLHUser >> addCommit: anObject [
+
+	<generated>
+
+	^ self commits add: anObject
 ]
 
 { #category : #adding }
@@ -135,6 +153,29 @@ GLHUser >> bot [
 GLHUser >> bot: anObject [
 	<generated>
 	bot := anObject
+]
+
+{ #category : #accessing }
+GLHUser >> commits [
+	"Relation named: #commits type: #GLHCommit opposite: #commitCreator"
+
+	<generated>
+	<derived>
+	^ commits
+]
+
+{ #category : #accessing }
+GLHUser >> commits: anObject [
+
+	<generated>
+	commits value: anObject
+]
+
+{ #category : #navigation }
+GLHUser >> commitsGroup [
+	<generated>
+	<navigation: 'Commits'>
+	^ MooseSpecializedGroup withAll: self commits asSet
 ]
 
 { #category : #accessing }

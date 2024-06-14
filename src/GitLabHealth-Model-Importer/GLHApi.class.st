@@ -53,12 +53,31 @@ GLHApi >> commit: commitSHA ofProject: aProjectId withStat: stats [
 				 << '/projects/';
 				 << aProjectId asString;
 				 << '/repository/commits/';
-				 << commitSHA asString ]).
+				 << commitSHA asString;
+				 << '' ]).
+			
 
 	stats ifNotNil: [ self client queryAt: #stats put: stats ].
 
 	^ self client get
 ]
+
+{ #category : #'api - commits' }
+GLHApi >> commit: commitSHA ofProject: aProjectId [
+
+	self client path: (String streamContents: [ :str |
+			 str
+				 << self baseAPIUrl;
+				 << '/projects/';
+				 << aProjectId asString;
+				 << '/repository/commits/';
+				 << commitSHA asString;
+				 << '' ]).
+
+	^ self client get
+]
+
+
 
 { #category : #'api - commits' }
 GLHApi >> commitDiff: commitSHA ofProject: aProjectId unidiff: unidiff [
@@ -97,6 +116,24 @@ GLHApi >> commitsOfProject: aProjectId [
 		  trailers: nil
 		  perPage: nil
 		  page: nil
+]
+
+{ #category : #commits }
+GLHApi >> commitsOfProject: anInteger forRefName: refName since: since [ 
+
+	^ self commitsOfProject: anInteger
+		  forRefName: refName
+		  since: since
+		  until: nil
+		  path: nil
+		  author: nil
+		  all: nil
+		  with_stats: nil
+		  firstParent: nil
+		  order: nil
+		  trailers: nil
+		  perPage: nil
+		  page: nil.
 ]
 
 { #category : #'api - commits' }
@@ -283,4 +320,10 @@ GLHApi >> treeOfRepository: aProjectID ofBranch: aBranchRef andPath: aPath [
 GLHApi >> user: aUserID [
 
 	^ self client get: self baseAPIUrl , '/users/' , aUserID printString
+]
+
+{ #category : #api }
+GLHApi >> userWithUsername: anUsername [
+
+	^ self client get: self baseAPIUrl , '/users?username=' , anUsername
 ]

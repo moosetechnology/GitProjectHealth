@@ -44,6 +44,8 @@ GLHMetamodelGenerator >> branchProperties [
 { #category : #definition }
 GLHMetamodelGenerator >> commitProperties [
 
+	commit property: #parent_ids type: #Object defaultValue: 'OrderedCollection new'.
+
 	commit property: #id type: #String.
 	commit property: #short_id type: #String.
 	commit property: #title type: #String.
@@ -56,6 +58,7 @@ GLHMetamodelGenerator >> commitProperties [
 	commit property: #created_at type: #Object.
 	commit property: #message type: #String.
 	commit property: #web_url type: #String.
+
 
 	(commit property: #additions type: #Number) comment:
 		'The number of line that git consider added'.
@@ -102,7 +105,11 @@ GLHMetamodelGenerator >> defineHierarchy [
 
 	group --|> #TNamedEntity.
 	project --|> #TNamedEntity.
+	user --|> #TNamedEntity.
+	commit --|> #TNamedEntity.
+	diff --|> #TNamedEntity.
 	job --|> #TNamedEntity
+
 ]
 
 { #category : #definition }
@@ -135,6 +142,7 @@ GLHMetamodelGenerator >> defineProperties [
 	(pipeline property: #id type: #String) comment:
 		'The id of the pipeline'.
 
+
 	self userProperties.
 	self branchProperties.
 	self fileProperties.
@@ -158,10 +166,14 @@ GLHMetamodelGenerator >> defineRelations [
 	<>-* (file property: #directoryOwner).
 	(repository property: #commits) <>-* (commit property: #repository).
 	(branch property: #commits) <>-* (commit property: #branch).
+	
 	(commit property: #diffs) <>-* (diff property: #commit).
+	(user property: #commits) <>-* (commit property: #commitCreator).
+	(commit property: #parentCommits) *-* (commit property: #childCommits)
 	(commit property: #jobs) <>-* (job property: #commit).
 	(pipeline property: #jobs) <>-* (job property: #pipeline).
 	(user property: #jobs) <>-* (job property: #user)
+
 ]
 
 { #category : #definition }

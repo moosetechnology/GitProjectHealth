@@ -2,11 +2,11 @@ Extension { #name : #GLHCommit }
 
 { #category : #'*GLPHExtended-Model-accessing' }
 GLHCommit >> commitedMergeRequest [
-	"Relation named: #commitedMergeRequest type: #GLPHEMergeRequest opposite: #mergeCommit"
+	"Relation named: #commitedMergeRequest type: #GLPHEMergeRequest opposite: #mergedCommit"
 
 	<generated>
 	<derived>
-	<FMProperty: #commitedMergeRequest type: #GLPHEMergeRequest opposite: #mergeCommit>
+	<FMProperty: #commitedMergeRequest type: #GLPHEMergeRequest opposite: #mergedCommit>
 	<package: #'GLPHExtended-Model'>
 	^ self attributeAt: #commitedMergeRequest ifAbsent: [ nil ]
 ]
@@ -19,10 +19,10 @@ GLHCommit >> commitedMergeRequest: anObject [
 	anObject ifNil: [ | otherSide |
 		otherSide :=  self commitedMergeRequest.
 		self attributeAt: #commitedMergeRequest put: anObject.
-		otherSide mergeCommit: nil ]
+		otherSide mergedCommit: nil ]
 	ifNotNil: [ 
 		self attributeAt: #commitedMergeRequest put: anObject.
-		anObject mergeCommit: self ]
+		anObject mergedCommit: self ]
 ]
 
 { #category : #'*GLPHExtended-Model-accessing' }

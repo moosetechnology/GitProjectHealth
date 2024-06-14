@@ -4,6 +4,11 @@ a gitlab merge request
 ## Relations
 ======================
 
+### Parents
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `project` | `GLPHEMergeRequest` | `mergeRequests` | `GLHProject` | |
+
 ### Other
 | Relation | Origin | Opposite | Type | Comment |
 |---|
@@ -11,9 +16,10 @@ a gitlab merge request
 | `assignees` | `GLPHEMergeRequest` | `assignedMergeRequests` | `GLHUser` | |
 | `author` | `GLPHEMergeRequest` | `createdMergeRequests` | `GLHUser` | |
 | `closed_by` | `GLPHEMergeRequest` | `closedMergeRequests` | `GLHUser` | |
-| `diff` | `GLPHEMergeRequest` | `mergeRequest` | `GLHDiff` | |
-| `mergeCommit` | `GLPHEMergeRequest` | `commitedMergeRequest` | `GLHCommit` | |
+| `diffs` | `GLPHEMergeRequest` | `mergeRequest` | `GLHDiff` | |
+| `mergeRequestCommit` | `GLPHEMergeRequest` | `commitedMergeRequest` | `GLHCommit` | |
 | `merge_user` | `GLPHEMergeRequest` | `usedMerges` | `GLHUser` | |
+| `mergedCommit` | `GLPHEMergeRequest` | `commitedMergeRequest` | `GLHCommit` | |
 | `merged_by` | `GLPHEMergeRequest` | `mergerOfMergeRequests` | `GLHUser` | |
 | `pipeline` | `GLPHEMergeRequest` | `mergeResquest` | `GLHPipeline` | |
 | `reviewers` | `GLPHEMergeRequest` | `reviewedMergeResquest` | `GLHUser` | |
@@ -27,8 +33,8 @@ a gitlab merge request
 |---|
 | `blocking_discussions_resolved` | `Boolean` | nil | |
 | `changes_count` | `String` | nil | |
-| `closed_at` | `String` | nil | |
-| `created_at` | `String` | nil | |
+| `closed_at` | `Object` | nil | |
+| `created_at` | `Object` | nil | |
 | `description` | `String` | nil | |
 | `detailed_merge_status` | `String` | nil | |
 | `discussion_locked` | `String` | nil | |
@@ -45,8 +51,9 @@ a gitlab merge request
 | `merge_commit_sha` | `String` | nil | |
 | `merge_status` | `String` | nil | |
 | `merge_when_pipeline_succeeds` | `Boolean` | nil | |
-| `merged_at` | `String` | nil | |
+| `merged_at` | `Object` | nil | |
 | `milestone` | `String` | nil | |
+| `name` | `String` | nil | Basic name of the entity, not full reference.|
 | `project_id` | `Number` | nil | |
 | `reference` | `String` | nil | |
 | `references_full` | `String` | nil | |
@@ -70,7 +77,7 @@ a gitlab merge request
 | `time_stats_time_estimate` | `Number` | nil | |
 | `time_stats_total_time_spent` | `Number` | nil | |
 | `title` | `String` | nil | |
-| `updated_at` | `String` | nil | |
+| `updated_at` | `Object` | nil | |
 | `upvotes` | `Number` | nil | |
 | `user_notes_count` | `Number` | nil | |
 | `web_url` | `String` | nil | |
@@ -80,6 +87,8 @@ a gitlab merge request
 Class {
 	#name : #GLPHEMergeRequest,
 	#superclass : #GLPHEEntity,
+	#traits : 'FamixTNamedEntity',
+	#classTraits : 'FamixTNamedEntity classTrait',
 	#instVars : [
 		'#blocking_discussions_resolved => FMProperty',
 		'#changes_count => FMProperty',
@@ -148,6 +157,12 @@ GLPHEMergeRequest class >> annotation [
 GLPHEMergeRequest >> addAssignee: anObject [
 	<generated>
 	^ self assignees add: anObject
+]
+
+{ #category : #adding }
+GLPHEMergeRequest >> addDiff: anObject [
+	<generated>
+	^ self diffs add: anObject
 ]
 
 { #category : #adding }
@@ -236,7 +251,7 @@ GLPHEMergeRequest >> changes_count: anObject [
 { #category : #accessing }
 GLPHEMergeRequest >> closed_at [
 
-	<FMProperty: #closed_at type: #String>
+	<FMProperty: #closed_at type: #Object>
 	<generated>
 	^ closed_at
 ]
@@ -266,7 +281,7 @@ GLPHEMergeRequest >> closed_by: anObject [
 { #category : #accessing }
 GLPHEMergeRequest >> created_at [
 
-	<FMProperty: #created_at type: #String>
+	<FMProperty: #created_at type: #Object>
 	<generated>
 	^ created_at
 ]
@@ -306,26 +321,20 @@ GLPHEMergeRequest >> detailed_merge_status: anObject [
 ]
 
 { #category : #accessing }
-GLPHEMergeRequest >> diff [
-	"Relation named: #diff type: #GLHDiff opposite: #mergeRequest"
+GLPHEMergeRequest >> diffs [
+	"Relation named: #diffs type: #GLHDiff opposite: #mergeRequest"
 
 	<generated>
-	<FMProperty: #diff type: #GLHDiff opposite: #mergeRequest>
-	^ self attributeAt: #diff ifAbsent: [ nil ]
+	<derived>
+	<FMProperty: #diffs type: #GLHDiff opposite: #mergeRequest>
+	^ self attributeAt: #diffs ifAbsentPut: [ FMMultivalueLink on: self opposite: #mergeRequest: ]
 ]
 
 { #category : #accessing }
-GLPHEMergeRequest >> diff: anObject [
+GLPHEMergeRequest >> diffs: anObject [
 
 	<generated>
-	(self attributeAt: #diff ifAbsentPut: [nil]) == anObject ifTrue: [ ^ anObject ].
-	anObject ifNil: [ | otherSide |
-		otherSide :=  self diff.
-		self attributeAt: #diff put: anObject.
-		otherSide mergeRequest: nil ]
-	ifNotNil: [ 
-		self attributeAt: #diff put: anObject.
-		anObject mergeRequest: self ]
+	self diffs value: anObject
 ]
 
 { #category : #accessing }
@@ -483,25 +492,25 @@ GLPHEMergeRequest >> latest_build_started_at: anObject [
 ]
 
 { #category : #accessing }
-GLPHEMergeRequest >> mergeCommit [
-	"Relation named: #mergeCommit type: #GLHCommit opposite: #commitedMergeRequest"
+GLPHEMergeRequest >> mergeRequestCommit [
+	"Relation named: #mergeRequestCommit type: #GLHCommit opposite: #commitedMergeRequest"
 
 	<generated>
-	<FMProperty: #mergeCommit type: #GLHCommit opposite: #commitedMergeRequest>
-	^ self attributeAt: #mergeCommit ifAbsent: [ nil ]
+	<FMProperty: #mergeRequestCommit type: #GLHCommit opposite: #commitedMergeRequest>
+	^ self attributeAt: #mergeRequestCommit ifAbsent: [ nil ]
 ]
 
 { #category : #accessing }
-GLPHEMergeRequest >> mergeCommit: anObject [
+GLPHEMergeRequest >> mergeRequestCommit: anObject [
 
 	<generated>
-	(self attributeAt: #mergeCommit ifAbsentPut: [nil]) == anObject ifTrue: [ ^ anObject ].
+	(self attributeAt: #mergeRequestCommit ifAbsentPut: [nil]) == anObject ifTrue: [ ^ anObject ].
 	anObject ifNil: [ | otherSide |
-		otherSide :=  self mergeCommit.
-		self attributeAt: #mergeCommit put: anObject.
+		otherSide :=  self mergeRequestCommit.
+		self attributeAt: #mergeRequestCommit put: anObject.
 		otherSide commitedMergeRequest: nil ]
 	ifNotNil: [ 
-		self attributeAt: #mergeCommit put: anObject.
+		self attributeAt: #mergeRequestCommit put: anObject.
 		anObject commitedMergeRequest: self ]
 ]
 
@@ -564,9 +573,32 @@ GLPHEMergeRequest >> merge_when_pipeline_succeeds: anObject [
 ]
 
 { #category : #accessing }
+GLPHEMergeRequest >> mergedCommit [
+	"Relation named: #mergedCommit type: #GLHCommit opposite: #commitedMergeRequest"
+
+	<generated>
+	<FMProperty: #mergedCommit type: #GLHCommit opposite: #commitedMergeRequest>
+	^ self attributeAt: #mergedCommit ifAbsent: [ nil ]
+]
+
+{ #category : #accessing }
+GLPHEMergeRequest >> mergedCommit: anObject [
+
+	<generated>
+	(self attributeAt: #mergedCommit ifAbsentPut: [nil]) == anObject ifTrue: [ ^ anObject ].
+	anObject ifNil: [ | otherSide |
+		otherSide :=  self mergedCommit.
+		self attributeAt: #mergedCommit put: anObject.
+		otherSide commitedMergeRequest: nil ]
+	ifNotNil: [ 
+		self attributeAt: #mergedCommit put: anObject.
+		anObject commitedMergeRequest: self ]
+]
+
+{ #category : #accessing }
 GLPHEMergeRequest >> merged_at [
 
-	<FMProperty: #merged_at type: #String>
+	<FMProperty: #merged_at type: #Object>
 	<generated>
 	^ merged_at
 ]
@@ -628,6 +660,30 @@ GLPHEMergeRequest >> pipeline: anObject [
 	ifNotNil: [ 
 		self attributeAt: #pipeline put: anObject.
 		anObject mergeResquest: self ]
+]
+
+{ #category : #accessing }
+GLPHEMergeRequest >> project [
+	"Relation named: #project type: #GLHProject opposite: #mergeRequests"
+
+	<generated>
+	<container>
+	<FMProperty: #project type: #GLHProject opposite: #mergeRequests>
+	^ self attributeAt: #project ifAbsent: [ nil ]
+]
+
+{ #category : #accessing }
+GLPHEMergeRequest >> project: anObject [
+
+	<generated>
+	self attributeAt: #project put: (FMMultivalueLink on: self update: #mergeRequests from: self project to: anObject).
+]
+
+{ #category : #navigation }
+GLPHEMergeRequest >> projectGroup [
+	<generated>
+	<navigation: 'Project'>
+	^ MooseSpecializedGroup with: self project
 ]
 
 { #category : #accessing }
@@ -995,7 +1051,7 @@ GLPHEMergeRequest >> title: anObject [
 { #category : #accessing }
 GLPHEMergeRequest >> updated_at [
 
-	<FMProperty: #updated_at type: #String>
+	<FMProperty: #updated_at type: #Object>
 	<generated>
 	^ updated_at
 ]

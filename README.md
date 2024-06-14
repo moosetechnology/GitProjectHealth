@@ -99,6 +99,100 @@ Here is the metamodel used in this project
 
 ![GitProject meta-model png](https://raw.githubusercontent.com/moosetechnology/GitProjectHealth/v1/doc/gitproject.png)
 
+
+
 ## Contributor
 
 This work has been first developed by the [research department of Berger-Levrault](https://www.research-bl.com/)
+
+
+## Running metrics with docker 
+
+### running locally
+```smalltalk
+
+|glphModel glphApi glhImporter beforeExp duringExp usersWithProjects gme|
+
+"This example set up and run a GitProjectHealth metrics over two period of time of a given set of users and their projects.
+It ouputs a csv files containing : churn code, commits frequencies, code addition and deletion, comments added (e.g. // # /**/ ), avg delay before first churn and merge request duration.
+"
+
+"load githealth project into your image"
+Metacello new
+  repository: 'github://moosetechnology/GitProjectHealth:GLPH-importer-new-changes/src';
+  baseline: 'GitLabHealth';
+  onConflict: [ :ex | ex useIncoming ];
+  onUpgrade: [ :ex | ex useIncoming ];
+  onDowngrade: [ :ex | ex useLoaded ];
+  ignoreImage;
+  load.
+
+"set up a log at your root"
+TinyLogger default
+    addFileLoggerNamed: 'pharo-code-churn.log'.
+
+"new model instance"
+glphModel := GLPHEModel new.
+
+"new API class instance"
+glphApi := GLPHApi new
+    privateToken: '<YOUR_TOKEN_KEY>';
+    baseAPIUrl:'https://gitlab.com/api/v4';
+    yourself.
+
+"new importer instance"
+glhImporter := GLPHModelImporter new
+    glhApi: glphApi;
+    glhModel: glphModel;
+        withFiles: false;
+        withCommitDiffs: true.
+
+"setting up the period to compare (e.g. before a experience and during an experience)"
+beforeExp := {
+                                        #since -> ('1 march 2023' asDate).
+                                        #until -> ('24 may 2023' asDate).
+                                        } asDictionary .
+duringExp := {
+                                        #since -> ('1 march 2024' asDate).
+                                        #until -> ('24 may 2024' asDate).
+                                        } asDictionary .
+
+usersWithProjects := {
+"  'dev nameA' -> {  projectID1 . projectID2 }."
+"  'dev nameB' -> {  projectID3 . projectID2 }."
+'John Do' -> { 14 . 543 . 2455 }.
+ } asDictionary.
+
+
+gme := GitMetricExporter new glhImporter: glhImporter;
+            initEntitiesFromUserProjects: usersWithProjects;
+            beforeDic: beforeExp; duringDic: duringExp; label: 'GitLabHealth'.
+
+"select among the following calendar class (at least one) "
+gme exportOver: { Date . Week . Month . Year .}.
+
+"the output files are located at 'FileLocator home/*.csv' "
+Smalltalk snapshot: true andQuit: true.
+```
+
+### deploying with docker
+ 
+
+```bash
+git clone https://github.com/moosetechnology/GitProjectHealth.git
+cd GitProjectHealth
+git checkout GLPH-importer-new-changes
+
+sudo docker build -t code-churn-pharo .
+sudo docker run  code-churn-pharo &
+```
+locate and retrieve csv output files: 
+```bash
+sudo docker ps
+sudo docker exec -it <container-id> find / -type f -name 'IA4Code*.csv' 2>/dev/null
+```
+
+
+
+
+

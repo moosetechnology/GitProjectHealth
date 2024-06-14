@@ -8,14 +8,6 @@ a commit attached to a repository
 | Relation | Origin | Opposite | Type | Comment |
 |---|
 | `branch` | `GLHCommit` | `commits` | `GLHBranch` | |
-| `repository` | `GLHCommit` | `commits` | `GLHRepository` | |
-
-### Children
-| Relation | Origin | Opposite | Type | Comment |
-|---|
-| `diffs` | `GLHCommit` | `commit` | `GLHDiff` | |
-| `jobs` | `GLHCommit` | `commit` | `GLHJob` | |
-
 
 ## Properties
 ======================
@@ -41,25 +33,31 @@ a commit attached to a repository
 Class {
 	#name : #GLHCommit,
 	#superclass : #GLHEntity,
+	#traits : 'FamixTNamedEntity',
+	#classTraits : 'FamixTNamedEntity classTrait',
 	#instVars : [
-		'#id => FMProperty',
-		'#short_id => FMProperty',
-		'#title => FMProperty',
-		'#author_name => FMProperty',
-		'#author_email => FMProperty',
-		'#authored_date => FMProperty',
-		'#committer_name => FMProperty',
-		'#committer_email => FMProperty',
-		'#committed_date => FMProperty',
-		'#created_at => FMProperty',
-		'#message => FMProperty',
-		'#web_url => FMProperty',
 		'#additions => FMProperty',
-		'#deletions => FMProperty',
-		'#repository => FMOne type: #GLHRepository opposite: #commits',
+		'#author_email => FMProperty',
+		'#author_name => FMProperty',
+		'#authored_date => FMProperty',
 		'#branch => FMOne type: #GLHBranch opposite: #commits',
+		'#childCommits => FMMany type: #GLHCommit opposite: #parentCommits',
+		'#commitCreator => FMOne type: #GLHUser opposite: #commits',
+		'#committed_date => FMProperty',
+		'#committer_email => FMProperty',
+		'#committer_name => FMProperty',
+		'#created_at => FMProperty',
+		'#deletions => FMProperty',
 		'#diffs => FMMany type: #GLHDiff opposite: #commit',
-		'#jobs => FMMany type: #GLHJob opposite: #commit'
+		'#id => FMProperty',
+		'#message => FMProperty',
+		'#parentCommits => FMMany type: #GLHCommit opposite: #childCommits',
+		'#parent_ids => FMProperty defaultValue: ((OrderedCollection new))',
+		'#repository => FMOne type: #GLHRepository opposite: #commits',
+    '#web_url => FMProperty',
+    '#short_id => FMProperty',
+    '#title => FMProperty',
+    '#jobs => FMMany type: #GLHJob opposite: #commit'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }
@@ -74,9 +72,21 @@ GLHCommit class >> annotation [
 ]
 
 { #category : #adding }
+GLHCommit >> addChildCommit: anObject [
+	<generated>
+	^ self childCommits add: anObject
+]
+
+{ #category : #adding }
 GLHCommit >> addDiff: anObject [
 	<generated>
 	^ self diffs add: anObject
+]
+
+{ #category : #adding }
+GLHCommit >> addParentCommit: anObject [
+	<generated>
+	^ self parentCommits add: anObject
 ]
 
 { #category : #adding }
@@ -163,6 +173,44 @@ GLHCommit >> branchGroup [
 	<generated>
 	<navigation: 'Branch'>
 	^ MooseSpecializedGroup with: self branch
+]
+
+{ #category : #accessing }
+GLHCommit >> childCommits [
+	"Relation named: #childCommits type: #GLHCommit opposite: #parentCommits"
+
+	<generated>
+	^ childCommits
+]
+
+{ #category : #accessing }
+GLHCommit >> childCommits: anObject [
+
+	<generated>
+	childCommits value: anObject
+]
+
+{ #category : #accessing }
+GLHCommit >> commitCreator [
+	"Relation named: #commitCreator type: #GLHUser opposite: #commits"
+
+	<generated>
+	<container>
+	^ commitCreator
+]
+
+{ #category : #accessing }
+GLHCommit >> commitCreator: anObject [
+
+	<generated>
+	commitCreator := anObject
+]
+
+{ #category : #navigation }
+GLHCommit >> commitCreatorGroup [
+	<generated>
+	<navigation: 'CommitCreator'>
+	^ MooseSpecializedGroup with: self commitCreator
 ]
 
 { #category : #accessing }
@@ -308,6 +356,28 @@ GLHCommit >> message [
 GLHCommit >> message: anObject [
 	<generated>
 	message := anObject
+]
+
+{ #category : #accessing }
+GLHCommit >> parentCommits [
+	"Relation named: #parentCommits type: #GLHCommit opposite: #childCommits"
+
+	<generated>
+	<derived>
+	^ parentCommits
+]
+
+{ #category : #accessing }
+GLHCommit >> parentCommits: anObject [
+
+	<generated>
+	parentCommits value: anObject
+]
+
+{ #category : #accessing }
+GLHCommit >> parent_ids: anObject [
+	<generated>
+	parent_ids := anObject
 ]
 
 { #category : #accessing }

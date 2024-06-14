@@ -11,7 +11,10 @@ Class {
 		'diff',
 		'user',
 		'pipeline',
-		'commit'
+		'commit',
+		'project',
+		'lineOfCode',
+		'diffRange'
 	],
 	#category : #'GitLabProjectHealth-ExtendModel-Generator'
 }
@@ -33,19 +36,11 @@ GLPHMetamodelGenerator class >> submetamodels [
 
 { #category : #'as yet unclassified' }
 GLPHMetamodelGenerator >> changeProperties [
-	"must parse the range. 
-	originalLineRange = '-120,5' --> change starts at line #120
-	5 is the number of lines in the original file affected by the change"
 
-	change property: #originalLineRange type: #String.
-	change property: #newLineRange type: #String.
-
-	change property: #linesOfCode type: #String.
-
-	addition
-		property: #delimiter
-		type: #String
-		defaultValue: '#+'.
+	change property: #index type: #Number.
+	change property: #relativeIndex type: #Number.
+	change property: #sourceCode type: #String. 
+	addition property: #delimiter type: #String defaultValue: '#+'.
 	deletion property: #delimiter type: #String defaultValue: '#-'
 ]
 
@@ -56,7 +51,6 @@ GLPHMetamodelGenerator >> defineClasses [
 	mergeRequest := builder
 		                newClassNamed: #MergeRequest
 		                comment: 'a gitlab merge request'.
-
 
 	change := builder
 		          newClassNamed: #Change
@@ -71,12 +65,23 @@ GLPHMetamodelGenerator >> defineClasses [
 		            comment:
 		            'a detected deletion of a line, seen within a diff '.
 
+	lineOfCode := builder
+		              newClassNamed: #LineOfCode
+		              comment: 'a line of code in a diff comparaison '.
+
+	diffRange := builder
+		             newClassNamed: #DiffRange
+		             comment:
+		             'a indicate on which line of code are concerned by a diff (usually declared with @@ oldRange, newRange @@) '.
+
+
 	repository := self remoteEntity: #Repository withPrefix: #GLH.
 	file := self remoteEntity: #File withPrefix: #GLH.
 	diff := self remoteEntity: #Diff withPrefix: #GLH.
 	user := self remoteEntity: #User withPrefix: #GLH.
 	pipeline := self remoteEntity: #Pipeline withPrefix: #GLH.
-	commit := self remoteEntity: #Commit withPrefix: #GLH
+	commit := self remoteEntity: #Commit withPrefix: #GLH.
+	project := self remoteEntity: #Project withPrefix: #GLH
 ]
 
 { #category : #definition }
@@ -84,18 +89,21 @@ GLPHMetamodelGenerator >> defineHierarchy [
 
 	super defineHierarchy.
 	(builder ensureClassNamed: #Entity) --|> #TEntityMetaLevelDependency.
-	change <|-- addition.
-	change <|-- deletion
-	
+	change --|> #TNamedEntity.
+	 change <|-- addition.
+	change <|-- deletion.
+	change <|-- lineOfCode.
+	mergeRequest --|> #TNamedEntity
 ]
 
 { #category : #definition }
 GLPHMetamodelGenerator >> defineProperties [
 
 	super defineProperties.
-	
+
 	self changeProperties.
 	self mergeRequestProperties.
+	self diffRangeProperties.
 ]
 
 { #category : #definition }
@@ -106,7 +114,7 @@ GLPHMetamodelGenerator >> defineRelations [
 	"MERGE REQUEST RELATIONS"
 	(mergeRequest property: #author)
 	*- (user property: #createdMergeRequests).
-	
+
 	(mergeRequest property: #merge_user) *- (user property: #usedMerges).
 
 	(mergeRequest property: #closed_by)
@@ -127,16 +135,34 @@ GLPHMetamodelGenerator >> defineRelations [
 	(mergeRequest property: #pipeline)
 	- (pipeline property: #mergeResquest).
 
-	(mergeRequest property: #mergeCommit)
+	(mergeRequest property: #mergedCommit)
+	- (commit property: #commitedMergeRequest).
+
+	(mergeRequest property: #mergeRequestCommit)
 	- (commit property: #commitedMergeRequest).
 
 	(mergeRequest property: #squashCommit)
 	- (commit property: #squashedMergeRequest).
 
-	(mergeRequest property: #diff) - (diff property: #mergeRequest).
+	(mergeRequest property: #diffs) -* (diff property: #mergeRequest).
+
+	(project property: #mergeRequests)
+	<>-* (mergeRequest property: #project).
 
 	"DIFF"
-	(diff property: #changes) <>-* (change property: #diff)
+	(diff property: #file) <>-* (file property: #diffs).
+	(diff property: #diffRanges) <>-* (diffRange property: #diff).
+	(diffRange property: #changes) -* (change property: #diffRange)
+]
+
+{ #category : #'as yet unclassified' }
+GLPHMetamodelGenerator >> diffRangeProperties [
+"must parse the range. 
+	originalLineRange = '-120,5' --> change starts at line #120
+	5 is the number of lines in the original file affected by the change"
+	diffRange property: #originalLineRange type: #String.
+	diffRange property: #newLineRange type: #String.
+	diffRange property: #lineOfCode type: #String
 ]
 
 { #category : #'as yet unclassified' }
@@ -148,10 +174,10 @@ GLPHMetamodelGenerator >> mergeRequestProperties [
 	mergeRequest property: #title type: #String.
 	mergeRequest property: #description type: #String.
 	mergeRequest property: #state type: #String.
-	mergeRequest property: #created_at type: #String.
-	mergeRequest property: #updated_at type: #String.
-	mergeRequest property: #merged_at type: #String.
-	mergeRequest property: #closed_at type: #String.
+	mergeRequest property: #created_at type: #Object.
+	mergeRequest property: #updated_at type: #Object.
+	mergeRequest property: #merged_at type: #Object.
+	mergeRequest property: #closed_at type: #Object.
 	mergeRequest property: #target_branch type: #String.
 	mergeRequest property: #source_branch type: #String.
 	mergeRequest property: #user_notes_count type: #Number.
