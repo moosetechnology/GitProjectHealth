@@ -13,37 +13,23 @@ Class {
 	#category : #'GitLabHealth-Model-Importer-Tests'
 }
 
-{ #category : #'class initialization' }
-GLHModelImporterTest class >> initialize [
+{ #category : #accessing }
+GLHModelImporterTest class >> resources [
 
-	
+	^ Array with: GLHModelImporterTestResource
 ]
 
 { #category : #running }
-GLHModelImporterTest >> setUp [
+GLHModelImporterTest >> model [
 
-	super setUp.
-
-	"Put here a common initialization logic for tests"
-	glphModel := GLPHEModel new.
-
-	glphApi := GLPHApi new
-		           privateToken: '';
-		           baseAPIUrl: 'https://gitlab.com/api/v4';
-		           yourself.
-
-	since := Date today - 2 day.
-
-	glhImporter := GLPHModelImporter new
-		               glhApi: glphApi;
-		               glhModel: glphModel;
-		               withFiles: false;
-		               withCommitsSince: 0 day;
-		               withCommitDiffs: true.
-		
-	glhImporter importGroup: 87194534.
+	^ self class resources first current model
 ]
 
 { #category : #tests }
-GLHModelImporterTest >> testImport [
+GLHModelImporterTest >> testImportProject [
+
+	self assert: (self model allWithType: GLHProject) size equals: 1.
+	self assert:
+		((self model allWithType: GLHProject) anySatisfy: [ :project |
+			 project id = 57841283 ])
 ]

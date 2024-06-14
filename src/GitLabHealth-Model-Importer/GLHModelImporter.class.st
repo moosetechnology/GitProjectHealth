@@ -31,8 +31,10 @@ GLHModelImporter >> addCommits: commitsList toRepository: aProjectRepository [
 { #category : #private }
 GLHModelImporter >> addGroupResultToModel: groupResult [
 
-	self glhModel add: groupResult.
-	self glhModel addAll: groupResult projects
+	self glhModel add: groupResult unless: (self blockEqualityOn: #id).
+	self glhModel
+		addAll: groupResult projects
+		unless: (self blockEqualityOn: #id)
 ]
 
 { #category : #accessing }
@@ -524,8 +526,7 @@ GLHModelImporter >> importGroup: aGroupID [
 		self completeImportProject: project ].
 	self addGroupResultToModel: groupResult.
 	(self subGroupsOf: aGroupID) do: [ :subGroup |
-
-	  groupResult addSubGroup: (self importGroup: subGroup id) ].
+		groupResult addSubGroup: (self importGroup: subGroup id) ].
 	^ groupResult
 ]
 
