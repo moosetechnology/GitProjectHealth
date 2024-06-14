@@ -26,6 +26,15 @@ GLHModelImporterTest >> model [
 ]
 
 { #category : #tests }
+GLHModelImporterTest >> testImportBranch [
+
+	| testCodeChurnRepository |
+	testCodeChurnRepository := (self model allWithType: GLHGroup) anyOne
+		                           projects anyOne repository.
+	self assert: testCodeChurnRepository branches isNotEmpty
+]
+
+{ #category : #tests }
 GLHModelImporterTest >> testImportGroup [
 
 	| evrefGroup |
