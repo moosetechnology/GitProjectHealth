@@ -6,13 +6,26 @@ Class {
 
 { #category : #baselines }
 BaselineOfGitLabHealth >> baseline: spec [
+
 	<baseline>
-	spec
-		for: #common
-		do: [ 
-			self defineDependencies: spec.
-			self definePackages: spec.
-			self defineGroups: spec ]
+	spec for: #common do: [
+		self defineDependencies: spec.
+		self definePackages: spec.
+		self defineGroups: spec.
+
+		spec for: #( #WithoutFamix ) do: [
+			spec
+				baseline: 'Moose'
+				with: [
+				spec repository: 'github://moosetechnology/Moose:development/src' ].
+			spec package: 'GitLabHealth-Model' with: [ spec requires: #( 'Moose' ) ] ] ]
+]
+
+{ #category : #baselines }
+BaselineOfGitLabHealth >> customProjectAttributes [
+    self class environment at: #MooseEntity ifAbsent: [ ^ #(#WithoutFamix) ].
+
+    ^ #()
 ]
 
 { #category : #baselines }
@@ -48,14 +61,18 @@ BaselineOfGitLabHealth >> definePackages: spec [
 		package: 'GitLabHealth-Model-Importer-Tests' with: [
 			spec requires:
 					#( 'GitLabHealth-Model-Importer' 'GitHubHealth-Model-Importer' ) ].
+	spec
+		package: 'GitHubHealth-Model-Importer-Tests'
+		with: [ spec requires: #( 'GitHubHealth-Model-Importer' ) ].
 
 	"model extension"
 	spec
 		package: 'GLPHExtended-Model' with: [
 			spec requires:
 					#( 'GitLabHealth-Model' 'GitLabHealth-Model-Extension' ) ];
-		package: 'GLPHExtended-Model-Extension'
-		with: [ spec requires: #( 'GLPHExtended-Model' 'GitLabHealth-Model' 'GitLabHealth-Model-Extension' ) ];
+		package: 'GLPHExtended-Model-Extension' with: [
+			spec requires:
+					#( 'GLPHExtended-Model' 'GitLabHealth-Model' 'GitLabHealth-Model-Extension' ) ];
 		package: 'GitLabHealth-Model-Analysis';
 		package: 'GitLabHealth-Model-Analysis-Tests'
 		with: [ spec requires: #( 'GitLabHealth-Model-Analysis' ) ];

@@ -4,6 +4,15 @@ A GitLab Pipeline execution
 ## Relations
 ======================
 
+### Parents
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `project` | `GLHPipeline` | `pipelines` | `GLHProject` | |
+
+### Children
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `jobs` | `GLHPipeline` | `pipeline` | `GLHJob` | |
 
 
 ## Properties
@@ -11,6 +20,7 @@ A GitLab Pipeline execution
 
 | Name | Type | Default value | Comment |
 |---|
+| `id` | `String` | nil | The id of the pipeline|
 | `runDate` | `Object` | nil | Date this pipeline was run|
 | `status` | `String` | nil | #success or #failure|
 

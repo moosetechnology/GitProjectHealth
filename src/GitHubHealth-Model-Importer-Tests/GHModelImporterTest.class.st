@@ -21,7 +21,6 @@ GHModelImporterTest >> setUp [
 GHModelImporterTest >> testParsePipelinesResult [
 
 	| project |
-
 	project := importer parsePipelinesResult: '{
   "total_count": 1,
   "workflow_runs": [
@@ -34,6 +33,7 @@ GHModelImporterTest >> testParsePipelinesResult [
 	self assert: project workflow_runs size equals: 1.
 
 	self assert: project workflow_runs anyOne status equals: 'success'.
-	self assert: project workflow_runs anyOne runDate equals: (DateAndTime year: 2024 month: 01 day: 11).
-
+	self
+		assert: project workflow_runs anyOne runDate
+		equals: (DateAndTime year: 2024 month: 01 day: 11)
 ]

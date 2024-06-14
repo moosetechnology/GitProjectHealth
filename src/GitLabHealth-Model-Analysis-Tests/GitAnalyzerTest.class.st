@@ -89,11 +89,11 @@ GitAnalyzerTest >> testAnalyseAmandment [
 		       fromCommit: mondayCommit;
 		       glhImporter: glhImporter;
 		       onModel: glphModel;
-				
+		       maxChildCommit: 5;
 		       analyseAmandment.
 
 
-	self assert: res = tuesdayCommit equals: true
+	self assert: res equals: tuesdayCommit
 ]
 
 { #category : #test }
@@ -118,15 +118,18 @@ GitAnalyzerTest >> testAnalyseCommitFrequencySinceUntil [
 { #category : #test }
 GitAnalyzerTest >> testAnalyseMergeResquestValidation [
 
-	| mergeResquest res|
+	| mergeResquest res |
+	glhImporter importMergeRequests: projects anyOne.
 	mergeResquest := (glhImporter glhModel allWithType: GLPHEMergeRequest)
-		                 detect: [ :mr | mr iid = 1 ] .
+		                 detect: [ :mr | mr iid = 1 ].
 
 
 	res := gitAnalyzer analyseMergeResquestValidation: mergeResquest.
 
 
-	self assert: ((res at: #merged_at) - (res at: #created_at) ) equals: (res at: #duration)
+	self
+		assert: (res at: #merged_at) - (res at: #created_at)
+		equals: (res at: #duration)
 ]
 
 { #category : #tests }

@@ -5,8 +5,10 @@ A GitLab User
 ======================
 
 ### Children
-
-
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `commits` | `GLHUser` | `commitCreator` | `GLHCommit` | |
+| `jobs` | `GLHUser` | `user` | `GLHJob` | |
 
 ### Other
 | Relation | Origin | Opposite | Type | Comment |
@@ -30,6 +32,7 @@ A GitLab User
 | `linkedin` | `String` | nil | |
 | `location` | `String` | nil | |
 | `name` | `String` | nil | |
+| `name` | `String` | nil | Basic name of the entity, not full reference.|
 | `organization` | `String` | nil | |
 | `pronouns` | `String` | nil | |
 | `public_email` | `String` | nil | |
@@ -70,16 +73,8 @@ Class {
 		'#username => FMProperty',
 		'#web_url => FMProperty',
 		'#website_url => FMProperty',
-		'#organization => FMProperty',
-		'#job_title => FMProperty',
-		'#pronouns => FMProperty',
-		'#bot => FMProperty',
 		'#work_information => FMProperty',
-		'#followers => FMProperty',
-		'#following => FMProperty',
-		'#createdProjects => FMMany type: #GLHProject opposite: #creator',
 		'#jobs => FMMany type: #GLHJob opposite: #user'
-
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }
@@ -95,9 +90,7 @@ GLHUser class >> annotation [
 
 { #category : #adding }
 GLHUser >> addCommit: anObject [
-
 	<generated>
-
 	^ self commits add: anObject
 ]
 

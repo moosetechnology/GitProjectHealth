@@ -8,6 +8,21 @@ a commit attached to a repository
 | Relation | Origin | Opposite | Type | Comment |
 |---|
 | `branch` | `GLHCommit` | `commits` | `GLHBranch` | |
+| `commitCreator` | `GLHCommit` | `commits` | `GLHUser` | |
+| `repository` | `GLHCommit` | `commits` | `GLHRepository` | |
+
+### Children
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `diffs` | `GLHCommit` | `commit` | `GLHDiff` | |
+| `jobs` | `GLHCommit` | `commit` | `GLHJob` | |
+
+### Other
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `childCommits` | `GLHCommit` | `parentCommits` | `GLHCommit` | |
+| `parentCommits` | `GLHCommit` | `childCommits` | `GLHCommit` | |
+
 
 ## Properties
 ======================
@@ -25,6 +40,8 @@ a commit attached to a repository
 | `deletions` | `Number` | nil | The number of line that git consider deleted|
 | `id` | `String` | nil | |
 | `message` | `String` | nil | |
+| `name` | `String` | nil | Basic name of the entity, not full reference.|
+| `parent_ids` | `Object` | 'OrderedCollection new' | |
 | `short_id` | `String` | nil | |
 | `title` | `String` | nil | |
 | `web_url` | `String` | nil | |
@@ -50,14 +67,14 @@ Class {
 		'#deletions => FMProperty',
 		'#diffs => FMMany type: #GLHDiff opposite: #commit',
 		'#id => FMProperty',
+		'#jobs => FMMany type: #GLHJob opposite: #commit',
 		'#message => FMProperty',
 		'#parentCommits => FMMany type: #GLHCommit opposite: #childCommits',
 		'#parent_ids => FMProperty defaultValue: ((OrderedCollection new))',
 		'#repository => FMOne type: #GLHRepository opposite: #commits',
-    '#web_url => FMProperty',
-    '#short_id => FMProperty',
-    '#title => FMProperty',
-    '#jobs => FMMany type: #GLHJob opposite: #commit'
+		'#short_id => FMProperty',
+		'#title => FMProperty',
+		'#web_url => FMProperty'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }
@@ -84,15 +101,15 @@ GLHCommit >> addDiff: anObject [
 ]
 
 { #category : #adding }
-GLHCommit >> addParentCommit: anObject [
-	<generated>
-	^ self parentCommits add: anObject
-]
-
-{ #category : #adding }
 GLHCommit >> addJob: anObject [
 	<generated>
 	^ self jobs add: anObject
+]
+
+{ #category : #adding }
+GLHCommit >> addParentCommit: anObject [
+	<generated>
+	^ self parentCommits add: anObject
 ]
 
 { #category : #accessing }
