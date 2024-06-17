@@ -6,7 +6,7 @@ It ouputs a csv files containing : churn code, commits frequencies, code additio
 
 "load githealth project into your image"
 Metacello new
-  repository: 'github://moosetechnology/GitProjectHealth:GLPH-importer-new-changes/src';
+  repository: 'github://moosetechnology/GitProjectHealth:main/src';
   baseline: 'GitLabHealth';
   onConflict: [ :ex | ex useIncoming ];
   onUpgrade: [ :ex | ex useIncoming ];
