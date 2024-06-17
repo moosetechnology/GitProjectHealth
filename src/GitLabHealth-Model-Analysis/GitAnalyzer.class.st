@@ -263,7 +263,9 @@ GitAnalyzer >> glhImporter: anImporter [
 { #category : #'as yet unclassified' }
 GitAnalyzer >> impactedFilesInFollowUpCommitsOf: aGLHCommit [
 
-	^ self impactedFilesInFollowUpCommitsOf:  aGLHCommit withMaxCommits: -1 
+	^ self
+		  impactedFilesInFollowUpCommitsOf: aGLHCommit
+		  withMaxCommits: self maxChildCommits. 
 ]
 
 { #category : #churn }
@@ -289,7 +291,7 @@ GitAnalyzer >> initialize [
 	fromCommit := GLHCommit new.
 	glhImporter := GLPHModelImporter new.
 	onProject := GLHProject new.
-	maxChildCommits := -1 
+	maxChildCommits := -1
 ]
 
 { #category : #insertion }

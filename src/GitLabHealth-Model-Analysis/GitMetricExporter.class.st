@@ -31,6 +31,118 @@ GitMetricExporter >> constructFilePath: over [
 ]
 
 { #category : #'as yet unclassified' }
+GitMetricExporter >> debugExportOver: aCollectionOfDateWeekMonthOrYear [
+
+	| over |
+	over := Date.
+
+
+	"Code Contribution "
+	entities collect: [ :metrics |
+		((metrics
+			  codeContributionsSince: (beforeExp at: #since)
+			  until: (beforeExp at: #until)
+			  overA: over) at: #avgAddition) printString ].
+
+	entities collect: [ :metrics |
+		((metrics
+			  codeContributionsSince: (beforeExp at: #since)
+			  until: (beforeExp at: #until)
+			  overA: over) at: #avgDeletion) printString ].
+
+	entities collect: [ :metrics |
+		Smalltalk snapshot: true andQuit: false.
+		((metrics
+			  codeContributionsSince: (duringExp at: #since)
+			  until: (duringExp at: #until)
+			  overA: over) at: #avgAddition) printString ].
+
+	entities collect: [ :metrics |
+		((metrics
+			  codeContributionsSince: (duringExp at: #since)
+			  until: (duringExp at: #until)
+			  overA: over) at: #avgDeletion) printString ].
+
+
+
+	"Commit frequencies "
+	entities collect: [ :metrics |
+		((metrics
+			  commitFrequencySince: (beforeExp at: #since)
+			  until: (beforeExp at: #until)
+			  overA: over) at: #averageFloat) printString ].
+
+
+	entities collect: [ :metrics |
+		((metrics
+			  commitFrequencySince: (duringExp at: #since)
+			  until: (duringExp at: #until)
+			  overA: over) at: #averageFloat) printString ].
+
+
+	"comment contribution "
+	entities collect: [ :metrics |
+		Smalltalk snapshot: true andQuit: false.
+		((metrics
+			  commentsContributionsSince: (beforeExp at: #since)
+			  until: (beforeExp at: #until)
+			  overA: over) at: #avgComments) printString ].
+
+	entities collect: [ :metrics |
+		((metrics
+			  commentsContributionsSince: (duringExp at: #since)
+			  until: (duringExp at: #until)
+			  overA: over) at: #avgComments) printString ].
+
+
+	"merge Request Duration "
+	entities collect: [ :metrics |
+		Smalltalk snapshot: true andQuit: false.
+		((metrics
+			  mergeRequestDurationSince: (beforeExp at: #since)
+			  until: (beforeExp at: #until)
+			  overA: over) at: #avgDuration) printString ].
+
+	entities collect: [ :metrics |
+		((metrics
+			  mergeRequestDurationSince: (duringExp at: #since)
+			  until: (duringExp at: #until)
+			  overA: over) at: #avgDuration) printString ].
+
+
+	"code churn"
+	entities collect: [ :metrics |
+		((metrics
+			  codeChurnSince: (beforeExp at: #since)
+			  until: (beforeExp at: #until)
+			  onACommitWindowOf: 3
+			  overA: over) at: #churn) printString ].
+
+	entities collect: [ :metrics |
+		((metrics
+			  codeChurnSince: (duringExp at: #since)
+			  until: (duringExp at: #until)
+			  onACommitWindowOf: 3
+			  overA: over) at: #churn) printString ].
+
+	"delay Until First Churn"
+	entities collect: [ :metrics |
+		((metrics
+			  delayUntilFirstChurnSince: (beforeExp at: #since)
+			  until: (beforeExp at: #until)
+			  overA: over) at: #avgDelay) printString ].
+
+	entities collect: [ :metrics |
+		((metrics
+			  delayUntilFirstChurnSince: (duringExp at: #since)
+			  until: (duringExp at: #until)
+			  overA: over) at: #avgDelay) printString ].
+
+
+	'Done computing' recordInfo
+]
+
+{ #category : #'as yet unclassified' }
 GitMetricExporter >> duringDic: aDictionnarySinceUntil [
 	duringExp := aDictionnarySinceUntil
 ]
@@ -222,7 +334,8 @@ GitMetricExporter >> exportOver: aCollectionOfDateWeekMonthOrYear [
 
 { #category : #accessing }
 GitMetricExporter >> glhImporter: anImporter [
-	glhImporter := anImporter. 
+
+	glhImporter := anImporter withInitialCommits: false; yourself. 
 ]
 
 { #category : #'as yet unclassified' }

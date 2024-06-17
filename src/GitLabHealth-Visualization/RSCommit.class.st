@@ -79,14 +79,11 @@ RSCommit >> buildCommitCompleteHierachyCanvas [
 	dic := Dictionary new.
 
 
-	churnAnalyzer := GitAnalyzer new fromCommit: aCommit.
+	churnAnalyzer := GitAnalyzer new fromCommit: aCommit; maxChildCommit: 50.
 	files2Commits := churnAnalyzer impactedFilesInFollowUpCommitsOf:
 		                 aCommit.
 	files2Commits := files2Commits select: [ :entry |
 		                 entry value isNotNil ].
-
-
-
 
 	commitShape add: (self shapeForCommit: aCommit).
 
@@ -104,25 +101,23 @@ RSCommit >> buildCommitCompleteHierachyCanvas [
 		(composite children select: [ :b | b class = RSBox ]) color:
 			Color red ].
 
-
 	parents addAll: (aCommit parentCommits collect: [ :c |
 			 self shapeForCommit: c withColor: self parentColor ]).
 
-
 	allCommitShps := parents , commitShape , children.
-	
+
 	allCommitShps do: [ :shp |
-		|commit|
+		| commit |
 		commit := shp model.
-		(commit commitCreator = commitShape first model commitCreator) ifTrue: [ 
-			(shp children detect: [ :c | c class = RSBox ]) border: (RSBorder new
-				   width: 5;
-				   color: self defaultColor ;
-				   yourself). 
-			 ].
-		 ].
-	
-	
+		commit commitCreator = commitShape first model commitCreator
+			ifTrue: [
+				(shp children detect: [ :c | c class = RSBox ]) border:
+					(RSBorder new
+						 width: 5;
+						 color: self defaultColor;
+						 yourself) ] ].
+
+
 
 	"canvas addAllShapes: commitShape , parents , children."
 	self createLinesBetweenCommits: allCommitShps.
@@ -173,7 +168,7 @@ RSCommit >> buildCommitHierachyCanvas [
 	children := RSGroup new.
 	commitShape := RSGroup new.
 
-	
+
 	commitShape add: (self shapeForCommit: aCommit).
 
 	children addAll: (aCommit childCommits collect: [ :c |
@@ -205,9 +200,6 @@ RSCommit >> buildCommitHierachyCanvas [
 		gapSize: 100;
 		on: group.
 
-	
-	
-	
 
 	"canvas addShape: (RSComposite new
 			 shapes: group;

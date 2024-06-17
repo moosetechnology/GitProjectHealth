@@ -6,7 +6,9 @@ Class {
 		'glhApi',
 		'withFiles',
 		'withCommitDiffs',
-		'withCommitsSince'
+		'withCommitsSince',
+		'withInitialCommits',
+		'withInitialMergeRequest'
 	],
 	#category : #'GitLabHealth-Model-Importer'
 }
@@ -680,7 +682,9 @@ GLHModelImporter >> initialize [
 
 	withFiles := false.
 	withCommitDiffs := false.
-	withCommitsSince := (Date today - 1 week) asDateAndTime. 
+	withInitialCommits := false. 
+	withInitialMergeRequest := false. 
+	withCommitsSince := (Date today - 1 week) asDateAndTime
 ]
 
 { #category : #private }
@@ -941,4 +945,9 @@ GLHModelImporter >> withFiles [
 { #category : #accessing }
 GLHModelImporter >> withFiles: aBoolean [
 	withFiles := aBoolean
+]
+
+{ #category : #accessing }
+GLHModelImporter >> withInitialCommits: boolean [
+	withInitialCommits := boolean 
 ]

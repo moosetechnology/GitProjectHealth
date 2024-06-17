@@ -81,10 +81,10 @@ GLPHModelImporter >> completeImportProject: aGLHProject [
 	super completeImportProject: aGLHProject.
 
 	"for this initial import, with only look at some but not all MR"
-	self
+	withInitialMergeRequest ifTrue: [ self
 		importMergeRequests: aGLHProject
 		since: DateAndTime today
-		until: DateAndTime now.
+		until: DateAndTime now. ].
 
 	^ aGLHProject
 ]
@@ -292,8 +292,9 @@ GLPHModelImporter >> importRepository: aGLHRepository [
 
 	super importRepository: aGLHRepository.
 
-	aGLHRepository branches do: [ :branch |
-		self importCommitsOfBranch: branch ].
+	withInitialCommits ifTrue: [
+		aGLHRepository branches do: [ :branch |
+			self importCommitsOfBranch: branch ] ]
 ]
 
 { #category : #initialization }
