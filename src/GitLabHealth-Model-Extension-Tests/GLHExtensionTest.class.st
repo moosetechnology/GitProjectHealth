@@ -47,18 +47,26 @@ GLHExtensionTest >> testAddAllOfTypeUnlessDifferentEntity [
 { #category : #tests }
 GLHExtensionTest >> testAddAllOfTypeUnlessWithAlreadyExistingEntity [
 
-	| user values alreadyExistingUser |
+	| user values alreadyExistingUser user15 |
 	alreadyExistingUser := model newUser.
 	alreadyExistingUser id: 15.
+	alreadyExistingUser name: 'John'.
+
 	user := GLHUser new.
 	user id: 12.
+	user15 := GLHUser new.
+	user15 id: 15.
+	user15 name: 'Tony'.
+
 	values := model
 		          addAll: {
 				          user.
-				          alreadyExistingUser }
+				          user15 }
 		          ofType: GLHUser
 		          unless: [ :a :b | a id = b id ].
 	self assert: values size equals: 2.
+	self assert: (values anySatisfy: [ :e | e name = 'John' ]).
+	self deny: (values anySatisfy: [ :e | e name = 'Tony' ]).
 	self assert: model size equals: 2.
 	self assert: (values includes: user).
 	self assert: (values includes: alreadyExistingUser)
