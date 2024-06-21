@@ -6,10 +6,53 @@ Class {
 		'beforeExp',
 		'duringExp',
 		'label',
-		'entities'
+		'entities',
+		'projectCache'
 	],
 	#category : #'GitLabHealth-Model-Analysis'
 }
+
+{ #category : #'as yet unclassified' }
+GitMetricExporter >> addEntitiesFromUserNames: userNames [
+
+	projectCache := projectCache ifNil: [ glhImporter importProjects ].
+
+	entities addAll: (userNames collect: [ :username |
+		            | projects metrics |
+		            projects := self
+			                        findProjectsOfUser: username
+			                        inside: projectCache.
+
+		            metrics := GitMetric4User new.
+		            metrics
+			            glhImporter: glhImporter;
+			            findUserNamed: username.
+		            metrics itsProjects:
+			            (projects collect: [ :p | p id -> p ]) asDictionary.
+
+		            metrics ]).
+
+	^ self
+]
+
+{ #category : #'as yet unclassified' }
+GitMetricExporter >> addEntitiesFromUserNamesAndProjects: usersWithProjects [
+
+	entities addAll: (usersWithProjects associations collect: [ :assoc |
+		            | username projects metrics |
+		            username := assoc key.
+		            projects := assoc value.
+
+		            metrics := GitMetric4User new.
+		            metrics
+			            glhImporter: glhImporter;
+			            findUserNamed: username.
+		            metrics loadProjects: projects.
+
+		            metrics ]).
+
+	^ self
+]
 
 { #category : #'as yet unclassified' }
 GitMetricExporter >> beforeDic: aDictionnarySinceUntil [
@@ -109,7 +152,7 @@ GitMetricExporter >> debugExportOver: aCollectionOfDateWeekMonthOrYear [
 			  until: (duringExp at: #until)
 			  overA: over) at: #avgDuration) printString ].
 
-
+	1 halt. 
 	"code churn"
 	entities collect: [ :metrics |
 		((metrics
@@ -162,7 +205,7 @@ GitMetricExporter >> exportFor: usersWithProjects [
 GitMetricExporter >> exportFor: usersWithProjects over: aCollectionOfDateWeekMonthOrYear [
 
 	entities ifNil: [
-		self initEntitiesFromUserProjects: usersWithProjects ].
+		self addEntitiesFromUserNamesAndProjects: usersWithProjects ].
 
 	self exportFor: aCollectionOfDateWeekMonthOrYear. 
 ]
@@ -332,35 +375,36 @@ GitMetricExporter >> exportOver: aCollectionOfDateWeekMonthOrYear [
 	'Done computing' recordInfo
 ]
 
+{ #category : #'as yet unclassified' }
+GitMetricExporter >> findProjectsOfUser: aCollection [ 
+	self shouldBeImplemented.
+]
+
+{ #category : #projects }
+GitMetricExporter >> findProjectsOfUser: username inside: aCollectionOfProjects [
+
+	| response itsProjects |
+	itsProjects := aCollectionOfProjects select: [ :project |
+		               response := glhImporter glhApi
+			                           commitsOfUser: username
+			                           inProject: project id since: '01 january 2023' asDateAndTime  until: '24 may 2024' asDateAndTime.
+		               response := glhImporter parseCommitsResult: response.
+
+		               response isNotEmpty ].
+
+	^ itsProjects
+]
+
 { #category : #accessing }
 GitMetricExporter >> glhImporter: anImporter [
 
 	glhImporter := anImporter withInitialCommits: false; yourself. 
 ]
 
-{ #category : #'as yet unclassified' }
-GitMetricExporter >> initEntitiesFromUserProjects: usersWithProjects [
-
-	entities := (usersWithProjects associations collect: [ :assoc |
-			 | username projects metrics |
-			 username := assoc key.
-			 projects := assoc value.
-
-			 metrics := GitMetric4User new.
-			 metrics
-				 glhImporter: glhImporter;
-				 findUserNamed: username.
-			 metrics loadProjects: projects.
-
-			 metrics ]).
-
-	^ self
-]
-
 { #category : #initialization }
 GitMetricExporter >> initialize [
-
-
+	entities := OrderedCollection new. 
+	
 ]
 
 { #category : #accessing }

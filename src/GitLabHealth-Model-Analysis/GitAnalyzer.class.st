@@ -15,7 +15,13 @@ Class {
 GitAnalyzer >> analyseAmandment [
 	"return the first commit that modify the same lines of code as the fromCommit"
 
-	| churn res |
+	| churn res access|
+	
+	access := ('' join: {
+			           'amandment'.
+			           maxChildCommits }) asSymbol.
+	
+	^ fromCommit cacheAt: access ifPresent: [ :v | v ] ifAbsentPut: [
 	
 	('GitAnalyzer, analyse amandment onProject: ', onProject printString )
 		recordInfo.
@@ -23,15 +29,18 @@ GitAnalyzer >> analyseAmandment [
 	churn := self analyseChurn.
 
 	res := self firstAmandmentFromChrun: churn.
-
-	^ res
+	 res]
 ]
 
 { #category : #'as yet unclassified' }
 GitAnalyzer >> analyseChurn [
 
-	| commitFiles totalContribution childCommits |
-	('GitAnalyzer, analyse chrun onProject: ' , onProject printString)
+	| commitFiles totalContribution childCommits access|
+	
+	access := ('' join: {'churn' . maxChildCommits }) asSymbol .
+	
+	^ fromCommit cacheAt: access ifPresent: [ :v | v ] ifAbsentPut: [ 
+		('GitAnalyzer, analyse chrun onProject: ' , onProject printString)
 		recordInfo.
 	childCommits := OrderedCollection new.
 	totalContribution := self
@@ -43,9 +52,11 @@ GitAnalyzer >> analyseChurn [
 	commitFiles := self
 		               impactedFilesInFollowUpCommitsOf: fromCommit
 		               withMaxCommits: self maxChildCommits.
-	^ (self computeChurnOnFiles: commitFiles)
+		
+		(self computeChurnOnFiles: commitFiles)
 		  at: #totalContribution ifAbsentPut: totalContribution;
-		  yourself
+		  yourself. ].
+		
 ]
 
 { #category : #'as yet unclassified' }
@@ -128,34 +139,32 @@ GitAnalyzer >> analyseCommitFrequencySince: since until: until [
 { #category : #'as yet unclassified' }
 GitAnalyzer >> analyseMergeResquestValidation: aGLHPMergeRequest [
 
-	|creationDate mergedDate response|
-	
-	
-	('GitAnalyzer, analyse merge request delay of: ', aGLHPMergeRequest printString )
-		recordInfo.
-	
-	response := { 
-		 #id_merge_resquest -> aGLHPMergeRequest iid. 
-		 #id_merge_commit -> nil.
-		 #created_at ->  aGLHPMergeRequest created_at.
-		 #merged_at -> nil .
-		 #duration ->  nil.
-		 #status -> (aGLHPMergeRequest merge_status)} asDictionary .  
-	 
-	
-	creationDate := aGLHPMergeRequest created_at asDateAndTime.
+	| creationDate mergedDate response |
+	('GitAnalyzer, analyse merge request delay of: '
+	 , aGLHPMergeRequest printString) recordInfo.
 
-	mergedDate := aGLHPMergeRequest merged_at ifNil: [ 
-		
-		^ response 
-		
-		 ].
-	
-	^ response at: #duration put: (mergedDate - creationDate); 
-					at: #id_merge_commit put: aGLHPMergeRequest merge_commit_sha  ; 
-					at: #merged_at put: aGLHPMergeRequest merged_at;
-					yourself. 
+	^ aGLHPMergeRequest
+		  cacheAt: #mergeRequestValidation
+		  ifPresent: [ :v | v ]
+		  ifAbsentPut: [
+			  response := {
+				              (#id_merge_resquest -> aGLHPMergeRequest iid).
+				              (#id_merge_commit -> nil).
+				              (#created_at -> aGLHPMergeRequest created_at).
+				              (#merged_at -> nil).
+				              (#duration -> nil).
+				              (#status -> aGLHPMergeRequest merge_status) }
+				              asDictionary.
 
+			  creationDate := aGLHPMergeRequest created_at asDateAndTime.
+
+			  mergedDate := aGLHPMergeRequest merged_at ifNil: [ ^ response ].
+
+			  response
+				  at: #duration put: mergedDate - creationDate;
+				  at: #id_merge_commit put: aGLHPMergeRequest merge_commit_sha;
+				  at: #merged_at put: aGLHPMergeRequest merged_at;
+				  yourself ]
 ]
 
 { #category : #filter }

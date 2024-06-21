@@ -602,6 +602,38 @@ GLHModelImporter >> importPipelinesOfProject: aGLHProject [
 		aGLHProject addPipeline: pipeline ]
 ]
 
+{ #category : #imports }
+GLHModelImporter >> importProjects [
+	"heavy import of all projects"
+	
+	"copy import from commits"
+	
+	
+	| newlyFoundProjects page foundProject amount|
+	('import all Projects into the model') recordInfo.
+	
+	"number of projects per page"
+	amount := 50.
+	page := 0.
+	foundProject := OrderedCollection new.
+	newlyFoundProjects := { true }.
+	[ newlyFoundProjects isNotEmpty ] whileTrue: [
+		| results |
+		page := page + 1.
+		('import project of page ' , page printString) recordInfo.
+		results := self glhApi projects: amount page: page.
+		
+		newlyFoundProjects := glhModel
+			                addAll: (self parseArrayOfProject: results)
+			                unless: self blockOnIdEquality.
+		foundProject addAll: newlyFoundProjects 
+		
+		].
+
+	^ foundProject
+	
+]
+
 { #category : #'private - api' }
 GLHModelImporter >> importRepository: aGLHRepository [
 
@@ -685,6 +717,33 @@ GLHModelImporter >> initialize [
 	withInitialCommits := false. 
 	withInitialMergeRequest := false. 
 	withCommitsSince := (Date today - 1 week) asDateAndTime
+]
+
+{ #category : #importer }
+GLHModelImporter >> loadAllSystemProjects [
+	"heavy import that load all the active project inside the model. Only import the project entities"
+	|projects|
+	
+	projects := self glhApi projects. 
+]
+
+{ #category : #parsing }
+GLHModelImporter >> parseArrayOfProject: arrayOfProjects [
+
+	| reader |
+	reader := NeoJSONReader on: arrayOfProjects readStream.
+	reader
+		for: #ArrayOfProjects
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHProject ].
+	reader for: GLHProject do: [ :mapping |
+		mapping mapInstVar: #name to: #name.
+		mapping mapInstVar: #description to: #description.
+		mapping mapInstVar: #id to: #id.
+		mapping mapInstVar: #archived to: #archived.
+		mapping mapInstVar: #web_url to: #html_url.
+		mapping mapInstVar: #topics to: #topics ].
+	^ reader nextAs: #ArrayOfProjects
 ]
 
 { #category : #private }

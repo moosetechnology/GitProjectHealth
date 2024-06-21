@@ -441,6 +441,11 @@ GitMetric4User >> initialize [
 	itsMergeRequests := Dictionary new
 ]
 
+{ #category : #accessing }
+GitMetric4User >> itsProjects: projects [
+	itsProjects := projects .
+]
+
 { #category : #churn }
 GitMetric4User >> loadCommitOfProjects: aCollection since: aTimespan [
 	|commits|

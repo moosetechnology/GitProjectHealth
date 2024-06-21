@@ -159,6 +159,60 @@ GLHApi >> commitsOfProject: aProjectId forRefName: refName since: since until: u
 	^ self client get
 ]
 
+{ #category : #commits }
+GLHApi >> commitsOfUser: aUserName inProject: anInteger [
+
+	| name |
+	name := (aUserName splitOn: ' ') collect: [ :part | part urlEncoded ].
+	name := ' ' join: name.
+
+	^ self
+		  commitsOfProject: anInteger
+		  forRefName: nil
+		  since: nil
+		  until: nil
+		  path: nil
+		  author: name
+		  all: nil
+		  with_stats: nil
+		  firstParent: nil
+		  order: nil
+		  trailers: nil
+		  perPage: 1
+		  page: 1
+
+	"client path: self baseAPIUrl, '/projects/',anInteger printString,'/repository/commits/'. 
+	client queryAt: #author put: name. 
+	^ client get. "
+]
+
+{ #category : #commits }
+GLHApi >> commitsOfUser: aUserName inProject: anInteger since: since until: until [
+
+	| name |
+	name := (aUserName splitOn: ' ') collect: [ :part | part urlEncoded ].
+	name := ' ' join: name.
+
+	^ self
+		  commitsOfProject: anInteger
+		  forRefName: nil
+		  since: since
+		  until: until
+		  path: nil
+		  author: name
+		  all: nil
+		  with_stats: nil
+		  firstParent: nil
+		  order: nil
+		  trailers: nil
+		  perPage: 1
+		  page: 1
+
+	"client path: self baseAPIUrl, '/projects/',anInteger printString,'/repository/commits/'. 
+	client queryAt: #author put: name. 
+	^ client get. "
+]
+
 { #category : #'api - repositories' }
 GLHApi >> compareProject: aProjectID from: fromSha to: toSha fromProject: fromProjectID straight: straight unidiff: unidiff [
 
@@ -240,6 +294,48 @@ GLHApi >> group: aGroupID [
 	^ self client get: self baseAPIUrl , '/groups/' , aGroupID printString
 ]
 
+{ #category : #projects }
+GLHApi >> importProjects: first after: after [ 
+	 | request query variables body response |
+
+		
+
+        query := 'query getAllProjects($first: Int!, $after: String) {
+            projects(first: $first, after: $after) {
+                pageInfo {
+                    endCursor
+                    hasNextPage
+                }
+                edges {
+                    node {
+                        id
+                    }
+                }
+            }
+        }'.
+
+        variables := String streamContents: [ :stream |
+            stream nextPutAll: '{'.
+            stream
+                nextPutAll: '"first": ', first printString, ',';
+                nextPutAll: '"after": "', after, '"'.
+            stream nextPutAll: '}'
+        ].
+
+        body := String streamContents: [ :stream |
+            stream nextPutAll: '{'.
+            stream
+                nextPutAll: '"query": "', (' ' join: query lines) , '",';
+                nextPutAll: '"variables": ', variables.
+            stream nextPutAll: '}'
+        ].
+
+       response := client entity: (ZnEntity with: body); contentType: 'application/json'; 
+            url: (self baseAPIUrl replaceSuffix: 'v4' with: 'graphql'); post.
+        
+        ^ response contents
+]
+
 { #category : #initialization }
 GLHApi >> initialize [
 
@@ -271,6 +367,48 @@ GLHApi >> privateToken [
 GLHApi >> privateToken: anObject [
 
 	self client headerAt: #'PRIVATE-TOKEN' add: anObject
+]
+
+{ #category : #accessing }
+GLHApi >> projects [
+	"use GraphQL"
+	
+	 | projectIds after hasNextPage response data edges pageInfo jsonParser |
+
+        projectIds := Set new.
+        after := ''.
+        hasNextPage := true.
+       " jsonParser := NeoJSONArray readFromString: self class."
+
+        [ hasNextPage ] whileTrue: [
+	
+            response := self importProjects: 10 after: after.
+            data := NeoJSONReader fromString: response.
+            edges := (data at: 'data') at: 'projects' at: 'edges'.
+            pageInfo := (data at: 'data') at: 'projects' at: 'pageInfo'.
+
+            edges do: [:edge | |id| 
+						id := (edge at: 'node' at: 'id'). 
+						 projectIds add: id ].
+
+            after := pageInfo at: 'endCursor'.
+            hasNextPage := pageInfo at: 'hasNextPage'.
+        ].
+
+        ^ projectIds
+]
+
+{ #category : #projects }
+GLHApi >> projects: aPerPageNumber page: aPageNumber [ 
+	
+	self client path:
+		self baseAPIUrl , '/projects/'.
+	
+	aPerPageNumber ifNotNil: [
+		self client queryAt: #per_page put: aPerPageNumber ].
+	aPageNumber ifNotNil: [ self client queryAt: #page put: aPageNumber ].
+
+	^ self client get
 ]
 
 { #category : #private }
