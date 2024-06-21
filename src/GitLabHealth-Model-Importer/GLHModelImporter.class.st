@@ -178,17 +178,14 @@ GLHModelImporter >> detectEntityType: aType overAttribut: aSelector equalTo: val
 ]
 
 { #category : #'as yet unclassified' }
-GLHModelImporter >> filterCommitChanges: aCollection [ 
-	|changes|
-	
-	"reject file infos"
-	changes := aCollection.
-	changes := changes reject: [ :line | line matchesRegex:  '---.*' ].
-	changes := changes reject: [ :line | line matchesRegex:  '\+\+\+.*' ].
-	changes := changes reject: [ :line | line matchesRegex:  '\\ No newline at end of file' ].
-		
+GLHModelImporter >> filterCommitChanges: aCollection [
 
-^ changes. 
+	^ aCollection reject: [ :line |
+		  | trimmedLine |
+		  trimmedLine := line trimLeft.
+		  (trimmedLine beginsWith: '---') or: [
+			  (trimmedLine beginsWith: '+++') or: [
+				  trimmedLine beginsWith: '\ No newline at end of file' ] ] ]
 ]
 
 { #category : #accessing }

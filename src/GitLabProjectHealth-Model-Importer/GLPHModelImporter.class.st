@@ -193,7 +193,6 @@ GLPHModelImporter >> importDiffRangesForDiff: aGLHDiff [
 	('Import changes of diff ' , aGLHDiff printString) recordInfo.
 	"the import of 'diffRanges' entites is technically done inside the parseDiffString"
 
-
 	diffRanges := self glhModel
 		              addAll: (self parseDiffString: aGLHDiff)
 		              unless: self blockForDiffRangeEquality.
@@ -308,42 +307,33 @@ GLPHModelImporter >> initialize [
 GLPHModelImporter >> parseDiffString: aDiff [
 	"parse diff string to create entities for each lines"
 
-	| lines range index firstChangeRange|
+	| lines range index firstChangeRange |
 	lines := aDiff diffString lines.
 	index := 0.
 	range := nil.
-	
-	(lines ifEmpty: [ ^ aDiff diffRanges  ]).
-	lines := self filterCommitChanges: lines. 
-	(lines first beginsWith: '@@') ifFalse:  [ ^ aDiff diffRanges  ].
-	
-	
-	
+
+	lines ifEmpty: [ ^ aDiff diffRanges ].
+	lines := self filterCommitChanges: lines.
+	(lines first beginsWith: '@@') ifFalse: [ ^ aDiff diffRanges ].
+
 	lines do: [ :line |
 		| aChange |
-		firstChangeRange := false. 
+		firstChangeRange := false.
 		(line trim beginsWith: #'@@') ifTrue: [
 			range := GLPHEDiffRange newFrom: line.
 			firstChangeRange := true.
-			range := aDiff diffRanges
-				add: range
-				unless: [ :existing :new | 
-					existing originalLineRange = new originalLineRange and: [
-						existing newLineRange = new newLineRange ] ] ].
+			range := aDiff diffRanges add: range unless: [ :existing :new |
+				         existing originalLineRange = new originalLineRange and: [
+					         existing newLineRange = new newLineRange ] ] ].
 
 		self withCommitDiffs ifTrue: [
-			
-			firstChangeRange ifFalse: [ 
+			firstChangeRange ifFalse: [
 				aChange := GLPHEChange newFrom: line.
-			aChange relativeIndex: index.
-			aChange := range changes add: aChange unless: [ :existing :new |
-				existing sourceCode = new sourceCode and: [
-					existing index = new index ] ].
-			index := index + 1
-				 ].
-			
-			 ] 
-	].
+				aChange relativeIndex: index.
+				aChange := range changes add: aChange unless: [ :existing :new |
+					           existing sourceCode = new sourceCode and: [
+						           existing index = new index ] ].
+				index := index + 1 ] ] ].
 
 	"add changes to the diff range"
 	aDiff diffRanges do: [ :diffRange |
