@@ -399,11 +399,16 @@ GLHApi >> projects [
 ]
 
 { #category : #projects }
-GLHApi >> projects: aPerPageNumber page: aPageNumber [ 
-	
-	self client path:
-		self baseAPIUrl , '/projects/'.
-	
+GLHApi >> projects: aPerPageNumber page: aPageNumber [
+
+	self projects: aPerPageNumber since: nil  page:  aPageNumber
+]
+
+{ #category : #projects }
+GLHApi >> projects: aPerPageNumber since: since page: aPageNumber [
+
+	self client path: self baseAPIUrl , '/projects/'.
+
 	aPerPageNumber ifNotNil: [
 		self client queryAt: #per_page put: aPerPageNumber ].
 	aPageNumber ifNotNil: [ self client queryAt: #page put: aPageNumber ].

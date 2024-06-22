@@ -631,6 +631,34 @@ GLHModelImporter >> importProjects [
 	
 ]
 
+{ #category : #imports }
+GLHModelImporter >> importProjectsSince: since [
+	"heavy import of all projects"
+
+	"copy import from commits"
+
+	| newlyFoundProjects page foundProject amount |
+	'import all Projects into the model' recordInfo.
+
+	"number of projects per page"
+	amount := 100.
+	page := 0.
+	foundProject := OrderedCollection new.
+	newlyFoundProjects := { true }.
+	[ newlyFoundProjects isNotEmpty ] whileTrue: [
+		| results |
+		page := page + 1.
+		('import project of page ' , page printString) recordInfo.
+		results := self glhApi projects: amount since: since page: page.
+
+		newlyFoundProjects := glhModel
+			                      addAll: (self parseArrayOfProject: results)
+			                      unless: self blockOnIdEquality.
+		foundProject addAll: newlyFoundProjects ].
+
+	^ foundProject
+]
+
 { #category : #'private - api' }
 GLHModelImporter >> importRepository: aGLHRepository [
 
