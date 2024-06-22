@@ -368,31 +368,20 @@ GitMetricExporter >> exportOver: aCollectionOfDateWeekMonthOrYear [
 	"Code Contribution "
 	self addContributionExporter: exportBrowserModel.
 
-
-
 	"Commit frequencies "
 	self addFrequencyCommitExporter: exportBrowserModel.
-
-
-
 
 	"comment contribution "
 	self addCommentContributionExporter: exportBrowserModel.
 
-
-
 	"merge Request Duration "
 	self addMergeRequestDurationExporter: exportBrowserModel.
-
 
 	"code churn"
 	self addCodeChurnExporter: exportBrowserModel.
 
-
-
 	"delay Until First Churn"
 	self addDelayUntilFirstChurnExporter: exportBrowserModel.
-
 
 	aCollectionOfDateWeekMonthOrYear do: [ :period |
 		over := period.
@@ -404,12 +393,7 @@ GitMetricExporter >> exportOver: aCollectionOfDateWeekMonthOrYear [
 				<< OSPlatform current lineEnding.
 			exportBrowserModel writeCSVOn: aStream.
 
-			aStream << OSPlatform current lineEnding.
-
-			aStream << ('(B): ' , beforeExp printString)
-			<< OSPlatform current lineEnding.
-			aStream << ('(D): ' , duringExp printString)
-			<< OSPlatform current lineEnding ] ].
+ ] ].
 
 	'Done computing' recordInfo
 ]
