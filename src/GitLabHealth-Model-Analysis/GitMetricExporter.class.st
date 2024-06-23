@@ -93,8 +93,9 @@ GitMetricExporter >> addEntitiesFromUserNames: userNames [
 				 glhImporter: glhImporter;
 				 findUserNamed: username.
 			 metrics itsProjects:
-				 (projects collect: [ :p | p id -> (glhImporter importProject: p id) ]) asDictionary.
-			
+				 (projects collect: [ :p |
+					  p id -> (glhImporter completeImportProject: p) ]) asDictionary.
+
 
 			 metrics ]).
 
