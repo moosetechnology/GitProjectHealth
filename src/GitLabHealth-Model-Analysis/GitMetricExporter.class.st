@@ -81,7 +81,8 @@ GitMetricExporter >> addDelayUntilFirstChurnExporter: exportBrowserModel [
 { #category : #'as yet unclassified' }
 GitMetricExporter >> addEntitiesFromUserNames: userNames [
 
-	projectCache := projectCache ifNil: [ glhImporter importProjectsSince: sinceTimeLimit ].
+	projectCache := projectCache ifNil: [
+		                glhImporter importProjectsSince: sinceTimeLimit ].
 
 	entities addAll: (userNames collect: [ :username |
 			 | projects metrics |
@@ -92,7 +93,8 @@ GitMetricExporter >> addEntitiesFromUserNames: userNames [
 				 glhImporter: glhImporter;
 				 findUserNamed: username.
 			 metrics itsProjects:
-				 (projects collect: [ :p | p id -> p ]) asDictionary.
+				 (projects collect: [ :p | p id -> (glhImporter importProject: p id) ]) asDictionary.
+			
 
 			 metrics ]).
 
