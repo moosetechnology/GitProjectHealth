@@ -103,6 +103,7 @@ GLHModelImporter >> completeImportedCommit: aCommit [
 	
 	addedCommit := aCommit.
 	
+	('Import creator of commit: ' , addedCommit short_id printString) recordInfo.
 	addedCommit commitCreator ifNil: [
 			addedCommit := (self importUserByUsername: aCommit author_name)
 		               commits
@@ -112,10 +113,11 @@ GLHModelImporter >> completeImportedCommit: aCommit [
 		 ].
 	
 
-	('Import diff of commit: ' , addedCommit short_id printString) recordInfo.
+	
 
 	self withCommitDiffs ifTrue: [
 		|diffs|
+		('Import diff of commit: ' , addedCommit short_id printString) recordInfo.
 		addedCommit diffs ifEmpty: [ 
 			diffs := self importDiffOfCommit: addedCommit.
 			self glhModel addAll: diffs unless: self blockForDiffEquality

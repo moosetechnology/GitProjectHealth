@@ -466,8 +466,26 @@ GitMetric4User >> loadCommitOfProjects: aCollection since: aTimespan [
 { #category : #churn }
 GitMetric4User >> loadCommitOfProjects: aCollection since: since until: until [
 
-	| allCommits |
-	allCommits := itsCommits
+	| allCommits period|
+	
+	period := ('commits since ', since printString , ' to ' , until printString)asSymbol .
+	
+	allCommits := (aCollection collect: [:idProject |
+		|project|
+		project := (itsProjects at: idProject).
+		project repository cacheAt: period ifPresent: [ :c | c ] ifAbsentPut: [ 
+			|foundCommits|
+			foundCommits := glhImporter importCommitsOProject:
+					                          (project)
+					                          since: since
+					                          until: until.
+			foundCommits := project repository commits addAll: foundCommits unless: glhImporter blockOnIdEquality. 
+			foundCommits. 
+			 ]
+		]).
+	
+	
+	"allCommits := itsCommits
 		              at: since printString , '-' , until printString
 		              ifPresent: [ :c | c ]
 		              ifAbsentPut: [
@@ -484,8 +502,8 @@ GitMetric4User >> loadCommitOfProjects: aCollection since: since until: until [
 				                           ]
 				
 				). 
-			             " commits := commits flatCollect: [ :c | c ]."
-			              commits ].
+			             "" commits := commits flatCollect: [ :c | c ].""
+			              commits ]."
 
 	allCommits := allCommits flatten.
 	allCommits do: [ :commit |

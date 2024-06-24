@@ -386,16 +386,16 @@ GitMetricExporter >> initialize [
 	runningPeriods := OrderedCollection new
 		                  add: {
 				                  (#since -> '1 march 2023' asDate).
-				                  (#until -> '24 may 2023' asDate) } asDictionary;
+				                  (#until -> '30 may 2023' asDate) } asDictionary;
 		                  add: {
 				                  (#since -> '1 march 2024' asDate).
-				                  (#until -> '24 may 2024' asDate) } asDictionary;
+				                  (#until -> '30 may 2024' asDate) } asDictionary;
 		                  add: {
-				                  (#since -> '1 december 2024' asDate).
-				                  (#until -> '24 february 2024' asDate) }
+				                  (#since -> '1 december 2023' asDate).
+				                  (#until -> '29 february 2024' asDate) }
 				                  asDictionary;
 		                  yourself.
-		over := Date.
+	over := Date
 ]
 
 { #category : #accessing }
