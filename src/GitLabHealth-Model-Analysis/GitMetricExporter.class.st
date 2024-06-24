@@ -250,6 +250,7 @@ GitMetricExporter >> debugExportOver: aCollectionOfDateWeekMonthOrYear [
 	
 	runningPeriods do: [ :period |
 
+	1 halt. 
 	"Code Contribution "
 	entities collect: (self blockCodeAdditionSince: period).
 
