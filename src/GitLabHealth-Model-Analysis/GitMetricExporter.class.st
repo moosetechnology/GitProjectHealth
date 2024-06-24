@@ -18,27 +18,16 @@ Class {
 { #category : #'as yet unclassified' }
 GitMetricExporter >> addCodeChurnExporter: exportBrowserModel [
 
-
-		
-	
 	| columnName |
-
-
 	runningPeriods do: [ :period |
 		columnName := ('code churn (window=3) ' , period printString)
 			              asSymbol.
 
-			exportBrowserModel
-		addColumnForQuery: [ :metrics |
-			((metrics
-				  codeChurnSince: (period at: #since)
-				  until: (period at: #until)
-				  onACommitWindowOf: 3
-				  overA: over) at: #churn) printString ]
-		withName: columnName.
-			
-				Smalltalk snapshot: true andQuit: false.
-			]
+		exportBrowserModel
+			addColumnForQuery: (self blockCodeChurnSince: period )
+			withName: columnName.
+
+		Smalltalk snapshot: true andQuit: false ]
 ]
 
 { #category : #'as yet unclassified' }
@@ -52,11 +41,7 @@ GitMetricExporter >> addCommentContributionExporter: exportBrowserModel [
 			              asSymbol.
 
 		exportBrowserModel
-			addColumnForQuery: [ :metrics |
-				((metrics
-					  commentsContributionsSince: (period at: #since)
-					  until: (period at: #until)
-					  overA: over) at: #avgComments) printString ]
+			addColumnForQuery: (self blockCommentsContributionSince: period)
 			withName: columnName ]
 ]
 
@@ -69,56 +54,35 @@ GitMetricExporter >> addContributionExporter: exportBrowserModel [
 		columnName := ('code addition (avg) ' , period printString) asSymbol.
 
 		exportBrowserModel
-			addColumnForQuery: [ :metrics |
-				((metrics
-					  codeContributionsSince: (period at: #since)
-					  until: (period at: #until)
-					  overA: over) at: #avgAddition) printString ]
+			addColumnForQuery: (self blockCodeAdditionSince: period)
 			withName: columnName.
 
 		columnName := ('code deletion (avg) ' , period printString) asSymbol.
 		exportBrowserModel
-			addColumnForQuery: [ :metrics |
-				((metrics
-					  codeContributionsSince: (period at: #since)
-					  until: (period at: #until)
-					  overA: over) at: #avgDeletion) printString ]
+			addColumnForQuery: (self blockCodeDeletionSince: period)
 			withName: columnName.
-			
-			Smalltalk snapshot: true andQuit: false.
-			
-			 ]
+
+		Smalltalk snapshot: true andQuit: false ]
 ]
 
 { #category : #'as yet unclassified' }
 GitMetricExporter >> addDelayUntilFirstChurnExporter: exportBrowserModel [
 
-	
-		
-		| columnName |
-
+	| columnName |
 	runningPeriods do: [ :period |
 		columnName := ('delay Until First Churn ' , period printString)
 			              asSymbol.
 
-exportBrowserModel
-		addColumnForQuery: [ :metrics |
-			((metrics
-				  delayUntilFirstChurnSince: (period at: #since)
-				  until: (period at: #until)
-				  overA: over) at: #avgDelay) printString ]
-		withName: columnName
-			
-			
-			]
-	
-	
+		exportBrowserModel
+			addColumnForQuery: (self blockDelayUntilFirstChurnSince: period)
+			withName: columnName ]
 ]
 
 { #category : #'as yet unclassified' }
 GitMetricExporter >> addEntitiesFromUserNames: userNames [
 
-	projectCache := projectCache ifNil: [ glhImporter importProjectsSince: sinceTimeLimit ].
+	projectCache := projectCache ifNil: [
+		                glhImporter importProjectsSince: sinceTimeLimit ].
 
 	entities addAll: (userNames collect: [ :username |
 			 | projects metrics |
@@ -129,7 +93,9 @@ GitMetricExporter >> addEntitiesFromUserNames: userNames [
 				 glhImporter: glhImporter;
 				 findUserNamed: username.
 			 metrics itsProjects:
-				 (projects collect: [ :p | p id -> p ]) asDictionary.
+				 (projects collect: [ :p |
+					  p id -> (glhImporter completeImportProject: p) ]) asDictionary.
+
 
 			 metrics ]).
 
@@ -164,42 +130,104 @@ GitMetricExporter >> addFrequencyCommitExporter: exportBrowserModel [
 			              asSymbol.
 
 		exportBrowserModel
-			addColumnForQuery: [ :metrics |
-				((metrics
-					  commitFrequencySince: (period at: #since)
-					  until: (period at: #until)
-					  overA: over) at: #averageFloat) printString ]
+			addColumnForQuery: (self blockCommitFrequencySince: period)
 			withName: columnName ]
 ]
 
 { #category : #'as yet unclassified' }
 GitMetricExporter >> addMergeRequestDurationExporter: exportBrowserModel [
 
-
-		| columnName |
+	| columnName |
 	runningPeriods do: [ :period |
 		columnName := ('merge Request Duration ' , period printString)
 			              asSymbol.
 
 		exportBrowserModel
-		addColumnForQuery: [ :metrics |
-			Smalltalk snapshot: true andQuit: false.
-			((metrics
-				  mergeRequestDurationSince: (period at: #since)
-				  until: (period at: #until)
-				  overA: over) at: #avgDuration) printString ]
-		withName: columnName
-			
-			
-			 ]
-	
-	
+			addColumnForQuery: (self blockMergeRequestDurationSince: period)
+			withName: columnName ]
 ]
 
 { #category : #'as yet unclassified' }
 GitMetricExporter >> beforeDic: aDictionnarySinceUntil [
 
 	beforeExp := aDictionnarySinceUntil
+]
+
+{ #category : #'as yet unclassified' }
+GitMetricExporter >> blockCodeAdditionSince: period [
+
+	^ [ :metrics |
+	  ((metrics
+		    codeContributionsSince: (period at: #since)
+		    until: (period at: #until)
+		    overA: over) at: #avgAddition) printString ]
+]
+
+{ #category : #'as yet unclassified' }
+GitMetricExporter >> blockCodeChurnSince: period [
+	"comment stating purpose of instance-side method"
+
+	"scope: class-variables  &  instance-variables"
+
+^ [ :metrics |
+				((metrics
+					  codeChurnSince: (period at: #since)
+					  until: (period at: #until)
+					  onACommitWindowOf: 3
+					  overA: over) at: #churn) printString ]
+]
+
+{ #category : #'as yet unclassified' }
+GitMetricExporter >> blockCodeDeletionSince: period [
+
+	^ [ :metrics |
+	  ((metrics
+		    codeContributionsSince: (period at: #since)
+		    until: (period at: #until)
+		    overA: over) at: #avgDeletion) printString ]
+]
+
+{ #category : #'as yet unclassified' }
+GitMetricExporter >> blockCommentsContributionSince: period [
+
+	^ [ :metrics |
+	  ((metrics
+		    commentsContributionsSince: (period at: #since)
+		    until: (period at: #until)
+		    overA: over) at: #avgComments) printString ]
+]
+
+{ #category : #'as yet unclassified' }
+GitMetricExporter >> blockCommitFrequencySince: period [
+
+	^ [ :metrics |
+	  ((metrics
+		    commitFrequencySince: (period at: #since)
+		    until: (period at: #until)
+		    overA: over) at: #averageFloat) printString ]
+]
+
+{ #category : #'as yet unclassified' }
+GitMetricExporter >> blockDelayUntilFirstChurnSince: period [
+	"comment stating purpose of instance-side method"
+
+	"scope: class-variables  &  instance-variables"
+^ [ :metrics |
+				((metrics
+					  delayUntilFirstChurnSince: (period at: #since)
+					  until: (period at: #until)
+					  overA: over) at: #avgDelay) printString ]
+]
+
+{ #category : #'as yet unclassified' }
+GitMetricExporter >> blockMergeRequestDurationSince: period [
+	
+	^ [ :metrics |
+				Smalltalk snapshot: true andQuit: false.
+				((metrics
+					  mergeRequestDurationSince: (period at: #since)
+					  until: (period at: #until)
+					  overA: over) at: #avgDuration) printString ]
 ]
 
 { #category : #'as yet unclassified' }
@@ -218,113 +246,39 @@ GitMetricExporter >> constructFilePath: over [
 { #category : #'as yet unclassified' }
 GitMetricExporter >> debugExportOver: aCollectionOfDateWeekMonthOrYear [
 
-	| over |
 	over := Date.
-
+	
+	runningPeriods do: [ :period |
 
 	"Code Contribution "
-	entities collect: [ :metrics |
-		((metrics
-			  codeContributionsSince: (beforeExp at: #since)
-			  until: (beforeExp at: #until)
-			  overA: over) at: #avgAddition) printString ].
+	entities collect: (self blockCodeAdditionSince: period).
 
-	entities collect: [ :metrics |
-		((metrics
-			  codeContributionsSince: (beforeExp at: #since)
-			  until: (beforeExp at: #until)
-			  overA: over) at: #avgDeletion) printString ].
-
-	entities collect: [ :metrics |
-		Smalltalk snapshot: true andQuit: false.
-		((metrics
-			  codeContributionsSince: (duringExp at: #since)
-			  until: (duringExp at: #until)
-			  overA: over) at: #avgAddition) printString ].
-
-	entities collect: [ :metrics |
-		((metrics
-			  codeContributionsSince: (duringExp at: #since)
-			  until: (duringExp at: #until)
-			  overA: over) at: #avgDeletion) printString ].
-
+	entities collect: (self blockCodeDeletionSince: period).
 
 
 	"Commit frequencies "
-	entities collect: [ :metrics |
-		((metrics
-			  commitFrequencySince: (beforeExp at: #since)
-			  until: (beforeExp at: #until)
-			  overA: over) at: #averageFloat) printString ].
-
-
-	entities collect: [ :metrics |
-		((metrics
-			  commitFrequencySince: (duringExp at: #since)
-			  until: (duringExp at: #until)
-			  overA: over) at: #averageFloat) printString ].
+	entities collect: (self blockCommitFrequencySince: period).
 
 
 	"comment contribution "
-	entities collect: [ :metrics |
-		Smalltalk snapshot: true andQuit: false.
-		((metrics
-			  commentsContributionsSince: (beforeExp at: #since)
-			  until: (beforeExp at: #until)
-			  overA: over) at: #avgComments) printString ].
 
-	entities collect: [ :metrics |
-		((metrics
-			  commentsContributionsSince: (duringExp at: #since)
-			  until: (duringExp at: #until)
-			  overA: over) at: #avgComments) printString ].
+	entities collect: (self blockCommentsContributionSince: period).
 
 
 	"merge Request Duration "
-	entities collect: [ :metrics |
-		Smalltalk snapshot: true andQuit: false.
-		((metrics
-			  mergeRequestDurationSince: (beforeExp at: #since)
-			  until: (beforeExp at: #until)
-			  overA: over) at: #avgDuration) printString ].
-
-	entities collect: [ :metrics |
-		((metrics
-			  mergeRequestDurationSince: (duringExp at: #since)
-			  until: (duringExp at: #until)
-			  overA: over) at: #avgDuration) printString ].
+	entities collect: (self blockMergeRequestDurationSince: period ).
 
 
 	"code churn"
-	entities collect: [ :metrics |
-		((metrics
-			  codeChurnSince: (beforeExp at: #since)
-			  until: (beforeExp at: #until)
-			  onACommitWindowOf: 3
-			  overA: over) at: #churn) printString ].
-
-	entities collect: [ :metrics |
-		((metrics
-			  codeChurnSince: (duringExp at: #since)
-			  until: (duringExp at: #until)
-			  onACommitWindowOf: 3
-			  overA: over) at: #churn) printString ].
+	entities collect: (self blockCodeChurnSince: period ).
 
 	"delay Until First Churn"
-	entities collect: [ :metrics |
-		((metrics
-			  delayUntilFirstChurnSince: (beforeExp at: #since)
-			  until: (beforeExp at: #until)
-			  overA: over) at: #avgDelay) printString ].
-
-	entities collect: [ :metrics |
-		((metrics
-			  delayUntilFirstChurnSince: (duringExp at: #since)
-			  until: (duringExp at: #until)
-			  overA: over) at: #avgDelay) printString ].
+	entities collect: (self blockDelayUntilFirstChurnSince: period ).
 
 
-	'Done computing' recordInfo
+].
+
+	'Done computing debug' recordInfo
 ]
 
 { #category : #'as yet unclassified' }
