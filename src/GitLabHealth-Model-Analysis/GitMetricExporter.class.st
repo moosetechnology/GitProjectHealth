@@ -20,8 +20,9 @@ Class {
 GitMetricExporter >> addCodeChurnExporter: exportBrowserModel [
 
 	| columnName |
+	maxCommitWindow := 3. 
 	runningPeriods do: [ :period |
-		columnName := ('code churn (W=' , maxCommitWindow , ') '
+		columnName := ('code churn (W=' , maxCommitWindow printString , ') '
 		               , period printString) asSymbol.
 
 		exportBrowserModel
@@ -71,7 +72,7 @@ GitMetricExporter >> addDelayUntilFirstChurnExporter: exportBrowserModel [
 
 	| columnName |
 	runningPeriods do: [ :period |
-		columnName := ('delay Until First Churn (W=' , maxCommitWindow , ') '
+		columnName := ('delay Until First Churn (W=' , maxCommitWindow printString , ') '
 		               , period printString) asSymbol.
 
 		exportBrowserModel
