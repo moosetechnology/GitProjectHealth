@@ -231,12 +231,12 @@ GitMetricExporter >> blockMergeRequestDurationSince: period [
 ]
 
 { #category : #'as yet unclassified' }
-GitMetricExporter >> constructFilePath: over [
+GitMetricExporter >> constructFilePath: runningOver [
 
 	| file |
 	file := (FileLocator home
 	         /
-		         ('IA4Code-' , label printString , '-' , over printString
+		         ('GitlabHealth-' , label printString , '-' , runningOver printString
 		          , '-'
 		          , (DateAndTime now printString replaceAll: $: with: $-)
 		          , '.csv')) asFileReference.
@@ -337,17 +337,15 @@ GitMetricExporter >> exportOver: aCollectionOfDateWeekMonthOrYear [
 	"delay Until First Churn"
 	self addDelayUntilFirstChurnExporter: exportBrowserModel.
 
-	aCollectionOfDateWeekMonthOrYear do: [ :period |
-		over := period.
+	aCollectionOfDateWeekMonthOrYear do: [ :aDateWeekMonthOrYear |
+		over := aDateWeekMonthOrYear.
 		file := self constructFilePath: over.
 
 		file writeStreamDo: [ :aStream |
 			aStream
 				<< 'sep=,';
 				<< OSPlatform current lineEnding.
-			exportBrowserModel writeCSVOn: aStream.
-
- ] ].
+			exportBrowserModel writeCSVOn: aStream ] ].
 
 	'Done computing' recordInfo
 ]
