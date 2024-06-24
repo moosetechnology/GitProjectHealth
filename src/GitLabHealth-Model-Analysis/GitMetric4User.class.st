@@ -352,6 +352,82 @@ GitMetric4User >> commitsProducedOnProject: aProjectId since: since until: until
 ]
 
 { #category : #churn }
+GitMetric4User >> delayUntilFirstChurnSince: since until: until onACommitWindowOf: maxCommitWindow overA: aDateWeekMonthOrYear [
+
+	| commits groupedByDate res avg |
+	'GitMetric4User: delay until first churn' recordInfo.
+
+	groupedByDate := self
+		                 setupGroupedDateFrom: since
+		                 to: until
+		                 over: aDateWeekMonthOrYear.
+
+	commits := self
+		           loadCommitOfProjects: itsProjects keys
+		           since: since
+		           until: until.
+
+	"class commit by dates, filter none user commits"
+	commits do: [ :commit |
+		commit commitCreator = user ifTrue: [
+			| overDate |
+			overDate := self
+				            transformDate: commit created_at
+				            to: aDateWeekMonthOrYear.
+
+			groupedByDate
+				at: overDate printString
+				ifPresent: [ :arrayOfCommits | arrayOfCommits add: commit ]
+				ifAbsentPut: [
+					OrderedCollection new
+						add: commit;
+						yourself ] ] ].
+
+
+
+	res := groupedByDate collect: [ :commits4Date |
+		       | durationFromA2B |
+		       commits4Date collect: [ :commitA |
+			       | commitB |
+			       commitB := GitAnalyzer new
+				                  glhImporter: glhImporter;
+				                  onModel: glhModel;
+				                  fromCommit: commitA;
+				                  maxChildCommit: maxCommitWindow;
+				                  analyseAmandment.
+
+			       durationFromA2B := commitB
+				                          ifNil: [ 0 ]
+				                          ifNotNil: [
+				                          commitB created_at - commitA created_at ].
+			       durationFromA2B ] ].
+
+
+
+	res := res collect: [ :durationsByDate |
+		       | filtered |
+		       filtered := durationsByDate reject: [ :value | value = 0 ].
+		       filtered isEmpty
+			       ifTrue: [ nil ]
+			       ifFalse: [
+			       (filtered sum: [ :v | v asDuration ]) / filtered size ] ].
+
+	res := res reject: #isNil.
+
+	res
+		ifEmpty: [ avg := nil ]
+		ifNotEmpty: [ avg := res values sum / res keys size ].
+
+
+	^ {
+		  (#avgDelay -> avg).
+		  (#overEach -> aDateWeekMonthOrYear name).
+		  (#forOver -> (groupedByDate keys size printString
+		    , aDateWeekMonthOrYear printString)).
+		  (#details -> groupedByDate) } asDictionary
+]
+
+{ #category : #churn }
 GitMetric4User >> delayUntilFirstChurnSince: since until: until overA: aDateWeekMonthOrYear [
 
 	| commits groupedByDate res avg |

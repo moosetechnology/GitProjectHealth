@@ -10,6 +10,7 @@ Class {
 		'projectCache',
 		'sinceTimeLimit',
 		'runningPeriods',
+		'maxCommitWindow',
 		'over'
 	],
 	#category : #'GitLabHealth-Model-Analysis'
@@ -20,11 +21,11 @@ GitMetricExporter >> addCodeChurnExporter: exportBrowserModel [
 
 	| columnName |
 	runningPeriods do: [ :period |
-		columnName := ('code churn (window=3) ' , period printString)
-			              asSymbol.
+		columnName := ('code churn (W=' , maxCommitWindow , ') '
+		               , period printString) asSymbol.
 
 		exportBrowserModel
-			addColumnForQuery: (self blockCodeChurnSince: period )
+			addColumnForQuery: (self blockCodeChurnSince: period)
 			withName: columnName.
 
 		Smalltalk snapshot: true andQuit: false ]
@@ -70,8 +71,8 @@ GitMetricExporter >> addDelayUntilFirstChurnExporter: exportBrowserModel [
 
 	| columnName |
 	runningPeriods do: [ :period |
-		columnName := ('delay Until First Churn ' , period printString)
-			              asSymbol.
+		columnName := ('delay Until First Churn (W=' , maxCommitWindow , ') '
+		               , period printString) asSymbol.
 
 		exportBrowserModel
 			addColumnForQuery: (self blockDelayUntilFirstChurnSince: period)
@@ -169,12 +170,12 @@ GitMetricExporter >> blockCodeChurnSince: period [
 
 	"scope: class-variables  &  instance-variables"
 
-^ [ :metrics |
-				((metrics
-					  codeChurnSince: (period at: #since)
-					  until: (period at: #until)
-					  onACommitWindowOf: 3
-					  overA: over) at: #churn) printString ]
+	^ [ :metrics |
+	  ((metrics
+		    codeChurnSince: (period at: #since)
+		    until: (period at: #until)
+		    onACommitWindowOf: maxCommitWindow
+		    overA: over) at: #churn) printString ]
 ]
 
 { #category : #'as yet unclassified' }
@@ -212,11 +213,13 @@ GitMetricExporter >> blockDelayUntilFirstChurnSince: period [
 	"comment stating purpose of instance-side method"
 
 	"scope: class-variables  &  instance-variables"
-^ [ :metrics |
-				((metrics
-					  delayUntilFirstChurnSince: (period at: #since)
-					  until: (period at: #until)
-					  overA: over) at: #avgDelay) printString ]
+
+	^ [ :metrics |
+	  ((metrics
+		    delayUntilFirstChurnSince: (period at: #since)
+		    until: (period at: #until)
+			 onACommitWindowOf: maxCommitWindow
+		    overA: over) at: #avgDelay) printString ]
 ]
 
 { #category : #'as yet unclassified' }
@@ -394,6 +397,7 @@ GitMetricExporter >> initialize [
 				                  (#until -> '29 february 2024' asDate) }
 				                  asDictionary;
 		                  yourself.
+	maxCommitWindow := 3. 
 	over := Date
 ]
 
