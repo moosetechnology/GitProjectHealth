@@ -63,10 +63,9 @@ GitAnalyzer >> analyseChurn [
 GitAnalyzer >> analyseCommentContributions [
 
 	| additions |
-	
-	('GitAnalyzer, analyse comment contributions onProject: ', onProject printString )
-		recordInfo.
-	
+	('GitAnalyzer, analyse comment contributions onProject: '
+	 , onProject printString) recordInfo.
+
 	additions := (fromCommit diffs collect: [ :diff |
 		              diff diffRanges collect: [ :range |
 			              range changes select: [ :change |
@@ -74,7 +73,7 @@ GitAnalyzer >> analyseCommentContributions [
 		             collect: [ :add | add sourceCode ].
 
 	additions := additions collect: [ :codeSource |
-		             (codeSource withoutPrefix: '+') trim ].
+		             (codeSource withoutPrefix: '+') trimLeft ].
 	additions := additions select: [ :codeSource |
 		             codeSource beginsWithAnyOf:
 			             { '#'. '//'. '/*'. '*'. '*/' } ].
