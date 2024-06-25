@@ -21,6 +21,7 @@ GitAnalyzerLocalTest >> setUp [
 	gitAnalyzer := GitAnalyzer new onModel: glphModel.
 	fromCommit := GLHCommit new.
 	fromCommit short_id: 'testFromCommit'.
+	fromCommit created_at: ('3 August 2021' asDate).
 	glphModel add: fromCommit.
 	
 	gitAnalyzer fromCommit: fromCommit.
@@ -211,4 +212,34 @@ GitAnalyzerLocalTest >> testAnalyseCommentNotAnAddition [
 	addition sourceCode: '-	// hello world'.
 
 	self assert: gitAnalyzer analyseCommentContributions equals: 0
+]
+
+{ #category : #test }
+GitAnalyzerLocalTest >> testArrangeCommitsByDate [
+
+	| commitA2 commitA3 commitB result |
+	commitA2 := GLHCommit new.
+	commitA2 short_id: 'testFromCommit2'.
+	commitA2 created_at: ('3 August 2021' asDate).
+	glphModel add: commitA2.
+
+	commitA3 := GLHCommit new.
+	commitA3 short_id: 'testFromCommit3'.
+	commitA3 created_at: ('3 August 2021' asDate).
+	glphModel add: commitA3.
+
+	commitB := GLHCommit new.
+	commitB short_id: 'testFromCommitB'.
+	commitB created_at: ('4 August 2021' asDate).	
+	glphModel add: commitB.
+
+	result := gitAnalyzer arrangeCommitsByDate: {
+			          fromCommit.
+			          commitA2.
+			          commitA3.
+			          commitB }.
+	
+	self assert: result size equals: 2.
+	self assert: (result at: '3 August 2021') size equals: 3.
+	self assert: (result at: '4 August 2021') size equals: 1.
 ]

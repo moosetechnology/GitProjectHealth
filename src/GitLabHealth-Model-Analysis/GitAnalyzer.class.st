@@ -91,11 +91,11 @@ GitAnalyzer >> analyseCommitContribution [
 GitAnalyzer >> analyseCommitFrequencyFromCommits: initialCommits [
 
 	| commits response |
-	
-	('GitAnalyzer, analyse commit Frequency on: ', onProject printString )
+	('GitAnalyzer, analyse commit Frequency on: ' , onProject printString)
 		recordInfo.
-	
-	response := {  (#numberOfCommit -> nil).
+
+	response := {
+		            (#numberOfCommit -> nil).
 		            (#frequency -> nil) } asDictionary.
 
 
@@ -162,16 +162,22 @@ GitAnalyzer >> analyseMergeResquestValidation: aGLHPMergeRequest [
 ]
 
 { #category : #filter }
-GitAnalyzer >> arrangeCommitsByDate: commits [ 
-	|date2commits|
-	date2commits := Dictionary new. 
-	
+GitAnalyzer >> arrangeCommitsByDate: commits [
+
+	| date2commits |
+	date2commits := Dictionary new.
+
 	commits do: [ :commit |
-		|date|
-		date := commit created_at asDate. 
-		date2commits at: date printString ifPresent: [ :v | v add: commit ] ifAbsentPut: [ OrderedCollection new add: commit; yourself. ].
-		 ].
-	^ date2commits. 
+		| date |
+		date := commit created_at asDate.
+		date2commits
+			at: date printString
+			ifPresent: [ :v | v add: commit ]
+			ifAbsentPut: [
+				OrderedCollection new
+					add: commit;
+					yourself ] ].
+	^ date2commits
 ]
 
 { #category : #churn }
