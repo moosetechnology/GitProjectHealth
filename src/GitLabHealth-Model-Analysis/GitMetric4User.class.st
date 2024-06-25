@@ -176,9 +176,8 @@ GitMetric4User >> codeContributionsSince: since until: until overA: aDateWeekMon
 GitMetric4User >> commentsContributionsSince: since until: until overA: aDateWeekMonthOrYear [
 
 	| commits contributions groupedByDate |
-	
-				('GitMetric4User: comment contribution') recordInfo.
-	
+	'GitMetric4User: comment contribution' recordInfo.
+
 	groupedByDate := self
 		                 setupGroupedDateFrom: since
 		                 to: until
@@ -223,7 +222,7 @@ GitMetric4User >> commentsContributionsSince: since until: until overA: aDateWee
 		  (#details -> groupedByDate).
 		  (#totalComments -> groupedByDate values sum).
 		  (#avgComments
-		   -> (groupedByDate values sum / groupedByDate keys size)).
+		   -> (groupedByDate values average asFloat)).
 		  (#overEach -> aDateWeekMonthOrYear name).
 		  (#forOver -> (groupedByDate keys size printString
 		    , aDateWeekMonthOrYear printString)).
