@@ -11,7 +11,7 @@ Class {
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #analyze }
 GitAnalyzer >> analyseAmandment [
 	"return the first commit that modify the same lines of code as the fromCommit"
 
@@ -32,7 +32,7 @@ GitAnalyzer >> analyseAmandment [
 	 res]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #analyze }
 GitAnalyzer >> analyseChurn [
 
 	| commitFiles totalContribution childCommits access |
@@ -59,26 +59,21 @@ GitAnalyzer >> analyseChurn [
 			  yourself ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #analyze }
 GitAnalyzer >> analyseCommentContributions [
 
-	| additions |
+	| numberOfComments |
 	('GitAnalyzer, analyse comment contributions onProject: '
 	 , onProject printString) recordInfo.
-
-	additions := (fromCommit diffs collect: [ :diff |
-		              diff diffRanges collect: [ :range |
-			              range changes select: [ :change |
-				              change class = GLPHEAddition ] ] ]) flattened
-		             collect: [ :add | add sourceCode ].
-
-	additions := additions collect: [ :codeSource |
-		             (codeSource withoutPrefix: '+') trimLeft ].
-	additions := additions select: [ :codeSource |
-		             codeSource beginsWithAnyOf:
-			             { '#'. '//'. '/*'. '*'. '*/' } ].
-
-	^ additions size
+	numberOfComments := 0.
+	fromCommit diffs do: [ :diff |
+		diff diffRanges do: [ :range |
+			range changes do: [ :change |
+				((change isKindOf: GLPHEAddition) and: [
+					 (change sourceCode withoutPrefix: '+') trimLeft
+						 beginsWithAnyOf: { '#'. '//'. '/*'. '*'. '*/' } ]) ifTrue: [
+					numberOfComments := numberOfComments + 1 ] ] ] ].
+	^ numberOfComments
 ]
 
 { #category : #commit }
@@ -92,7 +87,7 @@ GitAnalyzer >> analyseCommitContribution [
 	  (#deletion -> fromCommit deletions). } asDictionary 
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #analyze }
 GitAnalyzer >> analyseCommitFrequencyFromCommits: initialCommits [
 
 	| commits response |
@@ -111,7 +106,7 @@ GitAnalyzer >> analyseCommitFrequencyFromCommits: initialCommits [
 	^ commits
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #analyze }
 GitAnalyzer >> analyseCommitFrequencySince: since until: until [ 
 
 	| commits response |
@@ -135,7 +130,7 @@ GitAnalyzer >> analyseCommitFrequencySince: since until: until [
 	^ commits
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #analyze }
 GitAnalyzer >> analyseMergeResquestValidation: aGLHPMergeRequest [
 
 	| creationDate mergedDate response |
