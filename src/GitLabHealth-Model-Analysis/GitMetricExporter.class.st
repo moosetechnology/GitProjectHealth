@@ -20,9 +20,9 @@ Class {
 GitMetricExporter >> addCodeChurnExporter: exportBrowserModel [
 
 	| columnName |
-	maxCommitWindow := 3. 
+	maxCommitWindow := 3.
 	runningPeriods do: [ :period |
-		columnName := ('code churn (W=' , maxCommitWindow printString , ') '
+		columnName := ('churn % (W=' , maxCommitWindow printString , ') '
 		               , period printString) asSymbol.
 
 		exportBrowserModel
