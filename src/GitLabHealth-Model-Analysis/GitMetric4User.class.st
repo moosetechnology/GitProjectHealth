@@ -228,19 +228,21 @@ GitMetric4User >> commentsContributionsSince: since until: until overA: aDateWee
 { #category : #metrics }
 GitMetric4User >> commitFrequencySince: since until: until overA: aDateWeekMonthOrYear [
 
-	| all aggregate periods total groupedByDate userCommits |
+	| periods total groupedByDate userCommits |
 	'GitMetric4User: commit frequency' recordInfo.
+
 
 	groupedByDate := self
 		                 setupGroupedDateFrom: since
 		                 to: until
 		                 over: aDateWeekMonthOrYear.
 
-
+	glhImporter withCommitDiffs: false.
 	userCommits := self
 		               loadCommitOfProjects: itsProjects keys
 		               since: since
 		               until: until.
+	glhImporter withCommitDiffs: true.
 	userCommits := userCommits reject: [ :c | c commitCreator ~= user ].
 
 	userCommits do: [ :c |
@@ -250,31 +252,9 @@ GitMetric4User >> commitFrequencySince: since until: until overA: aDateWeekMonth
 			            to: aDateWeekMonthOrYear.
 		groupedByDate at: dateOver printString ifPresent: [ :v | v add: c ] ].
 
-
 	periods := groupedByDate keys size.
 	total := groupedByDate values sum: [ :commits | commits size ].
 
-
-	"aggregate := OrderedDictionary new.
-
-	all := itsProjects keys collect: [ :id |
-		       self
-			       commitsProducedOnProject: id
-			       since: since
-			       until: until
-			       overA: aDateWeekMonthOrYear ].
-
-
-	all do: [ :frequencies |
-		frequencies associations do: [ :assoc |
-			aggregate
-				at: assoc key
-				ifPresent: [ :collection | collection addAll: assoc value ]
-				ifAbsentPut: [ assoc value ] ] ].
-
-	periods := aggregate keys size.
-	total := aggregate values sum: [ :commits | commits size ].
-"
 
 	^ {
 		  (#averageFrac -> (total / periods)).
@@ -561,6 +541,11 @@ GitMetric4User >> loadCommitOfProjects: aCollection since: since until: until [
 			              foundCommits ] ].
 
 	allCommits := allCommits flatten.
+	
+	allCommits := glhImporter glhModel
+		              addAll: allCommits
+		              unless: glhImporter blockOnIdEquality.
+	
 	allCommits do: [ :commit |
 		glhImporter completeImportedCommit: commit ].
 
@@ -572,23 +557,26 @@ GitMetric4User >> loadCommitOfProjects: aCollection since: since until: until [
 { #category : #churn }
 GitMetric4User >> loadMergeRequestsOfProjects: aCollection since: since until: until [
 
-	| allMr |
-	itsMergeRequests ifNil: [ itsMergeRequests := Dictionary new ].
+	| allMr period|
+	"itsMergeRequests ifNil: [ itsMergeRequests := Dictionary new ]."
+	
+	period := ('mr since ' , since printString , ' to '
+	           , until printString) asSymbol.
 
-	allMr := itsMergeRequests
-		         at: since printString , '-' , until printString
-		         ifAbsentPut: [
-			         | mr |
-			         mr := (aCollection collect: [ :id |
-				                glhImporter
-					                importMergeRequests: (itsProjects at: id)
+	allMr := aCollection collect: [ :idProject |
+		              | project mr|
+		              project := itsProjects at: idProject.
+		              project cacheAt: period ifAbsentPut: [ 
+							mr :=	glhImporter
+					                importMergeRequests: project
 					                since: since
-					                until: until ]) flattened.
-			         " mr := mr flatCollect: [ :c | c ]."
-			         mr ].
+					                until: until.
+							mr. 	
+			 ].	
+		].
+	
+	^  allMr flattened.
 
-
-	^ allMr
 ]
 
 { #category : #loading }
@@ -614,11 +602,12 @@ GitMetric4User >> mergeRequestDurationSince: since until: until overA: aDateWeek
 		               glhImporter: glhImporter;
 		               onModel: glhModel.
 
+	glhImporter withCommitDiffs: false.
 	mergeRequest := self
 		                loadMergeRequestsOfProjects: itsProjects keys
 		                since: since
 		                until: until.
-	
+	glhImporter withCommitDiffs: true.
 
 	mergeRequest ifEmpty: [
 		^ {

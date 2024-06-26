@@ -99,10 +99,11 @@ GLHModelImporter >> completeImportProject: aGLHProject [
 { #category : #'as yet unclassified' }
 GLHModelImporter >> completeImportedCommit: aCommit [
 
-
+	('completing commit: ' , aCommit short_id printString)
+			recordInfo.
 	aCommit commitCreator ifNil: [
-			('Import creator of commit: ' , aCommit short_id printString)
-		recordInfo.
+		('Import creator of commit: ' , aCommit short_id printString)
+			recordInfo.
 		aCommit commitCreator:
 			(self importUserByUsername: aCommit author_name)
 

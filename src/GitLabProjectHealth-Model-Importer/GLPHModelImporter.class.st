@@ -234,7 +234,7 @@ GLPHModelImporter >> importMergeRequests: aGLHProject [
 GLPHModelImporter >> importMergeRequests: aGLHProject since: fromDate until: toDate [
 
 	| newlyFoundMR page foundMR |
-	('import MR of Project ' , aGLHProject id printString) recordInfo.
+	('import MR of Project ' , aGLHProject name) recordInfo.
 
 	page := 0.
 	foundMR := OrderedCollection new.
@@ -266,10 +266,11 @@ GLPHModelImporter >> importMergeRequests: aGLHProject since: fromDate until: toD
 	aGLHProject mergeRequests do: [ :mr |
 		self importCommitsOfMergeResquest: mr ].
 
-
 	self withCommitDiffs ifTrue: [
 		aGLHProject mergeRequests do: [ :mr |
 			self importDiffOfMergeRequest: mr ] ].
+	
+	self glhModel addAll: foundMR unless: (self blockEqualityOn: #iid).
 
 	^ foundMR
 ]

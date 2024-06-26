@@ -257,29 +257,22 @@ GitMetricExporter >> debugExportOver: aCollectionOfDateWeekMonthOrYear [
 	1 halt. 
 	"Code Contribution "
 	entities collect: (self blockCodeAdditionSince: period).
-
 	entities collect: (self blockCodeDeletionSince: period).
-
 
 	"Commit frequencies "
 	entities collect: (self blockCommitFrequencySince: period).
 
-
 	"comment contribution "
-
 	entities collect: (self blockCommentsContributionSince: period).
-
 
 	"merge Request Duration "
 	entities collect: (self blockMergeRequestDurationSince: period ).
-
 
 	"code churn"
 	entities collect: (self blockCodeChurnSince: period ).
 
 	"delay Until First Churn"
 	entities collect: (self blockDelayUntilFirstChurnSince: period ).
-
 
 ].
 
