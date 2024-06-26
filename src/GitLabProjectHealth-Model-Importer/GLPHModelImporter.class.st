@@ -5,12 +5,12 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
-GLPHModelImporter >> blockForDiffRangeEquality [ 
+GLPHModelImporter >> blockForDiffRangeEquality [
 
-^ [ :existing :new |
-		(existing diff mooseID = new diff mooseID and: [
-			 existing originalLineRange = new originalLineRange ]) and: [
-			existing newLineRange = new newLineRange ] ]
+	^ [ :existing :new |
+	  existing diff mooseID = new diff mooseID and: [
+		  existing originalLineRange = new originalLineRange and: [
+			  existing newLineRange = new newLineRange ] ] ]
 ]
 
 { #category : #commit }
@@ -338,9 +338,9 @@ GLPHModelImporter >> parseDiffString: aDiff [
 	"add changes to the diff range"
 	aDiff diffRanges do: [ :diffRange |
 		self glhModel addAll: diffRange changes unless: [ :existing :new |
-			(existing diffRange mooseID = new diffRange mooseID and: [
-				 existing sourceCode = new sourceCode ]) and: [
-				existing index = new index ] ] ].
+			existing diffRange mooseID = new diffRange mooseID and: [
+				existing sourceCode = new sourceCode and: [
+					existing index = new index ] ] ] ].
 
 	^ aDiff diffRanges
 ]

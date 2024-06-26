@@ -11,7 +11,7 @@ Class {
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #analyze }
 GitAnalyzer >> analyseAmandment [
 	"return the first commit that modify the same lines of code as the fromCommit"
 
@@ -32,7 +32,7 @@ GitAnalyzer >> analyseAmandment [
 	 res]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #analyze }
 GitAnalyzer >> analyseChurn [
 
 	| commitFiles totalContribution childCommits access |
@@ -59,26 +59,21 @@ GitAnalyzer >> analyseChurn [
 			  yourself ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #analyze }
 GitAnalyzer >> analyseCommentContributions [
 
-	| additions |
+	| numberOfComments |
 	('GitAnalyzer, analyse comment contributions onProject: '
 	 , onProject printString) recordInfo.
-
-	additions := (fromCommit diffs collect: [ :diff |
-		              diff diffRanges collect: [ :range |
-			              range changes select: [ :change |
-				              change class = GLPHEAddition ] ] ]) flattened
-		             collect: [ :add | add sourceCode ].
-
-	additions := additions collect: [ :codeSource |
-		             (codeSource withoutPrefix: '+') trimLeft ].
-	additions := additions select: [ :codeSource |
-		             codeSource beginsWithAnyOf:
-			             { '#'. '//'. '/*'. '*'. '*/' } ].
-
-	^ additions size
+	numberOfComments := 0.
+	fromCommit diffs do: [ :diff |
+		diff diffRanges do: [ :range |
+			range changes do: [ :change |
+				((change isKindOf: GLPHEAddition) and: [
+					 (change sourceCode withoutPrefix: '+') trimLeft
+						 beginsWithAnyOf: { '#'. '//'. '/*'. '*'. '*/' } ]) ifTrue: [
+					numberOfComments := numberOfComments + 1 ] ] ] ].
+	^ numberOfComments
 ]
 
 { #category : #commit }
@@ -92,15 +87,15 @@ GitAnalyzer >> analyseCommitContribution [
 	  (#deletion -> fromCommit deletions). } asDictionary 
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #analyze }
 GitAnalyzer >> analyseCommitFrequencyFromCommits: initialCommits [
 
 	| commits response |
-	
-	('GitAnalyzer, analyse commit Frequency on: ', onProject printString )
+	('GitAnalyzer, analyse commit Frequency on: ' , onProject printString)
 		recordInfo.
-	
-	response := {  (#numberOfCommit -> nil).
+
+	response := {
+		            (#numberOfCommit -> nil).
 		            (#frequency -> nil) } asDictionary.
 
 
@@ -111,7 +106,7 @@ GitAnalyzer >> analyseCommitFrequencyFromCommits: initialCommits [
 	^ commits
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #analyze }
 GitAnalyzer >> analyseCommitFrequencySince: since until: until [ 
 
 	| commits response |
@@ -135,7 +130,7 @@ GitAnalyzer >> analyseCommitFrequencySince: since until: until [
 	^ commits
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #analyze }
 GitAnalyzer >> analyseMergeResquestValidation: aGLHPMergeRequest [
 
 	| creationDate mergedDate response |
@@ -167,16 +162,22 @@ GitAnalyzer >> analyseMergeResquestValidation: aGLHPMergeRequest [
 ]
 
 { #category : #filter }
-GitAnalyzer >> arrangeCommitsByDate: commits [ 
-	|date2commits|
-	date2commits := Dictionary new. 
-	
+GitAnalyzer >> arrangeCommitsByDate: commits [
+
+	| date2commits |
+	date2commits := Dictionary new.
+
 	commits do: [ :commit |
-		|date|
-		date := commit created_at asDate. 
-		date2commits at: date printString ifPresent: [ :v | v add: commit ] ifAbsentPut: [ OrderedCollection new add: commit; yourself. ].
-		 ].
-	^ date2commits. 
+		| date |
+		date := commit created_at asDate.
+		date2commits
+			at: date printString
+			ifPresent: [ :v | v add: commit ]
+			ifAbsentPut: [
+				OrderedCollection new
+					add: commit;
+					yourself ] ].
+	^ date2commits
 ]
 
 { #category : #churn }

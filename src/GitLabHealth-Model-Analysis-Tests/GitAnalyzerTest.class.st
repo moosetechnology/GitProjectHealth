@@ -45,10 +45,10 @@ GitAnalyzerTest >> setUp [
 		importCommitsOProject: projects first
 		since: since asDate
 		until: nil.
-		
-	gitAnalyzer := GitAnalyzer new 
-	glhImporter: glhImporter; 
-	onModel: glphModel.
+
+	gitAnalyzer := GitAnalyzer new
+		               glhImporter: glhImporter;
+		               onModel: glphModel
 ]
 
 { #category : #test }
