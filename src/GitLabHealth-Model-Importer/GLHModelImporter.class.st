@@ -99,33 +99,28 @@ GLHModelImporter >> completeImportProject: aGLHProject [
 { #category : #'as yet unclassified' }
 GLHModelImporter >> completeImportedCommit: aCommit [
 
-	| addedCommit |
-	
-	addedCommit := aCommit.
-	
-	('Import creator of commit: ' , addedCommit short_id printString) recordInfo.
-	addedCommit commitCreator ifNil: [
-			addedCommit := (self importUserByUsername: aCommit author_name)
-		               commits
-		               add: aCommit
-		               unless: [ :existingCommit :newCommit |
-		               existingCommit id = newCommit id ].
-		 ].
-	
 
-	
+	aCommit commitCreator ifNil: [
+			('Import creator of commit: ' , aCommit short_id printString)
+		recordInfo.
+		aCommit commitCreator:
+			(self importUserByUsername: aCommit author_name)
+
+		"	addedCommit := (self importUserByUsername: addedCommit author_name)
+		               commits
+		               add: addedCommit
+		               unless: [ :existingCommit :newCommit |
+		               existingCommit id = newCommit id ]." ].
 
 	self withCommitDiffs ifTrue: [
-		|diffs|
-		('Import diff of commit: ' , addedCommit short_id printString) recordInfo.
-		addedCommit diffs ifEmpty: [ 
-			diffs := self importDiffOfCommit: addedCommit.
-			self glhModel addAll: diffs unless: self blockForDiffEquality
-			 ] 
-		
-		 ].
+		| diffs |
+		('Import diff of commit: ' , aCommit short_id printString)
+			recordInfo.
+		aCommit diffs ifEmpty: [
+			diffs := self importDiffOfCommit: aCommit.
+			self glhModel addAll: diffs unless: self blockForDiffEquality ] ].
 
-	^ addedCommit
+	^ aCommit
 ]
 
 { #category : #private }
@@ -705,35 +700,32 @@ GLHModelImporter >> importUser: aUserID [
 
 { #category : #user }
 GLHModelImporter >> importUserByUsername: anUsername [
-	|dicUsername|
-	
-	dicUsername := ((self glhModel allWithType: GLHUser) collect: [ :user |
-		user username -> user.
-		 ]) asSet asDictionary.
-	
-	^ dicUsername at: anUsername
-		  ifPresent: [ :user | user ]
-		  ifAbsent: [
-			  | result userId searchResult |
-			  ('Import user with username: ' , anUsername printString)
-				  recordInfo.
-			  result := self glhApi usersSearchByUsername: anUsername.
-			  searchResult := NeoJSONReader fromString: result.
 
-			  (searchResult class = Dictionary and: [
-				   (searchResult at: #message) includesSubstring: '403 Forbidden' ])
-				  ifTrue: [ GLHUser new username: anUsername ]
-				  ifFalse: [
-					  searchResult
-						  ifEmpty: [ GLHUser new username: anUsername; yourself ]
-						  ifNotEmpty: [
-							
-							  userId := searchResult first at: #id.
-							  (self glhModel allWithType: GLHUser)
-								  detect: [ :user | user id = userId ]
-								  ifNone: [ self importUser: userId ] .
-								
-								] ] ]
+	| dicUsername |
+	dicUsername := ((self glhModel allWithType: GLHUser) collect: [ :user |
+		                user username -> user ]) asSet asDictionary.
+
+	^ dicUsername at: anUsername ifPresent: [ :user | user ] ifAbsent: [
+		  | result userId searchResult |
+		  ('Import user with username: ' , anUsername printString)
+			  recordInfo.
+		  result := self glhApi usersSearchByUsername: anUsername.
+		  searchResult := NeoJSONReader fromString: result.
+
+		  (searchResult class = Dictionary and: [
+			   (searchResult at: #message) includesSubstring: '403 Forbidden' ])
+			  ifTrue: [ glhModel add: (GLHUser new username: anUsername) unless: [ :nu :ou | nu username = ou username ] ]
+			  ifFalse: [
+				  searchResult
+					  ifEmpty: [
+						  GLHUser new
+							  username: anUsername;
+							  yourself ]
+					  ifNotEmpty: [
+						  userId := searchResult first at: #id.
+						  (self glhModel allWithType: GLHUser)
+							  detect: [ :user | user id = userId ]
+							  ifNone: [ self importUser: userId ] ] ] ]
 ]
 
 { #category : #initialization }

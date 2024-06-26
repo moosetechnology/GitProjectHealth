@@ -162,12 +162,8 @@ GitMetric4User >> codeContributionsSince: since until: until overA: aDateWeekMon
 		  (#overEach -> aDateWeekMonthOrYear name).
 		  (#forOver -> (groupedByDate keys size printString
 		    , aDateWeekMonthOrYear printString)).
-		  (#avgAddition
-		   -> ((groupedByDate values sum: [ :v | v at: #addition ])
-			    / groupedByDate keys size) asFloat).
-		  (#avgDeletion
-		   -> ((groupedByDate values sum: [ :v | v at: #deletion ])
-			    / groupedByDate keys size) asFloat).
+		  (#avgAddition -> (groupedByDate collect: [:d | d at: #addition]) average asFloat ).
+		  (#avgDeletion -> (groupedByDate collect: [:d | d at: #deletion]) average asFloat ).
 		  (#details -> groupedByDate).
 		  (#userCommits -> commits size) } asDictionary
 ]
@@ -548,44 +544,21 @@ GitMetric4User >> loadCommitOfProjects: aCollection since: aTimespan [
 { #category : #churn }
 GitMetric4User >> loadCommitOfProjects: aCollection since: since until: until [
 
-	| allCommits period|
-	
-	period := ('commits since ', since printString , ' to ' , until printString)asSymbol .
-	
-	allCommits := (aCollection collect: [:idProject |
-		|project|
-		project := (itsProjects at: idProject).
-		project repository cacheAt: period ifPresent: [ :c | c ] ifAbsentPut: [ 
-			|foundCommits|
-			foundCommits := glhImporter importCommitsOProject:
-					                          (project)
-					                          since: since
-					                          until: until.
-			foundCommits := project repository commits addAll: foundCommits unless: glhImporter blockOnIdEquality. 
-			foundCommits. 
-			 ]
-		]).
-	
-	
-	"allCommits := itsCommits
-		              at: since printString , '-' , until printString
-		              ifPresent: [ :c | c ]
-		              ifAbsentPut: [
-			              | commits |
-							commits :=   (aCollection collect: [ :id |
-												|project|
-												
-												project := (itsProjects at: id).
-											 	project repository commits ifEmpty: [glhImporter
-					                          importCommitsOProject:
-					                          (project)
-					                          since: since
-					                          until: until].
-				                           ]
-				
-				). 
-			             "" commits := commits flatCollect: [ :c | c ].""
-			              commits ]."
+	| allCommits period |
+	period := ('commits since ' , since printString , ' to '
+	           , until printString) asSymbol.
+
+	"download commits unless project cache is not empty"
+	allCommits := aCollection collect: [ :idProject |
+		              | project |
+		              project := itsProjects at: idProject.
+		              project repository cacheAt: period ifAbsentPut: [
+			              | foundCommits |
+			              foundCommits := glhImporter
+				                              importCommitsOProject: project
+				                              since: since
+				                              until: until.
+			              foundCommits ] ].
 
 	allCommits := allCommits flatten.
 	allCommits do: [ :commit |
@@ -602,11 +575,8 @@ GitMetric4User >> loadMergeRequestsOfProjects: aCollection since: since until: u
 	| allMr |
 	itsMergeRequests ifNil: [ itsMergeRequests := Dictionary new ].
 
-
-
 	allMr := itsMergeRequests
 		         at: since printString , '-' , until printString
-		         ifPresent: [ :c | c ]
 		         ifAbsentPut: [
 			         | mr |
 			         mr := (aCollection collect: [ :id |
@@ -614,7 +584,7 @@ GitMetric4User >> loadMergeRequestsOfProjects: aCollection since: since until: u
 					                importMergeRequests: (itsProjects at: id)
 					                since: since
 					                until: until ]) flattened.
-			        " mr := mr flatCollect: [ :c | c ]."
+			         " mr := mr flatCollect: [ :c | c ]."
 			         mr ].
 
 
