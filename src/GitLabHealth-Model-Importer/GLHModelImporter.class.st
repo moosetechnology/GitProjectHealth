@@ -244,12 +244,12 @@ GLHModelImporter >> importAllGroups [
 		| results |
 		page := page + 1.
 		results := self glhApi listGroupsWithTopLevelOnly: true page: page.
-		newlyFoundGroups := results readStreamDo: [ :str |
-			                    generalReader
-				                    on: str;
-				                    nextAs: #ArrayOfGroups ].
+
+		newlyFoundGroups := generalReader
+			                    on: results readStream;
+			                    nextAs: #ArrayOfGroups.
 		foundGroups addAll: newlyFoundGroups ].
-	^ foundGroups 
+	^ foundGroups
 ]
 
 { #category : #'private - api' }

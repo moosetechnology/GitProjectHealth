@@ -264,6 +264,7 @@ GLHApi >> listGroupsWithTopLevelOnly: topLevelOnly page: aPageNumber [
 	topLevelOnly ifNotNil: [
 		self client queryAt: #top_level_only put: topLevelOnly ].
 	aPageNumber ifNotNil: [ self client queryAt: #page put: aPageNumber ].
+	self client queryAt: #per_page put: 100.
 	^ self client get
 ]
 
