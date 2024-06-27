@@ -11,11 +11,17 @@ Class {
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #analyze }
 GitAnalyzer >> analyseAmandment [
 	"return the first commit that modify the same lines of code as the fromCommit"
 
-	| churn res |
+	| churn res access|
+	
+	access := ('' join: {
+			           'amandment'.
+			           maxChildCommits }) asSymbol.
+	
+	^ fromCommit cacheAt: access ifPresent: [ :v | v ] ifAbsentPut: [
 	
 	('GitAnalyzer, analyse amandment onProject: ', onProject printString )
 		recordInfo.
@@ -23,52 +29,51 @@ GitAnalyzer >> analyseAmandment [
 	churn := self analyseChurn.
 
 	res := self firstAmandmentFromChrun: churn.
-
-	^ res
+	 res]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #analyze }
 GitAnalyzer >> analyseChurn [
 
-	| commitFiles totalContribution childCommits |
-	('GitAnalyzer, analyse chrun onProject: ' , onProject printString)
-		recordInfo.
-	childCommits := OrderedCollection new.
-	totalContribution := self
-		                     visitChildCommits: fromCommit childCommits
-		                     toStoreThemIn: childCommits
-		                     upto: self maxChildCommits.
-	totalContribution := totalContribution sum: [ :commit | "nil if merge request commit"
-		                     commit additions ifNil: [ 0 ] ].
-	commitFiles := self
-		               impactedFilesInFollowUpCommitsOf: fromCommit
-		               withMaxCommits: self maxChildCommits.
-	^ (self computeChurnOnFiles: commitFiles)
-		  at: #totalContribution ifAbsentPut: totalContribution;
-		  yourself
+	| commitFiles totalContribution childCommits access |
+	access := ('' join: {
+			           'churn'.
+			           maxChildCommits }) asSymbol.
+
+	^ fromCommit cacheAt: access ifAbsentPut: [
+		  ('GitAnalyzer, analyse chrun onProject: ' , onProject printString)
+			  recordInfo.
+		  childCommits := Set new.
+		  totalContribution := self
+			                       visitChildCommits: fromCommit childCommits
+			                       toStoreThemIn: childCommits
+			                       upto: self maxChildCommits.
+		  totalContribution := totalContribution sum: [ :commit | "nil if merge request commit"
+			                       commit additions ifNil: [ 0 ] ].
+		  commitFiles := self
+			                 impactedFilesInFollowUpCommitsOf: fromCommit
+			                 withMaxCommits: self maxChildCommits.
+			"a churned line is a line added on top of an already added line"
+		  (self computeChurnOnFiles: commitFiles)
+			  at: #totalContribution ifAbsentPut: totalContribution;
+			  yourself ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #analyze }
 GitAnalyzer >> analyseCommentContributions [
 
-	| additions |
-	
-	('GitAnalyzer, analyse comment contributions onProject: ', onProject printString )
-		recordInfo.
-	
-	additions := (fromCommit diffs collect: [ :diff |
-		              diff diffRanges collect: [ :range |
-			              range changes select: [ :change |
-				              change class = GLPHEAddition ] ] ]) flattened
-		             collect: [ :add | add sourceCode ].
-
-	additions := additions collect: [ :codeSource |
-		             (codeSource withoutPrefix: '+') trim ].
-	additions := additions select: [ :codeSource |
-		             codeSource beginsWithAnyOf:
-			             { '#'. '//'. '/*'. '*'. '*/' } ].
-
-	^ additions size
+	| numberOfComments |
+	('GitAnalyzer, analyse comment contributions onProject: '
+	 , onProject printString) recordInfo.
+	numberOfComments := 0.
+	fromCommit diffs do: [ :diff |
+		diff diffRanges do: [ :range |
+			range changes do: [ :change |
+				((change isKindOf: GLPHEAddition) and: [
+					 (change sourceCode withoutPrefix: '+') trimLeft
+						 beginsWithAnyOf: { '#'. '//'. '/*'. '*'. '*/' } ]) ifTrue: [
+					numberOfComments := numberOfComments + 1 ] ] ] ].
+	^ numberOfComments
 ]
 
 { #category : #commit }
@@ -82,15 +87,15 @@ GitAnalyzer >> analyseCommitContribution [
 	  (#deletion -> fromCommit deletions). } asDictionary 
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #analyze }
 GitAnalyzer >> analyseCommitFrequencyFromCommits: initialCommits [
 
 	| commits response |
-	
-	('GitAnalyzer, analyse commit Frequency on: ', onProject printString )
+	('GitAnalyzer, analyse commit Frequency on: ' , onProject printString)
 		recordInfo.
-	
-	response := {  (#numberOfCommit -> nil).
+
+	response := {
+		            (#numberOfCommit -> nil).
 		            (#frequency -> nil) } asDictionary.
 
 
@@ -101,7 +106,7 @@ GitAnalyzer >> analyseCommitFrequencyFromCommits: initialCommits [
 	^ commits
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #analyze }
 GitAnalyzer >> analyseCommitFrequencySince: since until: until [ 
 
 	| commits response |
@@ -125,113 +130,131 @@ GitAnalyzer >> analyseCommitFrequencySince: since until: until [
 	^ commits
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #analyze }
 GitAnalyzer >> analyseMergeResquestValidation: aGLHPMergeRequest [
 
-	|creationDate mergedDate response|
-	
-	
-	('GitAnalyzer, analyse merge request delay of: ', aGLHPMergeRequest printString )
-		recordInfo.
-	
-	response := { 
-		 #id_merge_resquest -> aGLHPMergeRequest iid. 
-		 #id_merge_commit -> nil.
-		 #created_at ->  aGLHPMergeRequest created_at.
-		 #merged_at -> nil .
-		 #duration ->  nil.
-		 #status -> (aGLHPMergeRequest merge_status)} asDictionary .  
-	 
-	
-	creationDate := aGLHPMergeRequest created_at asDateAndTime.
+	| creationDate mergedDate response |
+	('GitAnalyzer, analyse merge request delay of: '
+	 , aGLHPMergeRequest printString) recordInfo.
 
-	mergedDate := aGLHPMergeRequest merged_at ifNil: [ 
-		
-		^ response 
-		
-		 ].
-	
-	^ response at: #duration put: (mergedDate - creationDate); 
-					at: #id_merge_commit put: aGLHPMergeRequest merge_commit_sha  ; 
-					at: #merged_at put: aGLHPMergeRequest merged_at;
-					yourself. 
+	^ aGLHPMergeRequest
+		  cacheAt: #mergeRequestValidation
+		  ifPresent: [ :v | v ]
+		  ifAbsentPut: [
+			  response := {
+				              (#id_merge_resquest -> aGLHPMergeRequest iid).
+				              (#id_merge_commit -> nil).
+				              (#created_at -> aGLHPMergeRequest created_at).
+				              (#merged_at -> nil).
+				              (#duration -> nil).
+				              (#status -> aGLHPMergeRequest merge_status) }
+				              asDictionary.
 
+			  creationDate := aGLHPMergeRequest created_at asDateAndTime.
+
+			  mergedDate := aGLHPMergeRequest merged_at ifNil: [ ^ response ].
+
+			  response
+				  at: #duration put: mergedDate - creationDate;
+				  at: #id_merge_commit put: aGLHPMergeRequest merge_commit_sha;
+				  at: #merged_at put: aGLHPMergeRequest merged_at;
+				  yourself ]
 ]
 
 { #category : #filter }
-GitAnalyzer >> arrangeCommitsByDate: commits [ 
-	|date2commits|
-	date2commits := Dictionary new. 
-	
+GitAnalyzer >> arrangeCommitsByDate: commits [
+
+	| date2commits |
+	date2commits := Dictionary new.
+
 	commits do: [ :commit |
-		|date|
-		date := commit created_at asDate. 
-		date2commits at: date printString ifPresent: [ :v | v add: commit ] ifAbsentPut: [ OrderedCollection new add: commit; yourself. ].
-		 ].
-	^ date2commits. 
+		| date |
+		date := commit created_at asDate.
+		date2commits
+			at: date printString
+			ifPresent: [ :v | v add: commit ]
+			ifAbsentPut: [
+				OrderedCollection new
+					add: commit;
+					yourself ] ].
+	^ date2commits
 ]
 
 { #category : #churn }
-GitAnalyzer >> computeChurnOnFiles: aCollection [ 
-	
-	|changesDic perFileChanges  churns |
-	
+GitAnalyzer >> computeChurnOnFiles: aCollection [
+
+	| changesDic perFileChanges churns |
 	"1 -> (a GLPHEChange -> NumberOfChurnDetected)"
-	changesDic := Dictionary new. 
-	
-	
+	changesDic := Dictionary new.
+
+
 	perFileChanges := aCollection associations collect: [ :assoc |
-		
-		(assoc key -> (self computeSpecificChurnOf: assoc value )). 
-		 ] .
-	
-	 churns := perFileChanges collect: [ :assoc |
-		|churn file results|
-		
-		file := assoc key.
-		results := assoc value. 
-		results values ifEmpty: [ churn := -1. ] ifNotEmpty: [ churn := ((results values select: [ :a | a value > 1 ] )sum: [ :a | a value ]) / (results values sum: [ :a | a value ]) . ].
-		
-		(file -> churn)
-		 ].
-	
-	^ {(#churns -> churns).
-			(#details -> perFileChanges)} asDictionary 
+		                  assoc key
+		                  -> (self computeSpecificChurnOf: assoc value) ].
+
+
+	churns := perFileChanges collect: [ :assoc |
+		          | churn file results |
+		          file := assoc key.
+		          results := assoc value.
+		          results values ifEmpty: [ churn := nil ] ifNotEmpty: [
+			          | churnedContribution locContributed |
+			          "churn contribution are the LoC that were affected by a churn"
+			          churnedContribution := results values select: [ :a |
+				                                 a value > 1 ].
+			          locContributed := results values sum: [ :a | a value ].
+
+			          churn := {
+				                   (#churnLoC
+				                    ->
+					                    ((churnedContribution sum: [ :a | a value ])
+					                     - churnedContribution size)).
+				                   (#locContributed -> locContributed) }
+				                   asDictionary ].
+
+		          file -> churn ].
+	churns := churns reject: [ :file2churn | file2churn value isNil ].
+
+	^ {
+		  (#churns -> churns).
+		  (#details -> perFileChanges) } asDictionary
 ]
 
 { #category : #churn }
-GitAnalyzer >> computeSpecificChurnOf: commit2Changes [ 
-	|changesDic|
+GitAnalyzer >> computeSpecificChurnOf: commit2Changes [
+
+	| changesDic |
 	"1 -> (a GLPHEChange -> NumberOfChurnDetected)"
-	changesDic := OrderedDictionary new. 
-	
-	
-	(commit2Changes sortAscending: [ :assoc | assoc key created_at ]) do: [ :entry |
-		|commit diffRanges|
-		commit := entry key.
-		diffRanges := entry value. 
-		
-		diffRanges do: [ :diff |
-			|from upTo|
-			
-			from := (diff originalLineRange copyFrom: (diff originalLineRange indexOf: $-)+1 to: (diff originalLineRange indexOf: $, ifAbsent: [ diff originalLineRange size + 1 ] )-1 ) asString asNumber.
-			(from = 0) ifTrue:[from := 1].
-			self insertDiff: diff into: changesDic startingFrom: from. 
-			
-			 ].
-		
-		 ].
-	
-	
-	
-	^ self sortChangeDic: changesDic.
+	changesDic := OrderedDictionary new.
+
+
+	(commit2Changes sortAscending: [ :assoc | assoc key created_at ])
+		do: [ :entry |
+			| commit diffRanges |
+			commit := entry key.
+			diffRanges := entry value.
+
+			diffRanges do: [ :diff |
+				| from |
+				from := (diff originalLineRange
+					         copyFrom: (diff originalLineRange indexOf: $-) + 1
+					         to: (diff originalLineRange
+							          indexOf: $,
+							          ifAbsent: [ diff originalLineRange size + 1 ]) - 1)
+					        asString asNumber.
+				from = 0 ifTrue: [ from := 1 ].
+				self insertDiff: diff into: changesDic startingFrom: from ] ].
+
+
+
+	^ self sortChangeDic: changesDic
 ]
 
 { #category : #accessing }
 GitAnalyzer >> firstAmandmentFromChrun: aChurnAnalysis [ 
 	|details whereChangesOccurs firstCommitsPerFile|
 	
-	whereChangesOccurs := (aChurnAnalysis at: #churns ) select: [ :file | file value > 0 ].
+	whereChangesOccurs := (aChurnAnalysis at: #churns ) select: [ :file | (file value at: #churnLoC) > 0 ].
 	
 	details := whereChangesOccurs collect: [ :file |
 		((aChurnAnalysis at: #details) detect: [ :entry | entry key = file key] )

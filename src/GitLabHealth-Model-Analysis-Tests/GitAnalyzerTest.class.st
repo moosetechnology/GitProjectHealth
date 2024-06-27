@@ -45,10 +45,10 @@ GitAnalyzerTest >> setUp [
 		importCommitsOProject: projects first
 		since: since asDate
 		until: nil.
-		
-	gitAnalyzer := GitAnalyzer new 
-	glhImporter: glhImporter; 
-	onModel: glphModel.
+
+	gitAnalyzer := GitAnalyzer new
+		               glhImporter: glhImporter;
+		               onModel: glphModel
 ]
 
 { #category : #test }
@@ -135,7 +135,7 @@ GitAnalyzerTest >> testAnalyseMergeResquestValidation [
 { #category : #tests }
 GitAnalyzerTest >> testChurnMetric [
 
-	| myCommits res wednesdayCommit mondayCommit tuesdayCommit |
+	| myCommits res wednesdayCommit mondayCommit tuesdayCommit codeJs churn4CodeJs |
 	glhImporter withCommitDiffs: true.
 
 	"commit chain 
@@ -174,5 +174,10 @@ GitAnalyzerTest >> testChurnMetric [
 		       maxChildCommit: 3;
 		       analyseChurn.
 
-	self assert: (res at: #churns) first value equals: 5 / 7
+	codeJs := (res at: #churns) first.
+	churn4CodeJs := codeJs value. 
+
+	self assert: (churn4CodeJs at: #churnLoC) equals: 3 .
+	self assert: (churn4CodeJs at: #locContributed) equals: 7 .
+	
 ]

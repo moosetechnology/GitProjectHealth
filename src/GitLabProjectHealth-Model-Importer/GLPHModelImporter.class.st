@@ -5,12 +5,12 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
-GLPHModelImporter >> blockForDiffRangeEquality [ 
+GLPHModelImporter >> blockForDiffRangeEquality [
 
-^ [ :existing :new |
-		(existing diff mooseID = new diff mooseID and: [
-			 existing originalLineRange = new originalLineRange ]) and: [
-			existing newLineRange = new newLineRange ] ]
+	^ [ :existing :new |
+	  existing diff mooseID = new diff mooseID and: [
+		  existing originalLineRange = new originalLineRange and: [
+			  existing newLineRange = new newLineRange ] ] ]
 ]
 
 { #category : #commit }
@@ -193,7 +193,6 @@ GLPHModelImporter >> importDiffRangesForDiff: aGLHDiff [
 	('Import changes of diff ' , aGLHDiff printString) recordInfo.
 	"the import of 'diffRanges' entites is technically done inside the parseDiffString"
 
-
 	diffRanges := self glhModel
 		              addAll: (self parseDiffString: aGLHDiff)
 		              unless: self blockForDiffRangeEquality.
@@ -235,7 +234,7 @@ GLPHModelImporter >> importMergeRequests: aGLHProject [
 GLPHModelImporter >> importMergeRequests: aGLHProject since: fromDate until: toDate [
 
 	| newlyFoundMR page foundMR |
-	('import MR of Project ' , aGLHProject id printString) recordInfo.
+	('import MR of Project ' , aGLHProject name) recordInfo.
 
 	page := 0.
 	foundMR := OrderedCollection new.
@@ -267,10 +266,11 @@ GLPHModelImporter >> importMergeRequests: aGLHProject since: fromDate until: toD
 	aGLHProject mergeRequests do: [ :mr |
 		self importCommitsOfMergeResquest: mr ].
 
-
 	self withCommitDiffs ifTrue: [
 		aGLHProject mergeRequests do: [ :mr |
 			self importDiffOfMergeRequest: mr ] ].
+	
+	self glhModel addAll: foundMR unless: (self blockEqualityOn: #iid).
 
 	^ foundMR
 ]
@@ -308,49 +308,40 @@ GLPHModelImporter >> initialize [
 GLPHModelImporter >> parseDiffString: aDiff [
 	"parse diff string to create entities for each lines"
 
-	| lines range index firstChangeRange|
+	| lines range index firstChangeRange |
 	lines := aDiff diffString lines.
 	index := 0.
 	range := nil.
-	
-	(lines ifEmpty: [ ^ aDiff diffRanges  ]).
-	lines := self filterCommitChanges: lines. 
-	(lines first beginsWith: '@@') ifFalse:  [ ^ aDiff diffRanges  ].
-	
-	
-	
+
+	lines ifEmpty: [ ^ aDiff diffRanges ].
+	lines := self filterCommitChanges: lines.
+	(lines first beginsWith: '@@') ifFalse: [ ^ aDiff diffRanges ].
+
 	lines do: [ :line |
 		| aChange |
-		firstChangeRange := false. 
+		firstChangeRange := false.
 		(line trim beginsWith: #'@@') ifTrue: [
 			range := GLPHEDiffRange newFrom: line.
 			firstChangeRange := true.
-			range := aDiff diffRanges
-				add: range
-				unless: [ :existing :new | 
-					existing originalLineRange = new originalLineRange and: [
-						existing newLineRange = new newLineRange ] ] ].
+			range := aDiff diffRanges add: range unless: [ :existing :new |
+				         existing originalLineRange = new originalLineRange and: [
+					         existing newLineRange = new newLineRange ] ] ].
 
 		self withCommitDiffs ifTrue: [
-			
-			firstChangeRange ifFalse: [ 
+			firstChangeRange ifFalse: [
 				aChange := GLPHEChange newFrom: line.
-			aChange relativeIndex: index.
-			aChange := range changes add: aChange unless: [ :existing :new |
-				existing sourceCode = new sourceCode and: [
-					existing index = new index ] ].
-			index := index + 1
-				 ].
-			
-			 ] 
-	].
+				aChange relativeIndex: index.
+				aChange := range changes add: aChange unless: [ :existing :new |
+					           existing sourceCode = new sourceCode and: [
+						           existing index = new index ] ].
+				index := index + 1 ] ] ].
 
 	"add changes to the diff range"
 	aDiff diffRanges do: [ :diffRange |
 		self glhModel addAll: diffRange changes unless: [ :existing :new |
-			(existing diffRange mooseID = new diffRange mooseID and: [
-				 existing sourceCode = new sourceCode ]) and: [
-				existing index = new index ] ] ].
+			existing diffRange mooseID = new diffRange mooseID and: [
+				existing sourceCode = new sourceCode and: [
+					existing index = new index ] ] ] ].
 
 	^ aDiff diffRanges
 ]

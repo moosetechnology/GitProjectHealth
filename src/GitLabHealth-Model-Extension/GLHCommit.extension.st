@@ -1,6 +1,15 @@
 Extension { #name : #GLHCommit }
 
 { #category : #'*GitLabHealth-Model-Extension' }
+GLHCommit >> displayStringOn: aStream [
+
+	aStream
+		<< self short_id;
+		<< ' ';
+		<< self message
+]
+
+{ #category : #'*GitLabHealth-Model-Extension' }
 GLHCommit >> inspectionGLHCommitChildren [
 
 	<inspectorPresentationOrder: 3 title: 'Commits Tree'>
@@ -29,13 +38,4 @@ GLHCommit >> name [
 GLHCommit >> parent_ids [
 	
 	^ parent_ids
-]
-
-{ #category : #'*GitLabHealth-Model-Extension' }
-GLHCommit >> displayStringOn: aStream [
-
-	aStream
-		<< self short_id;
-		<< ' ';
-		<< self message
 ]

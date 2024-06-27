@@ -9,7 +9,6 @@ MooseAbstractGroup >> add: anElmt unless: aConditionAsBlock [
 
 { #category : #'*GitLabHealth-Model-Extension' }
 MooseAbstractGroup >> addAll: anElmtCollection ofType: aType unless: aConditionAsBlock [
-	"()>>>"
 
 	| addedElement |
 	addedElement := anElmtCollection reject: [ :anElmt |
@@ -18,7 +17,7 @@ MooseAbstractGroup >> addAll: anElmtCollection ofType: aType unless: aConditionA
 			                aConditionAsBlock value: existingElmt value: anElmt ] ].
 
 	self addAll: addedElement.
-	
+
 	^ (self allWithType: aType) select: [ :existingElmt |
 		  anElmtCollection anySatisfy: [ :anElmt |
 			  aConditionAsBlock value: anElmt value: existingElmt ] ]

@@ -31,6 +31,27 @@ GLHModelImporterTest >> model [
 	^ self class resources first current model
 ]
 
+{ #category : #test }
+GLHModelImporterTest >> testFilterCommitChanges [
+
+	| importer collection resultCollection |
+	importer := GLHModelImporter new.
+	collection := '--- a/code.js
++++ b/code.js
+@@ -1,3 +1,4 @@
+ //Populate the welcome text
+-var name = "Hello Customer";
+-$("#welcome").text
+\ No newline at end of file
++var is_new = false;
++var name = (is_new ? "Hello New Customer" : "Hello Customer")
++$("#welcome").text(name);
+\ No newline at end of file' lines.
+	"remove starting with --- and +++ and \nonewLine stuff"
+	resultCollection := importer filterCommitChanges: collection.
+	self assert: resultCollection size equals: 7
+]
+
 { #category : #tests }
 GLHModelImporterTest >> testImportBranch [
 
