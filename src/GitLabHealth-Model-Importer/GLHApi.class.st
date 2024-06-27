@@ -256,6 +256,17 @@ GLHApi >> jobsOfProject: aProjectID ofPipelines: aPipelineID [
 		  , '/pipelines/' , aPipelineID printString , '/jobs'
 ]
 
+{ #category : #'api - groups' }
+GLHApi >> listGroupsWithTopLevelOnly: topLevelOnly page: aPageNumber [
+	"https://docs.gitlab.com/ee/api/groups.html#list-groups"
+
+	self client url: self baseAPIUrl , '/groups'.
+	topLevelOnly ifNotNil: [
+		self client queryAt: #top_level_only put: topLevelOnly ].
+	aPageNumber ifNotNil: [ self client queryAt: #page put: aPageNumber ].
+	^ self client get
+]
+
 { #category : #api }
 GLHApi >> pipelinesOfProject: aProjectID [
 	^ self client get: self baseAPIUrl , '/projects/' , aProjectID printString, '/pipelines'

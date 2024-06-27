@@ -8,7 +8,8 @@ Class {
 		'withCommitDiffs',
 		'withCommitsSince',
 		'withInitialCommits',
-		'withInitialMergeRequest'
+		'withInitialMergeRequest',
+		'generalReader'
 	],
 	#category : #'GitLabHealth-Model-Importer'
 }
@@ -159,6 +160,23 @@ GLHModelImporter >> configureReaderForCommit: reader [
 ]
 
 { #category : #private }
+GLHModelImporter >> configureReaderForGroup: reader [
+
+	reader for: GLHGroup do: [ :mapping |
+		mapping mapInstVars.
+		(mapping mapInstVar: #projects) valueSchema: #ArrayOfProjects ].
+	reader mapInstVarsFor: GLHProject.
+	reader
+		for: #ArrayOfProjects
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHProject ].
+	reader
+		for: #ArrayOfGroups
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHGroup ]
+]
+
+{ #category : #private }
 GLHModelImporter >> convertApiFileAsFile: aAPIFile [
 
 	aAPIFile type = 'tree' ifTrue: [ 
@@ -213,6 +231,23 @@ GLHModelImporter >> glhModel [
 GLHModelImporter >> glhModel: anObject [
 
 	glhModel := anObject
+]
+
+{ #category : #api }
+GLHModelImporter >> importAllGroups [
+
+	| page foundGroups newlyFoundGroups |
+	page := 0.
+	foundGroups := OrderedCollection new.
+	newlyFoundGroups := { true }.
+	[ newlyFoundGroups isNotEmpty ] whileTrue: [
+		| results |
+		page := page + 1.
+		results := self glhApi listGroupsWithTopLevelOnly: true page: page.
+		newlyFoundGroups := generalReader
+			                    on: results readStream;
+			                    nextAs: #ArrayOfGroups.
+		foundGroups addAll: newlyFoundGroups ]
 ]
 
 { #category : #'private - api' }
@@ -678,13 +713,22 @@ GLHModelImporter >> importUserByUsername: anUsername [
 ]
 
 { #category : #initialization }
+GLHModelImporter >> initReader [
+
+	generalReader := NeoJSONReader new.
+	self configureReaderForCommit: generalReader.
+	self configureReaderForGroup: generalReader
+]
+
+{ #category : #initialization }
 GLHModelImporter >> initialize [
 
 	withFiles := false.
 	withCommitDiffs := false.
 	withInitialCommits := false. 
 	withInitialMergeRequest := false. 
-	withCommitsSince := (Date today - 1 week) asDateAndTime
+	withCommitsSince := (Date today - 1 week) asDateAndTime.
+	self initReader
 ]
 
 { #category : #private }
@@ -874,11 +918,7 @@ GLHModelImporter >> parseSubGroupResult: aResult [
 
 	| reader |
 	reader := NeoJSONReader on: aResult readStream.
-	reader mapInstVarsFor: GLHGroup.
-	reader
-		for: #ArrayOfGroups
-		customDo: [ :customMappting | 
-		customMappting listOfElementSchema: GLHGroup ].
+	self configureReaderForGroup: reader.
 	^ reader nextAs: #ArrayOfGroups
 ]
 
