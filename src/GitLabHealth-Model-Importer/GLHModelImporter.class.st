@@ -100,11 +100,8 @@ GLHModelImporter >> completeImportProject: aGLHProject [
 { #category : #'as yet unclassified' }
 GLHModelImporter >> completeImportedCommit: aCommit [
 
-	('completing commit: ' , aCommit short_id printString)
-			recordInfo.
+	('completing commit: ' , aCommit short_id printString) recordInfo.
 	aCommit commitCreator ifNil: [
-		('Import creator of commit: ' , aCommit short_id printString)
-			recordInfo.
 		aCommit commitCreator:
 			(self importUserByUsername: aCommit author_name)
 
@@ -116,8 +113,7 @@ GLHModelImporter >> completeImportedCommit: aCommit [
 
 	self withCommitDiffs ifTrue: [
 		| diffs |
-		('Import diff of commit: ' , aCommit short_id printString)
-			recordInfo.
+
 		aCommit diffs ifEmpty: [
 			diffs := self importDiffOfCommit: aCommit.
 			self glhModel addAll: diffs unless: self blockForDiffEquality ] ].
