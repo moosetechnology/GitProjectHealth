@@ -298,6 +298,14 @@ GLPHModelImporter >> importRepository: aGLHRepository [
 ]
 
 { #category : #initialization }
+GLPHModelImporter >> initReader [
+
+	super initReader.
+
+	
+]
+
+{ #category : #initialization }
 GLPHModelImporter >> initialize [
 
 	super initialize.

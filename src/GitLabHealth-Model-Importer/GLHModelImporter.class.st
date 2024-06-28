@@ -153,6 +153,21 @@ GLHModelImporter >> configureReaderForCommit: reader [
 
 ]
 
+{ #category : #'as yet unclassified' }
+GLHModelImporter >> configureReaderForDiffs: reader [
+
+	reader for: GLHDiff do: [ :mapping |
+		mapping mapInstVars:
+			#( deleted_file new_file new_path old_path renamed_file ).
+		mapping mapInstVar: #diffString to: #diff ].
+
+	reader
+		for: #ArrayOfDiffs
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHDiff ].
+	^ reader
+]
+
 { #category : #private }
 GLHModelImporter >> configureReaderForGroup: reader [
 
@@ -767,7 +782,8 @@ GLHModelImporter >> initReader [
 
 	generalReader := NeoJSONReader new.
 	self configureReaderForCommit: generalReader.
-	self configureReaderForGroup: generalReader
+	self configureReaderForGroup: generalReader.
+	self configureReaderForDiffs: generalReader. 
 ]
 
 { #category : #initialization }
@@ -787,6 +803,14 @@ GLHModelImporter >> loadAllSystemProjects [
 	|projects|
 	
 	projects := self glhApi projects. 
+]
+
+{ #category : #private }
+GLHModelImporter >> newParseDiffResult: result [
+
+	generalReader on: result readStream.
+
+	^ generalReader nextAs: #ArrayOfDiffs
 ]
 
 { #category : #parsing }
