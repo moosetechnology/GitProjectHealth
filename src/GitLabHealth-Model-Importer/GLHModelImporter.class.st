@@ -806,6 +806,14 @@ GLHModelImporter >> loadAllSystemProjects [
 ]
 
 { #category : #private }
+GLHModelImporter >> newParseCommitResult: result [
+
+	generalReader  on: result readStream.
+
+	^ generalReader nextAs: GLHCommit
+]
+
+{ #category : #private }
 GLHModelImporter >> newParseDiffResult: result [
 
 	generalReader on: result readStream.
@@ -917,6 +925,11 @@ GLHModelImporter >> parseCommitsResult: result [
 GLHModelImporter >> parseDiffResult: result [
 
 	| reader |
+	self
+		deprecated: 'Use #newParseDiffResult: instead'
+		on: '28 June 2024'
+		in:
+		'Pharo-11.0.0+build.726.sha.aece1b5473acf3830a0e082c1bc3a15d4ff3522b (64 Bit)'.
 	reader := NeoJSONReader on: result readStream.
 	reader for: GLHDiff do: [ :mapping |
 		mapping mapInstVars:
