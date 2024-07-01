@@ -822,7 +822,6 @@ GLHModelImporter >> newParseCommitResult: result [
 GLHModelImporter >> newParseDiffResult: result [
 
 	generalReader on: result readStream.
-
 	^ generalReader nextAs: #ArrayOfDiffs
 ]
 

@@ -71,6 +71,7 @@ GLHMetamodelGenerator >> defineClasses [
 
 	super defineClasses.
 	group := builder newClassNamed: #Group comment: 'A GitLab Group'.
+	group withGroup.
 	project := builder
 		           newClassNamed: #Project
 		           comment: 'A GitLab Project'.

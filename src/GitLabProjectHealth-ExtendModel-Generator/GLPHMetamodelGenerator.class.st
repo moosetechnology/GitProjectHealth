@@ -114,6 +114,9 @@ GLPHMetamodelGenerator >> defineRelations [
 	"MERGE REQUEST RELATIONS"
 	(mergeRequest property: #author)
 	*- (user property: #createdMergeRequests).
+	
+	(mergeRequest property: #approved_by)
+	*-* (user property: #approcheMergeRequests).
 
 	(mergeRequest property: #merge_user) *- (user property: #usedMerges).
 
@@ -221,5 +224,6 @@ GLPHMetamodelGenerator >> mergeRequestProperties [
 	mergeRequest property: #changes_count type: #String.
 	mergeRequest property: #latest_build_started_at type: #String.
 	mergeRequest property: #latest_build_finished_at type: #String.
-	mergeRequest property: #first_deployed_to_production_at type: #String
+	mergeRequest property: #first_deployed_to_production_at type: #String.
+	mergeRequest property: #approved type: #Boolean
 ]
