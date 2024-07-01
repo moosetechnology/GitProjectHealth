@@ -17,13 +17,14 @@ Class {
 { #category : #churn }
 GitMetric4User >> codeChurnSince: since until: until onACommitWindowOf: commitLimit overA: aDateWeekMonthOrYear [
 
-	| commits res groupedByDate totalContributions |
-	
-		('GitMetric4User: code churn')
-		recordInfo.
-	
+	| commits res groupedByDate totalContributions userCommits |
+	"for each commit, we get its churn result (a dictionnary)""debug halt""percentage := (((totalChurn * 100) / totalContribution) asFloat)""		(
+		#churn -> ((groupedByDate sum: [ :frac | frac numerator ]) ->
+		     (groupedByDate sum: [ :frac | frac denominator ]))
+		)."
+	'GitMetric4User: code churn' recordInfo.
 	totalContributions := OrderedCollection new.
-		groupedByDate := self
+	groupedByDate := self
 		                 setupGroupedDateFrom: since
 		                 to: until
 		                 over: aDateWeekMonthOrYear.
@@ -31,37 +32,36 @@ GitMetric4User >> codeChurnSince: since until: until onACommitWindowOf: commitLi
 		               glhImporter: glhImporter;
 		               onModel: glhModel;
 		               maxChildCommit: commitLimit.
-
+	glhImporter withCommitDiffs: false.
 	commits := self
 		           loadCommitOfProjects: itsProjects keys
 		           since: since
 		           until: until.
-	commits := commits reject: [ :commit | commit commitCreator ~= user ].
+	glhImporter withCommitDiffs: true.
+	userCommits := commits reject: [ :commit |
+		               commit commitCreator ~= user ].
+	commits := self
+		           foundSuccessorOf: userCommits
+		           andCompleteImportForMax: commitLimit.
 
 
-	"for each commit, we get its churn result (a dictionnary)"
 	res := commits collect: [ :commit |
 		       commit -> (gitAnalyzer
 			        fromCommit: commit;
 			        analyseChurn) ].
-
-
 	res do: [ :commits4Churns |
-		| commit allChurnsInCommit sumChurnInCommit overDate contribution churnOnCommit|
+		| commit allChurnsInCommit sumChurnInCommit overDate contribution churnOnCommit |
 		commit := commits4Churns key.
 		allChurnsInCommit := commits4Churns value.
 		sumChurnInCommit := (allChurnsInCommit at: #churns) sum: [ :churn |
-			            | numerator |
-			            numerator := churn value at: #churnLoC .
-							"debug halt"
-							self haltIf: [ numerator = -1 ].
-							numerator.             
-			 ].
+			                    | numerator |
+			                    numerator := churn value at: #churnLoC.
+			                    numerator ].
 		contribution := allChurnsInCommit at: #totalContribution.
 		totalContributions add: contribution.
-		
-		churnOnCommit := { (#churnOnCommit -> sumChurnInCommit). (#LoCOnCommit -> contribution). } asDictionary.
-		
+		churnOnCommit := {
+			                 (#churnOnCommit -> sumChurnInCommit).
+			                 (#LoCOnCommit -> contribution) } asDictionary.
 		overDate := self
 			            transformDate: commit created_at
 			            to: aDateWeekMonthOrYear.
@@ -72,33 +72,30 @@ GitMetric4User >> codeChurnSince: since until: until onACommitWindowOf: commitLi
 				OrderedCollection new
 					add: churnOnCommit;
 					yourself ] ].
-
-
 	groupedByDate := groupedByDate collect: [ :churnsAtDate |
-		                 | totalChurn totalContribution percentage|
+		                 | totalChurn totalContribution percentage |
 		                 totalChurn := churnsAtDate sum: [ :churn |
-													
 			                               churn at: #churnOnCommit ].
 		                 totalContribution := churnsAtDate sum: [ :churn |
 			                                      churn at: #LoCOnCommit ].
-							 (totalContribution = 0) ifTrue: [ percentage := 0 asFloat ] ifFalse: [ percentage := (((totalChurn * 100) / totalContribution) asFloat)  ].
-							"percentage := (((totalChurn * 100) / totalContribution) asFloat)"
-							{ (#churn -> totalChurn) . (#contribution -> totalContribution) . (#percentage ->  percentage) } asDictionary 
-		                  ].
-
+		                 totalContribution = 0
+			                 ifTrue: [ percentage := 0 asFloat ]
+			                 ifFalse: [
+			                 percentage := (totalChurn * 100
+			                                / totalContribution) asFloat ].
+		                 {
+			                 (#churn -> totalChurn).
+			                 (#contribution -> totalContribution).
+			                 (#percentage -> percentage) } asDictionary ].
 	^ {
 		  (#details -> groupedByDate).
-		  (#totalContribution -> (totalContributions ifEmpty: [ 0 ] ifNotEmpty: [ totalContributions sum ]) ).
+		  (#totalContribution -> (totalContributions
+			    ifEmpty: [ 0 ]
+			    ifNotEmpty: [ totalContributions sum ])).
 		  (#totalChurn -> (groupedByDate sum: [ :date | date at: #churn ])).
-		  
-"		(
-		#churn -> ((groupedByDate sum: [ :frac | frac numerator ]) ->
-		     (groupedByDate sum: [ :frac | frac denominator ]))
-		)."
-		(
-		#churn -> ((groupedByDate collect: [:date | date at: #percentage]) average )
-		).
-		
+		  (#churn
+		   ->
+		   (groupedByDate collect: [ :date | date at: #percentage ]) average).
 		  (#overEach -> aDateWeekMonthOrYear name).
 		  (#forOver -> (groupedByDate keys size printString
 		    , aDateWeekMonthOrYear printString)).
@@ -110,24 +107,25 @@ GitMetric4User >> codeChurnSince: since until: until onACommitWindowOf: commitLi
 GitMetric4User >> codeContributionsSince: since until: until overA: aDateWeekMonthOrYear [
 
 	| commits contributions groupedByDate |
-	
-			('GitMetric4User: code contribution') recordInfo.
-	
-		glhImporter withCommitDiffs: false.
-	
-		groupedByDate := self
+	'GitMetric4User: code contribution' recordInfo.
+
+
+
+	groupedByDate := self
 		                 setupGroupedDateFrom: since
 		                 to: until
 		                 over: aDateWeekMonthOrYear.
-		
+
 	gitAnalyzer := GitAnalyzer new
 		               onModel: glhModel;
 		               glhImporter: glhImporter.
 
+	glhImporter withCommitDiffs: false.
 	commits := self
 		           loadCommitOfProjects: itsProjects keys
 		           since: since
 		           until: until.
+	glhImporter withCommitDiffs: true.
 	commits := commits reject: [ :commit | commit commitCreator ~= user ].
 
 	contributions := commits collect: [ :commit |
@@ -156,14 +154,17 @@ GitMetric4User >> codeContributionsSince: since until: until overA: aDateWeekMon
 			                 (#addition -> totalAdd).
 			                 (#deletion -> totalDele) } asDictionary ].
 
-		glhImporter withCommitDiffs: true.
 
 	^ {
 		  (#overEach -> aDateWeekMonthOrYear name).
 		  (#forOver -> (groupedByDate keys size printString
 		    , aDateWeekMonthOrYear printString)).
-		  (#avgAddition -> (groupedByDate collect: [:d | d at: #addition]) average asFloat ).
-		  (#avgDeletion -> (groupedByDate collect: [:d | d at: #deletion]) average asFloat ).
+		  (#avgAddition
+		   ->
+		   (groupedByDate collect: [ :d | d at: #addition ]) average asFloat).
+		  (#avgDeletion
+		   ->
+		   (groupedByDate collect: [ :d | d at: #deletion ]) average asFloat).
 		  (#details -> groupedByDate).
 		  (#userCommits -> commits size) } asDictionary
 ]
@@ -183,11 +184,15 @@ GitMetric4User >> commentsContributionsSince: since until: until overA: aDateWee
 		               onModel: glhModel;
 		               glhImporter: glhImporter.
 
+	glhImporter withCommitDiffs: false.
 	commits := self
 		           loadCommitOfProjects: itsProjects keys
 		           since: since
 		           until: until.
+	glhImporter withCommitDiffs: true.
 	commits := commits reject: [ :commit | commit commitCreator ~= user ].
+	commits do: [ :commit | glhImporter completeImportedCommit: commit ].
+
 
 	contributions := commits collect: [ :commit |
 		                 commit -> (gitAnalyzer
@@ -217,8 +222,7 @@ GitMetric4User >> commentsContributionsSince: since until: until overA: aDateWee
 	^ {
 		  (#details -> groupedByDate).
 		  (#totalComments -> groupedByDate values sum).
-		  (#avgComments
-		   -> (groupedByDate values average asFloat)).
+		  (#avgComments -> groupedByDate values average asFloat).
 		  (#overEach -> aDateWeekMonthOrYear name).
 		  (#forOver -> (groupedByDate keys size printString
 		    , aDateWeekMonthOrYear printString)).
@@ -329,7 +333,7 @@ GitMetric4User >> commitsProducedOnProject: aProjectId since: since until: until
 { #category : #churn }
 GitMetric4User >> delayUntilFirstChurnSince: since until: until onACommitWindowOf: maxCommitWindow overA: aDateWeekMonthOrYear [
 
-	| commits groupedByDate res avg |
+	| commits groupedByDate res avg userCommits|
 	'GitMetric4User: delay until first churn' recordInfo.
 
 	groupedByDate := self
@@ -337,10 +341,19 @@ GitMetric4User >> delayUntilFirstChurnSince: since until: until onACommitWindowO
 		                 to: until
 		                 over: aDateWeekMonthOrYear.
 
+	glhImporter withCommitDiffs: false.
 	commits := self
 		           loadCommitOfProjects: itsProjects keys
 		           since: since
 		           until: until.
+	glhImporter withCommitDiffs: true.
+
+	userCommits := commits reject: [ :commit |
+		               commit commitCreator ~= user ].
+	commits := self
+		           foundSuccessorOf: userCommits
+		           andCompleteImportForMax: maxCommitWindow.
+	
 
 	"class commit by dates, filter none user commits"
 	commits do: [ :commit |
@@ -406,9 +419,15 @@ GitMetric4User >> delayUntilFirstChurnSince: since until: until onACommitWindowO
 GitMetric4User >> delayUntilFirstChurnSince: since until: until overA: aDateWeekMonthOrYear [
 
 	| commits groupedByDate res avg |
-	
-		('GitMetric4User: delay until first churn') recordInfo.	
-	
+	self
+		deprecated:
+		'Use #delayUntilFirstChurnSince:until:onACommitWindowOf:overA: instead'
+		on: '1 July 2024'
+		in:
+		'Pharo-11.0.0+build.726.sha.aece1b5473acf3830a0e082c1bc3a15d4ff3522b (64 Bit)'.
+
+	'GitMetric4User: delay until first churn' recordInfo.
+
 	groupedByDate := self
 		                 setupGroupedDateFrom: since
 		                 to: until
@@ -445,7 +464,7 @@ GitMetric4User >> delayUntilFirstChurnSince: since until: until overA: aDateWeek
 				                  glhImporter: glhImporter;
 				                  onModel: glhModel;
 				                  fromCommit: commitA;
-										maxChildCommit: 5;
+				                  maxChildCommit: 5;
 				                  analyseAmandment.
 
 			       durationFromA2B := commitB
@@ -465,8 +484,10 @@ GitMetric4User >> delayUntilFirstChurnSince: since until: until overA: aDateWeek
 			       (filtered sum: [ :v | v asDuration ]) / filtered size ] ].
 
 	res := res reject: #isNil.
-	
-	res ifEmpty: [ avg:= nil ] ifNotEmpty: [ avg := res values sum / res keys size. ].
+
+	res
+		ifEmpty: [ avg := nil ]
+		ifNotEmpty: [ avg := res values sum / res keys size ].
 
 
 	^ {
@@ -482,6 +503,26 @@ GitMetric4User >> findUserNamed: aUsername [
 
 	user := glhImporter importUserByUsername: aUsername.
 	^ user
+]
+
+{ #category : #churn }
+GitMetric4User >> foundSuccessorOf: userCommits andCompleteImportForMax: commitLimit [
+
+	| analyzingCommits i|
+	analyzingCommits := Set new.
+	glhImporter withCommitDiffs: true.
+
+	userCommits do: [ :c |
+		gitAnalyzer
+			visitChildCommits: c childCommits
+			toStoreThemIn: analyzingCommits
+			upto: commitLimit ].
+	i := 1. 
+	analyzingCommits do: [ :c | 
+		(' ' join: { 'import commit creators: ' .(i) . '/' . analyzingCommits size }) recordInfo.
+		i := i + 1. 
+		glhImporter completeImportedCommit: c ].
+	^ analyzingCommits
 ]
 
 { #category : #accessing }
@@ -524,7 +565,7 @@ GitMetric4User >> loadCommitOfProjects: aCollection since: aTimespan [
 { #category : #churn }
 GitMetric4User >> loadCommitOfProjects: aCollection since: since until: until [
 
-	| allCommits period |
+	| allCommits period i|
 	period := ('commits since ' , since printString , ' to '
 	           , until printString) asSymbol.
 
@@ -541,13 +582,13 @@ GitMetric4User >> loadCommitOfProjects: aCollection since: since until: until [
 			              foundCommits ] ].
 
 	allCommits := allCommits flatten.
-	
-	allCommits := glhImporter glhModel
-		              addAll: allCommits
-		              unless: glhImporter blockOnIdEquality.
-	
+
+	i := 1. 
 	allCommits do: [ :commit |
-		glhImporter completeImportedCommit: commit ].
+		(' ' join: { 'import creators ' .(i) . '/' . allCommits size }) recordInfo.
+		glhImporter importCreatorOfCommit: commit.
+		i := i + 1. 
+	 ].
 
 	glhImporter chainsCommitsFrom: allCommits.
 

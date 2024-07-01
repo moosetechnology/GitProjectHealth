@@ -101,19 +101,10 @@ GLHModelImporter >> completeImportProject: aGLHProject [
 GLHModelImporter >> completeImportedCommit: aCommit [
 
 	('completing commit: ' , aCommit short_id printString) recordInfo.
-	aCommit commitCreator ifNil: [
-		aCommit commitCreator:
-			(self importUserByUsername: aCommit author_name)
-
-		"	addedCommit := (self importUserByUsername: addedCommit author_name)
-		               commits
-		               add: addedCommit
-		               unless: [ :existingCommit :newCommit |
-		               existingCommit id = newCommit id ]." ].
+	self importCreatorOfCommit: aCommit.
 
 	self withCommitDiffs ifTrue: [
 		| diffs |
-
 		aCommit diffs ifEmpty: [
 			diffs := self importDiffOfCommit: aCommit.
 			self glhModel addAll: diffs unless: self blockForDiffEquality ] ].
@@ -498,6 +489,20 @@ GLHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName until:
 		  until: toDate
 ]
 
+{ #category : #'as yet unclassified' }
+GLHModelImporter >> importCreatorOfCommit: aCommit [
+
+	aCommit commitCreator ifNil: [
+		aCommit commitCreator:
+			(self importUserByUsername: aCommit author_name)
+
+		"	addedCommit := (self importUserByUsername: addedCommit author_name)
+		               commits
+		               add: addedCommit
+		               unless: [ :existingCommit :newCommit |
+		               existingCommit id = newCommit id ]." ]
+]
+
 { #category : #api }
 GLHModelImporter >> importDiffOfCommit: aCommit [
 
@@ -510,7 +515,7 @@ GLHModelImporter >> importDiffOfCommit: aCommit [
 		          commitDiff: aCommit id
 		          ofProject: aCommit repository project id
 		          unidiff: true.
-	diffsResult := self parseDiffResult: result.
+	diffsResult := self newParseDiffResult: result.
 
 	^ aCommit diffs addAll: diffsResult unless: self blockForDiffEquality.
 

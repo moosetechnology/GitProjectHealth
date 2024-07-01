@@ -250,11 +250,13 @@ GitMetricExporter >> constructFilePath: runningOver [
 { #category : #'as yet unclassified' }
 GitMetricExporter >> debugExportOver: aCollectionOfDateWeekMonthOrYear [
 
-	over := Date.
-	
-	runningPeriods do: [ :period |
+	| period |
+	over := Week.
 
-	1 halt. 
+	period := runningPeriods first.
+
+
+	1 halt.
 	"Code Contribution "
 	entities collect: (self blockCodeAdditionSince: period).
 	entities collect: (self blockCodeDeletionSince: period).
@@ -266,15 +268,14 @@ GitMetricExporter >> debugExportOver: aCollectionOfDateWeekMonthOrYear [
 	entities collect: (self blockCommentsContributionSince: period).
 
 	"merge Request Duration "
-	entities collect: (self blockMergeRequestDurationSince: period ).
+	entities collect: (self blockMergeRequestDurationSince: period).
 
 	"code churn"
-	entities collect: (self blockCodeChurnSince: period ).
+	entities collect: (self blockCodeChurnSince: period).
 
 	"delay Until First Churn"
-	entities collect: (self blockDelayUntilFirstChurnSince: period ).
+	entities collect: (self blockDelayUntilFirstChurnSince: period).
 
-].
 
 	'Done computing debug' recordInfo
 ]
