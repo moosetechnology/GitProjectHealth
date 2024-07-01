@@ -12,6 +12,7 @@ a gitlab merge request
 ### Other
 | Relation | Origin | Opposite | Type | Comment |
 |---|
+| `approved_by` | `GLPHEMergeRequest` | `approcheMergeRequests` | `GLHUser` | |
 | `assignee` | `GLPHEMergeRequest` | `currentlyAssignedMergeRequest` | `GLHUser` | |
 | `assignees` | `GLPHEMergeRequest` | `assignedMergeRequests` | `GLHUser` | |
 | `author` | `GLPHEMergeRequest` | `createdMergeRequests` | `GLHUser` | |
@@ -31,6 +32,7 @@ a gitlab merge request
 
 | Name | Type | Default value | Comment |
 |---|
+| `approved` | `Boolean` | nil | |
 | `blocking_discussions_resolved` | `Boolean` | nil | |
 | `changes_count` | `String` | nil | |
 | `closed_at` | `Object` | nil | |
@@ -90,6 +92,7 @@ Class {
 	#traits : 'FamixTNamedEntity',
 	#classTraits : 'FamixTNamedEntity classTrait',
 	#instVars : [
+		'#approved => FMProperty',
 		'#blocking_discussions_resolved => FMProperty',
 		'#changes_count => FMProperty',
 		'#closed_at => FMProperty',
@@ -154,6 +157,12 @@ GLPHEMergeRequest class >> annotation [
 ]
 
 { #category : #adding }
+GLPHEMergeRequest >> addApproved_by: anObject [
+	<generated>
+	^ self approved_by add: anObject
+]
+
+{ #category : #adding }
 GLPHEMergeRequest >> addAssignee: anObject [
 	<generated>
 	^ self assignees add: anObject
@@ -169,6 +178,37 @@ GLPHEMergeRequest >> addDiff: anObject [
 GLPHEMergeRequest >> addReviewer: anObject [
 	<generated>
 	^ self reviewers add: anObject
+]
+
+{ #category : #accessing }
+GLPHEMergeRequest >> approved [
+
+	<FMProperty: #approved type: #Boolean>
+	<generated>
+	^ approved
+]
+
+{ #category : #accessing }
+GLPHEMergeRequest >> approved: anObject [
+	<generated>
+	approved := anObject
+]
+
+{ #category : #accessing }
+GLPHEMergeRequest >> approved_by [
+	"Relation named: #approved_by type: #GLHUser opposite: #approcheMergeRequests"
+
+	<generated>
+	<derived>
+	<FMProperty: #approved_by type: #GLHUser opposite: #approcheMergeRequests>
+	^ self attributeAt: #approved_by ifAbsentPut: [ FMMultiMultivalueLink on: self opposite: #approcheMergeRequests ]
+]
+
+{ #category : #accessing }
+GLPHEMergeRequest >> approved_by: anObject [
+
+	<generated>
+	self approved_by value: anObject
 ]
 
 { #category : #accessing }

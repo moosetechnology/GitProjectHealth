@@ -1,6 +1,23 @@
 Extension { #name : #GLHUser }
 
 { #category : #'*GLPHExtended-Model-accessing' }
+GLHUser >> approcheMergeRequests [
+	"Relation named: #approcheMergeRequests type: #GLPHEMergeRequest opposite: #approved_by"
+
+	<generated>
+	<FMProperty: #approcheMergeRequests type: #GLPHEMergeRequest opposite: #approved_by>
+	<package: #'GLPHExtended-Model'>
+	^ self attributeAt: #approcheMergeRequests ifAbsentPut: [ FMMultiMultivalueLink on: self opposite: #approved_by ]
+]
+
+{ #category : #'*GLPHExtended-Model-accessing' }
+GLHUser >> approcheMergeRequests: anObject [
+
+	<generated>
+	self approcheMergeRequests value: anObject
+]
+
+{ #category : #'*GLPHExtended-Model-accessing' }
 GLHUser >> assignedMergeRequests [
 	"Relation named: #assignedMergeRequests type: #GLPHEMergeRequest opposite: #assignees"
 
