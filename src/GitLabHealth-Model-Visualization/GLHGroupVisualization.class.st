@@ -111,12 +111,13 @@ GLHGroupVisualization >> failingPipelinecolor: anObject [
 ]
 
 { #category : #running }
-GLHGroupVisualization >> forGroup: aGLHGroup [
+GLHGroupVisualization >> forGroup: aGLHGroups [
 
 	| c shapes legend |
 	c := RSCanvas new.
 
-	shapes := self createShapes: aGLHGroup.
+	shapes := aGLHGroups flatCollect: [ :group |
+		          self createShapes: group ].
 	c addAll: shapes.
 
 	c @ RSCanvasController.

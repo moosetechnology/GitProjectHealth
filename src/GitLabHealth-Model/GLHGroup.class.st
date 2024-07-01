@@ -56,6 +56,13 @@ GLHGroup class >> annotation [
 	^ self
 ]
 
+{ #category : #groups }
+GLHGroup class >> annotationGLHGroupGroup [
+	<generated>
+	<mooseGroup>
+	^ GLHGroupGroup
+]
+
 { #category : #adding }
 GLHGroup >> addProject: anObject [
 	<generated>
