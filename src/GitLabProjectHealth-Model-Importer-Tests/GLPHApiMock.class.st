@@ -8,6 +8,7 @@ Class {
 GLPHApiMock >> mergeRequestOfProject: project withId: id [
 
 	^ '{
-	"author":{ "id": 12 }
+	"author":{ "id": 12 },
+	"merge_user":{ "id": 12 }
 }'
 ]

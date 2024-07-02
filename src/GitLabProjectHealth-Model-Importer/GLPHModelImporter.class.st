@@ -118,13 +118,20 @@ GLPHModelImporter >> configureReaderForMergeRequest: reader [
 		(mapping mapInstVar: #merged_at) valueSchema: DateAndTime.
 		(mapping mapInstVar: #closed_at) valueSchema: DateAndTime.
 		"(mapping mapInstVar: #assignee) valueSchema: GLHUser."
-		(mapping
-			 mapProperty: #author
-			 getter: [  ]
-			 setter: [ :object :value | object cacheAt: #authorID put: (value at: #id) ]).
-		"(mapping mapInstVar: #closed_by) valueSchema: GLHUser.
-		(mapping mapInstVar: #mergeCommit) valueSchema: GLHCommit." ].
+		mapping
+			mapProperty: #author
+			getter: [  ]
+			setter: [ :object :value |
+			object cacheAt: #authorID put: (value at: #id) ].
+		mapping
+			mapProperty: #merge_user
+			getter: [  ]
+			setter: [ :object :value | 
+				value ifNotNil: [
+					object cacheAt: #mergeUserID put: (value at: #id) ] ] ].
 
+	"(mapping mapInstVar: #closed_by) valueSchema: GLHUser.
+	(mapping mapInstVar: #mergeCommit) valueSchema: GLHCommit."
 	"indique ce que doit faire le reader lorsqu'il parse une DateAndTime object"
 	reader for: DateAndTime customDo: [ :mapping |
 		mapping decoder: [ :string |
@@ -352,6 +359,21 @@ GLPHModelImporter >> importMergeResquestAuthor: aGLPHEMergeRequest [
 					              withId: aGLPHEMergeRequest iid) readStream;
 			             next) at: #author at: #id ].
 	aGLPHEMergeRequest author: (self importUser: authorID)
+]
+
+{ #category : #'import - merge request' }
+GLPHModelImporter >> importMergeResquestMerger: aGLPHEMergeRequest [
+
+	| authorID |
+	aGLPHEMergeRequest merge_user ifNotNil: [ ^ aGLPHEMergeRequest merge_user ].
+	authorID := aGLPHEMergeRequest cacheAt: #mergeUserID ifAbsent: [
+		            (generalReader
+			             on: (self glhApi
+					              mergeRequestOfProject:
+						              aGLPHEMergeRequest project_id
+					              withId: aGLPHEMergeRequest iid) readStream;
+			             next) at: #merge_user at: #id ].
+	aGLPHEMergeRequest merge_user: (self importUser: authorID)
 ]
 
 { #category : #'as yet unclassified' }

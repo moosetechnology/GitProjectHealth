@@ -29,7 +29,14 @@ GLPHModelImporterMergeRequestTest >> setUp [
 		"created_at":"2024-07-01T16:05:48.775+02:00",
 		"updated_at":"2024-07-01T16:05:51.221+02:00",
 		"merged_by":null,
-		"merge_user":null,
+		"merge_user":{
+				"id":12,
+				"username":"badetitou",
+				"name":"Verhaeghe Benoit",
+				"state":"active",
+				"avatar_url":"https://gitlab.com/badetitou.png",
+				"web_url":"https://gitlab.com/badetitou"
+			},
 		"merged_at":null,
 		"closed_by":null,
 		"closed_at":null,
@@ -103,6 +110,49 @@ GLPHModelImporterMergeRequestTest >> setUp [
 		"has_conflicts":false,
 		"blocking_discussions_resolved":true
 }]'
+]
+
+{ #category : #test }
+GLPHModelImporterMergeRequestTest >> testParseMergeRequestMergeUserAlreadySet [
+
+	| mergeRequest user |
+	mergeRequest := (glhImporter parseMergeRequestResult: gitlabMergeData) anyOne.
+	user := GLHUser new.
+	mergeRequest merge_user: user.
+	glhImporter importMergeResquestMerger: mergeRequest.
+	self assert: mergeRequest merge_user equals: user
+]
+
+{ #category : #test }
+GLPHModelImporterMergeRequestTest >> testParseMergeRequestMergeUserExistInModelAndCacheID [
+
+	| mergeRequest user |
+	mergeRequest := (glhImporter parseMergeRequestResult: gitlabMergeData)
+		                anyOne.
+	user := glhModel newUser.
+	user id: 12.
+	glhImporter importMergeResquestMerger: mergeRequest.
+	self assert: mergeRequest merge_user equals: user
+]
+
+{ #category : #test }
+GLPHModelImporterMergeRequestTest >> testParseMergeRequestMergeUserIsNil [
+
+	| mergeRequest |
+	mergeRequest := (glhImporter parseMergeRequestResult: '[{"id":46074}]') anyOne.
+	self assert: mergeRequest merge_user equals: nil
+]
+
+{ #category : #test }
+GLPHModelImporterMergeRequestTest >> testParseMergeRequestMergeUserWithoutCache [
+
+	| mergeRequest user |
+	mergeRequest := (glhImporter parseMergeRequestResult: gitlabMergeData) anyOne.
+	mergeRequest flush.
+	user := glhModel newUser.
+	user id: 12.
+	glhImporter importMergeResquestMerger: mergeRequest.
+	self assert: mergeRequest merge_user equals: user
 ]
 
 { #category : #test }
