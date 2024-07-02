@@ -243,7 +243,7 @@ GLPHModelImporter >> importDiffRangesForDiff: aGLHDiff [
 		  unless: self blockForDiffRangeEquality
 ]
 
-{ #category : #import }
+{ #category : #'import - merge request' }
 GLPHModelImporter >> importMergeRequests: aGLHProject [
 
 	| results parsedResults |
@@ -272,7 +272,7 @@ GLPHModelImporter >> importMergeRequests: aGLHProject [
 			self importDiffOfMergeRequest: mr ] ]
 ]
 
-{ #category : #import }
+{ #category : #'import - merge request' }
 GLPHModelImporter >> importMergeRequests: aGLHProject since: fromDate until: toDate [
 
 	| newlyFoundMR page foundMR |
@@ -317,7 +317,7 @@ GLPHModelImporter >> importMergeRequests: aGLHProject since: fromDate until: toD
 	^ foundMR
 ]
 
-{ #category : #import }
+{ #category : #'import - merge request' }
 GLPHModelImporter >> importMergeResquestApprovals: aGLPHEMergeRequest [
 
 	| results parsedResult |
@@ -337,6 +337,20 @@ GLPHModelImporter >> importMergeResquestApprovals: aGLPHEMergeRequest [
 			(self importUser: ((approvedUser at: #user) at: #id)) ].
 	aGLPHEMergeRequest approved: (parsedResult at: #approved).
 	^ aGLPHEMergeRequest
+]
+
+{ #category : #'import - merge request' }
+GLPHModelImporter >> importMergeResquestAuthor: aGLPHEMergeRequest [
+
+	| authorID |
+	aGLPHEMergeRequest author ifNotNil: [ ^ aGLPHEMergeRequest author ].
+	authorID := aGLPHEMergeRequest cacheAt: #authorID ifAbsent: [
+		            (self glhApi
+			             mergeRequestOfProject: aGLPHEMergeRequest project_id
+			             withId: aGLPHEMergeRequest iid) next
+			            at: #author
+			            at: #id ].
+	aGLPHEMergeRequest author: (self importUser: authorID)
 ]
 
 { #category : #'as yet unclassified' }

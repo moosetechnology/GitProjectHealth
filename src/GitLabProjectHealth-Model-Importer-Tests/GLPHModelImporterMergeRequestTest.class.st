@@ -5,7 +5,8 @@ Class {
 		'githubDiffData',
 		'gitlabDiffData',
 		'glhImporter',
-		'gitlabMergeData'
+		'gitlabMergeData',
+		'glhModel'
 	],
 	#category : #'GitLabProjectHealth-Model-Importer-Tests'
 }
@@ -15,6 +16,8 @@ GLPHModelImporterMergeRequestTest >> setUp [
 
 	super setUp.
 	glhImporter := GLPHModelImporter new.
+	glhModel := GLPHEModel new.
+	glhImporter glhModel: glhModel.
 	gitlabMergeData := '[
 		{"id":46074,
 		"iid":1415,
@@ -108,4 +111,27 @@ GLPHModelImporterMergeRequestTest >> testParseMergeRequestResult [
 	parseRes := glhImporter parseMergeRequestResult: gitlabMergeData.
 	self assert: parseRes size equals: 1.
 	self assert: parseRes anyOne id equals: 46074
+]
+
+{ #category : #test }
+GLPHModelImporterMergeRequestTest >> testParseMergeRequestUserAlreadySet [
+
+	| mergeRequest user |
+	mergeRequest := (glhImporter parseMergeRequestResult: gitlabMergeData) anyOne.
+	user := GLHUser new.
+	mergeRequest author: user.
+	glhImporter importMergeResquestAuthor: mergeRequest.
+	self assert: mergeRequest author equals: user
+]
+
+{ #category : #test }
+GLPHModelImporterMergeRequestTest >> testParseMergeRequestUserExistInModelAndCacheID [
+
+	| mergeRequest user |
+	mergeRequest := (glhImporter parseMergeRequestResult: gitlabMergeData)
+		                anyOne.
+	user := glhModel newUser.
+	user id: 12.
+	glhImporter importMergeResquestAuthor: mergeRequest.
+	self assert: mergeRequest author equals: user
 ]
