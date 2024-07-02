@@ -365,14 +365,18 @@ GLPHModelImporter >> importMergeResquestAuthor: aGLPHEMergeRequest [
 GLPHModelImporter >> importMergeResquestMerger: aGLPHEMergeRequest [
 
 	| authorID |
-	aGLPHEMergeRequest merge_user ifNotNil: [ ^ aGLPHEMergeRequest merge_user ].
+	aGLPHEMergeRequest merge_user ifNotNil: [
+		^ aGLPHEMergeRequest merge_user ].
 	authorID := aGLPHEMergeRequest cacheAt: #mergeUserID ifAbsent: [
 		            (generalReader
 			             on: (self glhApi
 					              mergeRequestOfProject:
 						              aGLPHEMergeRequest project_id
 					              withId: aGLPHEMergeRequest iid) readStream;
-			             next) at: #merge_user at: #id ].
+			             next)
+			            at: #merge_user
+			            ifPresent: [ :mergeUser |
+			            mergeUser ifNotNil: [ :mruser | mruser at: #id ] ] ].
 	aGLPHEMergeRequest merge_user: (self importUser: authorID)
 ]
 
