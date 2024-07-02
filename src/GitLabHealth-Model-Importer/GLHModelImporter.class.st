@@ -739,8 +739,9 @@ GLHModelImporter >> importRepository: aGLHRepository [
 GLHModelImporter >> importUser: aUserID [
 
 	| result userResult |
-
-	(glhModel allWithType: GLHUser) asOrderedCollection detect: [ :user | user id = aUserID ] ifFound: [ :user | ^ user ].
+	(glhModel allWithType: GLHUser) asOrderedCollection
+		detect: [ :user | user id = aUserID ]
+		ifFound: [ :user | ^ user ].
 	('Import user: ' , aUserID printString) recordInfo.
 	result := self glhApi user: aUserID.
 	userResult := self parseUserResult: result.
@@ -763,7 +764,10 @@ GLHModelImporter >> importUserByUsername: anUsername [
 
 		  (searchResult class = Dictionary and: [
 			   (searchResult at: #message) includesSubstring: '403 Forbidden' ])
-			  ifTrue: [ glhModel add: (GLHUser new username: anUsername) unless: [ :nu :ou | nu username = ou username ] ]
+			  ifTrue: [
+				  glhModel
+					  add: (GLHUser new username: anUsername)
+					  unless: [ :nu :ou | nu username = ou username ] ]
 			  ifFalse: [
 				  searchResult
 					  ifEmpty: [
