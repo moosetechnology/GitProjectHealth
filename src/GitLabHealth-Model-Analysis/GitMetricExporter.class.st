@@ -253,7 +253,7 @@ GitMetricExporter >> debugExportOver: aCollectionOfDateWeekMonthOrYear [
 	| period |
 	over := Week.
 
-	period := runningPeriods first.
+	period := runningPeriods second.
 
 
 	1 halt.
