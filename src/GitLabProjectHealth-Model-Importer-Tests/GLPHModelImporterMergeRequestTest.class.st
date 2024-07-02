@@ -16,6 +16,7 @@ GLPHModelImporterMergeRequestTest >> setUp [
 
 	super setUp.
 	glhImporter := GLPHModelImporter new.
+	glhImporter glhApi: GLPHApiMock new.
 	glhModel := GLPHEModel new.
 	glhImporter glhModel: glhModel.
 	gitlabMergeData := '[
@@ -130,6 +131,19 @@ GLPHModelImporterMergeRequestTest >> testParseMergeRequestUserExistInModelAndCac
 	| mergeRequest user |
 	mergeRequest := (glhImporter parseMergeRequestResult: gitlabMergeData)
 		                anyOne.
+	user := glhModel newUser.
+	user id: 12.
+	glhImporter importMergeResquestAuthor: mergeRequest.
+	self assert: mergeRequest author equals: user
+]
+
+{ #category : #test }
+GLPHModelImporterMergeRequestTest >> testParseMergeRequestWithoutCache [
+
+	| mergeRequest user |
+	mergeRequest := (glhImporter parseMergeRequestResult: gitlabMergeData)
+		                anyOne.
+	mergeRequest flush.
 	user := glhModel newUser.
 	user id: 12.
 	glhImporter importMergeResquestAuthor: mergeRequest.

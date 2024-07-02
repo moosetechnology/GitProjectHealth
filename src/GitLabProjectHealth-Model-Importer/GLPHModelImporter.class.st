@@ -345,11 +345,12 @@ GLPHModelImporter >> importMergeResquestAuthor: aGLPHEMergeRequest [
 	| authorID |
 	aGLPHEMergeRequest author ifNotNil: [ ^ aGLPHEMergeRequest author ].
 	authorID := aGLPHEMergeRequest cacheAt: #authorID ifAbsent: [
-		            (self glhApi
-			             mergeRequestOfProject: aGLPHEMergeRequest project_id
-			             withId: aGLPHEMergeRequest iid) next
-			            at: #author
-			            at: #id ].
+		            (generalReader
+			             on: (self glhApi
+					              mergeRequestOfProject:
+						              aGLPHEMergeRequest project_id
+					              withId: aGLPHEMergeRequest iid) readStream;
+			             next) at: #author at: #id ].
 	aGLPHEMergeRequest author: (self importUser: authorID)
 ]
 
