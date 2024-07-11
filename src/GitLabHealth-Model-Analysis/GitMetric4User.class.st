@@ -333,7 +333,7 @@ GitMetric4User >> commitsProducedOnProject: aProjectId since: since until: until
 { #category : #churn }
 GitMetric4User >> delayUntilFirstChurnSince: since until: until onACommitWindowOf: maxCommitWindow overA: aDateWeekMonthOrYear [
 
-	| commits groupedByDate res avg userCommits|
+	| commits groupedByDate res avg userCommits |
 	'GitMetric4User: delay until first churn' recordInfo.
 
 	groupedByDate := self
@@ -353,7 +353,7 @@ GitMetric4User >> delayUntilFirstChurnSince: since until: until onACommitWindowO
 	commits := self
 		           foundSuccessorOf: userCommits
 		           andCompleteImportForMax: maxCommitWindow.
-	
+
 
 	"class commit by dates, filter none user commits"
 	commits do: [ :commit |
@@ -398,13 +398,13 @@ GitMetric4User >> delayUntilFirstChurnSince: since until: until onACommitWindowO
 		       filtered isEmpty
 			       ifTrue: [ nil ]
 			       ifFalse: [
-			       (filtered sum: [ :v | v asDuration ]) / filtered size ] ].
+			       (filtered sum: [ :v | v asDuration asSeconds]) / filtered size ] ].
 
 	res := res reject: #isNil.
 
 	res
 		ifEmpty: [ avg := nil ]
-		ifNotEmpty: [ avg := res values sum / res keys size ].
+		ifNotEmpty: [ avg := res values average asFloat ].
 
 
 	^ {
