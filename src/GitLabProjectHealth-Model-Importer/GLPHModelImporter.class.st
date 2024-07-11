@@ -116,53 +116,22 @@ GLPHModelImporter >> configureReaderForMergeRequest: reader [
 		(mapping mapInstVar: #created_at) valueSchema: DateAndTime.
 		(mapping mapInstVar: #updated_at) valueSchema: DateAndTime.
 		(mapping mapInstVar: #merged_at) valueSchema: DateAndTime.
-		(mapping mapInstVar: #closed_at) valueSchema: DateAndTime
-		"		
-		(mapping mapInstVar: #assignee) valueSchema: GLHUser.
-		(mapping mapInstVar: #author) valueSchema: GLHUser.
-		(mapping mapInstVar: #closed_by) valueSchema: GLHUser.
-		(mapping mapInstVar: #mergeCommit) valueSchema: GLHCommit." ].
+		(mapping mapInstVar: #closed_at) valueSchema: DateAndTime.
+		"(mapping mapInstVar: #assignee) valueSchema: GLHUser."
+		mapping
+			mapProperty: #author
+			getter: [  ]
+			setter: [ :object :value |
+			object cacheAt: #authorID put: (value at: #id) ].
+		mapping
+			mapProperty: #merge_user
+			getter: [  ]
+			setter: [ :object :value | 
+				value ifNotNil: [
+					object cacheAt: #mergeUserID put: (value at: #id) ] ] ].
 
-	"indique ce que doit faire le reader lorsqu'il parse une DateAndTime object"
-	reader for: DateAndTime customDo: [ :mapping |
-		mapping decoder: [ :string |
-			string ifNil: [ nil ] ifNotNil: [ DateAndTime fromString: string ] ] ]
-]
-
-{ #category : #'private - configure reader' }
-GLPHModelImporter >> configureReaderForMergeRequestApproval: reader [
-	"declare quil y a un array a mapper"
-
-	reader for: #ArrayOfMergeRequest customDo: [ :customMappting |
-		customMappting listOfElementSchema: GLPHEMergeRequest ].
-
-	"declare la liste des properties"
-	reader for: GLPHEMergeRequest do: [ :mapping |
-		mapping mapInstVars:
-			#( blocking_discussions_resolved changes_count description
-			   detailed_merge_status discussion_locked downvotes draft first_deployed_to_production_at
-			   force_remove_source_branch has_conflicts id iid labels latest_build_finished_at
-			   latest_build_started_at merge_commit_sha merge_status
-			   merge_when_pipeline_succeeds merged_at milestone project_id
-			   reference references_full references_relative
-			   references_short sha should_remove_source_branch
-			   source_branch source_project_id squash squash_commit_sha
-			   squash_on_merge state subscribed target_branch target_project_id
-			   task_completion_status_completed_count
-			   task_completion_status_count time_stats_human_time_estimate
-			   time_stats_human_total_time_spent
-			   time_stats_time_estimate time_stats_total_time_spent
-			   title updated_at upvotes user_notes_count web_url work_in_progress ).
-		(mapping mapInstVar: #created_at) valueSchema: DateAndTime.
-		(mapping mapInstVar: #updated_at) valueSchema: DateAndTime.
-		(mapping mapInstVar: #merged_at) valueSchema: DateAndTime.
-		(mapping mapInstVar: #closed_at) valueSchema: DateAndTime
-		"		
-		(mapping mapInstVar: #assignee) valueSchema: GLHUser.
-		(mapping mapInstVar: #author) valueSchema: GLHUser.
-		(mapping mapInstVar: #closed_by) valueSchema: GLHUser.
-		(mapping mapInstVar: #mergeCommit) valueSchema: GLHCommit." ].
-
+	"(mapping mapInstVar: #closed_by) valueSchema: GLHUser.
+	(mapping mapInstVar: #mergeCommit) valueSchema: GLHCommit."
 	"indique ce que doit faire le reader lorsqu'il parse une DateAndTime object"
 	reader for: DateAndTime customDo: [ :mapping |
 		mapping decoder: [ :string |
@@ -281,7 +250,7 @@ GLPHModelImporter >> importDiffRangesForDiff: aGLHDiff [
 		  unless: self blockForDiffRangeEquality
 ]
 
-{ #category : #import }
+{ #category : #'import - merge request' }
 GLPHModelImporter >> importMergeRequests: aGLHProject [
 
 	| results parsedResults |
@@ -310,7 +279,7 @@ GLPHModelImporter >> importMergeRequests: aGLHProject [
 			self importDiffOfMergeRequest: mr ] ]
 ]
 
-{ #category : #import }
+{ #category : #'import - merge request' }
 GLPHModelImporter >> importMergeRequests: aGLHProject since: fromDate until: toDate [
 
 	| newlyFoundMR page foundMR |
@@ -355,7 +324,7 @@ GLPHModelImporter >> importMergeRequests: aGLHProject since: fromDate until: toD
 	^ foundMR
 ]
 
-{ #category : #import }
+{ #category : #'import - merge request' }
 GLPHModelImporter >> importMergeResquestApprovals: aGLPHEMergeRequest [
 
 	| results parsedResult |
@@ -369,8 +338,46 @@ GLPHModelImporter >> importMergeResquestApprovals: aGLPHEMergeRequest [
 	parsedResult := generalReader
 		                on: results readStream;
 		                next.
+
+	(parsedResult at: #approved_by) do: [ :approvedUser |
+		aGLPHEMergeRequest addApproved_by:
+			(self importUser: ((approvedUser at: #user) at: #id)) ].
 	aGLPHEMergeRequest approved: (parsedResult at: #approved).
 	^ aGLPHEMergeRequest
+]
+
+{ #category : #'import - merge request' }
+GLPHModelImporter >> importMergeResquestAuthor: aGLPHEMergeRequest [
+
+	| authorID |
+	aGLPHEMergeRequest author ifNotNil: [ ^ aGLPHEMergeRequest author ].
+	authorID := aGLPHEMergeRequest cacheAt: #authorID ifAbsent: [
+		            (generalReader
+			             on: (self glhApi
+					              mergeRequestOfProject:
+						              aGLPHEMergeRequest project_id
+					              withId: aGLPHEMergeRequest iid) readStream;
+			             next) at: #author at: #id ].
+	aGLPHEMergeRequest author: (self importUser: authorID)
+]
+
+{ #category : #'import - merge request' }
+GLPHModelImporter >> importMergeResquestMerger: aGLPHEMergeRequest [
+
+	| authorID |
+	aGLPHEMergeRequest merge_user ifNotNil: [
+		^ aGLPHEMergeRequest merge_user ].
+	authorID := aGLPHEMergeRequest cacheAt: #mergeUserID ifAbsent: [
+		            (generalReader
+			             on: (self glhApi
+					              mergeRequestOfProject:
+						              aGLPHEMergeRequest project_id
+					              withId: aGLPHEMergeRequest iid) readStream;
+			             next)
+			            at: #merge_user
+			            ifPresent: [ :mergeUser |
+			            mergeUser ifNotNil: [ :mruser | mruser at: #id ] ] ].
+	aGLPHEMergeRequest merge_user: (self importUser: authorID)
 ]
 
 { #category : #'as yet unclassified' }
