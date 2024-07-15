@@ -43,7 +43,7 @@ GitAnalyzerLocalTest >> testAnalyseCommentContributionsJavaComment [
 	diffARange addChange: addition.
 	addition sourceCode: '+	// hello world'.
 
-	self assert: gitAnalyzer analyseCommentContributions equals: 1
+	self assert: gitAnalyzer analyseCommentContribution equals: 1
 ]
 
 { #category : #test }
@@ -62,7 +62,7 @@ GitAnalyzerLocalTest >> testAnalyseCommentContributionsJavaContinueComment [
 	diffARange addChange: addition.
 	addition sourceCode: '+	* hello world'.
 
-	self assert: gitAnalyzer analyseCommentContributions equals: 1
+	self assert: gitAnalyzer analyseCommentContribution equals: 1
 ]
 
 { #category : #test }
@@ -81,7 +81,7 @@ GitAnalyzerLocalTest >> testAnalyseCommentContributionsJavaStopComment [
 	diffARange addChange: addition.
 	addition sourceCode: '+	*/ hello world'.
 
-	self assert: gitAnalyzer analyseCommentContributions equals: 1
+	self assert: gitAnalyzer analyseCommentContribution equals: 1
 ]
 
 { #category : #test }
@@ -108,7 +108,7 @@ GitAnalyzerLocalTest >> testAnalyseCommentContributionsMixedMultipleComments [
 	diffARange addChange: additionC.
 	additionC sourceCode: '+	// hello world'.
 
-	self assert: gitAnalyzer analyseCommentContributions equals: 2
+	self assert: gitAnalyzer analyseCommentContribution equals: 2
 ]
 
 { #category : #test }
@@ -135,7 +135,7 @@ GitAnalyzerLocalTest >> testAnalyseCommentContributionsMultipleComments [
 	diffARange addChange: additionC.
 	additionC sourceCode: '+	// hello world'.
 
-	self assert: gitAnalyzer analyseCommentContributions equals: 3
+	self assert: gitAnalyzer analyseCommentContribution equals: 3
 ]
 
 { #category : #test }
@@ -154,7 +154,7 @@ GitAnalyzerLocalTest >> testAnalyseCommentContributionsPythonComment [
 	diffARange addChange: addition.
 	addition sourceCode: '+	*/ hello world'.
 
-	self assert: gitAnalyzer analyseCommentContributions equals: 1
+	self assert: gitAnalyzer analyseCommentContribution equals: 1
 ]
 
 { #category : #test }
@@ -173,7 +173,7 @@ GitAnalyzerLocalTest >> testAnalyseCommentContributionsShouldBe0 [
 	diffARange addChange: addition.
 	addition sourceCode: '+	hello world'.
 
-	self assert: gitAnalyzer analyseCommentContributions equals: 0
+	self assert: gitAnalyzer analyseCommentContribution equals: 0
 ]
 
 { #category : #test }
@@ -192,7 +192,7 @@ GitAnalyzerLocalTest >> testAnalyseCommentInSomeAroundCode [
 	diffARange addChange: addition.
 	addition sourceCode: '// hello world'.
 
-	self assert: gitAnalyzer analyseCommentContributions equals: 0
+	self assert: gitAnalyzer analyseCommentContribution equals: 0
 ]
 
 { #category : #test }
@@ -211,7 +211,7 @@ GitAnalyzerLocalTest >> testAnalyseCommentNotAnAddition [
 	diffARange addChange: addition.
 	addition sourceCode: '-	// hello world'.
 
-	self assert: gitAnalyzer analyseCommentContributions equals: 0
+	self assert: gitAnalyzer analyseCommentContribution equals: 0
 ]
 
 { #category : #test }

@@ -771,7 +771,7 @@ GLHModelImporter >> importUserByUsername: anUsername [
 			   (searchResult at: #message) includesSubstring: '403 Forbidden' ])
 			  ifTrue: [
 				  glhModel
-					  add: (GLHUser new username: anUsername)
+					  add: (GLHUser new username: anUsername; name: anUsername; yourself )
 					  unless: [ :nu :ou | nu username = ou username ] ]
 			  ifFalse: [
 				  searchResult

@@ -90,7 +90,7 @@ GitAnalyzerTest >> testAnalyseAmandment [
 		       glhImporter: glhImporter;
 		       onModel: glphModel;
 		       maxChildCommit: 5;
-		       analyseAmandment.
+		       analyseDelayUntilFirstChurn.
 
 
 	self assert: res equals: tuesdayCommit
@@ -138,9 +138,7 @@ GitAnalyzerTest >> testChurnMetric [
 	| myCommits res wednesdayCommit mondayCommit tuesdayCommit codeJs churn4CodeJs |
 	glhImporter withCommitDiffs: true.
 
-	"commit chain 
-	mondayCommit -> tuesdayCommit -> wednesdayCommit
-	"
+	"commit chain: mondayCommit -> tuesdayCommit -> wednesdayCommit "
 	wednesdayCommit := glhImporter
 		                   importCommitOfProject: projects first
 		                   withId:
@@ -178,6 +176,8 @@ GitAnalyzerTest >> testChurnMetric [
 	churn4CodeJs := codeJs value. 
 
 	self assert: (churn4CodeJs at: #churnLoC) equals: 3 .
-	self assert: (churn4CodeJs at: #locContributed) equals: 7 .
+	self assert: (churn4CodeJs at: #churnFromInitialCommitLines) equals: 2 .
+	self assert: (churn4CodeJs at: #churnFromCommitCreatorOnly ) equals: 2. 
+	self assert: (res at: #totalContribution) equals: 7. 
 	
 ]

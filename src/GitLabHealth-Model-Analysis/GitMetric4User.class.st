@@ -197,7 +197,7 @@ GitMetric4User >> commentsContributionsSince: since until: until overA: aDateWee
 	contributions := commits collect: [ :commit |
 		                 commit -> (gitAnalyzer
 			                  fromCommit: commit;
-			                  analyseCommentContributions) ].
+			                  analyseCommentContribution) ].
 
 
 	contributions do: [ :assoc |
@@ -382,7 +382,7 @@ GitMetric4User >> delayUntilFirstChurnSince: since until: until onACommitWindowO
 				                  onModel: glhModel;
 				                  fromCommit: commitA;
 				                  maxChildCommit: maxCommitWindow;
-				                  analyseAmandment.
+				                  analyseDelayUntilFirstChurn.
 
 			       durationFromA2B := commitB
 				                          ifNil: [ 0 ]
@@ -465,7 +465,7 @@ GitMetric4User >> delayUntilFirstChurnSince: since until: until overA: aDateWeek
 				                  onModel: glhModel;
 				                  fromCommit: commitA;
 				                  maxChildCommit: 5;
-				                  analyseAmandment.
+				                  analyseDelayUntilFirstChurn.
 
 			       durationFromA2B := commitB
 				                          ifNil: [ 0 ]
