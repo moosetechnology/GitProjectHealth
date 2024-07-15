@@ -34,7 +34,7 @@ GitAnalyzerTest >> setUp [
 		               glhApi: glphApi;
 		               glhModel: glphModel;
 		               withFiles: false;
-		               withCommitsSince: 0 day;
+		              
 		               withCommitDiffs: true.
 
 	glhImporter importProject: 57841283.

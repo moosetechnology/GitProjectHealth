@@ -23,6 +23,19 @@ GLHApi >> baseAPIUrl: anObject [
 	baseAPIUrl := anObject
 ]
 
+{ #category : #'as yet unclassified' }
+GLHApi >> blamesOfProject: aProjectId forFile: filePath onStartRange: start toEndRange: end [
+
+	self client path:
+		self baseAPIUrl , '/projects/' , aProjectId printString
+		, '/repository/files/' , filePath urlEncoded, '/blame'.
+
+	start ifNotNil: [ self client queryAt: #'range[start]' put: start ].
+	end ifNotNil: [ self client queryAt: #'range[end]' put: end ].
+
+	^ self client get
+]
+
 { #category : #api }
 GLHApi >> branchesOfRepository: aProjectID [
 
@@ -89,7 +102,6 @@ GLHApi >> commitDiff: commitSHA ofProject: aProjectId unidiff: unidiff [
 				 << '/diff' ]).
 
 	unidiff ifNotNil: [ self client queryAt: #unidiff put: unidiff ].
-
 
 	('Call: ' , self client request url asString) recordInfo.
 

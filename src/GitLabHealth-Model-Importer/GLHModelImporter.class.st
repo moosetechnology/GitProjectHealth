@@ -320,9 +320,9 @@ GLHModelImporter >> importCommits: aGLHProject [
 		commit repository: aGLHProject repository ].
 
 	self withCommitDiffs ifTrue: [
-		parsedResults do: [ :commit |
-
-			self importDiffOfCommit: commit ] ]
+		parsedResults do: [ :commit | self importDiffOfCommit: commit ] ].
+	
+	^ parsedResults. 
 ]
 
 { #category : #'as yet unclassified' }
@@ -653,15 +653,14 @@ GLHModelImporter >> importPipelinesOfProject: aGLHProject [
 { #category : #imports }
 GLHModelImporter >> importProjects [
 	"heavy import of all projects"
-	
+
 	"copy import from commits"
-	
-	
-	| newlyFoundProjects page foundProject amount|
-	('import all Projects into the model') recordInfo.
-	
+
+	| newlyFoundProjects page foundProject amount |
+	'import all Projects into the model' recordInfo.
+
 	"number of projects per page"
-	amount := 50.
+	amount := 100.
 	page := 0.
 	foundProject := OrderedCollection new.
 	newlyFoundProjects := { true }.
@@ -670,16 +669,22 @@ GLHModelImporter >> importProjects [
 		page := page + 1.
 		('import project of page ' , page printString) recordInfo.
 		results := self glhApi projects: amount page: page.
-		
+
 		newlyFoundProjects := glhModel
-			                addAll: (self parseArrayOfProject: results)
-			                unless: self blockOnIdEquality.
-		foundProject addAll: newlyFoundProjects 
-		
-		].
+			                      addAll: (self parseArrayOfProject: results)
+			                      unless: self blockOnIdEquality.
+		foundProject addAll: newlyFoundProjects ].
 
 	^ foundProject
+]
+
+{ #category : #projects }
+GLHModelImporter >> importProjects: aCollectionOfProjectID [
 	
+	^ aCollectionOfProjectID collect: [ :id |
+		self importProject: id.
+		 ]
+	 
 ]
 
 { #category : #imports }
