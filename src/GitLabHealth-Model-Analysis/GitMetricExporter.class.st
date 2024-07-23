@@ -103,7 +103,10 @@ GitMetricExporter >> addEntitiesFromUserNames: userNames [
 			 metrics
 				 glhImporter: glhImporter;
 				 findUserNamed: username.
+			
 			 metrics itsProjects: (projects collect: [ :p |
+					MyLogs logProgress: 'complete import of project #' over: projects.
+					 
 					  p id -> (glhImporter completeImportProject: p) ]) asDictionary.
 
 			 metrics ]).
@@ -410,8 +413,8 @@ GitMetricExporter >> initialize [
 
 	entities := OrderedCollection new.
 	"set up the minimal date from which we are looking for the commits a particular user in projects"
-	sinceTimeLimit := '1 january 2023' asDateAndTime.
-	runningPeriods := OrderedCollection new. 
+	sinceTimeLimit := '1 january 2024' asDateAndTime.
+	runningPeriods := OrderedCollection new.
 	maxCommitWindow := 3.
 	over := Date
 ]

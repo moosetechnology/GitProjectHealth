@@ -13,10 +13,7 @@ Class {
 GitMetric4User >> codeChurnSince: since until: until onACommitWindowOf: commitLimit overA: aDateWeekMonthOrYear [
 
 	| commits res groupedByDate totalContributions userCommits |
-	"for each commit, we get its churn result (a dictionnary)""debug halt""percentage := (((totalChurn * 100) / totalContribution) asFloat)""		(
-		#churn -> ((groupedByDate sum: [ :frac | frac numerator ]) ->
-		     (groupedByDate sum: [ :frac | frac denominator ]))
-		)."
+	"for each commit, we get its churn result (a dictionnary)"
 	'GitMetric4User: code churn' recordInfo.
 	totalContributions := OrderedCollection new.
 	groupedByDate := self
@@ -103,9 +100,7 @@ GitMetric4User >> codeContributionsSince: since until: until overA: aDateWeekMon
 
 	| commits contributions groupedByDate |
 	'GitMetric4User: code contribution' recordInfo.
-
-
-
+	
 	groupedByDate := self
 		                 setupGroupedDateFrom: since
 		                 to: until
@@ -148,7 +143,6 @@ GitMetric4User >> codeContributionsSince: since until: until overA: aDateWeekMon
 		                 {
 			                 (#addition -> totalAdd).
 			                 (#deletion -> totalDele) } asDictionary ].
-
 
 	^ {
 		  (#overEach -> aDateWeekMonthOrYear name).
@@ -230,7 +224,6 @@ GitMetric4User >> commitFrequencySince: since until: until overA: aDateWeekMonth
 	| periods total groupedByDate userCommits |
 	'GitMetric4User: commit frequency' recordInfo.
 
-
 	groupedByDate := self
 		                 setupGroupedDateFrom: since
 		                 to: until
@@ -297,18 +290,18 @@ GitMetric4User >> commitsProducedOnProject: projectId since: sinceDate until: un
 
 { #category : #metrics }
 GitMetric4User >> commitsProducedOnProject: aProjectId since: since until: until overA: aWeekOrMonthOrYear [
-	"'aWeekOrMonthOrYear' should be the class of Week, Month or Year"
-
-	"self commitFrequencyOnProject: 6462 since: (Date today - 60 day) until: (Date today) overA: Week. "
+	"'aWeekOrMonthOrYear' should be the class of Data, Week, Month or Year"
 
 	| frequency aggregatedFrequencies |
-	aggregatedFrequencies := self setupGroupedDateFrom: since to: until  over: aWeekOrMonthOrYear.
-	
+	aggregatedFrequencies := self
+		                         setupGroupedDateFrom: since
+		                         to: until
+		                         over: aWeekOrMonthOrYear.
+
 	frequency := self
 		             commitsProducedOnProject: aProjectId
 		             since: since
 		             until: until.
-
 
 	frequency associations do: [ :assoc |
 		| date commits overDate |
@@ -496,7 +489,7 @@ GitMetric4User >> delayUntilFirstChurnSince: since until: until overA: aDateWeek
 { #category : #churn }
 GitMetric4User >> foundSuccessorOf: userCommits andCompleteImportForMax: commitLimit [
 
-	| analyzingCommits i|
+	| analyzingCommits |
 	analyzingCommits := Set new.
 	glhImporter withCommitDiffs: true.
 
@@ -505,17 +498,14 @@ GitMetric4User >> foundSuccessorOf: userCommits andCompleteImportForMax: commitL
 			visitChildCommits: c childCommits
 			toStoreThemIn: analyzingCommits
 			upto: commitLimit ].
-	i := 1. 
-	analyzingCommits do: [ :c | 
-		(' ' join: { 'import commit creators: ' .(i) . '/' . analyzingCommits size }) recordInfo.
-		i := i + 1. 
-		glhImporter completeImportedCommit: c ].
-	^ analyzingCommits
-]
 
-{ #category : #accessing }
-GitMetric4User >> glhImporter: aGLPHModelImporter [ 
-	glhImporter := aGLPHModelImporter
+	analyzingCommits do: [ :c |
+		MyLogs
+			logProgress: 'import commit creators: '
+			over: analyzingCommits size.
+		glhImporter completeImportedCommit: c ].
+	
+	^ analyzingCommits
 ]
 
 { #category : #initialization }

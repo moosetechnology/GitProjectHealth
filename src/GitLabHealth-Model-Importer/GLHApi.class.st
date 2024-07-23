@@ -8,8 +8,17 @@ Class {
 		'baseAPIUrl',
 		'client'
 	],
+	#classVars : [
+		'currentAPI'
+	],
 	#category : #'GitLabHealth-Model-Importer'
 }
+
+{ #category : #accessing }
+GLHApi class >> current [
+
+	^ currentAPI
+]
 
 { #category : #accessing }
 GLHApi >> baseAPIUrl [
@@ -21,6 +30,20 @@ GLHApi >> baseAPIUrl [
 GLHApi >> baseAPIUrl: anObject [
 
 	baseAPIUrl := anObject
+]
+
+{ #category : #'as yet unclassified' }
+GLHApi >> blamesOfProject: aProjectId forFile: filePath onBranch: branchRef onStartRange: start toEndRange: end [
+
+	self client path:
+		self baseAPIUrl , '/projects/' , aProjectId printString
+		, '/repository/files/' , filePath urlEncoded , '/blame'.
+
+	branchRef ifNotNil: [ self client queryAt: #'ref' put: branchRef ].
+	start ifNotNil: [ self client queryAt: #'range[start]' put: start ].
+	end ifNotNil: [ self client queryAt: #'range[end]' put: end ].
+
+	^ self client get
 ]
 
 { #category : #'as yet unclassified' }
@@ -353,7 +376,8 @@ GLHApi >> initialize [
 
 	self client: (ZnClient new
 			 accept: ZnMimeType applicationJson;
-			 yourself)
+			 yourself).
+	currentAPI:= self
 ]
 
 { #category : #'api - jobs' }

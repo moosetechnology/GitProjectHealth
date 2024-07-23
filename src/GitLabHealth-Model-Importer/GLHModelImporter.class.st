@@ -11,8 +11,17 @@ Class {
 		'withInitialMergeRequest',
 		'generalReader'
 	],
+	#classVars : [
+		'currentImporter'
+	],
 	#category : #'GitLabHealth-Model-Importer'
 }
+
+{ #category : #accessing }
+GLHModelImporter class >> current [
+
+	^ currentImporter
+]
 
 { #category : #'private - api' }
 GLHModelImporter >> addCommits: commitsList toRepository: aProjectRepository [
@@ -491,16 +500,10 @@ GLHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName until:
 
 { #category : #'as yet unclassified' }
 GLHModelImporter >> importCreatorOfCommit: aCommit [
-
+	
 	aCommit commitCreator ifNil: [
 		aCommit commitCreator:
-			(self importUserByUsername: aCommit author_name)
-
-		"	addedCommit := (self importUserByUsername: addedCommit author_name)
-		               commits
-		               add: addedCommit
-		               unless: [ :existingCommit :newCommit |
-		               existingCommit id = newCommit id ]." ]
+			(self importUserByUsername: aCommit author_name) ]
 ]
 
 { #category : #api }
@@ -704,7 +707,7 @@ GLHModelImporter >> importProjectsSince: since [
 	[ newlyFoundProjects isNotEmpty ] whileTrue: [
 		| results |
 		page := page + 1.
-		('import project of page ' , page printString) recordInfo.
+		('import projects page #' , page printString) recordInfo.
 		results := self glhApi projects: amount since: since page: page.
 
 		newlyFoundProjects := glhModel
@@ -805,10 +808,11 @@ GLHModelImporter >> initialize [
 
 	withFiles := false.
 	withCommitDiffs := false.
-	withInitialCommits := false. 
-	withInitialMergeRequest := false. 
+	withInitialCommits := false.
+	withInitialMergeRequest := false.
 	withCommitsSince := (Date today - 1 week) asDateAndTime.
-	self initReader
+	self initReader.
+	currentImporter := self. 
 ]
 
 { #category : #importer }
