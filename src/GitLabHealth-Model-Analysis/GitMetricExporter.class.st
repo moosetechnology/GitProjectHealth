@@ -100,7 +100,7 @@ GitMetricExporter >> addEntitiesFromUserNames: userNames [
 	"then collect the project in which the user has be seen commited"
 	entities addAll: (userNames collect: [ :username |
 			 | projects metrics i size |
-			 projects := self findProjectsOfUser: username inside: projectCache.
+			 projects := self findCommitAuthorNamed: username amongProjects: projectCache.
 
 			 metrics := GitMetric4User new.
 			 metrics
@@ -396,13 +396,8 @@ GitMetricExporter >> exportOver: aCollectionOfDateWeekMonthOrYear [
 	'Done computing' recordInfo
 ]
 
-{ #category : #'as yet unclassified' }
-GitMetricExporter >> findProjectsOfUser: aCollection [ 
-	self shouldBeImplemented.
-]
-
 { #category : #projects }
-GitMetricExporter >> findProjectsOfUser: username inside: aCollectionOfProjects [
+GitMetricExporter >> findCommitAuthorNamed: username amongProjects: aCollectionOfProjects [
 
 	| response itsProjects i size |
 	i := 1.
@@ -428,6 +423,11 @@ GitMetricExporter >> findProjectsOfUser: username inside: aCollectionOfProjects 
 		               response isNotEmpty ].
 
 	^ itsProjects
+]
+
+{ #category : #'as yet unclassified' }
+GitMetricExporter >> findProjectsOfUser: aCollection [ 
+	self shouldBeImplemented.
 ]
 
 { #category : #accessing }
