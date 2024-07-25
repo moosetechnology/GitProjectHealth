@@ -88,7 +88,7 @@ GitMetric >> glhImporter: aGLPHModelImporter [
 { #category : #churn }
 GitMetric >> loadCommitOfProjects: aCollection since: since until: until [
 
-	| allCommits period size |
+	| allCommits period size i|
 	period := self cacheSymbolFor: GLHCommit since: since until: until.
 
 	"download commits unless project cache is not empty"
@@ -105,9 +105,11 @@ GitMetric >> loadCommitOfProjects: aCollection since: since until: until [
 
 	allCommits := allCommits flatten.
 
+	i := 0. 
 	size := allCommits size.
 	allCommits do: [ :commit |
-		MyLogs logProgress: 'import creators ' over: size.
+		('import commit creators [',  (i:=i+1) printString,  '/', size printString) recordInfo. 
+
 		glhImporter importCreatorOfCommit: commit ].
 
 	glhImporter chainsCommitsFrom: allCommits.
@@ -177,11 +179,11 @@ GitMetric >> setupGroupedDateFrom: since to: until over: aDateWeekMonthOrYear [
 
 
 	over = #day ifTrue: [
-		groupedByDate keysDo: [ :date |
+		
+	 groupedByDate := 	(groupedByDate associations select: [ :date |
 			| aWeekday |
-			aWeekday := date asDate weekday.
-			(aWeekday = #Sunday or: [ aWeekday = #Saturday ]) ifTrue: [
-				groupedByDate removeKey: date ] ] ].
+			aWeekday := date key asDate weekday.
+			(aWeekday = #Sunday or: [ aWeekday = #Saturday ]) not ]) asOrderedDictionary ].
 
 
 	groupedByDate

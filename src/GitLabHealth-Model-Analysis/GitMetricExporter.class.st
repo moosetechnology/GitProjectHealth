@@ -265,13 +265,13 @@ GitMetricExporter >> blockDelayUntilFirstChurnSince: period [
 
 { #category : #'as yet unclassified' }
 GitMetricExporter >> blockMergeRequestDurationSince: period [
-	
+
 	^ [ :metrics |
-				Smalltalk snapshot: true andQuit: false.
-				((metrics
-					  mergeRequestDurationSince: (period at: #since)
-					  until: (period at: #until)
-					  overA: over) at: #avgDuration) printString ]
+	  
+	  ((metrics
+		    mergeRequestDurationSince: (period at: #since)
+		    until: (period at: #until)
+		    overA: over) at: #avgDuration) printString ]
 ]
 
 { #category : #'as yet unclassified' }
@@ -291,30 +291,35 @@ GitMetricExporter >> constructFilePath: runningOver [
 GitMetricExporter >> debugExportOver: aCollectionOfDateWeekMonthOrYear [
 
 	| period |
-	over := Week.
+	over := Date.
 
-	period := runningPeriods second.
+	period := runningPeriods first.
 
 
 	1 halt.
 	"Code Contribution "
-	entities collect: (self blockCodeAdditionSince: period).
-	entities collect: (self blockCodeDeletionSince: period).
+
+	(entities collect: (self blockCodeAdditionSince: period)) recordInfo.
+	(entities collect: (self blockCodeDeletionSince: period)) recordInfo.
 
 	"Commit frequencies "
-	entities collect: (self blockCommitFrequencySince: period).
+	(entities collect: (self blockCommitFrequencySince: period))
+		recordInfo.
 
 	"comment contribution "
-	entities collect: (self blockCommentsContributionSince: period).
+	(entities collect: (self blockCommentsContributionSince: period))
+		recordInfo.
 
 	"merge Request Duration "
-	entities collect: (self blockMergeRequestDurationSince: period).
+	(entities collect: (self blockMergeRequestDurationSince: period))
+		recordInfo.
 
 	"code churn"
-	entities collect: (self blockCodeChurnSince: period).
+	(entities collect: (self blockCodeChurnSince: period)) recordInfo.
 
 	"delay Until First Churn"
-	entities collect: (self blockDelayUntilFirstChurnSince: period).
+	(entities collect: (self blockDelayUntilFirstChurnSince: period))
+		recordInfo.
 
 
 	'Done computing debug' recordInfo
@@ -338,22 +343,7 @@ GitMetricExporter >> entities: aCollection [
 ]
 
 { #category : #'as yet unclassified' }
-GitMetricExporter >> exportFor: usersWithProjects [
-
-	self exportFor: usersWithProjects over: { Date. Week . Month . Year }.
-]
-
-{ #category : #'as yet unclassified' }
-GitMetricExporter >> exportFor: usersWithProjects over: aCollectionOfDateWeekMonthOrYear [
-
-	entities ifNil: [
-		self addEntitiesFromUserNamesAndProjects: usersWithProjects ].
-
-	self exportFor: aCollectionOfDateWeekMonthOrYear. 
-]
-
-{ #category : #'as yet unclassified' }
-GitMetricExporter >> exportOver: aCollectionOfDateWeekMonthOrYear [
+GitMetricExporter >> exportAverageOver: aCollectionOfDateWeekMonthOrYear [
 
 	| file exportBrowserModel |
 	exportBrowserModel := MiExportModel new.
@@ -394,6 +384,21 @@ GitMetricExporter >> exportOver: aCollectionOfDateWeekMonthOrYear [
 			exportBrowserModel writeCSVOn: aStream ] ].
 
 	'Done computing' recordInfo
+]
+
+{ #category : #'as yet unclassified' }
+GitMetricExporter >> exportFor: usersWithProjects [
+
+	self exportFor: usersWithProjects over: { Date. Week . Month . Year }.
+]
+
+{ #category : #'as yet unclassified' }
+GitMetricExporter >> exportFor: usersWithProjects over: aCollectionOfDateWeekMonthOrYear [
+
+	entities ifNil: [
+		self addEntitiesFromUserNamesAndProjects: usersWithProjects ].
+
+	self exportFor: aCollectionOfDateWeekMonthOrYear. 
 ]
 
 { #category : #projects }

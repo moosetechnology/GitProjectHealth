@@ -100,7 +100,7 @@ GitMetric4User >> codeContributionsSince: since until: until overA: aDateWeekMon
 
 	| commits contributions groupedByDate |
 	'GitMetric4User: code contribution' recordInfo.
-	
+
 	groupedByDate := self
 		                 setupGroupedDateFrom: since
 		                 to: until
@@ -489,7 +489,7 @@ GitMetric4User >> delayUntilFirstChurnSince: since until: until overA: aDateWeek
 { #category : #churn }
 GitMetric4User >> foundSuccessorOf: userCommits andCompleteImportForMax: commitLimit [
 
-	| analyzingCommits |
+	| analyzingCommits i size|
 	analyzingCommits := Set new.
 	glhImporter withCommitDiffs: true.
 
@@ -499,12 +499,12 @@ GitMetric4User >> foundSuccessorOf: userCommits andCompleteImportForMax: commitL
 			toStoreThemIn: analyzingCommits
 			upto: commitLimit ].
 
+	i := 0.
+	size := analyzingCommits size. 
 	analyzingCommits do: [ :c |
-		MyLogs
-			logProgress: 'import commit creators: '
-			over: analyzingCommits size.
+		('import complete commits  [' , (i:=i+1) printString, '/', size printString , ']'  ) recordInfo.
 		glhImporter completeImportedCommit: c ].
-	
+
 	^ analyzingCommits
 ]
 
