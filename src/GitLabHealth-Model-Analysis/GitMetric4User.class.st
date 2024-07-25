@@ -2,7 +2,6 @@ Class {
 	#name : #GitMetric4User,
 	#superclass : #GitMetric,
 	#instVars : [
-		'itsGroups',
 		'itsCommits',
 		'itsMergeRequests'
 	],
@@ -26,7 +25,7 @@ GitMetric4User >> codeChurnSince: since until: until onACommitWindowOf: commitLi
 		               maxChildCommit: commitLimit.
 	glhImporter withCommitDiffs: false.
 	commits := self
-		           loadCommitOfProjects: itsProjects keys
+		           loadCommitsFromProjectsIds: itsProjects keys
 		           since: since
 		           until: until.
 	glhImporter withCommitDiffs: true.
@@ -112,7 +111,7 @@ GitMetric4User >> codeContributionsSince: since until: until overA: aDateWeekMon
 
 	glhImporter withCommitDiffs: false.
 	commits := self
-		           loadCommitOfProjects: itsProjects keys
+		           loadCommitsFromProjectsIds: itsProjects keys
 		           since: since
 		           until: until.
 	glhImporter withCommitDiffs: true.
@@ -175,7 +174,7 @@ GitMetric4User >> commentsContributionsSince: since until: until overA: aDateWee
 
 	glhImporter withCommitDiffs: false.
 	commits := self
-		           loadCommitOfProjects: itsProjects keys
+		           loadCommitsFromProjectsIds: itsProjects keys
 		           since: since
 		           until: until.
 	glhImporter withCommitDiffs: true.
@@ -231,7 +230,7 @@ GitMetric4User >> commitFrequencySince: since until: until overA: aDateWeekMonth
 
 	glhImporter withCommitDiffs: false.
 	userCommits := self
-		               loadCommitOfProjects: itsProjects keys
+		               loadCommitsFromProjectsIds: itsProjects keys
 		               since: since
 		               until: until.
 	glhImporter withCommitDiffs: true.
@@ -331,7 +330,7 @@ GitMetric4User >> delayUntilFirstChurnSince: since until: until onACommitWindowO
 
 	glhImporter withCommitDiffs: false.
 	commits := self
-		           loadCommitOfProjects: itsProjects keys
+		           loadCommitsFromProjectsIds: itsProjects keys
 		           since: since
 		           until: until.
 	glhImporter withCommitDiffs: true.
@@ -422,7 +421,7 @@ GitMetric4User >> delayUntilFirstChurnSince: since until: until overA: aDateWeek
 		                 over: aDateWeekMonthOrYear.
 
 	commits := self
-		           loadCommitOfProjects: itsProjects keys
+		           loadCommitsFromProjectsIds: itsProjects keys
 		           since: since
 		           until: until.
 
@@ -514,7 +513,6 @@ GitMetric4User >> initialize [
 	user := GLHUser new.
 	itsProjects := Dictionary new.
 	itsCommits := Dictionary new.
-	itsGroups := Dictionary new.
 	itsMergeRequests := Dictionary new
 ]
 
@@ -555,7 +553,7 @@ GitMetric4User >> mergeRequestDurationSince: since until: until overA: aDateWeek
 
 	glhImporter withCommitDiffs: false.
 	mergeRequest := self
-		                loadMergeRequestsOfProjects: itsProjects keys
+		                loadMergeRequestsFromProjectsIds: itsProjects keys
 		                since: since
 		                until: until.
 	glhImporter withCommitDiffs: true.

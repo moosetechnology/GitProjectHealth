@@ -86,7 +86,7 @@ GitMetric >> glhImporter: aGLPHModelImporter [
 ]
 
 { #category : #churn }
-GitMetric >> loadCommitOfProjects: aCollection since: since until: until [
+GitMetric >> loadCommitsFromProjectsIds: aCollection since: since until: until [
 
 	| allCommits period size i|
 	period := self cacheSymbolFor: GLHCommit since: since until: until.
@@ -118,7 +118,7 @@ GitMetric >> loadCommitOfProjects: aCollection since: since until: until [
 ]
 
 { #category : #churn }
-GitMetric >> loadMergeRequestsOfProjects: aCollection since: since until: until [
+GitMetric >> loadMergeRequestsFromProjectsIds: aCollection since: since until: until [
 
 	| allMr period |
 	"itsMergeRequests ifNil: [ itsMergeRequests := Dictionary new ]."
@@ -138,7 +138,7 @@ GitMetric >> loadMergeRequestsOfProjects: aCollection since: since until: until 
 ]
 
 { #category : #loading }
-GitMetric >> loadProjects: projectIds [
+GitMetric >> loadProjectsFromIds: projectIds [
 
 	projectIds do: [ :id |
 		

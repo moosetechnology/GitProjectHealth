@@ -3,8 +3,6 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'glhImporter',
-		'beforeExp',
-		'duringExp',
 		'label',
 		'entities',
 		'projectCache',
@@ -20,9 +18,19 @@ Class {
 GitMetricExporter class >> demoPeriod [
 
 	^ self new
-		  addPeriodFrom: '01 march 2023' to: '31 may 2023';
-		  addPeriodFrom: '01 december 2023' to: '29 february 2024';
-		  addPeriodFrom: '01 march 2024' to: '31 may 2024'
+		  addAPeriodFrom: '01 march 2023' to: '31 may 2023';
+		  addAPeriodFrom: '01 december 2023' to: '29 february 2024';
+		  addAPeriodFrom: '01 march 2024' to: '31 may 2024'
+]
+
+{ #category : #adding }
+GitMetricExporter >> addAPeriodFrom: since to: until [
+
+	runningPeriods add: {
+			(#since -> since asDate).
+			(#until -> until asDate) } asDictionary.
+	
+	^runningPeriods 
 ]
 
 { #category : #'as yet unclassified' }
@@ -100,7 +108,7 @@ GitMetricExporter >> addEntitiesFromUserNames: userNames [
 	"then collect the project in which the user has be seen commited"
 	entities addAll: (userNames collect: [ :username |
 			 | projects metrics i size |
-			 projects := self findCommitAuthorNamed: username amongProjects: projectCache.
+			 projects := self findParticipationOfCommitAuthorNamed: username amongProjects: projectCache.
 
 			 metrics := GitMetric4User new.
 			 metrics
@@ -140,7 +148,7 @@ GitMetricExporter >> addEntitiesFromUserNamesAndProjects: usersWithProjects [
 		            metrics
 			            glhImporter: glhImporter;
 			            findUserNamed: username.
-		            metrics loadProjects: projects.
+		            metrics loadProjectsFromIds: projects.
 
 		            metrics ]).
 
@@ -171,28 +179,6 @@ GitMetricExporter >> addMergeRequestDurationExporter: exportBrowserModel [
 		exportBrowserModel
 			addColumnForQuery: (self blockMergeRequestDurationSince: period)
 			withName: columnName ]
-]
-
-{ #category : #adding }
-GitMetricExporter >> addPeriodFrom: since to: until [
-
-	runningPeriods add: {
-			(#since -> since asDate).
-			(#until -> until asDate) } asDictionary.
-	
-	^runningPeriods 
-]
-
-{ #category : #'as yet unclassified' }
-GitMetricExporter >> beforeDic: aDictionnarySinceUntil [
-
-	self
-		deprecated: 'Use #addPeriodFrom:to: instead'
-		on: '11 July 2024'
-		in:
-		'Pharo-11.0.0+build.726.sha.aece1b5473acf3830a0e082c1bc3a15d4ff3522b (64 Bit)'.
-
-	beforeExp := aDictionnarySinceUntil
 ]
 
 { #category : #'as yet unclassified' }
@@ -325,18 +311,6 @@ GitMetricExporter >> debugExportOver: aCollectionOfDateWeekMonthOrYear [
 	'Done computing debug' recordInfo
 ]
 
-{ #category : #'as yet unclassified' }
-GitMetricExporter >> duringDic: aDictionnarySinceUntil [
-
-	self
-		deprecated: 'Use #addPeriodFrom:to: instead'
-		on: '11 July 2024'
-		in:
-		'Pharo-11.0.0+build.726.sha.aece1b5473acf3830a0e082c1bc3a15d4ff3522b (64 Bit)'.
-
-	duringExp := aDictionnarySinceUntil
-]
-
 { #category : #accessing }
 GitMetricExporter >> entities: aCollection [ 
 	entities := aCollection
@@ -372,6 +346,8 @@ GitMetricExporter >> exportAverageOver: aCollectionOfDateWeekMonthOrYear [
 
 	"delay Until First Churn"
 	self addDelayUntilFirstChurnExporter: exportBrowserModel.
+	
+	self addMergeRequestDurationExporter: exportBrowserModel.
 
 	aCollectionOfDateWeekMonthOrYear do: [ :aDateWeekMonthOrYear |
 		over := aDateWeekMonthOrYear.
@@ -402,7 +378,7 @@ GitMetricExporter >> exportFor: usersWithProjects over: aCollectionOfDateWeekMon
 ]
 
 { #category : #projects }
-GitMetricExporter >> findCommitAuthorNamed: username amongProjects: aCollectionOfProjects [
+GitMetricExporter >> findParticipationOfCommitAuthorNamed: username amongProjects: aCollectionOfProjects [
 
 	| response itsProjects i size |
 	i := 1.
@@ -423,7 +399,7 @@ GitMetricExporter >> findCommitAuthorNamed: username amongProjects: aCollectionO
 			                           commitsOfUser: username
 			                           inProject: project id
 			                           since: '01 january 2023' asDateAndTime
-			                           until: '24 may 2024' asDateAndTime.
+			                           until: Date today asDateAndTime.
 		               response := glhImporter parseCommitsResult: response.
 		               response isNotEmpty ].
 
@@ -460,4 +436,12 @@ GitMetricExporter >> label: aString [
 { #category : #accessing }
 GitMetricExporter >> maxCommitWindow: anInteger [
 	maxCommitWindow := anInteger abs
+]
+
+{ #category : #'as yet unclassified' }
+GitMetricExporter >> onlyImportProjectsOfGroup: groupId [ 
+	|group|
+	
+	group := GLHModelImporter current importGroup: groupId.
+	projectCache := group toScope: GLHProject. 
 ]

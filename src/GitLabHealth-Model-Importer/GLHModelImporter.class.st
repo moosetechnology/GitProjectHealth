@@ -42,11 +42,12 @@ GLHModelImporter >> addCommits: commitsList toRepository: aProjectRepository [
 
 { #category : #private }
 GLHModelImporter >> addGroupResultToModel: groupResult [
-
-	self glhModel add: groupResult unless: (self blockEqualityOn: #id).
+	|group|
+	group := self glhModel add: groupResult unless: self blockOnIdEquality.
 	self glhModel
 		addAll: groupResult projects
-		unless: (self blockEqualityOn: #id)
+		unless: self blockOnIdEquality.
+	^ group 
 ]
 
 { #category : #accessing }
@@ -576,9 +577,12 @@ GLHModelImporter >> importGroup: aGroupID [
 
 	groupResult projects do: [ :project |
 		self completeImportProject: project ].
-	self addGroupResultToModel: groupResult.
+	groupResult := self addGroupResultToModel: groupResult.
 	(self subGroupsOf: aGroupID) do: [ :subGroup |
-		groupResult addSubGroup: (self importGroup: subGroup id) ].
+		self glhModel add: subGroup unless: self blockOnIdEquality.
+		groupResult subGroups
+			add: (self importGroup: subGroup id)
+			unless: self blockOnIdEquality ].
 	^ groupResult
 ]
 
@@ -817,7 +821,7 @@ GLHModelImporter >> initialize [
 ]
 
 { #category : #importer }
-GLHModelImporter >> loadAllSystemProjects [
+GLHModelImporter >> loadAllProjectsFromRepositorySoftware [
 	"heavy import that load all the active project inside the model. Only import the project entities"
 	|projects|
 	
@@ -1085,15 +1089,15 @@ GLHModelImporter >> subGroupsOf: aGroupID [
 	| results parsedResult result page |
 	('Search subgroup of: ' , aGroupID printString) recordInfo.
 	results := OrderedCollection new.
-	page := 1.
-	result := self glhApi subgroupsOfGroup: aGroupID page: page.
-	parsedResult := self parseSubGroupResult: result.
-	results addAll: parsedResult.
-	[ parsedResult size = 20 ] whileTrue: [ 
+	page := 0.
+	
+	parsedResult := { true }.
+	[ parsedResult size > 0 ] whileTrue: [ 
 		page := page + 1.
 		result := self glhApi subgroupsOfGroup: aGroupID page: page.
 		parsedResult := self parseSubGroupResult: result.
 		results addAll: parsedResult ].
+	
 	^ results
 ]
 
