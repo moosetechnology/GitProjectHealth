@@ -697,7 +697,7 @@ GLHModelImporter >> importProjectsSince: since [
 	"copy import from commits"
 
 	| newlyFoundProjects page foundProject amount |
-	'import all Projects into the model' recordInfo.
+	('import all Projects since: ', since printString) recordInfo.
 
 	"number of projects per page"
 	amount := 100.
@@ -708,6 +708,7 @@ GLHModelImporter >> importProjectsSince: since [
 		| results |
 		page := page + 1.
 		('import projects page #' , page printString) recordInfo.
+		
 		results := self glhApi projects: amount since: since page: page.
 
 		newlyFoundProjects := glhModel

@@ -91,22 +91,36 @@ GitMetricExporter >> addDelayUntilFirstChurnExporter: exportBrowserModel [
 
 { #category : #'as yet unclassified' }
 GitMetricExporter >> addEntitiesFromUserNames: userNames [
+	"import all the project since a certain time"
 
+	'Import all projects from the Git repository' recordInfo.
 	projectCache := projectCache ifNil: [
 		                glhImporter importProjectsSince: sinceTimeLimit ].
 
+	"then collect the project in which the user has be seen commited"
 	entities addAll: (userNames collect: [ :username |
-			 | projects metrics |
+			 | projects metrics i size |
 			 projects := self findProjectsOfUser: username inside: projectCache.
 
 			 metrics := GitMetric4User new.
 			 metrics
 				 glhImporter: glhImporter;
 				 findUserNamed: username.
-			
+
+
+
+			 i := 0.
+			 size := projects size.
 			 metrics itsProjects: (projects collect: [ :p |
-					MyLogs logProgress: 'complete import of project #' over: projects.
-					 
+					  (' ' join: {
+							   'complete import of project:'.
+							   p name printString.
+							   '['.
+							   (i := i + 1) printString.
+							   '/'.
+							   size.
+							   ']' }) recordInfo.
+
 					  p id -> (glhImporter completeImportProject: p) ]) asDictionary.
 
 			 metrics ]).
@@ -390,13 +404,27 @@ GitMetricExporter >> findProjectsOfUser: aCollection [
 { #category : #projects }
 GitMetricExporter >> findProjectsOfUser: username inside: aCollectionOfProjects [
 
-	| response itsProjects |
+	| response itsProjects i size |
+	i := 1.
+	size := aCollectionOfProjects size.
 	itsProjects := aCollectionOfProjects select: [ :project |
+		               (' ' join: {
+				                'search'.
+				                username printString.
+				                'in Project:'.
+				                project name printString.
+				                '['.
+				                (i := i + 1) printString.
+				                '/'.
+				                size.
+				                ']' }) recordInfo.
+
 		               response := glhImporter glhApi
 			                           commitsOfUser: username
-			                           inProject: project id since: '01 january 2023' asDateAndTime  until: '24 may 2024' asDateAndTime.
+			                           inProject: project id
+			                           since: '01 january 2023' asDateAndTime
+			                           until: '24 may 2024' asDateAndTime.
 		               response := glhImporter parseCommitsResult: response.
-
 		               response isNotEmpty ].
 
 	^ itsProjects
