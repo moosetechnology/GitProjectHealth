@@ -12,27 +12,6 @@ Class {
 }
 
 { #category : #analyze }
-GitAnalyzer >> analyseAmandment [
-	"return the first commit that modify the same lines of code as the fromCommit"
-
-	| churn res access|
-	
-	access := ('' join: {
-			           'amandment'.
-			           maxChildCommits }) asSymbol.
-	
-	^ fromCommit cacheAt: access ifPresent: [ :v | v ] ifAbsentPut: [
-	
-	('GitAnalyzer, analyse amandment onProject: ', onProject printString )
-		recordInfo.
-	
-	churn := self analyseChurn.
-
-	res := self firstAmandmentFromChrun: churn.
-	 res]
-]
-
-{ #category : #analyze }
 GitAnalyzer >> analyseChurn [
 
 	| commitFiles totalContribution childCommits access |
@@ -48,6 +27,7 @@ GitAnalyzer >> analyseChurn [
 			                       visitChildCommits: fromCommit childCommits
 			                       toStoreThemIn: childCommits
 			                       upto: self maxChildCommits.
+		  totalContribution add: fromCommit. 
 		  totalContribution := totalContribution sum: [ :commit | "nil if merge request commit"
 			                       commit additions ifNil: [ 0 ] ].
 		  commitFiles := self
@@ -60,7 +40,7 @@ GitAnalyzer >> analyseChurn [
 ]
 
 { #category : #analyze }
-GitAnalyzer >> analyseCommentContributions [
+GitAnalyzer >> analyseCommentContribution [
 
 	| numberOfComments |
 	('GitAnalyzer, analyse comment contributions onProject: '
@@ -131,6 +111,27 @@ GitAnalyzer >> analyseCommitFrequencySince: since until: until [
 ]
 
 { #category : #analyze }
+GitAnalyzer >> analyseDelayUntilFirstChurn [
+	"return the first commit that modify the same lines of code as the fromCommit"
+
+	| churn res access|
+	
+	access := ('' join: {
+			           'amandment'.
+			           maxChildCommits }) asSymbol.
+	
+	^ fromCommit cacheAt: access ifPresent: [ :v | v ] ifAbsentPut: [
+	
+	('GitAnalyzer, analyse amandment onProject: ', onProject printString )
+		recordInfo.
+	
+	churn := self analyseChurn.
+
+	res := self firstAmandmentFromChrun: churn.
+	 res]
+]
+
+{ #category : #analyze }
 GitAnalyzer >> analyseMergeResquestValidation: aGLHPMergeRequest [
 
 	| creationDate mergedDate response |
@@ -183,10 +184,11 @@ GitAnalyzer >> arrangeCommitsByDate: commits [
 { #category : #churn }
 GitAnalyzer >> computeChurnOnFiles: aCollection [
 
-	| changesDic perFileChanges churns |
+	| changesDic perFileChanges churns initialAuthor followingAuthors|
 	"1 -> (a GLPHEChange -> NumberOfChurnDetected)"
 	changesDic := Dictionary new.
-
+	initialAuthor := fromCommit commitCreator. 
+	
 
 	perFileChanges := aCollection associations collect: [ :assoc |
 		                  assoc key
@@ -194,25 +196,43 @@ GitAnalyzer >> computeChurnOnFiles: aCollection [
 
 
 	churns := perFileChanges collect: [ :assoc |
-		          | churn file results |
+		          | churnData file aLineOfChanges |
 		          file := assoc key.
-		          results := assoc value.
-		          results values ifEmpty: [ churn := nil ] ifNotEmpty: [
-			          | churnedContribution locContributed |
-			          "churn contribution are the LoC that were affected by a churn"
-			          churnedContribution := results values select: [ :a |
-				                                 a value > 1 ].
-			          locContributed := results values sum: [ :a | a value ].
+		          aLineOfChanges := assoc value.
+		          churnData := aLineOfChanges values ifEmpty: [  nil ] ifNotEmpty: [
+			          | churnedContribution churnSpecificFromCommit churnOfAuthorOnly |
+			        
+			          "the total churn on any LoC affected"
+			          churnedContribution := aLineOfChanges select: [ :a |
+				                                 a value  > 1 ].
 
-			          churn := {
+			          "the churn that coccurs specifically on the loc introduced by the initial commit"
+			          churnSpecificFromCommit := churnedContribution select: [ :a |
+				                                     (a key collect: [ :loc |
+					                                      loc diffRange diff commit ])
+					                                     includes: fromCommit ].
+
+						"the churn made the author of the initial commits "
+			          churnOfAuthorOnly := churnSpecificFromCommit select: [ :a |
+				                                     (((a key collect: [ :loc |
+					                                      loc diffRange diff commit commitCreator ]) asSet) difference: {initialAuthor} asSet ) isEmpty
+					                                     ].
+						
+
+			          {
+				                   (#churnFromInitialCommitLines
+				                    ->
+					                    ((churnSpecificFromCommit sum: #value) - churnSpecificFromCommit size)).
+										(#churnFromCommitCreatorOnly
+				                    ->
+					                    ((churnOfAuthorOnly sum: #value) - churnOfAuthorOnly size)).
 				                   (#churnLoC
 				                    ->
-					                    ((churnedContribution sum: [ :a | a value ])
-					                     - churnedContribution size)).
-				                   (#locContributed -> locContributed) }
-				                   asDictionary ].
+					                    ((churnedContribution sum: #value)
+					                     - churnedContribution size)) 
+					} asDictionary ].
 
-		          file -> churn ].
+		          file -> churnData ].
 	churns := churns reject: [ :file2churn | file2churn value isNil ].
 
 	^ {

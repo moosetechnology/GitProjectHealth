@@ -1,6 +1,15 @@
 Extension { #name : #GLHCommit }
 
 { #category : #'*GitLabHealth-Model-Extension' }
+GLHCommit >> computeChurnForMaxCommits: aLimit [
+
+	^ GitAnalyzer new
+		  fromCommit: self;
+		  maxChildCommit: aLimit;
+		  analyseChurn
+]
+
+{ #category : #'*GitLabHealth-Model-Extension' }
 GLHCommit >> displayStringOn: aStream [
 
 	aStream

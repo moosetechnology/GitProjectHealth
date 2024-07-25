@@ -1,14 +1,9 @@
 Class {
 	#name : #GitMetric4User,
-	#superclass : #Object,
+	#superclass : #GitMetric,
 	#instVars : [
-		'user',
-		'itsProjects',
 		'itsGroups',
 		'itsCommits',
-		'gitAnalyzer',
-		'glhModel',
-		'glhImporter',
 		'itsMergeRequests'
 	],
 	#category : #'GitLabHealth-Model-Analysis'
@@ -18,10 +13,7 @@ Class {
 GitMetric4User >> codeChurnSince: since until: until onACommitWindowOf: commitLimit overA: aDateWeekMonthOrYear [
 
 	| commits res groupedByDate totalContributions userCommits |
-	"for each commit, we get its churn result (a dictionnary)""debug halt""percentage := (((totalChurn * 100) / totalContribution) asFloat)""		(
-		#churn -> ((groupedByDate sum: [ :frac | frac numerator ]) ->
-		     (groupedByDate sum: [ :frac | frac denominator ]))
-		)."
+	"for each commit, we get its churn result (a dictionnary)"
 	'GitMetric4User: code churn' recordInfo.
 	totalContributions := OrderedCollection new.
 	groupedByDate := self
@@ -108,9 +100,7 @@ GitMetric4User >> codeContributionsSince: since until: until overA: aDateWeekMon
 
 	| commits contributions groupedByDate |
 	'GitMetric4User: code contribution' recordInfo.
-
-
-
+	
 	groupedByDate := self
 		                 setupGroupedDateFrom: since
 		                 to: until
@@ -154,7 +144,6 @@ GitMetric4User >> codeContributionsSince: since until: until overA: aDateWeekMon
 			                 (#addition -> totalAdd).
 			                 (#deletion -> totalDele) } asDictionary ].
 
-
 	^ {
 		  (#overEach -> aDateWeekMonthOrYear name).
 		  (#forOver -> (groupedByDate keys size printString
@@ -197,7 +186,7 @@ GitMetric4User >> commentsContributionsSince: since until: until overA: aDateWee
 	contributions := commits collect: [ :commit |
 		                 commit -> (gitAnalyzer
 			                  fromCommit: commit;
-			                  analyseCommentContributions) ].
+			                  analyseCommentContribution) ].
 
 
 	contributions do: [ :assoc |
@@ -234,7 +223,6 @@ GitMetric4User >> commitFrequencySince: since until: until overA: aDateWeekMonth
 
 	| periods total groupedByDate userCommits |
 	'GitMetric4User: commit frequency' recordInfo.
-
 
 	groupedByDate := self
 		                 setupGroupedDateFrom: since
@@ -302,18 +290,18 @@ GitMetric4User >> commitsProducedOnProject: projectId since: sinceDate until: un
 
 { #category : #metrics }
 GitMetric4User >> commitsProducedOnProject: aProjectId since: since until: until overA: aWeekOrMonthOrYear [
-	"'aWeekOrMonthOrYear' should be the class of Week, Month or Year"
-
-	"self commitFrequencyOnProject: 6462 since: (Date today - 60 day) until: (Date today) overA: Week. "
+	"'aWeekOrMonthOrYear' should be the class of Data, Week, Month or Year"
 
 	| frequency aggregatedFrequencies |
-	aggregatedFrequencies := self setupGroupedDateFrom: since to: until  over: aWeekOrMonthOrYear.
-	
+	aggregatedFrequencies := self
+		                         setupGroupedDateFrom: since
+		                         to: until
+		                         over: aWeekOrMonthOrYear.
+
 	frequency := self
 		             commitsProducedOnProject: aProjectId
 		             since: since
 		             until: until.
-
 
 	frequency associations do: [ :assoc |
 		| date commits overDate |
@@ -382,7 +370,7 @@ GitMetric4User >> delayUntilFirstChurnSince: since until: until onACommitWindowO
 				                  onModel: glhModel;
 				                  fromCommit: commitA;
 				                  maxChildCommit: maxCommitWindow;
-				                  analyseAmandment.
+				                  analyseDelayUntilFirstChurn.
 
 			       durationFromA2B := commitB
 				                          ifNil: [ 0 ]
@@ -465,7 +453,7 @@ GitMetric4User >> delayUntilFirstChurnSince: since until: until overA: aDateWeek
 				                  onModel: glhModel;
 				                  fromCommit: commitA;
 				                  maxChildCommit: 5;
-				                  analyseAmandment.
+				                  analyseDelayUntilFirstChurn.
 
 			       durationFromA2B := commitB
 				                          ifNil: [ 0 ]
@@ -498,17 +486,10 @@ GitMetric4User >> delayUntilFirstChurnSince: since until: until overA: aDateWeek
 		  (#details -> groupedByDate) } asDictionary
 ]
 
-{ #category : #'as yet unclassified' }
-GitMetric4User >> findUserNamed: aUsername [
-
-	user := glhImporter importUserByUsername: aUsername.
-	^ user
-]
-
 { #category : #churn }
 GitMetric4User >> foundSuccessorOf: userCommits andCompleteImportForMax: commitLimit [
 
-	| analyzingCommits i|
+	| analyzingCommits |
 	analyzingCommits := Set new.
 	glhImporter withCommitDiffs: true.
 
@@ -517,17 +498,14 @@ GitMetric4User >> foundSuccessorOf: userCommits andCompleteImportForMax: commitL
 			visitChildCommits: c childCommits
 			toStoreThemIn: analyzingCommits
 			upto: commitLimit ].
-	i := 1. 
-	analyzingCommits do: [ :c | 
-		(' ' join: { 'import commit creators: ' .(i) . '/' . analyzingCommits size }) recordInfo.
-		i := i + 1. 
-		glhImporter completeImportedCommit: c ].
-	^ analyzingCommits
-]
 
-{ #category : #accessing }
-GitMetric4User >> glhImporter: aGLPHModelImporter [ 
-	glhImporter := aGLPHModelImporter
+	analyzingCommits do: [ :c |
+		MyLogs
+			logProgress: 'import commit creators: '
+			over: analyzingCommits size.
+		glhImporter completeImportedCommit: c ].
+	
+	^ analyzingCommits
 ]
 
 { #category : #initialization }
@@ -560,74 +538,6 @@ GitMetric4User >> loadCommitOfProjects: aCollection since: aTimespan [
 		 ].
 
 	^ self userCommits.
-]
-
-{ #category : #churn }
-GitMetric4User >> loadCommitOfProjects: aCollection since: since until: until [
-
-	| allCommits period i|
-	period := ('commits since ' , since printString , ' to '
-	           , until printString) asSymbol.
-
-	"download commits unless project cache is not empty"
-	allCommits := aCollection collect: [ :idProject |
-		              | project |
-		              project := itsProjects at: idProject.
-		              project repository cacheAt: period ifAbsentPut: [
-			              | foundCommits |
-			              foundCommits := glhImporter
-				                              importCommitsOProject: project
-				                              since: since
-				                              until: until.
-			              foundCommits ] ].
-
-	allCommits := allCommits flatten.
-
-	i := 1. 
-	allCommits do: [ :commit |
-		(' ' join: { 'import creators ' .(i) . '/' . allCommits size }) recordInfo.
-		glhImporter importCreatorOfCommit: commit.
-		i := i + 1. 
-	 ].
-
-	glhImporter chainsCommitsFrom: allCommits.
-
-	^ allCommits
-]
-
-{ #category : #churn }
-GitMetric4User >> loadMergeRequestsOfProjects: aCollection since: since until: until [
-
-	| allMr period|
-	"itsMergeRequests ifNil: [ itsMergeRequests := Dictionary new ]."
-	
-	period := ('mr since ' , since printString , ' to '
-	           , until printString) asSymbol.
-
-	allMr := aCollection collect: [ :idProject |
-		              | project mr|
-		              project := itsProjects at: idProject.
-		              project cacheAt: period ifAbsentPut: [ 
-							mr :=	glhImporter
-					                importMergeRequests: project
-					                since: since
-					                until: until.
-							mr. 	
-			 ].	
-		].
-	
-	^  allMr flattened.
-
-]
-
-{ #category : #loading }
-GitMetric4User >> loadProjects: projectIds [
-
-	projectIds do: [ :id |
-		
-		itsProjects at: id ifAbsentPut: [ glhImporter importProject: id ] ].
-
-	^ itsProjects
 ]
 
 { #category : #metrics }
@@ -706,61 +616,6 @@ GitMetric4User >> mergeRequestDurationSince: since until: until overA: aDateWeek
 		    , aDateWeekMonthOrYear printString)).
 		  (#totalMergeRequest -> mergeRequest size).
 		  (#details -> groupedByDate) } asDictionary
-]
-
-{ #category : #setup }
-GitMetric4User >> setupGroupedDateFrom: since to: until over: aDateWeekMonthOrYear [
-
-	| groupedByDate start end over increment|
-	groupedByDate := OrderedDictionary new.
-
-	increment := 1.
-	start := self transformDate: since to: aDateWeekMonthOrYear.
-	end := self transformDate: until to: aDateWeekMonthOrYear.
-
-	groupedByDate
-		at: start printString
-		ifAbsentPut: [ OrderedCollection new ].
-	
-	over := aDateWeekMonthOrYear name asLowercase asSymbol.
-		over = #date ifTrue: [ over := #day ].
-		over = #month ifTrue: [ increment := 32. over := #day ].
-		 
-
-	[ groupedByDate keys last asDateAndTime < end ] whileTrue: [
-		| index  |
-		index := groupedByDate keys last asDateAndTime + (increment perform: over).
-		index := self transformDate: index to: aDateWeekMonthOrYear.
-		groupedByDate
-			at: index printString
-			ifAbsentPut: [ OrderedCollection new ] ].
-	
-	
-	over = #day ifTrue: [ 
-		groupedByDate keys do: [ :date |
-			|aWeekday|
-			 aWeekday := date asDate weekday. 
-			((aWeekday =  #Sunday) or: [ aWeekday = #Saturday ] )ifTrue: [ 
-				groupedByDate removeKey: date. 
-				 ] 
-			 ].
-		 ].
-	
-
-	groupedByDate
-		at: end printString
-		ifAbsentPut: [ OrderedCollection new ].
-
-	^ groupedByDate
-]
-
-{ #category : #'as yet unclassified' }
-GitMetric4User >> transformDate: date to: aWeekOrMonthOrYear [
-
-	aWeekOrMonthOrYear = Month ifTrue: [ ^ date asDate month asDate ].
-
-	^ (date asDate perform: ('as' , aWeekOrMonthOrYear name) asSymbol)
-		  asDate
 ]
 
 { #category : #accessing }

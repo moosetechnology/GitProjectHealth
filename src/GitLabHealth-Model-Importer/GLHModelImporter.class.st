@@ -11,8 +11,17 @@ Class {
 		'withInitialMergeRequest',
 		'generalReader'
 	],
+	#classVars : [
+		'currentImporter'
+	],
 	#category : #'GitLabHealth-Model-Importer'
 }
+
+{ #category : #accessing }
+GLHModelImporter class >> current [
+
+	^ currentImporter
+]
 
 { #category : #'private - api' }
 GLHModelImporter >> addCommits: commitsList toRepository: aProjectRepository [
@@ -320,9 +329,9 @@ GLHModelImporter >> importCommits: aGLHProject [
 		commit repository: aGLHProject repository ].
 
 	self withCommitDiffs ifTrue: [
-		parsedResults do: [ :commit |
-
-			self importDiffOfCommit: commit ] ]
+		parsedResults do: [ :commit | self importDiffOfCommit: commit ] ].
+	
+	^ parsedResults. 
 ]
 
 { #category : #'as yet unclassified' }
@@ -491,16 +500,10 @@ GLHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName until:
 
 { #category : #'as yet unclassified' }
 GLHModelImporter >> importCreatorOfCommit: aCommit [
-
+	
 	aCommit commitCreator ifNil: [
 		aCommit commitCreator:
-			(self importUserByUsername: aCommit author_name)
-
-		"	addedCommit := (self importUserByUsername: addedCommit author_name)
-		               commits
-		               add: addedCommit
-		               unless: [ :existingCommit :newCommit |
-		               existingCommit id = newCommit id ]." ]
+			(self importUserByUsername: aCommit author_name) ]
 ]
 
 { #category : #api }
@@ -653,15 +656,14 @@ GLHModelImporter >> importPipelinesOfProject: aGLHProject [
 { #category : #imports }
 GLHModelImporter >> importProjects [
 	"heavy import of all projects"
-	
+
 	"copy import from commits"
-	
-	
-	| newlyFoundProjects page foundProject amount|
-	('import all Projects into the model') recordInfo.
-	
+
+	| newlyFoundProjects page foundProject amount |
+	'import all Projects into the model' recordInfo.
+
 	"number of projects per page"
-	amount := 50.
+	amount := 100.
 	page := 0.
 	foundProject := OrderedCollection new.
 	newlyFoundProjects := { true }.
@@ -670,16 +672,22 @@ GLHModelImporter >> importProjects [
 		page := page + 1.
 		('import project of page ' , page printString) recordInfo.
 		results := self glhApi projects: amount page: page.
-		
+
 		newlyFoundProjects := glhModel
-			                addAll: (self parseArrayOfProject: results)
-			                unless: self blockOnIdEquality.
-		foundProject addAll: newlyFoundProjects 
-		
-		].
+			                      addAll: (self parseArrayOfProject: results)
+			                      unless: self blockOnIdEquality.
+		foundProject addAll: newlyFoundProjects ].
 
 	^ foundProject
+]
+
+{ #category : #projects }
+GLHModelImporter >> importProjects: aCollectionOfProjectID [
 	
+	^ aCollectionOfProjectID collect: [ :id |
+		self importProject: id.
+		 ]
+	 
 ]
 
 { #category : #imports }
@@ -699,7 +707,7 @@ GLHModelImporter >> importProjectsSince: since [
 	[ newlyFoundProjects isNotEmpty ] whileTrue: [
 		| results |
 		page := page + 1.
-		('import project of page ' , page printString) recordInfo.
+		('import projects page #' , page printString) recordInfo.
 		results := self glhApi projects: amount since: since page: page.
 
 		newlyFoundProjects := glhModel
@@ -771,7 +779,7 @@ GLHModelImporter >> importUserByUsername: anUsername [
 			   (searchResult at: #message) includesSubstring: '403 Forbidden' ])
 			  ifTrue: [
 				  glhModel
-					  add: (GLHUser new username: anUsername)
+					  add: (GLHUser new username: anUsername; name: anUsername; yourself )
 					  unless: [ :nu :ou | nu username = ou username ] ]
 			  ifFalse: [
 				  searchResult
@@ -800,10 +808,11 @@ GLHModelImporter >> initialize [
 
 	withFiles := false.
 	withCommitDiffs := false.
-	withInitialCommits := false. 
-	withInitialMergeRequest := false. 
+	withInitialCommits := false.
+	withInitialMergeRequest := false.
 	withCommitsSince := (Date today - 1 week) asDateAndTime.
-	self initReader
+	self initReader.
+	currentImporter := self. 
 ]
 
 { #category : #importer }

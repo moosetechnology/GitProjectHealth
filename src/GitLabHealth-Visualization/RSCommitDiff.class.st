@@ -29,11 +29,11 @@ RSCommitDiff class >> shapeFor: aCommitDiff [
 RSCommitDiff >> buildCanvas [
 
 	| shapes |
-	self
+"	self
 		deprecated: 'Use #build instead'
 		on: '2 May 2024'
 		in:
-		'Pharo-11.0.0+build.726.sha.aece1b5473acf3830a0e082c1bc3a15d4ff3522b (64 Bit)'.
+		'Pharo-11.0.0+build.726.sha.aece1b5473acf3830a0e082c1bc3a15d4ff3522b (64 Bit)'."
 	canvas := RSCanvas new.
 	shapes := RSGroup new.
 
@@ -101,7 +101,7 @@ RSCommitDiff >> shapeForDiff: aGLHDiff withColor: color [
 	group := RSGroup new.
 	label := RSLabel new
 		         text:
-			         (aGLHDiff new_path asPath segments last
+			         (aGLHDiff diff new_path asPath segments last
 				          truncateWithElipsisTo: 50);
 		         yourself.
 	box := RSBox new

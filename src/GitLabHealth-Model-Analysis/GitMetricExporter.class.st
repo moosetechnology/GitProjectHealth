@@ -17,6 +17,15 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
+GitMetricExporter class >> demoPeriod [
+
+	^ self new
+		  addPeriodFrom: '01 march 2023' to: '31 may 2023';
+		  addPeriodFrom: '01 december 2023' to: '29 february 2024';
+		  addPeriodFrom: '01 march 2024' to: '31 may 2024'
+]
+
+{ #category : #'as yet unclassified' }
 GitMetricExporter >> addCodeChurnExporter: exportBrowserModel [
 
 	| columnName |
@@ -29,7 +38,7 @@ GitMetricExporter >> addCodeChurnExporter: exportBrowserModel [
 			addColumnForQuery: (self blockCodeChurnSince: period)
 			withName: columnName.
 
-		Smalltalk snapshot: true andQuit: false ]
+	 ].
 ]
 
 { #category : #'as yet unclassified' }
@@ -64,7 +73,7 @@ GitMetricExporter >> addContributionExporter: exportBrowserModel [
 			addColumnForQuery: (self blockCodeDeletionSince: period)
 			withName: columnName.
 
-		Smalltalk snapshot: true andQuit: false ]
+	 ]
 ]
 
 { #category : #'as yet unclassified' }
@@ -94,10 +103,11 @@ GitMetricExporter >> addEntitiesFromUserNames: userNames [
 			 metrics
 				 glhImporter: glhImporter;
 				 findUserNamed: username.
-			 metrics itsProjects:
-				 (projects collect: [ :p |
+			
+			 metrics itsProjects: (projects collect: [ :p |
+					MyLogs logProgress: 'complete import of project #' over: projects.
+					 
 					  p id -> (glhImporter completeImportProject: p) ]) asDictionary.
-
 
 			 metrics ]).
 
@@ -149,8 +159,24 @@ GitMetricExporter >> addMergeRequestDurationExporter: exportBrowserModel [
 			withName: columnName ]
 ]
 
+{ #category : #adding }
+GitMetricExporter >> addPeriodFrom: since to: until [
+
+	runningPeriods add: {
+			(#since -> since asDate).
+			(#until -> until asDate) } asDictionary.
+	
+	^runningPeriods 
+]
+
 { #category : #'as yet unclassified' }
 GitMetricExporter >> beforeDic: aDictionnarySinceUntil [
+
+	self
+		deprecated: 'Use #addPeriodFrom:to: instead'
+		on: '11 July 2024'
+		in:
+		'Pharo-11.0.0+build.726.sha.aece1b5473acf3830a0e082c1bc3a15d4ff3522b (64 Bit)'.
 
 	beforeExp := aDictionnarySinceUntil
 ]
@@ -282,6 +308,13 @@ GitMetricExporter >> debugExportOver: aCollectionOfDateWeekMonthOrYear [
 
 { #category : #'as yet unclassified' }
 GitMetricExporter >> duringDic: aDictionnarySinceUntil [
+
+	self
+		deprecated: 'Use #addPeriodFrom:to: instead'
+		on: '11 July 2024'
+		in:
+		'Pharo-11.0.0+build.726.sha.aece1b5473acf3830a0e082c1bc3a15d4ff3522b (64 Bit)'.
+
 	duringExp := aDictionnarySinceUntil
 ]
 
@@ -379,24 +412,19 @@ GitMetricExporter >> glhImporter: anImporter [
 GitMetricExporter >> initialize [
 
 	entities := OrderedCollection new.
-	sinceTimeLimit := '1 january 2023' asDateAndTime.
-	runningPeriods := OrderedCollection new
-		                  add: {
-				                  (#since -> '1 march 2023' asDate).
-				                  (#until -> '30 may 2023' asDate) } asDictionary;
-		                  add: {
-				                  (#since -> '1 march 2024' asDate).
-				                  (#until -> '30 may 2024' asDate) } asDictionary;
-		                  add: {
-				                  (#since -> '1 december 2023' asDate).
-				                  (#until -> '29 february 2024' asDate) }
-				                  asDictionary;
-		                  yourself.
-	maxCommitWindow := 3. 
+	"set up the minimal date from which we are looking for the commits a particular user in projects"
+	sinceTimeLimit := '1 january 2024' asDateAndTime.
+	runningPeriods := OrderedCollection new.
+	maxCommitWindow := 3.
 	over := Date
 ]
 
 { #category : #accessing }
 GitMetricExporter >> label: aString [ 
 	label := aString
+]
+
+{ #category : #accessing }
+GitMetricExporter >> maxCommitWindow: anInteger [
+	maxCommitWindow := anInteger abs
 ]
