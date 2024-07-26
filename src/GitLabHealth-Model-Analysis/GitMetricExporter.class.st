@@ -401,7 +401,8 @@ GitMetricExporter >> findParticipationOfCommitAuthorNamed: username amongProject
 			                           since: '01 january 2023' asDateAndTime
 			                           until: Date today asDateAndTime.
 		               response := glhImporter parseCommitsResult: response.
-		               response isNotEmpty ].
+		               response isNotEmpty
+		 ].
 
 	^ itsProjects
 ]
