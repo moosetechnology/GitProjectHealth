@@ -45,7 +45,7 @@ GLHModelImporter >> addGroupResultToModel: groupResult [
 	|group|
 	group := self glhModel add: groupResult unless: self blockOnIdEquality.
 	self glhModel
-		addAll: groupResult projects
+		addAll: group projects
 		unless: self blockOnIdEquality.
 	^ group 
 ]
@@ -88,23 +88,24 @@ GLHModelImporter >> blockOnNameEquality [
 
 { #category : #'private - api' }
 GLHModelImporter >> completeImportProject: aGLHProject [
-
+	|importedProject|
 	('Complete import of project: ' , aGLHProject id printString)
 		recordInfo.
+	importedProject := self glhModel add: aGLHProject unless: (self blockOnIdEquality ).
 
-	self importPipelinesOfProject: aGLHProject.
+	self importPipelinesOfProject: importedProject.
 
 	"aGLHProject creator: (self importUser: aGLHProject creator_id)."
 
-	(self importUser: aGLHProject creator_id) addCreatedProject:
-		aGLHProject.
+	(self importUser: importedProject creator_id) addCreatedProject:
+		importedProject.
 
-	aGLHProject repository: GLHRepository new.
-	self glhModel add: aGLHProject unless: (self blockEqualityOn: #id).
-	self glhModel add: aGLHProject repository.
-	self importRepository: aGLHProject repository.
 
-	^ aGLHProject
+	importedProject repository: GLHRepository new.
+	self glhModel add: importedProject repository.
+	self importRepository: importedProject repository.
+
+	^ importedProject
 ]
 
 { #category : #'as yet unclassified' }
@@ -574,12 +575,13 @@ GLHModelImporter >> importGroup: aGroupID [
 
 	result := self glhApi group: aGroupID.
 	groupResult := self parseGroupResult: result.
+	groupResult := self addGroupResultToModel: groupResult.
 
 	groupResult projects do: [ :project |
 		self completeImportProject: project ].
-	groupResult := self addGroupResultToModel: groupResult.
+
 	(self subGroupsOf: aGroupID) do: [ :subGroup |
-		self glhModel add: subGroup unless: self blockOnIdEquality.
+		
 		groupResult subGroups
 			add: (self importGroup: subGroup id)
 			unless: self blockOnIdEquality ].
@@ -653,8 +655,8 @@ GLHModelImporter >> importParentCommitsOfCommit: aGLHCommit since: aDate [
 GLHModelImporter >> importPipelinesOfProject: aGLHProject [
 
 	(self pipelinesOf: aGLHProject id) do: [ :pipeline |
-		self glhModel add: pipeline.
-		aGLHProject addPipeline: pipeline ]
+		self glhModel add: pipeline unless: self blockOnIdEquality .
+		aGLHProject pipelines add: pipeline unless: self blockOnIdEquality]
 ]
 
 { #category : #imports }
@@ -737,14 +739,11 @@ GLHModelImporter >> importRepository: aGLHRepository [
 
 	('import the branches of project ') recordInfo.
 
-	aGLHRepository branches
+	branches := aGLHRepository branches
 		addAll: branches
 		unless: self blockOnNameEquality.
-	self glhModel addAll: branches unless: self blockOnNameEquality.
+	branches := self glhModel addAll: branches unless: self blockOnNameEquality.
 
-	"branches do: [ :branch |
-		aGLHRepository addBranch: branch.
-		self glhModel add: branch ]."
 
 	self withFiles ifTrue: [
 		branches do: [ :branch | self importFilesOfBranch: branch ] ] ]
@@ -1093,10 +1092,10 @@ GLHModelImporter >> subGroupsOf: aGroupID [
 	
 	parsedResult := { true }.
 	[ parsedResult size > 0 ] whileTrue: [ 
-		page := page + 1.
 		result := self glhApi subgroupsOfGroup: aGroupID page: page.
 		parsedResult := self parseSubGroupResult: result.
-		results addAll: parsedResult ].
+		results addAll: parsedResult.
+				page := page + 1. ].
 	
 	^ results
 ]
