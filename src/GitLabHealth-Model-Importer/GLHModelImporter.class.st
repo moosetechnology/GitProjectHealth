@@ -653,8 +653,8 @@ GLHModelImporter >> importParentCommitsOfCommit: aGLHCommit since: aDate [
 GLHModelImporter >> importPipelinesOfProject: aGLHProject [
 
 	(self pipelinesOf: aGLHProject id) do: [ :pipeline |
-		self glhModel add: pipeline.
-		aGLHProject addPipeline: pipeline ]
+		self glhModel add: pipeline unless: self blockOnIdEquality .
+		aGLHProject pipelines add: pipeline unless: self blockOnIdEquality]
 ]
 
 { #category : #imports }
