@@ -439,9 +439,10 @@ GitMetricExporter >> maxCommitWindow: anInteger [
 ]
 
 { #category : #'as yet unclassified' }
-GitMetricExporter >> onlyImportProjectsOfGroup: groupId [ 
-	|group|
-	
+GitMetricExporter >> onlyImportProjectsOfGroup: groupId [
+
+	| group |
+	1 halt. 
 	group := GLHModelImporter current importGroup: groupId.
-	projectCache := group toScope: GLHProject. 
+	projectCache := (group toScope: GLHProject)
 ]
