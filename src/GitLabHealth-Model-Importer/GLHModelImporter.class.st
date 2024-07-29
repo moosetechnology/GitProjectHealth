@@ -732,7 +732,7 @@ GLHModelImporter >> importRepository: aGLHRepository [
 GLHModelImporter >> importUser: aUserID [
 
 	| result userResult |
-	(glhModel allWithType: GLHUser) asOrderedCollection
+	(glhModel allWithType: GLHUser)
 		detect: [ :user | user id = aUserID ]
 		ifFound: [ :user | ^ user ].
 	('Import user: ' , aUserID printString) recordInfo.
