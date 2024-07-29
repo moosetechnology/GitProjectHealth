@@ -71,3 +71,45 @@ GLHExtensionTest >> testAddAllOfTypeUnlessWithAlreadyExistingEntity [
 	self assert: (values includes: user).
 	self assert: (values includes: alreadyExistingUser)
 ]
+
+{ #category : #tests }
+GLHExtensionTest >> testAddAllUnless [
+
+	| col |
+	col := OrderedCollection new.
+	col addAll: { 12 } unless: [ :a :b | a = b ].
+	self assert: col size equals: 1.
+	self assert: col first equals: 12
+]
+
+{ #category : #tests }
+GLHExtensionTest >> testAddAllUnlessTwiceEqualityIsTheSameButNotObject [
+
+	| col user result userB |
+	user := GLHUser new.
+	user id: 12.
+	col := OrderedCollection new.
+	col addAll: { user } unless: [ :a :b | a id = b id ].
+	self assert: col size equals: 1.
+	self assert: col first identicalTo: user.
+	userB := GLHUser new.
+	userB id: 12.
+	result := col addAll: { userB } unless: [ :a :b | a id = b id ].
+	self assert: col size equals: 1.
+	self assert: result first identicalTo: user
+]
+
+{ #category : #tests }
+GLHExtensionTest >> testAddAllUnlessTwiceTheSame [
+
+	| col user result |
+	user := GLHUser new.
+	user id: 12.
+	col := OrderedCollection new.
+	col addAll: { user } unless: [ :a :b | a = b ].
+	self assert: col size equals: 1.
+	self assert: col first identicalTo: user.
+	result := col addAll: { user } unless: [ :a :b | a = b ].
+	self assert: col size equals: 1.
+	self assert: result first identicalTo: user
+]
