@@ -1,1 +1,1 @@
-Package { #name : #BaselineOfGitLabHealth }
+Package { #name : 'BaselineOfGitLabHealth' }

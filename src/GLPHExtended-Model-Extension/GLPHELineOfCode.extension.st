@@ -1,6 +1,6 @@
-Extension { #name : #GLPHELineOfCode }
+Extension { #name : 'GLPHELineOfCode' }
 
-{ #category : #'*GLPHExtended-Model-Extension' }
+{ #category : '*GLPHExtended-Model-Extension' }
 GLPHELineOfCode class >> newFrom: aDiffLine [
 
 	| aLoC infos ranges |
@@ -10,7 +10,7 @@ GLPHELineOfCode class >> newFrom: aDiffLine [
 	^ aLoC.
 ]
 
-{ #category : #'*GLPHExtended-Model-Extension' }
+{ #category : '*GLPHExtended-Model-Extension' }
 GLPHELineOfCode class >> newFromLoCRange: aDiffLine [ 
 	|aLoC infos ranges|
 	infos := (aDiffLine splitOn: '@@') copyWithoutFirst.

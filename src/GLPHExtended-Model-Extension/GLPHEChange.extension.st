@@ -1,6 +1,6 @@
-Extension { #name : #GLPHEChange }
+Extension { #name : 'GLPHEChange' }
 
-{ #category : #'*GLPHExtended-Model-Extension' }
+{ #category : '*GLPHExtended-Model-Extension' }
 GLPHEChange class >> createFrom: aDiffLine [
 	"Factory a Change from a loc"
 
@@ -15,25 +15,25 @@ GLPHEChange class >> createFrom: aDiffLine [
 	^ aChange
 ]
 
-{ #category : #'*GLPHExtended-Model-Extension' }
+{ #category : '*GLPHExtended-Model-Extension' }
 GLPHEChange >> isAddition [
 
 	^ false
 ]
 
-{ #category : #'*GLPHExtended-Model-Extension' }
+{ #category : '*GLPHExtended-Model-Extension' }
 GLPHEChange >> isDeletion [
 
 	^ false
 ]
 
-{ #category : #'*GLPHExtended-Model-Extension' }
+{ #category : '*GLPHExtended-Model-Extension' }
 GLPHEChange >> name [
 
 	^ sourceCode 
 ]
 
-{ #category : #'*GLPHExtended-Model-Extension' }
+{ #category : '*GLPHExtended-Model-Extension' }
 GLPHEChange class >> newFrom: aDiffLine [
 	"Factory a Change from a loc"
 
