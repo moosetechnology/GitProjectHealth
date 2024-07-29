@@ -83,6 +83,44 @@ GLHExtensionTest >> testAddAllUnless [
 ]
 
 { #category : #tests }
+GLHExtensionTest >> testAddAllUnlessIntersectionOfUsers [
+
+	| col result user1 user2 user3 user2b user3b user4 |
+	user1 := GLHUser new.
+	user1 id: 1.
+	user2 := GLHUser new.
+	user2 id: 2.
+	user3 := GLHUser new.
+	user3 id: 3.
+	col := OrderedCollection new.
+	col
+		addAll: {
+				user1.
+				user2.
+				user3 }
+		unless: [ :a :b | a id = b id ].
+	self assert: col size equals: 3.
+	user2b := GLHUser new.
+	user2b id: 2.
+	user3b := GLHUser new.
+	user3b id: 3.
+	user4 := GLHUser new.
+	user4 id: 4.
+
+	result := col
+		          addAll: {
+				          user2b.
+				          user3b.
+				          user4 }
+		          unless: [ :a :b | a id = b id ].
+	self assert: col size equals: 4.
+	self assert: result size equals: 3.
+	self assert: (result includes: user2).
+	self assert: (result includes: user3).
+	self assert: (result includes: user4)
+]
+
+{ #category : #tests }
 GLHExtensionTest >> testAddAllUnlessTwiceEqualityIsTheSameButNotObject [
 
 	| col user result userB |
