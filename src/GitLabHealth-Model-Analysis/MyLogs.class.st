@@ -1,25 +1,26 @@
 Class {
-	#name : #MyLogs,
-	#superclass : #Object,
+	#name : 'MyLogs',
+	#superclass : 'Object',
 	#classVars : [
 		'i',
 		'size'
 	],
-	#category : #'GitLabHealth-Model-Analysis'
+	#category : 'GitLabHealth-Model-Analysis',
+	#package : 'GitLabHealth-Model-Analysis'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 MyLogs class >> i [
 	^ i 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 MyLogs class >> increment [
 
 	^ i := i + 1
 ]
 
-{ #category : #progress }
+{ #category : 'progress' }
 MyLogs class >> logProgress: aString over: aCollection [
 
 	('' join: {
@@ -31,7 +32,7 @@ MyLogs class >> logProgress: aString over: aCollection [
 	i >= aCollection size ifTrue: [ self reset ]
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 MyLogs class >> newLogNamed: aName [
 
 	self reset. 
@@ -40,7 +41,7 @@ MyLogs class >> newLogNamed: aName [
 	
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 MyLogs class >> reset [
 	i := 0.
 	size  := 0. 

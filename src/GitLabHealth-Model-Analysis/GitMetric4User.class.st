@@ -1,15 +1,16 @@
 Class {
-	#name : #GitMetric4User,
-	#superclass : #GitMetric,
+	#name : 'GitMetric4User',
+	#superclass : 'GitMetric',
 	#instVars : [
 		'itsGroups',
 		'itsCommits',
 		'itsMergeRequests'
 	],
-	#category : #'GitLabHealth-Model-Analysis'
+	#category : 'GitLabHealth-Model-Analysis',
+	#package : 'GitLabHealth-Model-Analysis'
 }
 
-{ #category : #churn }
+{ #category : 'churn' }
 GitMetric4User >> codeChurnSince: since until: until onACommitWindowOf: commitLimit overA: aDateWeekMonthOrYear [
 
 	| commits res groupedByDate totalContributions userCommits |
@@ -95,7 +96,7 @@ GitMetric4User >> codeChurnSince: since until: until onACommitWindowOf: commitLi
 		  (#churnWindow -> commitLimit) } asDictionary
 ]
 
-{ #category : #metrics }
+{ #category : 'metrics' }
 GitMetric4User >> codeContributionsSince: since until: until overA: aDateWeekMonthOrYear [
 
 	| commits contributions groupedByDate |
@@ -158,7 +159,7 @@ GitMetric4User >> codeContributionsSince: since until: until overA: aDateWeekMon
 		  (#userCommits -> commits size) } asDictionary
 ]
 
-{ #category : #metrics }
+{ #category : 'metrics' }
 GitMetric4User >> commentsContributionsSince: since until: until overA: aDateWeekMonthOrYear [
 
 	| commits contributions groupedByDate |
@@ -218,7 +219,7 @@ GitMetric4User >> commentsContributionsSince: since until: until overA: aDateWee
 		  (#userCommits -> commits size) } asDictionary
 ]
 
-{ #category : #metrics }
+{ #category : 'metrics' }
 GitMetric4User >> commitFrequencySince: since until: until overA: aDateWeekMonthOrYear [
 
 	| periods total groupedByDate userCommits |
@@ -258,7 +259,7 @@ GitMetric4User >> commitFrequencySince: since until: until overA: aDateWeekMonth
 		  (#details -> groupedByDate) } asOrderedDictionary
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GitMetric4User >> commitsProducedOnProject: projectId since: sinceDate until: untilDate [
 
 	| frequencies |
@@ -288,7 +289,7 @@ GitMetric4User >> commitsProducedOnProject: projectId since: sinceDate until: un
 	^ frequencies 
 ]
 
-{ #category : #metrics }
+{ #category : 'metrics' }
 GitMetric4User >> commitsProducedOnProject: aProjectId since: since until: until overA: aWeekOrMonthOrYear [
 	"'aWeekOrMonthOrYear' should be the class of Data, Week, Month or Year"
 
@@ -318,7 +319,7 @@ GitMetric4User >> commitsProducedOnProject: aProjectId since: since until: until
 	^ aggregatedFrequencies
 ]
 
-{ #category : #churn }
+{ #category : 'churn' }
 GitMetric4User >> delayUntilFirstChurnSince: since until: until onACommitWindowOf: maxCommitWindow overA: aDateWeekMonthOrYear [
 
 	| commits groupedByDate res avg userCommits |
@@ -403,7 +404,7 @@ GitMetric4User >> delayUntilFirstChurnSince: since until: until onACommitWindowO
 		  (#details -> groupedByDate) } asDictionary
 ]
 
-{ #category : #churn }
+{ #category : 'churn' }
 GitMetric4User >> delayUntilFirstChurnSince: since until: until overA: aDateWeekMonthOrYear [
 
 	| commits groupedByDate res avg |
@@ -486,7 +487,7 @@ GitMetric4User >> delayUntilFirstChurnSince: since until: until overA: aDateWeek
 		  (#details -> groupedByDate) } asDictionary
 ]
 
-{ #category : #churn }
+{ #category : 'churn' }
 GitMetric4User >> foundSuccessorOf: userCommits andCompleteImportForMax: commitLimit [
 
 	| analyzingCommits |
@@ -508,7 +509,7 @@ GitMetric4User >> foundSuccessorOf: userCommits andCompleteImportForMax: commitL
 	^ analyzingCommits
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 GitMetric4User >> initialize [
 
 	user := GLHUser new.
@@ -518,12 +519,12 @@ GitMetric4User >> initialize [
 	itsMergeRequests := Dictionary new
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GitMetric4User >> itsProjects: projects [
 	itsProjects := projects .
 ]
 
-{ #category : #churn }
+{ #category : 'churn' }
 GitMetric4User >> loadCommitOfProjects: aCollection since: aTimespan [
 	|commits|
 	
@@ -540,7 +541,7 @@ GitMetric4User >> loadCommitOfProjects: aCollection since: aTimespan [
 	^ self userCommits.
 ]
 
-{ #category : #metrics }
+{ #category : 'metrics' }
 GitMetric4User >> mergeRequestDurationSince: since until: until overA: aDateWeekMonthOrYear [
 
 	| mergeRequest res groupedByDate filterGroups avg |
@@ -618,17 +619,17 @@ GitMetric4User >> mergeRequestDurationSince: since until: until overA: aDateWeek
 		  (#details -> groupedByDate) } asDictionary
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GitMetric4User >> user [
 	^ user
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GitMetric4User >> user: anUser [
 	user := anUser. 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GitMetric4User >> userCommits [
 	^ user commits
 ]

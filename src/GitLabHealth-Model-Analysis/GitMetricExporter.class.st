@@ -1,6 +1,6 @@
 Class {
-	#name : #GitMetricExporter,
-	#superclass : #Object,
+	#name : 'GitMetricExporter',
+	#superclass : 'Object',
 	#instVars : [
 		'glhImporter',
 		'beforeExp',
@@ -13,10 +13,11 @@ Class {
 		'maxCommitWindow',
 		'over'
 	],
-	#category : #'GitLabHealth-Model-Analysis'
+	#category : 'GitLabHealth-Model-Analysis',
+	#package : 'GitLabHealth-Model-Analysis'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GitMetricExporter class >> demoPeriod [
 
 	^ self new
@@ -25,7 +26,7 @@ GitMetricExporter class >> demoPeriod [
 		  addPeriodFrom: '01 march 2024' to: '31 may 2024'
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GitMetricExporter >> addCodeChurnExporter: exportBrowserModel [
 
 	| columnName |
@@ -41,7 +42,7 @@ GitMetricExporter >> addCodeChurnExporter: exportBrowserModel [
 	 ].
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GitMetricExporter >> addCommentContributionExporter: exportBrowserModel [
 
 	| columnName |
@@ -56,7 +57,7 @@ GitMetricExporter >> addCommentContributionExporter: exportBrowserModel [
 			withName: columnName ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GitMetricExporter >> addContributionExporter: exportBrowserModel [
 
 	| columnName |
@@ -76,7 +77,7 @@ GitMetricExporter >> addContributionExporter: exportBrowserModel [
 	 ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GitMetricExporter >> addDelayUntilFirstChurnExporter: exportBrowserModel [
 
 	| columnName |
@@ -89,7 +90,7 @@ GitMetricExporter >> addDelayUntilFirstChurnExporter: exportBrowserModel [
 			withName: columnName ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GitMetricExporter >> addEntitiesFromUserNames: userNames [
 	"import all the project since a certain time"
 
@@ -128,7 +129,7 @@ GitMetricExporter >> addEntitiesFromUserNames: userNames [
 	^ self
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GitMetricExporter >> addEntitiesFromUserNamesAndProjects: usersWithProjects [
 
 	entities addAll: (usersWithProjects associations collect: [ :assoc |
@@ -147,7 +148,7 @@ GitMetricExporter >> addEntitiesFromUserNamesAndProjects: usersWithProjects [
 	^ self
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GitMetricExporter >> addFrequencyCommitExporter: exportBrowserModel [
 
 	| columnName |
@@ -160,7 +161,7 @@ GitMetricExporter >> addFrequencyCommitExporter: exportBrowserModel [
 			withName: columnName ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GitMetricExporter >> addMergeRequestDurationExporter: exportBrowserModel [
 
 	| columnName |
@@ -173,7 +174,7 @@ GitMetricExporter >> addMergeRequestDurationExporter: exportBrowserModel [
 			withName: columnName ]
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 GitMetricExporter >> addPeriodFrom: since to: until [
 
 	runningPeriods add: {
@@ -183,7 +184,7 @@ GitMetricExporter >> addPeriodFrom: since to: until [
 	^runningPeriods 
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GitMetricExporter >> beforeDic: aDictionnarySinceUntil [
 
 	self
@@ -195,7 +196,7 @@ GitMetricExporter >> beforeDic: aDictionnarySinceUntil [
 	beforeExp := aDictionnarySinceUntil
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GitMetricExporter >> blockCodeAdditionSince: period [
 
 	^ [ :metrics |
@@ -205,7 +206,7 @@ GitMetricExporter >> blockCodeAdditionSince: period [
 		    overA: over) at: #avgAddition) printString ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GitMetricExporter >> blockCodeChurnSince: period [
 	"comment stating purpose of instance-side method"
 
@@ -219,7 +220,7 @@ GitMetricExporter >> blockCodeChurnSince: period [
 		    overA: over) at: #churn) printString ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GitMetricExporter >> blockCodeDeletionSince: period [
 
 	^ [ :metrics |
@@ -229,7 +230,7 @@ GitMetricExporter >> blockCodeDeletionSince: period [
 		    overA: over) at: #avgDeletion) printString ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GitMetricExporter >> blockCommentsContributionSince: period [
 
 	^ [ :metrics |
@@ -239,7 +240,7 @@ GitMetricExporter >> blockCommentsContributionSince: period [
 		    overA: over) at: #avgComments) printString ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GitMetricExporter >> blockCommitFrequencySince: period [
 
 	^ [ :metrics |
@@ -249,7 +250,7 @@ GitMetricExporter >> blockCommitFrequencySince: period [
 		    overA: over) at: #averageFloat) printString ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GitMetricExporter >> blockDelayUntilFirstChurnSince: period [
 	"comment stating purpose of instance-side method"
 
@@ -263,7 +264,7 @@ GitMetricExporter >> blockDelayUntilFirstChurnSince: period [
 		    overA: over) at: #avgDelay) printString ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GitMetricExporter >> blockMergeRequestDurationSince: period [
 	
 	^ [ :metrics |
@@ -274,7 +275,7 @@ GitMetricExporter >> blockMergeRequestDurationSince: period [
 					  overA: over) at: #avgDuration) printString ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GitMetricExporter >> constructFilePath: runningOver [
 
 	| file |
@@ -287,7 +288,7 @@ GitMetricExporter >> constructFilePath: runningOver [
 	^ file
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GitMetricExporter >> debugExportOver: aCollectionOfDateWeekMonthOrYear [
 
 	| period |
@@ -320,7 +321,7 @@ GitMetricExporter >> debugExportOver: aCollectionOfDateWeekMonthOrYear [
 	'Done computing debug' recordInfo
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GitMetricExporter >> duringDic: aDictionnarySinceUntil [
 
 	self
@@ -332,18 +333,18 @@ GitMetricExporter >> duringDic: aDictionnarySinceUntil [
 	duringExp := aDictionnarySinceUntil
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GitMetricExporter >> entities: aCollection [ 
 	entities := aCollection
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GitMetricExporter >> exportFor: usersWithProjects [
 
 	self exportFor: usersWithProjects over: { Date. Week . Month . Year }.
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GitMetricExporter >> exportFor: usersWithProjects over: aCollectionOfDateWeekMonthOrYear [
 
 	entities ifNil: [
@@ -352,7 +353,7 @@ GitMetricExporter >> exportFor: usersWithProjects over: aCollectionOfDateWeekMon
 	self exportFor: aCollectionOfDateWeekMonthOrYear. 
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GitMetricExporter >> exportOver: aCollectionOfDateWeekMonthOrYear [
 
 	| file exportBrowserModel |
@@ -396,7 +397,7 @@ GitMetricExporter >> exportOver: aCollectionOfDateWeekMonthOrYear [
 	'Done computing' recordInfo
 ]
 
-{ #category : #projects }
+{ #category : 'projects' }
 GitMetricExporter >> findCommitAuthorNamed: username amongProjects: aCollectionOfProjects [
 
 	| response itsProjects i size |
@@ -425,34 +426,34 @@ GitMetricExporter >> findCommitAuthorNamed: username amongProjects: aCollectionO
 	^ itsProjects
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GitMetricExporter >> findProjectsOfUser: aCollection [ 
 	self shouldBeImplemented.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GitMetricExporter >> glhImporter: anImporter [
 
 	glhImporter := anImporter withInitialCommits: false; yourself. 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 GitMetricExporter >> initialize [
 
 	entities := OrderedCollection new.
 	"set up the minimal date from which we are looking for the commits a particular user in projects"
-	sinceTimeLimit := '1 january 2024' asDateAndTime.
+	sinceTimeLimit := '2024-01-01' asDateAndTime..
 	runningPeriods := OrderedCollection new.
 	maxCommitWindow := 3.
 	over := Date
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GitMetricExporter >> label: aString [ 
 	label := aString
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GitMetricExporter >> maxCommitWindow: anInteger [
 	maxCommitWindow := anInteger abs
 ]
