@@ -2,14 +2,12 @@
 A GLPHEDiffRangeTest is a test class for testing the behavior of GLPHEDiffRange
 "
 Class {
-	#name : 'GLPHEDiffRangeTest',
-	#superclass : 'TestCase',
-	#category : 'GLPHExtended-Model-Tests-Entities',
-	#package : 'GLPHExtended-Model-Tests',
-	#tag : 'Entities'
+	#name : #GLPHEDiffRangeTest,
+	#superclass : #TestCase,
+	#category : 'GLPHExtended-Model-Tests-Entities'
 }
 
-{ #category : 'tests' }
+{ #category : #tests }
 GLPHEDiffRangeTest >> testNewEntityFromString [
 
 	| diffRange |
@@ -19,7 +17,7 @@ GLPHEDiffRangeTest >> testNewEntityFromString [
 	self assert: diffRange newLineRange equals: '+15,9'
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 GLPHEDiffRangeTest >> testNewEntityFromStringWithDifferentValues [
 
 	| diffRange |

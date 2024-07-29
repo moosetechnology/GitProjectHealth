@@ -1,6 +1,6 @@
-Extension { #name : 'GLPHEMergeRequest' }
+Extension { #name : #GLPHEMergeRequest }
 
-{ #category : '*GLPHExtended-Model-Extension' }
+{ #category : #'*GLPHExtended-Model-Extension' }
 GLPHEMergeRequest >> name [
 
 	<FMProperty: #name type: #String>

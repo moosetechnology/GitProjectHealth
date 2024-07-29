@@ -1,12 +1,12 @@
-Extension { #name : 'GLPHEDiffRange' }
+Extension { #name : #GLPHEDiffRange }
 
-{ #category : '*GLPHExtended-Model-Extension' }
+{ #category : #'*GLPHExtended-Model-Extension' }
 GLPHEDiffRange >> name [
 
 	^ '[ OG: ' , originalLineRange , ' | NEW: ' , newLineRange , ']'
 ]
 
-{ #category : '*GLPHExtended-Model-Extension' }
+{ #category : #'*GLPHExtended-Model-Extension' }
 GLPHEDiffRange class >> newFrom: aLine [
 
 	| range infos rangesInfo |
