@@ -10,16 +10,19 @@ OrderedCollection >> add: anElmt unless: aConditionAsBlock [
 { #category : #'*GitLabHealth-Model-Extension' }
 OrderedCollection >> addAll: anElmtCollection unless: aConditionAsBlock [
 
-	| addedElements |
-	addedElements := anElmtCollection reject: [ :anElmt |
-		                 self anySatisfy: [ :existingElmt |
-			                 aConditionAsBlock
-				                 value: existingElmt
-				                 value: anElmt ] ].
+	| returnCollection |
+	"Create same kind of collection"
+	returnCollection := self species new.
+	"For each element of this collection"
 
-	self addAll: addedElements.
+	anElmtCollection do: [ :anElmt |
+		self
+			detect: [ :existingElmt |
+			aConditionAsBlock value: existingElmt value: anElmt ]
+			ifFound: [ :el | returnCollection add: el ]
+			ifNone: [
+				returnCollection add: anElmt.
+				self add: anElmt ] ].
 
-	^ self select: [ :existingElmt |
-		  anElmtCollection anySatisfy: [ :anElmt |
-			  aConditionAsBlock value: anElmt value: existingElmt ] ]
+	^ returnCollection
 ]
