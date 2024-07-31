@@ -37,17 +37,20 @@ GLPHEChange >> name [
 GLPHEChange class >> newFrom: aDiffLine [
 	"Factory a Change from a loc"
 
-	| aChange code|
-	aChange := GLPHELineOfCode new.
-	
+	| aChange trimedLine code |
+	trimedLine := aDiffLine trim.
+
+	aChange := (trimedLine beginsWith: #+)
+		           ifTrue: [ GLPHEAddition new ]
+		           ifFalse: [
+			           (aDiffLine trim beginsWith: #-)
+				           ifTrue: [ GLPHEDeletion new ]
+				           ifFalse: [ GLPHELineOfCode new ] ].
+
 	code := aDiffLine.
-	(aDiffLine beginsWith: #'@@') ifTrue: [
-		code := (aDiffLine splitOn: '@@') copyWithoutFirst second.
-	].
-	(aDiffLine trim beginsWith: #+) ifTrue: [ aChange := GLPHEAddition new. ]. 
-	(aDiffLine trim beginsWith: #-) ifTrue: [ aChange := GLPHEDeletion new. ]. 
-	
+	(trimedLine beginsWith: #'@@') ifTrue: [
+		code := (trimedLine splitOn: '@@') copyWithoutFirst second ].
 	aChange sourceCode: code.
-		
+
 	^ aChange
 ]
