@@ -150,11 +150,11 @@ GHModelImporter >> importRepositoriesOfGroup: groupResult [
 	| reposResult |
 	reposResult := self api reposOfOrganization: groupResult name.
 	groupResult projects addAll: (self parseArrayOfProject: reposResult).
-	self glhModel addAll: groupResult projects.
-	groupResult projects do: [ :project | 
+	self glhModel
+		addAll: groupResult projects.
+	groupResult projects do: [ :project |
 		self importPipelinesOf: project.
-		self importBranchesOf: project.
-		 ].
+		self importBranchesOf: project ].
 	^ groupResult
 ]
 

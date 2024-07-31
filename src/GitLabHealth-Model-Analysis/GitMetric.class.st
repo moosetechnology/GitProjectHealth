@@ -1,6 +1,6 @@
 Class {
-	#name : 'GitMetric',
-	#superclass : 'Object',
+	#name : #GitMetric,
+	#superclass : #Object,
 	#instVars : [
 		'user',
 		'glhImporter',
@@ -8,11 +8,10 @@ Class {
 		'gitAnalyzer',
 		'glhModel'
 	],
-	#category : 'GitLabHealth-Model-Analysis',
-	#package : 'GitLabHealth-Model-Analysis'
+	#category : #'GitLabHealth-Model-Analysis'
 }
 
-{ #category : 'setup' }
+{ #category : #setup }
 GitMetric class >> setupGroupedDateFrom: since to: until over: aDateWeekMonthOrYear [
 
 	| groupedByDate start end over increment |
@@ -58,7 +57,7 @@ GitMetric class >> setupGroupedDateFrom: since to: until over: aDateWeekMonthOrY
 	^ groupedByDate
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 GitMetric class >> transformDate: date to: aWeekOrMonthOrYear [
 
 	aWeekOrMonthOrYear = Month ifTrue: [ ^ date asDate month asDate ].
@@ -67,29 +66,29 @@ GitMetric class >> transformDate: date to: aWeekOrMonthOrYear [
 		  asDate
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 GitMetric >> cacheSymbolFor: anEntityType since: since until: until [
 
 	^ (anEntityType printString , ' since ' , since printString , ' to '
 	   , until printString) asSymbol
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 GitMetric >> findUserNamed: aUsername [
 
 	user := glhImporter importUserByUsername: aUsername.
 	^ user
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GitMetric >> glhImporter: aGLPHModelImporter [ 
 	glhImporter := aGLPHModelImporter
 ]
 
-{ #category : 'churn' }
-GitMetric >> loadCommitOfProjects: aCollection since: since until: until [
+{ #category : #churn }
+GitMetric >> loadCommitsFromProjectsIds: aCollection since: since until: until [
 
-	| allCommits period size |
+	| allCommits period size i|
 	period := self cacheSymbolFor: GLHCommit since: since until: until.
 
 	"download commits unless project cache is not empty"
@@ -106,9 +105,11 @@ GitMetric >> loadCommitOfProjects: aCollection since: since until: until [
 
 	allCommits := allCommits flatten.
 
+	i := 0. 
 	size := allCommits size.
 	allCommits do: [ :commit |
-		MyLogs logProgress: 'import creators ' over: size.
+		('import commit creators [',  (i:=i+1) printString,  '/', size printString) recordInfo. 
+
 		glhImporter importCreatorOfCommit: commit ].
 
 	glhImporter chainsCommitsFrom: allCommits.
@@ -116,8 +117,8 @@ GitMetric >> loadCommitOfProjects: aCollection since: since until: until [
 	^ allCommits
 ]
 
-{ #category : 'churn' }
-GitMetric >> loadMergeRequestsOfProjects: aCollection since: since until: until [
+{ #category : #churn }
+GitMetric >> loadMergeRequestsFromProjectsIds: aCollection since: since until: until [
 
 	| allMr period |
 	"itsMergeRequests ifNil: [ itsMergeRequests := Dictionary new ]."
@@ -136,8 +137,8 @@ GitMetric >> loadMergeRequestsOfProjects: aCollection since: since until: until 
 	^ allMr flattened
 ]
 
-{ #category : 'loading' }
-GitMetric >> loadProjects: projectIds [
+{ #category : #loading }
+GitMetric >> loadProjectsFromIds: projectIds [
 
 	projectIds do: [ :id |
 		
@@ -146,7 +147,7 @@ GitMetric >> loadProjects: projectIds [
 	^ itsProjects
 ]
 
-{ #category : 'setup' }
+{ #category : #setup }
 GitMetric >> setupGroupedDateFrom: since to: until over: aDateWeekMonthOrYear [
 
 	| groupedByDate start end over increment |
@@ -178,11 +179,11 @@ GitMetric >> setupGroupedDateFrom: since to: until over: aDateWeekMonthOrYear [
 
 
 	over = #day ifTrue: [
-		groupedByDate keysDo: [ :date |
+		
+	 groupedByDate := 	(groupedByDate associations select: [ :date |
 			| aWeekday |
-			aWeekday := date asDate weekday.
-			(aWeekday = #Sunday or: [ aWeekday = #Saturday ]) ifTrue: [
-				groupedByDate removeKey: date ] ] ].
+			aWeekday := date key asDate weekday.
+			(aWeekday = #Sunday or: [ aWeekday = #Saturday ]) not ]) asOrderedDictionary ].
 
 
 	groupedByDate
@@ -192,7 +193,7 @@ GitMetric >> setupGroupedDateFrom: since to: until over: aDateWeekMonthOrYear [
 	^ groupedByDate
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 GitMetric >> transformDate: date to: aWeekOrMonthOrYear [
 
 	aWeekOrMonthOrYear = Month ifTrue: [ ^ date asDate month asDate ].

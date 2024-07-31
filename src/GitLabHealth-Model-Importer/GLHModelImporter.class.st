@@ -1,6 +1,6 @@
 Class {
-	#name : 'GLHModelImporter',
-	#superclass : 'Object',
+	#name : #GLHModelImporter,
+	#superclass : #Object,
 	#instVars : [
 		'glhModel',
 		'glhApi',
@@ -14,17 +14,16 @@ Class {
 	#classVars : [
 		'currentImporter'
 	],
-	#category : 'GitLabHealth-Model-Importer',
-	#package : 'GitLabHealth-Model-Importer'
+	#category : #'GitLabHealth-Model-Importer'
 }
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHModelImporter class >> current [
 
 	^ currentImporter
 ]
 
-{ #category : 'private - api' }
+{ #category : #'private - api' }
 GLHModelImporter >> addCommits: commitsList toRepository: aProjectRepository [
 	"I take a list of GLHCommit. But some might have been parsed but are already on the model..."
 
@@ -41,73 +40,75 @@ GLHModelImporter >> addCommits: commitsList toRepository: aProjectRepository [
 	^ newlyFoundCommit
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 GLHModelImporter >> addGroupResultToModel: groupResult [
-
-	self glhModel add: groupResult unless: (self blockEqualityOn: #id).
+	|group|
+	group := self glhModel add: groupResult unless: self blockOnIdEquality.
 	self glhModel
-		addAll: groupResult projects
-		unless: (self blockEqualityOn: #id)
+		addAll: group projects
+		unless: self blockOnIdEquality.
+	^ group 
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHModelImporter >> beWithFiles [
 	withFiles := true
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHModelImporter >> beWithouFiles [
 	withFiles := false
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 GLHModelImporter >> blockEqualityOn: aSymbol [
 	^ [ :existing :new |
 	  (existing perform: aSymbol) = (new perform: aSymbol) ]
 ]
 
-{ #category : 'equality' }
+{ #category : #equality }
 GLHModelImporter >> blockForDiffEquality [
 	^ [ :existing :new |
 			existing diffString size = new diffString size and: [
 				existing diffString = new diffString ] ]
 ]
 
-{ #category : 'equality' }
+{ #category : #equality }
 GLHModelImporter >> blockOnIdEquality [
 
 	^ [ :existing :new |
 	  existing id = new id ]
 ]
 
-{ #category : 'equality' }
+{ #category : #equality }
 GLHModelImporter >> blockOnNameEquality [
 
 	^ self blockEqualityOn: #name
 ]
 
-{ #category : 'private - api' }
+{ #category : #'private - api' }
 GLHModelImporter >> completeImportProject: aGLHProject [
-
+	|importedProject|
 	('Complete import of project: ' , aGLHProject id printString)
 		recordInfo.
+	importedProject := self glhModel add: aGLHProject unless: (self blockOnIdEquality ).
 
-	self importPipelinesOfProject: aGLHProject.
+	self importPipelinesOfProject: importedProject.
 
 	"aGLHProject creator: (self importUser: aGLHProject creator_id)."
 
-	(self importUser: aGLHProject creator_id) addCreatedProject:
-		aGLHProject.
+	(self importUser: importedProject creator_id) addCreatedProject:
+		importedProject.
 
-	aGLHProject repository: GLHRepository new.
-	self glhModel add: aGLHProject unless: (self blockEqualityOn: #id).
-	self glhModel add: aGLHProject repository.
-	self importRepository: aGLHProject repository.
 
-	^ aGLHProject
+	importedProject repository: GLHRepository new.
+	self glhModel add: importedProject repository.
+	self importRepository: importedProject repository.
+
+	^ importedProject
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 GLHModelImporter >> completeImportedCommit: aCommit [
 
 	('completing commit: ' , aCommit short_id printString) recordInfo.
@@ -122,7 +123,7 @@ GLHModelImporter >> completeImportedCommit: aCommit [
 	^ aCommit
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 GLHModelImporter >> configureReaderForCommit: reader [
 
   	reader for: GLHCommit do: [ :mapping |
@@ -154,7 +155,7 @@ GLHModelImporter >> configureReaderForCommit: reader [
 
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 GLHModelImporter >> configureReaderForDiffs: reader [
 
 	reader for: GLHDiff do: [ :mapping |
@@ -169,7 +170,7 @@ GLHModelImporter >> configureReaderForDiffs: reader [
 	^ reader
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 GLHModelImporter >> configureReaderForGroup: reader [
 
 	reader for: GLHGroup do: [ :mapping |
@@ -186,7 +187,7 @@ GLHModelImporter >> configureReaderForGroup: reader [
 		customMappting listOfElementSchema: GLHGroup ]
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 GLHModelImporter >> convertApiFileAsFile: aAPIFile [
 
 	aAPIFile type = 'tree' ifTrue: [ 
@@ -198,14 +199,14 @@ GLHModelImporter >> convertApiFileAsFile: aAPIFile [
 		  yourself
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 GLHModelImporter >> detectEntityType: aType overAttribut: aSelector equalTo: value [
 
 	^ (self glhModel allWithType: aType) detect: [ :entity |
 		  (entity perform: aSelector) = value ] ifNone: [ nil ]. 
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 GLHModelImporter >> filterCommitChanges: aCollection [
 
 	^ aCollection reject: [ :line |
@@ -216,31 +217,31 @@ GLHModelImporter >> filterCommitChanges: aCollection [
 				  trimmedLine beginsWith: '\ No newline at end of file' ] ] ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHModelImporter >> glhApi [
 
 	^ glhApi
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHModelImporter >> glhApi: anObject [
 
 	glhApi := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHModelImporter >> glhModel [
 
 	^ glhModel
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHModelImporter >> glhModel: anObject [
 
 	glhModel := anObject
 ]
 
-{ #category : 'api' }
+{ #category : #api }
 GLHModelImporter >> importAllGroups [
 
 	| page foundGroups newlyFoundGroups |
@@ -259,7 +260,7 @@ GLHModelImporter >> importAllGroups [
 	^ foundGroups
 ]
 
-{ #category : 'private - api' }
+{ #category : #'private - api' }
 GLHModelImporter >> importCommit: aCommitID ofProject: aGLHProject [
 
 	| result parsedResult |
@@ -277,7 +278,7 @@ GLHModelImporter >> importCommit: aCommitID ofProject: aGLHProject [
 	^ parsedResult
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 GLHModelImporter >> importCommitOfProject: anProject withId: anID [
 
 	| commit result |
@@ -304,7 +305,7 @@ GLHModelImporter >> importCommitOfProject: anProject withId: anID [
 	^ commit
 ]
 
-{ #category : 'private - api' }
+{ #category : #'private - api' }
 GLHModelImporter >> importCommits: aGLHProject [
 	"limited to the last 20 commits"
 
@@ -335,7 +336,7 @@ GLHModelImporter >> importCommits: aGLHProject [
 	^ parsedResults. 
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 GLHModelImporter >> importCommitsFollowing: aCommit upToDays: aNumberOfDay [
 	"import the 'n' commits of a project starting from an initial 'aCommit' commit. 
 	Lazy import does not import the entities inside the model"
@@ -350,7 +351,7 @@ GLHModelImporter >> importCommitsFollowing: aCommit upToDays: aNumberOfDay [
 		  until: (date + aNumberOfDay day)
 ]
 
-{ #category : 'commit' }
+{ #category : #commit }
 GLHModelImporter >> importCommitsOProject: aProject since: fromDate until: toDate [
 
 	| newlyFoundCommit page foundCommit |
@@ -361,7 +362,7 @@ GLHModelImporter >> importCommitsOProject: aProject since: fromDate until: toDat
 		| results |
 		page := page + 1.
 		('import commit page ' , page printString) recordInfo.
-		results := self glhApi
+		results := GLHApi current
 			           commitsOfProject: aProject id
 			           forRefName: nil
 			           since:
@@ -389,7 +390,7 @@ GLHModelImporter >> importCommitsOProject: aProject since: fromDate until: toDat
 	^ self glhModel addAll: foundCommit unless: self blockOnIdEquality
 ]
 
-{ #category : 'api' }
+{ #category : #api }
 GLHModelImporter >> importCommitsOf: aGLHProject withStats: aBoolean until: toDate [
 
 	| newlyFoundCommit page |
@@ -434,7 +435,7 @@ GLHModelImporter >> importCommitsOf: aGLHProject withStats: aBoolean until: toDa
 			self importDiffOfCommit: commit ] ]
 ]
 
-{ #category : 'commit' }
+{ #category : #commit }
 GLHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName since: fromDate [
 
 	^ self
@@ -444,7 +445,7 @@ GLHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName since:
 		  until: nil
 ]
 
-{ #category : 'commit' }
+{ #category : #commit }
 GLHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName since: fromDate until: toDate [
 
 	| newlyFoundCommit page foundCommit|
@@ -489,7 +490,7 @@ GLHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName since:
 	^ foundCommit
 ]
 
-{ #category : 'commit' }
+{ #category : #commit }
 GLHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName until: toDate [
 
 	^ self
@@ -499,7 +500,7 @@ GLHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName until:
 		  until: toDate
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 GLHModelImporter >> importCreatorOfCommit: aCommit [
 	
 	aCommit commitCreator ifNil: [
@@ -507,7 +508,7 @@ GLHModelImporter >> importCreatorOfCommit: aCommit [
 			(self importUserByUsername: aCommit author_name) ]
 ]
 
-{ #category : 'api' }
+{ #category : #api }
 GLHModelImporter >> importDiffOfCommit: aCommit [
 
 	| result diffsResult |
@@ -525,7 +526,7 @@ GLHModelImporter >> importDiffOfCommit: aCommit [
 
 ]
 
-{ #category : 'private - api' }
+{ #category : #'private - api' }
 GLHModelImporter >> importDirectoryFiles: aDirectoryFile OfBranch: aBranch [
 
 	| result files apiFiles |
@@ -546,7 +547,7 @@ GLHModelImporter >> importDirectoryFiles: aDirectoryFile OfBranch: aBranch [
 		self importDirectoryFiles: file OfBranch: aBranch ]
 ]
 
-{ #category : 'private - api' }
+{ #category : #'private - api' }
 GLHModelImporter >> importFilesOfBranch: aBranch [
 
 	| result files apiFiles |
@@ -566,7 +567,7 @@ GLHModelImporter >> importFilesOfBranch: aBranch [
 		self importDirectoryFiles: file OfBranch: aBranch ]
 ]
 
-{ #category : 'api' }
+{ #category : #api }
 GLHModelImporter >> importGroup: aGroupID [
 
 	| result groupResult |
@@ -574,16 +575,20 @@ GLHModelImporter >> importGroup: aGroupID [
 
 	result := self glhApi group: aGroupID.
 	groupResult := self parseGroupResult: result.
+	groupResult := self addGroupResultToModel: groupResult.
 
 	groupResult projects do: [ :project |
 		self completeImportProject: project ].
-	self addGroupResultToModel: groupResult.
+
 	(self subGroupsOf: aGroupID) do: [ :subGroup |
-		groupResult addSubGroup: (self importGroup: subGroup id) ].
+		
+		groupResult subGroups
+			add: (self importGroup: subGroup id)
+			unless: self blockOnIdEquality ].
 	^ groupResult
 ]
 
-{ #category : 'api' }
+{ #category : #api }
 GLHModelImporter >> importJobsOf: aPipeline [
 
 	| result jobs |
@@ -596,7 +601,7 @@ GLHModelImporter >> importJobsOf: aPipeline [
 
 ]
 
-{ #category : 'commit' }
+{ #category : #commit }
 GLHModelImporter >> importParentCommitsOfCommit: aGLHCommit forOnly: number [
 
 	| parentsIds commits |
@@ -622,7 +627,7 @@ GLHModelImporter >> importParentCommitsOfCommit: aGLHCommit forOnly: number [
 			   forOnly: number - 1 ]) flatten
 ]
 
-{ #category : 'commit' }
+{ #category : #commit }
 GLHModelImporter >> importParentCommitsOfCommit: aGLHCommit since: aDate [
 
 	| parentsIds commits |
@@ -646,21 +651,21 @@ GLHModelImporter >> importParentCommitsOfCommit: aGLHCommit since: aDate [
 		  flatten
 ]
 
-{ #category : 'private - api' }
+{ #category : #'private - api' }
 GLHModelImporter >> importPipelinesOfProject: aGLHProject [
 
 	(self pipelinesOf: aGLHProject id) do: [ :pipeline |
-		self glhModel add: pipeline.
-		aGLHProject addPipeline: pipeline ]
+		self glhModel add: pipeline unless: self blockOnIdEquality .
+		aGLHProject pipelines add: pipeline unless: self blockOnIdEquality]
 ]
 
-{ #category : 'imports' }
+{ #category : #imports }
 GLHModelImporter >> importProjects [
 
 	^ self importProjectsSince: nil
 ]
 
-{ #category : 'projects' }
+{ #category : #projects }
 GLHModelImporter >> importProjects: aCollectionOfProjectID [
 	
 	^ aCollectionOfProjectID collect: [ :id |
@@ -669,7 +674,7 @@ GLHModelImporter >> importProjects: aCollectionOfProjectID [
 	 
 ]
 
-{ #category : 'imports' }
+{ #category : #imports }
 GLHModelImporter >> importProjectsSince: since [
 	"heavy import of all projects"
 
@@ -698,7 +703,7 @@ GLHModelImporter >> importProjectsSince: since [
 	^ foundProject
 ]
 
-{ #category : 'private - api' }
+{ #category : #'private - api' }
 GLHModelImporter >> importRepository: aGLHRepository [
 
 	| resultBranches branches |
@@ -712,14 +717,11 @@ GLHModelImporter >> importRepository: aGLHRepository [
 
 	('import the branches of project ') recordInfo.
 
-	aGLHRepository branches
+	branches := aGLHRepository branches
 		addAll: branches
 		unless: self blockOnNameEquality.
-	self glhModel addAll: branches unless: self blockOnNameEquality.
+	branches := self glhModel addAll: branches unless: self blockOnNameEquality.
 
-	"branches do: [ :branch |
-		aGLHRepository addBranch: branch.
-		self glhModel add: branch ]."
 
 	self withFiles ifTrue: [
 		branches do: [ :branch | self importFilesOfBranch: branch ] ] ]
@@ -728,7 +730,7 @@ GLHModelImporter >> importRepository: aGLHRepository [
 		self inform: aGLHRepository project name , ' has no repository' ]
 ]
 
-{ #category : 'private - api' }
+{ #category : #'private - api' }
 GLHModelImporter >> importUser: aUserID [
 
 	| result userResult |
@@ -741,7 +743,7 @@ GLHModelImporter >> importUser: aUserID [
 	^ glhModel add: userResult unless: self blockOnIdEquality
 ]
 
-{ #category : 'user' }
+{ #category : #user }
 GLHModelImporter >> importUserByUsername: anUsername [
 
 	| dicUsername |
@@ -774,7 +776,7 @@ GLHModelImporter >> importUserByUsername: anUsername [
 							  ifNone: [ self importUser: userId ] ] ] ]
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 GLHModelImporter >> initReader [
 
 	generalReader := NeoJSONReader new.
@@ -783,7 +785,7 @@ GLHModelImporter >> initReader [
 	self configureReaderForDiffs: generalReader. 
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 GLHModelImporter >> initialize [
 
 	withFiles := false.
@@ -795,15 +797,15 @@ GLHModelImporter >> initialize [
 	currentImporter := self. 
 ]
 
-{ #category : 'importer' }
-GLHModelImporter >> loadAllSystemProjects [
+{ #category : #importer }
+GLHModelImporter >> loadAllProjectsFromRepositorySoftware [
 	"heavy import that load all the active project inside the model. Only import the project entities"
 	|projects|
 	
 	projects := self glhApi projects. 
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 GLHModelImporter >> newParseCommitResult: result [
 
 	generalReader  on: result readStream.
@@ -811,14 +813,14 @@ GLHModelImporter >> newParseCommitResult: result [
 	^ generalReader nextAs: GLHCommit
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 GLHModelImporter >> newParseDiffResult: result [
 
 	generalReader on: result readStream.
 	^ generalReader nextAs: #ArrayOfDiffs
 ]
 
-{ #category : 'parsing' }
+{ #category : #parsing }
 GLHModelImporter >> parseArrayOfProject: arrayOfProjects [
 
 	| reader |
@@ -837,7 +839,7 @@ GLHModelImporter >> parseArrayOfProject: arrayOfProjects [
 	^ reader nextAs: #ArrayOfProjects
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 GLHModelImporter >> parseBranchesResult: result [
 
 	| reader |
@@ -850,7 +852,7 @@ GLHModelImporter >> parseBranchesResult: result [
 	^ reader nextAs: #ArrayOfBranch
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 GLHModelImporter >> parseCommitResult: result [
 
 	| reader |
@@ -882,7 +884,7 @@ GLHModelImporter >> parseCommitResult: result [
 	^ reader nextAs: GLHCommit
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 GLHModelImporter >> parseCommitsResult: result [
 
 	| reader |
@@ -918,7 +920,7 @@ GLHModelImporter >> parseCommitsResult: result [
 	^ reader nextAs: #ArrayOfCommit
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 GLHModelImporter >> parseDiffResult: result [
 
 	| reader |
@@ -940,7 +942,7 @@ GLHModelImporter >> parseDiffResult: result [
 	^ reader nextAs: #ArrayOfDiffs
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 GLHModelImporter >> parseFileTreeResult: aResult [
 
 	| reader |
@@ -953,7 +955,7 @@ GLHModelImporter >> parseFileTreeResult: aResult [
 	^ reader nextAs: #ArrayOfFile
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 GLHModelImporter >> parseGroupResult: aResult [
 
 	| reader |
@@ -970,7 +972,7 @@ GLHModelImporter >> parseGroupResult: aResult [
 	^ reader nextAs: GLHGroup
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 GLHModelImporter >> parseJobsResult: result ofProject: aProject [
 
 	| reader |
@@ -1005,7 +1007,7 @@ GLHModelImporter >> parseJobsResult: result ofProject: aProject [
 	^ reader nextAs: #ArrayOfGLHJob
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 GLHModelImporter >> parsePipelinesResult: result [
 
 	| reader |
@@ -1024,7 +1026,7 @@ GLHModelImporter >> parsePipelinesResult: result [
 	^ reader nextAs: #ArrayOfPipelines
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 GLHModelImporter >> parseSubGroupResult: aResult [
 
 	| reader |
@@ -1033,7 +1035,7 @@ GLHModelImporter >> parseSubGroupResult: aResult [
 	^ reader nextAs: #ArrayOfGroups
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 GLHModelImporter >> parseUserResult: result [
 
 	| reader |
@@ -1042,7 +1044,7 @@ GLHModelImporter >> parseUserResult: result [
 	^ reader nextAs: GLHUser
 ]
 
-{ #category : 'private - api' }
+{ #category : #'private - api' }
 GLHModelImporter >> pipelinesOf: aProjectID [
 
 	| result |
@@ -1051,54 +1053,54 @@ GLHModelImporter >> pipelinesOf: aProjectID [
 	^ self parsePipelinesResult: result
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 GLHModelImporter >> selectEntityType: aType overAttribut: aSelector equalTo: value [
 
 	^ (self glhModel allWithType: aType)
 		select: [ :entity | (entity perform: aSelector) = value ]
 ]
 
-{ #category : 'private - api' }
+{ #category : #'private - api' }
 GLHModelImporter >> subGroupsOf: aGroupID [
 
 	| results parsedResult result page |
 	('Search subgroup of: ' , aGroupID printString) recordInfo.
 	results := OrderedCollection new.
-	page := 1.
-	result := self glhApi subgroupsOfGroup: aGroupID page: page.
-	parsedResult := self parseSubGroupResult: result.
-	results addAll: parsedResult.
-	[ parsedResult size = 20 ] whileTrue: [ 
-		page := page + 1.
+	page := 0.
+	
+	parsedResult := { true }.
+	[ parsedResult size > 0 ] whileTrue: [ 
 		result := self glhApi subgroupsOfGroup: aGroupID page: page.
 		parsedResult := self parseSubGroupResult: result.
-		results addAll: parsedResult ].
+		results addAll: parsedResult.
+				page := page + 1. ].
+	
 	^ results
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHModelImporter >> withCommitDiffs [
 
 	^ withCommitDiffs
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHModelImporter >> withCommitDiffs: anObject [
 
 	withCommitDiffs := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHModelImporter >> withFiles [
 	^ withFiles
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHModelImporter >> withFiles: aBoolean [
 	withFiles := aBoolean
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHModelImporter >> withInitialCommits: boolean [
 	withInitialCommits := boolean 
 ]

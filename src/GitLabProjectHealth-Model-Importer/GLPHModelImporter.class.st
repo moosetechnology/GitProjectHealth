@@ -77,16 +77,16 @@ GLPHModelImporter >> commitsOfProject: aGLHProject forRefName: refName until: to
 
 { #category : #'private - api' }
 GLPHModelImporter >> completeImportProject: aGLHProject [
-
-	super completeImportProject: aGLHProject.
+	|completedProject|
+	completedProject := super completeImportProject: aGLHProject.
 
 	"for this initial import, with only look at some but not all MR"
 	withInitialMergeRequest ifTrue: [ self
-		importMergeRequests: aGLHProject
+		importMergeRequests: completedProject
 		since: DateAndTime today
 		until: DateAndTime now. ].
 
-	^ aGLHProject
+	^ completedProject
 ]
 
 { #category : #'private - configure reader' }
