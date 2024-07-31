@@ -5,7 +5,7 @@ Class {
 		'name',
 		'type'
 	],
-	#category : #'GitLabHealth-Model-Importer'
+	#category : 'GitLabHealth-Model-Importer'
 }
 
 { #category : #accessing }

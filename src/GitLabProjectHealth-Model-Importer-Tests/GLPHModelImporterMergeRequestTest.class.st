@@ -1,6 +1,6 @@
 Class {
-	#name : #GLPHModelImporterMergeRequestTest,
-	#superclass : #TestCase,
+	#name : 'GLPHModelImporterMergeRequestTest',
+	#superclass : 'TestCase',
 	#instVars : [
 		'githubDiffData',
 		'gitlabDiffData',
@@ -8,10 +8,11 @@ Class {
 		'gitlabMergeData',
 		'glhModel'
 	],
-	#category : #'GitLabProjectHealth-Model-Importer-Tests'
+	#category : 'GitLabProjectHealth-Model-Importer-Tests',
+	#package : 'GitLabProjectHealth-Model-Importer-Tests'
 }
 
-{ #category : #running }
+{ #category : 'running' }
 GLPHModelImporterMergeRequestTest >> setUp [
 
 	super setUp.
@@ -112,7 +113,7 @@ GLPHModelImporterMergeRequestTest >> setUp [
 }]'
 ]
 
-{ #category : #test }
+{ #category : 'test' }
 GLPHModelImporterMergeRequestTest >> testParseMergeRequestMergeUserAlreadySet [
 
 	| mergeRequest user |
@@ -123,7 +124,7 @@ GLPHModelImporterMergeRequestTest >> testParseMergeRequestMergeUserAlreadySet [
 	self assert: mergeRequest merge_user equals: user
 ]
 
-{ #category : #test }
+{ #category : 'test' }
 GLPHModelImporterMergeRequestTest >> testParseMergeRequestMergeUserExistInModelAndCacheID [
 
 	| mergeRequest user |
@@ -135,7 +136,7 @@ GLPHModelImporterMergeRequestTest >> testParseMergeRequestMergeUserExistInModelA
 	self assert: mergeRequest merge_user equals: user
 ]
 
-{ #category : #test }
+{ #category : 'test' }
 GLPHModelImporterMergeRequestTest >> testParseMergeRequestMergeUserIsNil [
 
 	| mergeRequest |
@@ -143,7 +144,7 @@ GLPHModelImporterMergeRequestTest >> testParseMergeRequestMergeUserIsNil [
 	self assert: mergeRequest merge_user equals: nil
 ]
 
-{ #category : #test }
+{ #category : 'test' }
 GLPHModelImporterMergeRequestTest >> testParseMergeRequestMergeUserWithoutCache [
 
 	| mergeRequest user |
@@ -155,7 +156,7 @@ GLPHModelImporterMergeRequestTest >> testParseMergeRequestMergeUserWithoutCache 
 	self assert: mergeRequest merge_user equals: user
 ]
 
-{ #category : #test }
+{ #category : 'test' }
 GLPHModelImporterMergeRequestTest >> testParseMergeRequestResult [
 
 	| parseRes |
@@ -164,7 +165,7 @@ GLPHModelImporterMergeRequestTest >> testParseMergeRequestResult [
 	self assert: parseRes anyOne id equals: 46074
 ]
 
-{ #category : #test }
+{ #category : 'test' }
 GLPHModelImporterMergeRequestTest >> testParseMergeRequestUserAlreadySet [
 
 	| mergeRequest user |
@@ -175,7 +176,7 @@ GLPHModelImporterMergeRequestTest >> testParseMergeRequestUserAlreadySet [
 	self assert: mergeRequest author equals: user
 ]
 
-{ #category : #test }
+{ #category : 'test' }
 GLPHModelImporterMergeRequestTest >> testParseMergeRequestUserExistInModelAndCacheID [
 
 	| mergeRequest user |
@@ -187,7 +188,7 @@ GLPHModelImporterMergeRequestTest >> testParseMergeRequestUserExistInModelAndCac
 	self assert: mergeRequest author equals: user
 ]
 
-{ #category : #test }
+{ #category : 'test' }
 GLPHModelImporterMergeRequestTest >> testParseMergeRequestWithoutCache [
 
 	| mergeRequest user |

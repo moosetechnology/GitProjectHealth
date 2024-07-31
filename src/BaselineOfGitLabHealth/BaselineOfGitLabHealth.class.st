@@ -1,10 +1,11 @@
 Class {
-	#name : #BaselineOfGitLabHealth,
-	#superclass : #BaselineOf,
-	#category : #BaselineOfGitLabHealth
+	#name : 'BaselineOfGitLabHealth',
+	#superclass : 'BaselineOf',
+	#category : 'BaselineOfGitLabHealth',
+	#package : 'BaselineOfGitLabHealth'
 }
 
-{ #category : #baselines }
+{ #category : 'baselines' }
 BaselineOfGitLabHealth >> baseline: spec [
 
 	<baseline>
@@ -21,14 +22,14 @@ BaselineOfGitLabHealth >> baseline: spec [
 			spec package: 'GitLabHealth-Model' with: [ spec requires: #( 'Moose' ) ] ] ]
 ]
 
-{ #category : #baselines }
+{ #category : 'baselines' }
 BaselineOfGitLabHealth >> customProjectAttributes [
     self class environment at: #MooseEntity ifAbsent: [ ^ #(#WithoutFamix) ].
 
     ^ #()
 ]
 
-{ #category : #baselines }
+{ #category : 'baselines' }
 BaselineOfGitLabHealth >> defineDependencies: spec [
 
 	spec
@@ -39,11 +40,11 @@ BaselineOfGitLabHealth >> defineDependencies: spec [
 		with: [ spec repository: 'github://badetitou/MoreLogger:main/src' ]
 ]
 
-{ #category : #baselines }
+{ #category : 'baselines' }
 BaselineOfGitLabHealth >> defineGroups: spec [
 ]
 
-{ #category : #baselines }
+{ #category : 'baselines' }
 BaselineOfGitLabHealth >> definePackages: spec [
 
 	spec
@@ -72,6 +73,8 @@ BaselineOfGitLabHealth >> definePackages: spec [
 		package: 'GLPHExtended-Model' with: [
 			spec requires:
 					#( 'GitLabHealth-Model' 'GitLabHealth-Model-Extension' ) ];
+		package: 'GLPHExtended-Model-Tests'
+		with: [ spec requires: #( 'GLPHExtended-Model' ) ];
 		package: 'GLPHExtended-Model-Extension' with: [
 			spec requires:
 					#( 'GLPHExtended-Model' 'GitLabHealth-Model' 'GitLabHealth-Model-Extension' ) ];

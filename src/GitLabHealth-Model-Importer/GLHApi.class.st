@@ -11,7 +11,7 @@ Class {
 	#classVars : [
 		'currentAPI'
 	],
-	#category : #'GitLabHealth-Model-Importer'
+	#category : 'GitLabHealth-Model-Importer'
 }
 
 { #category : #accessing }
@@ -449,7 +449,7 @@ GLHApi >> projects [
 { #category : #projects }
 GLHApi >> projects: aPerPageNumber page: aPageNumber [
 
-	self projects: aPerPageNumber since: nil  page:  aPageNumber
+	self projects: aPerPageNumber since: nil page: aPageNumber
 ]
 
 { #category : #projects }

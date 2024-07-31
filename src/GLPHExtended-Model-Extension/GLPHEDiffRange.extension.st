@@ -8,12 +8,13 @@ GLPHEDiffRange >> name [
 
 { #category : #'*GLPHExtended-Model-Extension' }
 GLPHEDiffRange class >> newFrom: aLine [
-	|range infos rangesInfo |
-	range := GLPHEDiffRange new. 
-	infos := (aLine  splitOn: '@@') copyWithoutFirst.
-	rangesInfo := infos first trim splitOn: ' '.
+
+	| range infos rangesInfo |
+	range := GLPHEDiffRange new.
+	infos := (aLine splitOn: '@@') second.
+	rangesInfo := infos trim splitOn: ' '.
 	range originalLineRange: rangesInfo first.
-	range newLineRange: rangesInfo second . 
-	
-^ range. 
+	range newLineRange: rangesInfo second.
+
+	^ range
 ]

@@ -423,7 +423,7 @@ GitMetricExporter >> initialize [
 
 	entities := OrderedCollection new.
 	"set up the minimal date from which we are looking for the commits a particular user in projects"
-	sinceTimeLimit := '1 january 2024' asDateAndTime.
+	sinceTimeLimit := '2024-01-01' asDateAndTime..
 	runningPeriods := OrderedCollection new.
 	maxCommitWindow := 3.
 	over := Date
