@@ -17,6 +17,36 @@ GLHExtensionTest >> setUp [
 { #category : #tests }
 GLHExtensionTest >> testAddAllOfTypeUnless [
 
+	| user values |
+	user := GLHUser new.
+	user id: 12.
+	values := model addAll: { user } ofType: GLHUser unless: [ :a :b | a id = b id ].
+	self assert: values size equals: 1.
+	self assert: values anyOne equals: user.
+]
+
+{ #category : #tests }
+GLHExtensionTest >> testAddAllOfTypeUnlessDifferentEntity [
+
+	| user values alreadyExistingUser |
+	alreadyExistingUser := model newUser.
+	alreadyExistingUser id: 15.
+	user := GLHUser new.
+	user id: 12.
+	values := model
+		          addAll: { user }
+		          ofType: GLHUser
+		          unless: [ :a :b | a id = b id ].
+	self assert: values size equals: 1.
+	self assert: model size equals: 2.
+	self assert: (values includes: user).
+	self assert: (model includes: user).
+	self assert: (model includes: alreadyExistingUser)
+]
+
+{ #category : #tests }
+GLHExtensionTest >> testAddAllOfTypeUnlessIntersection [
+
 
 	| user1 user2 user3 user2b user3b user4 result |
 	user1 := GLHUser new.
@@ -50,25 +80,6 @@ GLHExtensionTest >> testAddAllOfTypeUnless [
 	self assert: (result includes: user2).
 	self assert: (result includes: user3).
 	self assert: (result includes: user4)
-]
-
-{ #category : #tests }
-GLHExtensionTest >> testAddAllOfTypeUnlessDifferentEntity [
-
-	| user values alreadyExistingUser |
-	alreadyExistingUser := model newUser.
-	alreadyExistingUser id: 15.
-	user := GLHUser new.
-	user id: 12.
-	values := model
-		          addAll: { user }
-		          ofType: GLHUser
-		          unless: [ :a :b | a id = b id ].
-	self assert: values size equals: 1.
-	self assert: model size equals: 2.
-	self assert: (values includes: user).
-	self assert: (model includes: user).
-	self assert: (model includes: alreadyExistingUser)
 ]
 
 { #category : #tests }
