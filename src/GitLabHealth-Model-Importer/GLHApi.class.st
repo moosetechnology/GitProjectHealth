@@ -11,7 +11,7 @@ Class {
 	#classVars : [
 		'currentAPI'
 	],
-	#category : 'GitLabHealth-Model-Importer'
+	#category : #'GitLabHealth-Model-Importer'
 }
 
 { #category : #accessing }
@@ -323,6 +323,18 @@ GLHApi >> getFileBlameForProject: aProjectId andFilePath: aFilePath inRef: aRef 
 	^ self client get
 ]
 
+{ #category : #'api - graphql' }
+GLHApi >> graphQLQuery: query [
+
+	self client path: (String streamContents: [ :str |
+			 str
+				 << (self baseAPIUrl withoutSuffix: '/v4');
+				 << '/graphql/' ]).
+
+	self client contents: { (#query -> query) } asDictionary.
+	^ self client post
+]
+
 { #category : #api }
 GLHApi >> group: aGroupID [
 
@@ -377,7 +389,8 @@ GLHApi >> initialize [
 	self client: (ZnClient new
 			 accept: ZnMimeType applicationJson;
 			 yourself).
-	currentAPI:= self
+	self client forJsonREST.
+	currentAPI := self
 ]
 
 { #category : #'api - jobs' }
