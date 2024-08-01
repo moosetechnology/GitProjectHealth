@@ -326,8 +326,11 @@ GLHApi >> getFileBlameForProject: aProjectId andFilePath: aFilePath inRef: aRef 
 { #category : #'api - graphql' }
 GLHApi >> graphQLQuery: query [
 
-	self client forJsonREST.
-
+	| writer |
+	writer := ZnUtils defaultJSONWriter.
+	self client
+		accept: ZnMimeType applicationJson;
+		contentWriter: [ :data | ZnEntity json: (writer toString: data) ].
 	self client path: (String streamContents: [ :str |
 			 str
 				 << (self baseAPIUrl withoutSuffix: '/v4');
