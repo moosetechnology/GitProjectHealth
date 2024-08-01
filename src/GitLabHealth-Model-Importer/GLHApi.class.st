@@ -326,6 +326,8 @@ GLHApi >> getFileBlameForProject: aProjectId andFilePath: aFilePath inRef: aRef 
 { #category : #'api - graphql' }
 GLHApi >> graphQLQuery: query [
 
+	self client forJsonREST.
+
 	self client path: (String streamContents: [ :str |
 			 str
 				 << (self baseAPIUrl withoutSuffix: '/v4');
@@ -389,7 +391,6 @@ GLHApi >> initialize [
 	self client: (ZnClient new
 			 accept: ZnMimeType applicationJson;
 			 yourself).
-	self client forJsonREST.
 	currentAPI := self
 ]
 
