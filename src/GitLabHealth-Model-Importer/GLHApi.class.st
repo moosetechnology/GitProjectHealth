@@ -6,12 +6,13 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'baseAPIUrl',
-		'client'
+		'privateToken',
+		'pool'
 	],
 	#classVars : [
 		'currentAPI'
 	],
-	#category : 'GitLabHealth-Model-Importer'
+	#category : #'GitLabHealth-Model-Importer'
 }
 
 { #category : #accessing }
@@ -62,21 +63,9 @@ GLHApi >> blamesOfProject: aProjectId forFile: filePath onStartRange: start toEn
 { #category : #api }
 GLHApi >> branchesOfRepository: aProjectID [
 
-	^ self client get:
+	^ self newClient get:
 		  self baseAPIUrl , '/projects/' , aProjectID printString
 		  , '/repository/branches'
-]
-
-{ #category : #accessing }
-GLHApi >> client [
-
-	^ client
-]
-
-{ #category : #accessing }
-GLHApi >> client: anObject [
-
-	client := anObject
 ]
 
 { #category : #'api - commits' }
@@ -326,16 +315,14 @@ GLHApi >> getFileBlameForProject: aProjectId andFilePath: aFilePath inRef: aRef 
 { #category : #api }
 GLHApi >> group: aGroupID [
 
-	^ self client get: self baseAPIUrl , '/groups/' , aGroupID printString
+	^ self newClient get: self baseAPIUrl , '/groups/' , aGroupID printString
 ]
 
 { #category : #projects }
-GLHApi >> importProjects: first after: after [ 
-	 | request query variables body response |
+GLHApi >> importProjects: first after: after [
 
-		
-
-        query := 'query getAllProjects($first: Int!, $after: String) {
+	| query variables body response |
+	query := 'query getAllProjects($first: Int!, $after: String) {
             projects(first: $first, after: $after) {
                 pageInfo {
                     endCursor
@@ -349,35 +336,34 @@ GLHApi >> importProjects: first after: after [
             }
         }'.
 
-        variables := String streamContents: [ :stream |
-            stream nextPutAll: '{'.
-            stream
-                nextPutAll: '"first": ', first printString, ',';
-                nextPutAll: '"after": "', after, '"'.
-            stream nextPutAll: '}'
-        ].
+	variables := String streamContents: [ :stream |
+		             stream nextPutAll: '{'.
+		             stream
+			             nextPutAll: '"first": ' , first printString , ',';
+			             nextPutAll: '"after": "' , after , '"'.
+		             stream nextPutAll: '}' ].
 
-        body := String streamContents: [ :stream |
-            stream nextPutAll: '{'.
-            stream
-                nextPutAll: '"query": "', (' ' join: query lines) , '",';
-                nextPutAll: '"variables": ', variables.
-            stream nextPutAll: '}'
-        ].
+	body := String streamContents: [ :stream |
+		        stream nextPutAll: '{'.
+		        stream
+			        nextPutAll: '"query": "' , (' ' join: query lines) , '",';
+			        nextPutAll: '"variables": ' , variables.
+		        stream nextPutAll: '}' ].
 
-       response := client entity: (ZnEntity with: body); contentType: 'application/json'; 
-            url: (self baseAPIUrl replaceSuffix: 'v4' with: 'graphql'); post.
-        
-        ^ response contents
+	response := self client
+		            entity: (ZnEntity with: body);
+		            contentType: 'application/json';
+		            url:
+			            (self baseAPIUrl replaceSuffix: 'v4' with: 'graphql');
+		            post.
+
+	^ response contents
 ]
 
 { #category : #initialization }
 GLHApi >> initialize [
 
-	self client: (ZnClient new
-			 accept: ZnMimeType applicationJson;
-			 yourself).
-	currentAPI:= self
+	currentAPI := self
 ]
 
 { #category : #'api - jobs' }
@@ -400,21 +386,32 @@ GLHApi >> listGroupsWithTopLevelOnly: topLevelOnly page: aPageNumber [
 	^ self client get
 ]
 
+{ #category : #accessing }
+GLHApi >> newClient [
+
+	| client |
+	client := ZnClient new
+		          accept: ZnMimeType applicationJson;
+		          yourself.
+	client headerAt: #'PRIVATE-TOKEN' add: self privateToken.
+	^ client
+]
+
 { #category : #api }
 GLHApi >> pipelinesOfProject: aProjectID [
-	^ self client get: self baseAPIUrl , '/projects/' , aProjectID printString, '/pipelines'
+	^ self newClient get: self baseAPIUrl , '/projects/' , aProjectID printString, '/pipelines'
 ]
 
 { #category : #accessing }
 GLHApi >> privateToken [
 
-	^ self client request headers at: #'PRIVATE-TOKEN'
+	^ privateToken
 ]
 
 { #category : #accessing }
 GLHApi >> privateToken: anObject [
 
-	self client headerAt: #'PRIVATE-TOKEN' add: anObject
+	privateToken := anObject
 ]
 
 { #category : #accessing }
@@ -484,10 +481,12 @@ GLHApi >> subgroupsOfGroup: aGroupID [
 { #category : #'api - groups' }
 GLHApi >> subgroupsOfGroup: aGroupID page: aPageNumber [
 
-	self client url:
+	| client |
+	client := self newClient.
+	client url:
 		self baseAPIUrl , '/groups/' , aGroupID printString , '/subgroups'.
-	aPageNumber ifNotNil: [ self client queryAt: #page put: aPageNumber ].
-	^ self client get
+	aPageNumber ifNotNil: [ client queryAt: #page put: aPageNumber ].
+	^ client get
 ]
 
 { #category : #api }
@@ -507,7 +506,7 @@ GLHApi >> treeOfRepository: aProjectID ofBranch: aBranchRef andPath: aPath [
 { #category : #api }
 GLHApi >> user: aUserID [
 
-	^ self client get: self baseAPIUrl , '/users/' , aUserID printString
+	^ self newClient get: self baseAPIUrl , '/users/' , aUserID printString
 ]
 
 { #category : #api }

@@ -9,7 +9,8 @@ Class {
 		'withCommitsSince',
 		'withInitialCommits',
 		'withInitialMergeRequest',
-		'generalReader'
+		'generalReader',
+		'pool'
 	],
 	#classVars : [
 		'currentImporter'
@@ -581,10 +582,10 @@ GLHModelImporter >> importGroup: aGroupID [
 		self completeImportProject: project ].
 
 	(self subGroupsOf: aGroupID) do: [ :subGroup |
-		
-		groupResult subGroups
-			add: (self importGroup: subGroup id)
-			unless: self blockOnIdEquality ].
+		| future |
+		future := [ self importGroup: subGroup id ] future.
+		future onSuccessDo: [ :imported |
+			groupResult subGroups add: imported unless: self blockOnIdEquality ] ].
 	^ groupResult
 ]
 
@@ -794,7 +795,10 @@ GLHModelImporter >> initialize [
 	withInitialMergeRequest := false.
 	withCommitsSince := (Date today - 1 week) asDateAndTime.
 	self initReader.
-	currentImporter := self. 
+	currentImporter := self.
+	self pool: TKTWorkerPool new.
+	self pool poolMaxSize: 5.
+	self pool start
 ]
 
 { #category : #importer }
@@ -1051,6 +1055,18 @@ GLHModelImporter >> pipelinesOf: aProjectID [
 	('Search pipelines of: ' , aProjectID printString) recordInfo.
 	result := self glhApi pipelinesOfProject: aProjectID.
 	^ self parsePipelinesResult: result
+]
+
+{ #category : #accessing }
+GLHModelImporter >> pool [
+
+	^ pool
+]
+
+{ #category : #accessing }
+GLHModelImporter >> pool: anObject [
+
+	pool := anObject
 ]
 
 { #category : #'as yet unclassified' }
