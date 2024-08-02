@@ -173,5 +173,5 @@ GLPHApi >> usersSearchByUsername: aUserName [
 	name := (aUserName splitOn: ' ') collect: [:part | part urlEncoded].
 	name := '+' join: name.
 	
-	^ self client get: self baseAPIUrl , '/users?search=' , name 
+	^ self newClient get: self baseAPIUrl , '/users?search=' , name 
 ]

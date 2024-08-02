@@ -6,8 +6,7 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'baseAPIUrl',
-		'privateToken',
-		'pool'
+		'privateToken'
 	],
 	#classVars : [
 		'currentAPI'
@@ -160,27 +159,29 @@ GLHApi >> commitsOfProject: anInteger forRefName: refName since: since [
 { #category : #'api - commits' }
 GLHApi >> commitsOfProject: aProjectId forRefName: refName since: since until: until path: aPath author: author all: aAllBoolean with_stats: withStateBoolean firstParent: firstParent order: orderString trailers: trailers perPage: aPerPageNumber page: aPageNumber [
 	"https://docs.gitlab.com/ee/api/commits.html#list-repository-commits"
+	| client |
+	client := self newClient.
 
-	self client path:
+	client path:
 		self baseAPIUrl , '/projects/' , aProjectId printString
 		, '/repository/commits'.
-	refName ifNotNil: [ self client queryAt: #ref_name put: refName ].
-	since ifNotNil: [ self client queryAt: #since put: since ].
-	until ifNotNil: [ self client queryAt: #until put: until ].
-	aPath ifNotNil: [ self client queryAt: #path put: aPath ].
-	author ifNotNil: [ self client queryAt: #author put: author ].
-	aAllBoolean ifNotNil: [ self client queryAt: #all put: aAllBoolean ].
+	refName ifNotNil: [ client queryAt: #ref_name put: refName ].
+	since ifNotNil: [ client queryAt: #since put: since ].
+	until ifNotNil: [ client queryAt: #until put: until ].
+	aPath ifNotNil: [ client queryAt: #path put: aPath ].
+	author ifNotNil: [ client queryAt: #author put: author ].
+	aAllBoolean ifNotNil: [ client queryAt: #all put: aAllBoolean ].
 	withStateBoolean ifNotNil: [
-		self client queryAt: #with_stats put: withStateBoolean ].
+		client queryAt: #with_stats put: withStateBoolean ].
 	firstParent ifNotNil: [
-		self client queryAt: #first_parent put: firstParent ].
-	orderString ifNotNil: [ self client queryAt: #order put: orderString ].
-	trailers ifNotNil: [ self client queryAt: #trailers put: trailers ].
+		client queryAt: #first_parent put: firstParent ].
+	orderString ifNotNil: [ client queryAt: #order put: orderString ].
+	trailers ifNotNil: [ client queryAt: #trailers put: trailers ].
 	aPerPageNumber ifNotNil: [
-		self client queryAt: #per_page put: aPerPageNumber ].
-	aPageNumber ifNotNil: [ self client queryAt: #page put: aPageNumber ].
+		client queryAt: #per_page put: aPerPageNumber ].
+	aPageNumber ifNotNil: [ client queryAt: #page put: aPageNumber ].
 
-	^ self client get
+	^ client get
 ]
 
 { #category : #commits }
