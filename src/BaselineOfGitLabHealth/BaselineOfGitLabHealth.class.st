@@ -1,11 +1,10 @@
 Class {
-	#name : 'BaselineOfGitLabHealth',
-	#superclass : 'BaselineOf',
-	#category : 'BaselineOfGitLabHealth',
-	#package : 'BaselineOfGitLabHealth'
+	#name : #BaselineOfGitLabHealth,
+	#superclass : #BaselineOf,
+	#category : #BaselineOfGitLabHealth
 }
 
-{ #category : 'baselines' }
+{ #category : #baselines }
 BaselineOfGitLabHealth >> baseline: spec [
 
 	<baseline>
@@ -22,14 +21,14 @@ BaselineOfGitLabHealth >> baseline: spec [
 			spec package: 'GitLabHealth-Model' with: [ spec requires: #( 'Moose' ) ] ] ]
 ]
 
-{ #category : 'baselines' }
+{ #category : #baselines }
 BaselineOfGitLabHealth >> customProjectAttributes [
     self class environment at: #MooseEntity ifAbsent: [ ^ #(#WithoutFamix) ].
 
     ^ #()
 ]
 
-{ #category : 'baselines' }
+{ #category : #baselines }
 BaselineOfGitLabHealth >> defineDependencies: spec [
 
 	spec
@@ -37,14 +36,19 @@ BaselineOfGitLabHealth >> defineDependencies: spec [
 		with: [ spec repository: 'github://svenvc/NeoJSON/repository' ].
 	spec
 		baseline: 'MoreLogger'
-		with: [ spec repository: 'github://badetitou/MoreLogger:main/src' ]
+		with: [ spec repository: 'github://badetitou/MoreLogger:main/src' ].
+			spec
+		baseline: 'Voyage'
+		with: [ spec
+			loads: #('mongo'); 
+			repository: 'github://pharo-nosql/voyage/mc' ]
 ]
 
-{ #category : 'baselines' }
+{ #category : #baselines }
 BaselineOfGitLabHealth >> defineGroups: spec [
 ]
 
-{ #category : 'baselines' }
+{ #category : #baselines }
 BaselineOfGitLabHealth >> definePackages: spec [
 
 	spec
