@@ -380,7 +380,7 @@ GitMetricExporter >> exportFor: usersWithProjects over: aCollectionOfDateWeekMon
 { #category : #'as yet unclassified' }
 GitMetricExporter >> exportInDB: repository [
 
-	| entity period analysisReport contribution frequencyCommit commentContribution mergeRequestDuration codeChurn delayUntilFirstChurn |
+	| entity period analysisReport contribution commentContribution mergeRequestDuration codeChurn delayUntilFirstChurn codeAddition codeDeletion commitFrequency |
 	repository enableSingleton.
 
 	entity := entities at: 1.
@@ -390,48 +390,51 @@ GitMetricExporter >> exportInDB: repository [
 		                codeContributionsSince: (period at: #since)
 		                until: (period at: #until)
 		                overA: over.
+	codeAddition := contribution at: #avgAddition.
+	codeDeletion := contribution at: #avgDeletion.
 
-	frequencyCommit := entity
-		                   commitFrequencySince: (period at: #since)
-		                   until: (period at: #until)
-		                   overA: over.
+	commitFrequency := (entity
+		                    commitFrequencySince: (period at: #since)
+		                    until: (period at: #until)
+		                    overA: over) at: #averageFloat.
 
-	commentContribution := entity
-		                       commentsContributionsSince:
-		                       (period at: #since)
-		                       until: (period at: #until)
-		                       overA: over.
-
-	mergeRequestDuration := entity
-		                        mergeRequestDurationSince:
+	commentContribution := (entity
+		                        commentsContributionsSince:
 		                        (period at: #since)
 		                        until: (period at: #until)
-		                        overA: over.
+		                        overA: over) at: #avgComments.
 
-	codeChurn := entity
-		             codeChurnSince: (period at: #since)
-		             until: (period at: #until)
-		             onACommitWindowOf: maxCommitWindow
-		             overA: over.
+	mergeRequestDuration := (entity
+		                         mergeRequestDurationSince:
+		                         (period at: #since)
+		                         until: (period at: #until)
+		                         overA: over) at: #avgDuration.
 
-	delayUntilFirstChurn := entity
-		                        delayUntilFirstChurnSince:
-		                        (period at: #since)
-		                        until: (period at: #until)
-		                        onACommitWindowOf: maxCommitWindow
-		                        overA: over.
+	codeChurn := (entity
+		              codeChurnSince: (period at: #since)
+		              until: (period at: #until)
+		              onACommitWindowOf: maxCommitWindow
+		              overA: over) at: #churn.
+
+	delayUntilFirstChurn := (entity
+		                         delayUntilFirstChurnSince:
+		                         (period at: #since)
+		                         until: (period at: #until)
+		                         onACommitWindowOf: maxCommitWindow
+		                         overA: over) at: #avgDelay.
 
 	analysisReport := AnalysisReport new
 		                  username: entity user name;
 		                  period: period;
-								contribution: contribution;
-								frequencyCommit: frequencyCommit;
-								commentContribution: commentContribution;
-								mergeRequestDuration: mergeRequestDuration;
-								codeChurn: codeChurn;
-								delayUntilFirstChurn: delayUntilFirstChurn.
-								
-	analysisReport save.
+		                  codeAddition: codeAddition;
+		                  codeDeletion: codeDeletion;
+		                  commitFrequency: commitFrequency;
+		                  commentContribution: commentContribution;
+		                  mergeRequestDuration: mergeRequestDuration;
+		                  codeChurn: codeChurn;
+		                  delayUntilFirstChurn: delayUntilFirstChurn.
+
+	analysisReport save
 ]
 
 { #category : #projects }

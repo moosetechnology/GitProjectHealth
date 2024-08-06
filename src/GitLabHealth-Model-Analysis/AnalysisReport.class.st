@@ -4,8 +4,9 @@ Class {
 	#instVars : [
 		'username',
 		'period',
-		'contribution',
-		'frequencyCommit',
+		'codeAddition',
+		'codeDeletion',
+		'commitFrequency',
 		'commentContribution',
 		'mergeRequestDuration',
 		'codeChurn',
@@ -13,6 +14,23 @@ Class {
 	],
 	#category : #'GitLabHealth-Model-Analysis'
 }
+
+{ #category : #testing }
+AnalysisReport class >> isVoyageRoot [
+	^true
+]
+
+{ #category : #accessing }
+AnalysisReport >> codeAddition [
+
+	^ codeAddition
+]
+
+{ #category : #accessing }
+AnalysisReport >> codeAddition: anObject [
+
+	codeAddition := anObject
+]
 
 { #category : #accessing }
 AnalysisReport >> codeChurn [
@@ -24,6 +42,18 @@ AnalysisReport >> codeChurn [
 AnalysisReport >> codeChurn: anObject [
 
 	codeChurn := anObject
+]
+
+{ #category : #accessing }
+AnalysisReport >> codeDeletion [
+
+	^ codeDeletion
+]
+
+{ #category : #accessing }
+AnalysisReport >> codeDeletion: anObject [
+
+	codeDeletion := anObject
 ]
 
 { #category : #accessing }
@@ -39,15 +69,15 @@ AnalysisReport >> commentContribution: anObject [
 ]
 
 { #category : #accessing }
-AnalysisReport >> contribution [
+AnalysisReport >> commitFrequency [
 
-	^ contribution
+	^ commitFrequency
 ]
 
 { #category : #accessing }
-AnalysisReport >> contribution: anObject [
+AnalysisReport >> commitFrequency: anObject [
 
-	contribution := anObject
+	commitFrequency := anObject
 ]
 
 { #category : #accessing }
@@ -60,18 +90,6 @@ AnalysisReport >> delayUntilFirstChurn [
 AnalysisReport >> delayUntilFirstChurn: anObject [
 
 	delayUntilFirstChurn := anObject
-]
-
-{ #category : #accessing }
-AnalysisReport >> frequencyCommit [
-
-	^ frequencyCommit
-]
-
-{ #category : #accessing }
-AnalysisReport >> frequencyCommit: anObject [
-
-	frequencyCommit := anObject
 ]
 
 { #category : #accessing }
