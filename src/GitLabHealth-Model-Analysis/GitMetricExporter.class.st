@@ -9,7 +9,8 @@ Class {
 		'sinceTimeLimit',
 		'runningPeriods',
 		'maxCommitWindow',
-		'over'
+		'over',
+		'analyses'
 	],
 	#category : #'GitLabHealth-Model-Analysis'
 }
@@ -179,6 +180,18 @@ GitMetricExporter >> addMergeRequestDurationExporter: exportBrowserModel [
 		exportBrowserModel
 			addColumnForQuery: (self blockMergeRequestDurationSince: period)
 			withName: columnName ]
+]
+
+{ #category : #accessing }
+GitMetricExporter >> analyses [
+
+	^ analyses
+]
+
+{ #category : #accessing }
+GitMetricExporter >> analyses: anObject [
+
+	analyses := anObject
 ]
 
 { #category : #'as yet unclassified' }
@@ -378,70 +391,82 @@ GitMetricExporter >> exportFor: usersWithProjects over: aCollectionOfDateWeekMon
 ]
 
 { #category : #'as yet unclassified' }
+GitMetricExporter >> exportInCSVOver: aCollectionOfDateWeekMonthOrYear [
+
+	| exportBrowserModel file |
+	exportBrowserModel := MiExportModel new.
+
+	self analyses ifNil: [ self generateAnalyses ].
+	exportBrowserModel entitiesList: self analyses.
+
+	exportBrowserModel removeColumnForQueryNamed: #Type.
+	exportBrowserModel removeColumnForQueryNamed: #Name.
+
+	exportBrowserModel
+		addColumnForQuery: [ :analysis | analysis username ]
+		withName: #'User name'.
+
+	exportBrowserModel
+		addColumnForQuery: [ :analysis | analysis period ]
+		withName: #Period.
+
+	"Code Contribution "
+	exportBrowserModel
+		addColumnForQuery: [ :analysis | analysis codeAddition ]
+		withName: 'code addition (avg)' asSymbol.
+
+	exportBrowserModel
+		addColumnForQuery: [ :analysis | analysis codeDeletion ]
+		withName: 'code deletion (avg)' asSymbol.
+
+	"Commit frequencies "
+	exportBrowserModel
+		addColumnForQuery: [ :analysis | analysis commitFrequency ]
+		withName: 'commits frequency (avg) ' asSymbol.
+
+	"comment contribution "
+	exportBrowserModel
+		addColumnForQuery: [ :analysis | analysis commentContribution ]
+		withName: 'comment contribution (avg)' asSymbol.
+
+	"merge Request Duration "
+	exportBrowserModel
+		addColumnForQuery: [ :analysis | analysis mergeRequestDuration ]
+		withName: 'merge Request Duration ' asSymbol.
+
+	"code churn"
+	exportBrowserModel
+		addColumnForQuery: [ :analysis | analysis codeChurn ]
+		withName:
+		'churn % (W=' , maxCommitWindow printString , ') ' asSymbol.
+
+	"delay Until First Churn"
+	exportBrowserModel
+		addColumnForQuery: [ :analysis | analysis delayUntilFirstChurn ]
+		withName:
+			'delay Until First Churn (W=' , maxCommitWindow printString
+			, ') ' asSymbol.
+
+	aCollectionOfDateWeekMonthOrYear do: [ :aDateWeekMonthOrYear |
+		over := aDateWeekMonthOrYear.
+		file := self constructFilePath: over.
+
+		file writeStreamDo: [ :aStream |
+			aStream
+				<< 'sep=,';
+				<< OSPlatform current lineEnding.
+			exportBrowserModel writeCSVOn: aStream ] ].
+
+	'Done computing' recordInfo
+]
+
+{ #category : #export }
 GitMetricExporter >> exportInDB: repository [
 
-	| analysisReport contribution commentContribution mergeRequestDuration codeChurn delayUntilFirstChurn codeAddition codeDeletion commitFrequency |
 	repository enableSingleton.
-	
-	runningPeriods do: [ :period |
-		entities do: [ 
-			:entity |
-			contribution := entity
-		                codeContributionsSince: (period at: #since)
-		                until: (period at: #until)
-		                overA: over.
-	codeAddition := contribution at: #avgAddition.
-	codeDeletion := contribution at: #avgDeletion.
 
-	commitFrequency := (entity
-		                    commitFrequencySince: (period at: #since)
-		                    until: (period at: #until)
-		                    overA: over) at: #averageFloat.
-
-	commentContribution := (entity
-		                        commentsContributionsSince:
-		                        (period at: #since)
-		                        until: (period at: #until)
-		                        overA: over) at: #avgComments.
-
-	mergeRequestDuration := (entity
-		                         mergeRequestDurationSince:
-		                         (period at: #since)
-		                         until: (period at: #until)
-		                         overA: over) at: #avgDuration.
-
-	codeChurn := (entity
-		              codeChurnSince: (period at: #since)
-		              until: (period at: #until)
-		              onACommitWindowOf: maxCommitWindow
-		              overA: over) at: #churn.
-
-	delayUntilFirstChurn := (entity
-		                         delayUntilFirstChurnSince:
-		                         (period at: #since)
-		                         until: (period at: #until)
-		                         onACommitWindowOf: maxCommitWindow
-		                         overA: over) at: #avgDelay.
-
-	analysisReport := AnalysisReport new
-		                  username: entity user name;
-		                  period: period;
-		                  codeAddition: codeAddition;
-		                  codeDeletion: codeDeletion;
-		                  commitFrequency: commitFrequency;
-		                  commentContribution: commentContribution;
-		                  mergeRequestDuration: mergeRequestDuration;
-		                  codeChurn: codeChurn;
-		                  delayUntilFirstChurn: delayUntilFirstChurn.
-
-	analysisReport save
-				 
-		]
-		 
-	]
-
-
-	
+	self analyses ifNil: [ self generateAnalyses ].
+	self analyses do: [ :analysis | analysis save ]
 ]
 
 { #category : #projects }
@@ -477,6 +502,24 @@ GitMetricExporter >> findParticipationOfCommitAuthorNamed: username amongProject
 { #category : #'as yet unclassified' }
 GitMetricExporter >> findProjectsOfUser: aCollection [ 
 	self shouldBeImplemented.
+]
+
+{ #category : #analysis }
+GitMetricExporter >> generateAnalyses [
+
+	| newAnalyses |
+	newAnalyses := OrderedCollection new.
+
+	runningPeriods do: [ :period |
+		newAnalyses addAll: (entities collect: [ :entity |
+			entity
+				generateAnalysisForPeriod: period
+				over: over
+				withMaxCommitWindows: maxCommitWindow ]) ].
+
+	self analyses: newAnalyses.
+
+	^ newAnalyses
 ]
 
 { #category : #accessing }

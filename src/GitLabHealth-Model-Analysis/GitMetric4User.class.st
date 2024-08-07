@@ -507,6 +507,60 @@ GitMetric4User >> foundSuccessorOf: userCommits andCompleteImportForMax: commitL
 	^ analyzingCommits
 ]
 
+{ #category : #'as yet unclassified' }
+GitMetric4User >> generateAnalysisForPeriod: period over: over withMaxCommitWindows: maxCommitWindow [
+
+	| contribution codeAddition codeDeletion commitFrequency commentContribution mergeRequestDuration codeChurn delayUntilFirstChurn |
+	
+	contribution := self
+		                codeContributionsSince: (period at: #since)
+		                until: (period at: #until)
+		                overA: over.
+	codeAddition := contribution at: #avgAddition.
+	codeDeletion := contribution at: #avgDeletion.
+
+	commitFrequency := (self
+		                    commitFrequencySince: (period at: #since)
+		                    until: (period at: #until)
+		                    overA: over) at: #averageFloat.
+
+	commentContribution := (self
+		                        commentsContributionsSince:
+		                        (period at: #since)
+		                        until: (period at: #until)
+		                        overA: over) at: #avgComments.
+
+	mergeRequestDuration := (self
+		                         mergeRequestDurationSince:
+		                         (period at: #since)
+		                         until: (period at: #until)
+		                         overA: over) at: #avgDuration.
+
+	codeChurn := (self
+		              codeChurnSince: (period at: #since)
+		              until: (period at: #until)
+		              onACommitWindowOf: maxCommitWindow
+		              overA: over) at: #churn.
+
+	delayUntilFirstChurn := (self
+		                         delayUntilFirstChurnSince:
+		                         (period at: #since)
+		                         until: (period at: #until)
+		                         onACommitWindowOf: maxCommitWindow
+		                         overA: over) at: #avgDelay.
+
+	^ AnalysisReport new
+		  username: self user name;
+		  period: period;
+		  codeAddition: codeAddition;
+		  codeDeletion: codeDeletion;
+		  commitFrequency: commitFrequency;
+		  commentContribution: commentContribution;
+		  mergeRequestDuration: mergeRequestDuration;
+		  codeChurn: codeChurn;
+		  delayUntilFirstChurn: delayUntilFirstChurn
+]
+
 { #category : #initialization }
 GitMetric4User >> initialize [
 
