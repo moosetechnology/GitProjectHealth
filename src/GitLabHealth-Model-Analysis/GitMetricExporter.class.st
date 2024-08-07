@@ -380,13 +380,13 @@ GitMetricExporter >> exportFor: usersWithProjects over: aCollectionOfDateWeekMon
 { #category : #'as yet unclassified' }
 GitMetricExporter >> exportInDB: repository [
 
-	| entity period analysisReport contribution commentContribution mergeRequestDuration codeChurn delayUntilFirstChurn codeAddition codeDeletion commitFrequency |
+	| analysisReport contribution commentContribution mergeRequestDuration codeChurn delayUntilFirstChurn codeAddition codeDeletion commitFrequency |
 	repository enableSingleton.
-
-	entity := entities at: 1.
-	period := runningPeriods at: 1.
-
-	contribution := entity
+	
+	runningPeriods do: [ :period |
+		entities do: [ 
+			:entity |
+			contribution := entity
 		                codeContributionsSince: (period at: #since)
 		                until: (period at: #until)
 		                overA: over.
@@ -435,6 +435,13 @@ GitMetricExporter >> exportInDB: repository [
 		                  delayUntilFirstChurn: delayUntilFirstChurn.
 
 	analysisReport save
+				 
+		]
+		 
+	]
+
+
+	
 ]
 
 { #category : #projects }
