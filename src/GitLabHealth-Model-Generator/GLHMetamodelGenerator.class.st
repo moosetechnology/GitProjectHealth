@@ -160,6 +160,7 @@ GLHMetamodelGenerator >> defineRelations [
 	(group property: #subGroups) <>-* (group property: #group).
 	(project property: #pipelines) <>-* (pipeline property: #project).
 	(project property: #creator) *- (user property: #createdProjects).
+	(project property: #contributors) *-* (user property: #contributedProjects).
 	(project property: #repository) <>- (repository property: #project).
 	(repository property: #branches) <>-* (branch property: #repository).
 	(branch property: #files) <>-* (file property: #branch).
@@ -167,14 +168,14 @@ GLHMetamodelGenerator >> defineRelations [
 	<>-* (file property: #directoryOwner).
 	(repository property: #commits) <>-* (commit property: #repository).
 	(branch property: #commits) <>-* (commit property: #branch).
-	
+
 	(commit property: #diffs) <>-* (diff property: #commit).
 	(user property: #commits) <>-* (commit property: #commitCreator).
-	(commit property: #parentCommits) *-* (commit property: #childCommits).
+	(commit property: #parentCommits)
+	*-* (commit property: #childCommits).
 	(commit property: #jobs) <>-* (job property: #commit).
 	(pipeline property: #jobs) <>-* (job property: #pipeline).
 	(user property: #jobs) <>-* (job property: #user)
-
 ]
 
 { #category : #definition }

@@ -241,6 +241,32 @@ GLHModelImporter >> glhModel: anObject [
 	glhModel := anObject
 ]
 
+{ #category : #'as yet unclassified' }
+GLHModelImporter >> importActiveHumanUsers [
+	
+	| newlyFoundUser page foundUsers |
+	page := 0.
+	foundUsers := OrderedCollection new.
+	newlyFoundUser := { true }.
+	[ newlyFoundUser isNotEmpty ] whileTrue: [
+		| results |
+		page := page + 1.
+		('import users page ' , page printString) recordInfo.
+		results := GLHApi current
+			        	  usersHuman: true active: true withoutProjectBots: true perPage: 100 page: page.
+
+		newlyFoundUser := self parseUsersResult: results.
+		"newlyFoundCommit do: [ :c | c repository: aProject repository ]."
+		
+		foundUsers addAll: (self glhModel addAll: newlyFoundUser
+				 unless: self blockOnIdEquality) ].
+
+
+	^ foundUsers
+	
+
+]
+
 { #category : #api }
 GLHModelImporter >> importAllGroups [
 
@@ -303,37 +329,6 @@ GLHModelImporter >> importCommitOfProject: anProject withId: anID [
 	self withCommitDiffs ifTrue: [ self importDiffOfCommit: commit ].
 
 	^ commit
-]
-
-{ #category : #'private - api' }
-GLHModelImporter >> importCommits: aGLHProject [
-	"limited to the last 20 commits"
-
-	| results parsedResults |
-	results := self glhApi
-		           commitsOfProject: aGLHProject id
-		           forRefName: nil
-		           since: nil
-		           until: nil
-		           path: nil
-		           author: nil
-		           all: nil
-		           with_stats: true
-		           firstParent: nil
-		           order: nil
-		           trailers: nil
-		           perPage: nil
-		           page: nil.
-	parsedResults := self parseCommitsResult: results.
-	self glhModel addAll: parsedResults unless: self blockOnIdEquality.
-
-	parsedResults do: [ :commit |
-		commit repository: aGLHProject repository ].
-
-	self withCommitDiffs ifTrue: [
-		parsedResults do: [ :commit | self importDiffOfCommit: commit ] ].
-	
-	^ parsedResults. 
 ]
 
 { #category : #'as yet unclassified' }
@@ -501,6 +496,38 @@ GLHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName until:
 ]
 
 { #category : #'as yet unclassified' }
+GLHModelImporter >> importContributedProjectsOfUser: aGLHUser [ 
+	| newlyFoundElmts page foundElmts |
+	page := 0.
+	foundElmts := OrderedCollection new.
+	newlyFoundElmts := { true }.
+	[ newlyFoundElmts isNotEmpty ] whileTrue: [
+		| results |
+		page := page + 1.
+		('import contributed project of user ', aGLHUser name ,' page ' , page printString) recordInfo.
+		results := GLHApi current
+			           contributedProjectsOfUserId: aGLHUser id
+						  orderBy: 'created_at'
+						  simple: true
+						  sort: 'desc'
+			           perPage: 100
+			           page: page.
+
+		newlyFoundElmts := self parseArrayOfProject: results.
+		"newlyFoundCommit do: [ :c | c repository: aProject repository ]."
+
+		foundElmts addAll:
+			(self glhModel
+				 addAll: newlyFoundElmts
+				 unless: self blockOnIdEquality) ].
+
+	self flag: 'TODO: uncomment that contributed project are added to user'.
+	"aGLHUser contributedProjects addAll: foundElmts unless: self blockOnIdEquality. "
+
+	^ foundElmts
+]
+
+{ #category : #'as yet unclassified' }
 GLHModelImporter >> importCreatorOfCommit: aCommit [
 	
 	aCommit commitCreator ifNil: [
@@ -599,6 +626,37 @@ GLHModelImporter >> importJobsOf: aPipeline [
 	jobs do: [ :job | aPipeline addJob: job ].
 	self glhModel addAll: jobs
 
+]
+
+{ #category : #'private - api' }
+GLHModelImporter >> importLastestCommitsOfProject: aGLHProject [
+	"limited to the last 20 commits"
+
+	| results parsedResults |
+	results := self glhApi
+		           commitsOfProject: aGLHProject id
+		           forRefName: nil
+		           since: nil
+		           until: nil
+		           path: nil
+		           author: nil
+		           all: nil
+		           with_stats: true
+		           firstParent: nil
+		           order: nil
+		           trailers: nil
+		           perPage: nil
+		           page: nil.
+	parsedResults := self parseCommitsResult: results.
+	self glhModel addAll: parsedResults unless: self blockOnIdEquality.
+
+	parsedResults do: [ :commit |
+		commit repository: aGLHProject repository ].
+
+	self withCommitDiffs ifTrue: [
+		parsedResults do: [ :commit | self importDiffOfCommit: commit ] ].
+	
+	^ parsedResults. 
 ]
 
 { #category : #commit }
@@ -1042,6 +1100,22 @@ GLHModelImporter >> parseUserResult: result [
 	reader := NeoJSONReader on: result readStream.
 	reader mapInstVarsFor: GLHUser.
 	^ reader nextAs: GLHUser
+]
+
+{ #category : #private }
+GLHModelImporter >> parseUsersResult: result [
+
+	| reader |
+	reader := NeoJSONReader on: result readStream.
+
+	reader mapInstVarsFor: GLHUser.
+
+	reader
+		for: #ArrayOfUser
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHUser ].
+
+	^ reader nextAs: #ArrayOfUser
 ]
 
 { #category : #'private - api' }
