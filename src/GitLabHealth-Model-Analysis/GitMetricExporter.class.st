@@ -377,6 +377,66 @@ GitMetricExporter >> exportFor: usersWithProjects over: aCollectionOfDateWeekMon
 	self exportFor: aCollectionOfDateWeekMonthOrYear. 
 ]
 
+{ #category : #'as yet unclassified' }
+GitMetricExporter >> exportInDB: repository [
+
+	| entity period analysisReport contribution commentContribution mergeRequestDuration codeChurn delayUntilFirstChurn codeAddition codeDeletion commitFrequency |
+	repository enableSingleton.
+
+	entity := entities at: 1.
+	period := runningPeriods at: 1.
+
+	contribution := entity
+		                codeContributionsSince: (period at: #since)
+		                until: (period at: #until)
+		                overA: over.
+	codeAddition := contribution at: #avgAddition.
+	codeDeletion := contribution at: #avgDeletion.
+
+	commitFrequency := (entity
+		                    commitFrequencySince: (period at: #since)
+		                    until: (period at: #until)
+		                    overA: over) at: #averageFloat.
+
+	commentContribution := (entity
+		                        commentsContributionsSince:
+		                        (period at: #since)
+		                        until: (period at: #until)
+		                        overA: over) at: #avgComments.
+
+	mergeRequestDuration := (entity
+		                         mergeRequestDurationSince:
+		                         (period at: #since)
+		                         until: (period at: #until)
+		                         overA: over) at: #avgDuration.
+
+	codeChurn := (entity
+		              codeChurnSince: (period at: #since)
+		              until: (period at: #until)
+		              onACommitWindowOf: maxCommitWindow
+		              overA: over) at: #churn.
+
+	delayUntilFirstChurn := (entity
+		                         delayUntilFirstChurnSince:
+		                         (period at: #since)
+		                         until: (period at: #until)
+		                         onACommitWindowOf: maxCommitWindow
+		                         overA: over) at: #avgDelay.
+
+	analysisReport := AnalysisReport new
+		                  username: entity user name;
+		                  period: period;
+		                  codeAddition: codeAddition;
+		                  codeDeletion: codeDeletion;
+		                  commitFrequency: commitFrequency;
+		                  commentContribution: commentContribution;
+		                  mergeRequestDuration: mergeRequestDuration;
+		                  codeChurn: codeChurn;
+		                  delayUntilFirstChurn: delayUntilFirstChurn.
+
+	analysisReport save
+]
+
 { #category : #projects }
 GitMetricExporter >> findParticipationOfCommitAuthorNamed: username amongProjects: aCollectionOfProjects [
 
