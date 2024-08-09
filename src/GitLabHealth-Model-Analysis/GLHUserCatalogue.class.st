@@ -12,6 +12,9 @@ GLHUserCatalogue class >> scrapeContributedProjectsForCommitAuthorsRelatedToUser
 	"get all "
 
 	| maxProjects itsProjects |
+	
+	aGLHUser id ifNil: [ ^ {  } asSet ].
+	
 	maxProjects := 10.
 
 	GLHModelImporter current withCommitDiffs: false.
