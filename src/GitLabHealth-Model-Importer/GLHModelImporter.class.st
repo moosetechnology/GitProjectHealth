@@ -895,28 +895,6 @@ GLHModelImporter >> parseCommitsResult: result [
 ]
 
 { #category : #private }
-GLHModelImporter >> parseDiffResult: result [
-
-	| reader |
-	self
-		deprecated: 'Use #newParseDiffResult: instead'
-		on: '28 June 2024'
-		in:
-		'Pharo-11.0.0+build.726.sha.aece1b5473acf3830a0e082c1bc3a15d4ff3522b (64 Bit)'.
-	reader := NeoJSONReader on: result readStream.
-	reader for: GLHDiff do: [ :mapping |
-		mapping mapInstVars:
-			#( deleted_file new_file new_path old_path renamed_file ).
-		mapping mapInstVar: #diffString to: #diff ].
-
-	reader
-		for: #ArrayOfDiffs
-		customDo: [ :customMappting |
-		customMappting listOfElementSchema: GLHDiff ].
-	^ reader nextAs: #ArrayOfDiffs
-]
-
-{ #category : #private }
 GLHModelImporter >> parseFileTreeResult: aResult [
 
 	| reader |
