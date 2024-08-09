@@ -123,7 +123,7 @@ GLHModelImporter >> completeImportedCommit: aCommit [
 	^ aCommit
 ]
 
-{ #category : #private }
+{ #category : #'private - configure reader' }
 GLHModelImporter >> configureReaderForCommit: reader [
 
   	reader for: GLHCommit do: [ :mapping |
@@ -155,7 +155,7 @@ GLHModelImporter >> configureReaderForCommit: reader [
 
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'private - configure reader' }
 GLHModelImporter >> configureReaderForDiffs: reader [
 
 	reader for: GLHDiff do: [ :mapping |
@@ -170,7 +170,7 @@ GLHModelImporter >> configureReaderForDiffs: reader [
 	^ reader
 ]
 
-{ #category : #private }
+{ #category : #'private - configure reader' }
 GLHModelImporter >> configureReaderForGroup: reader [
 
 	reader for: GLHGroup do: [ :mapping |
