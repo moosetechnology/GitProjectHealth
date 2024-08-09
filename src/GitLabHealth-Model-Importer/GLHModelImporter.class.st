@@ -602,32 +602,6 @@ GLHModelImporter >> importJobsOf: aPipeline [
 ]
 
 { #category : #commit }
-GLHModelImporter >> importParentCommitsOfCommit: aGLHCommit forOnly: number [
-
-	| parentsIds commits |
-	commits := OrderedCollection new.
-	number = 0 ifTrue: [
-		^ commits
-			  add: aGLHCommit;
-			  yourself ].
-
-	parentsIds := aGLHCommit parent_ids.
-
-	commits addAll: (parentsIds collect: [ :id |
-			 self
-				 importCommitOfProject: aGLHCommit repository project
-				 withId: id.
-			 (self selectEntityType: GLHCommit overAttribut: #id equalTo: id)
-				 first ]).
-
-
-	^ commits , (commits collect: [ :parentCommit |
-		   self
-			   importParentCommitsOfCommit: parentCommit
-			   forOnly: number - 1 ]) flatten
-]
-
-{ #category : #commit }
 GLHModelImporter >> importParentCommitsOfCommit: aGLHCommit since: aDate [
 
 	| parentsIds commits |
@@ -1051,13 +1025,6 @@ GLHModelImporter >> pipelinesOf: aProjectID [
 	('Search pipelines of: ' , aProjectID printString) recordInfo.
 	result := self glhApi pipelinesOfProject: aProjectID.
 	^ self parsePipelinesResult: result
-]
-
-{ #category : #'as yet unclassified' }
-GLHModelImporter >> selectEntityType: aType overAttribut: aSelector equalTo: value [
-
-	^ (self glhModel allWithType: aType)
-		select: [ :entity | (entity perform: aSelector) = value ]
 ]
 
 { #category : #'private - api' }
