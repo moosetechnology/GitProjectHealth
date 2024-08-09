@@ -72,13 +72,15 @@ BaselineOfGitLabHealth >> defineGroups: spec [
 BaselineOfGitLabHealth >> defineJiraConnector: spec [
 
 	spec
-		package: 'GitProject-JiraConnector-Model';
+		package: 'GitProject-JiraConnector-Model'
+		with: [ spec requires: #( 'JiraPharoAPI' ) ];
 		package: 'GitProject-JiraConnector' with: [
 			spec requires: #( 'GitProject-JiraConnector-Model'
 				   'JiraPharoAPI' ) ];
 		package: 'GitProject-JiraConnector-Generator';
-		package: 'GitProject-JiraConnector-Tests'
-		with: [ spec requires: #( 'GitProject-JiraConnector' ) ].
+		package: 'GitProject-JiraConnector-Tests' with: [
+			spec requires: #( 'GitProject-JiraConnector'
+				   'JiraPharoAPI' ) ].
 
 	"dependency"
 	spec
