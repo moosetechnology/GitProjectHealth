@@ -86,12 +86,39 @@ GLHModelImporter >> blockOnNameEquality [
 	^ self blockEqualityOn: #name
 ]
 
+{ #category : #commit }
+GLHModelImporter >> chainsCommitsFrom: commitsCollection [
+
+	| dic |
+	
+	('Chains ', commitsCollection size printString , ' commits') recordInfo.
+	
+	dic := ((self glhModel allWithType: GLHCommit) collect: [ :commit |
+		        commit id -> commit ]) asSet asDictionary.
+
+	commitsCollection do: [ :commit |
+		commit parent_ids do: [ :parentId | 
+			dic
+				at: parentId
+				ifPresent: [ :parentCommit |
+					parentCommit childCommits
+						add: commit
+						unless: self blockOnIdEquality ]
+				ifAbsent: [  ] ] ].
+	^ commitsCollection
+]
+
 { #category : #'private - api' }
 GLHModelImporter >> completeImportProject: aGLHProject [
-	|importedProject|
+
+	| importedProject |
 	('Complete import of project: ' , aGLHProject id printString)
 		recordInfo.
-	importedProject := self glhModel add: aGLHProject unless: (self blockOnIdEquality ).
+	aGLHProject repository ifNotNil: [ ^ aGLHProject ].
+	
+	importedProject := self glhModel
+		                   add: aGLHProject
+		                   unless: self blockOnIdEquality.
 
 	self importPipelinesOfProject: importedProject.
 
@@ -284,6 +311,17 @@ GLHModelImporter >> importAllGroups [
 			                    nextAs: #ArrayOfGroups.
 		foundGroups addAll: newlyFoundGroups ].
 	^ foundGroups
+]
+
+{ #category : #'as yet unclassified' }
+GLHModelImporter >> importAndLoadLatestsCommitsOfProject: aGLHProject [
+
+	| commits |
+	self completeImportProject: aGLHProject.
+	commits := self importLastestCommitsOfProject: aGLHProject.
+	commits do: [ :commit | self completeImportedCommit: commit ].
+	self chainsCommitsFrom: commits.
+	^ commits
 ]
 
 { #category : #'private - api' }
@@ -496,7 +534,8 @@ GLHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName until:
 ]
 
 { #category : #'as yet unclassified' }
-GLHModelImporter >> importContributedProjectsOfUser: aGLHUser [ 
+GLHModelImporter >> importContributedProjectsOfUser: aGLHUser [
+
 	| newlyFoundElmts page foundElmts |
 	page := 0.
 	foundElmts := OrderedCollection new.
@@ -504,25 +543,27 @@ GLHModelImporter >> importContributedProjectsOfUser: aGLHUser [
 	[ newlyFoundElmts isNotEmpty ] whileTrue: [
 		| results |
 		page := page + 1.
-		('import contributed project of user ', aGLHUser name ,' page ' , page printString) recordInfo.
+		('import contributed project of user ' , aGLHUser name , ' page '
+		 , page printString) recordInfo.
 		results := GLHApi current
 			           contributedProjectsOfUserId: aGLHUser id
-						  orderBy: 'created_at'
-						  simple: true
-						  sort: 'desc'
+			           orderBy: 'created_at'
+			           simple: true
+			           sort: 'desc'
 			           perPage: 100
 			           page: page.
 
 		newlyFoundElmts := self parseArrayOfProject: results.
-		"newlyFoundCommit do: [ :c | c repository: aProject repository ]."
 
 		foundElmts addAll:
 			(self glhModel
 				 addAll: newlyFoundElmts
 				 unless: self blockOnIdEquality) ].
 
-	self flag: 'TODO: uncomment that contributed project are added to user'.
-	"aGLHUser contributedProjects addAll: foundElmts unless: self blockOnIdEquality. "
+
+	aGLHUser contributedProjects
+		addAll: foundElmts
+		unless: self blockOnIdEquality.
 
 	^ foundElmts
 ]
@@ -769,16 +810,18 @@ GLHModelImporter >> importRepository: aGLHRepository [
 	('import the repository of project ' , aGLHRepository project name)
 		recordInfo.
 
-	resultBranches := self glhApi branchesOfRepository:
+	resultBranches := GLHApi current branchesOfRepository:
 		                  aGLHRepository project id.
 	branches := self parseBranchesResult: resultBranches.
 
-	('import the branches of project ') recordInfo.
+	'import the branches of project ' recordInfo.
 
 	branches := aGLHRepository branches
-		addAll: branches
-		unless: self blockOnNameEquality.
-	branches := self glhModel addAll: branches unless: self blockOnNameEquality.
+		            addAll: branches
+		            unless: self blockOnNameEquality.
+	branches := self glhModel
+		            addAll: branches
+		            unless: self blockOnNameEquality.
 
 
 	self withFiles ifTrue: [
@@ -792,13 +835,13 @@ GLHModelImporter >> importRepository: aGLHRepository [
 GLHModelImporter >> importUser: aUserID [
 
 	| result userResult |
-	(glhModel allWithType: GLHUser)
+	(self glhModel allWithType: GLHUser)
 		detect: [ :user | user id = aUserID ]
 		ifFound: [ :user | ^ user ].
 	('Import user: ' , aUserID printString) recordInfo.
-	result := self glhApi user: aUserID.
+	result := GLHApi current user: aUserID.
 	userResult := self parseUserResult: result.
-	^ glhModel add: userResult unless: self blockOnIdEquality
+	^ self glhModel add: userResult unless: self blockOnIdEquality
 ]
 
 { #category : #user }
