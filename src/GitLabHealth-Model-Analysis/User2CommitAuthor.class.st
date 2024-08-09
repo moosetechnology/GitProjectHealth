@@ -23,6 +23,12 @@ User2CommitAuthor >> commitAuthors [
 	^ value
 ]
 
+{ #category : #accessing }
+User2CommitAuthor >> commitAuthors: values [
+
+	self value: values. 
+]
+
 { #category : #initialization }
 User2CommitAuthor >> initialize [
 	self value: Set new. 

@@ -393,7 +393,7 @@ GLHApi >> initialize [
 	self client: (ZnClient new
 			 accept: ZnMimeType applicationJson;
 			 yourself).
-	currentAPI:= self
+
 ]
 
 { #category : #'api - jobs' }
@@ -414,6 +414,11 @@ GLHApi >> listGroupsWithTopLevelOnly: topLevelOnly page: aPageNumber [
 	aPageNumber ifNotNil: [ self client queryAt: #page put: aPageNumber ].
 	self client queryAt: #per_page put: 100.
 	^ self client get
+]
+
+{ #category : #'as yet unclassified' }
+GLHApi >> makeGlobal [ 
+		currentAPI := self
 ]
 
 { #category : #api }
