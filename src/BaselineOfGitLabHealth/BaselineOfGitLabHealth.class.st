@@ -51,7 +51,7 @@ BaselineOfGitLabHealth >> defineGroups: spec [
 	spec
 		group: 'Jira'
 		with:
-		#( 'GitProject-JiraConnector' 'GitProject-JiraConnector-Generator' ).
+		#( 'GitProject-JiraConnector' 'GitProject-JiraConnector-Generator' 'GitProject-JiraConnector-Tests' ).
 	spec
 		group: 'Core'
 		with: #( 'GitLabHealth-Model' 'GitLabHealth-Model-Extension'
