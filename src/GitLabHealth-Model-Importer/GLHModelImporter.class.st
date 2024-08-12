@@ -692,10 +692,11 @@ GLHModelImporter >> importLastestCommitsOfProject: aGLHProject [
 		           perPage: 50
 		           page: nil.
 	parsedResults := self parseCommitsResult: results.
-	self glhModel addAll: parsedResults unless: self blockOnIdEquality.
+	parsedResults := self glhModel addAll: parsedResults unless: self blockOnIdEquality.
 
-	parsedResults do: [ :commit |
-		commit repository: aGLHProject repository ].
+	aGLHProject repository commits addAll: parsedResults unless: self blockOnIdEquality.
+	"parsedResults do: [ :commit |
+		commit repository: aGLHProject repository ]."
 
 	self withCommitDiffs ifTrue: [
 		parsedResults do: [ :commit | self importDiffOfCommit: commit ] ].
@@ -850,55 +851,51 @@ GLHModelImporter >> importUser: aUserID [
 { #category : #user }
 GLHModelImporter >> importUserByUsername: anUsername [
 
-	| dicUsername resultUser|
-	
+	| dicUsername resultUser |
 	dicUsername := ((self glhModel allWithType: GLHUser) collect: [ :user |
 		                user username -> user ]) asSet asDictionary.
-	
-	dicUsername addAll: (self userCatalogue collectUsernames) asDictionary   .
 
-	resultUser := dicUsername at: anUsername 
-		ifAbsent: [
-			"thus we have to import this new user"
-		  | result userId searchResult |
-		  ('Import user with username: ' , anUsername printString) recordInfo.
-		  result := self glhApi usersSearchByUsername: anUsername.
-		  searchResult := NeoJSONReader fromString: result.
+	dicUsername addAll: self userCatalogue collectUsernames.
 
-		  (searchResult class = Dictionary and: [
-			   (searchResult at: #message) includesSubstring: '403 Forbidden' ])
-			  ifTrue: [
-				"if the result is an 403 error we fake a new user"
-				  self glhModel
-					  add: (GLHUser new
-							   username: anUsername;
-							   name: anUsername;
-							   yourself)
-					  unless: [ :nu :ou | nu username = ou username ] ]
-			  ifFalse: [
-				  searchResult
-					  ifEmpty: [
-						"results can be empty thus we force a new user with the info we have "
-						  GLHUser new
-							  name: anUsername;
-							  username: anUsername;
-							  yourself ]
-					  ifNotEmpty: [
-						  userId := searchResult first at: #id.
-						  (self glhModel allWithType: GLHUser)
-							  detect: [ :user | user id = userId ]
-							  ifNone: [ self importUser: userId ] 
-							] 
-				]
-			].
-		
-		self userCatalogue addUser: resultUser withName: anUsername. 
-		
-		^ resultUser
-				
-			
-	
 
+	resultUser := dicUsername
+		              at: anUsername
+		              ifAbsent: [ "thus we have to import this new user"
+			              | result userId searchResult |
+			              ('Import user with username: '
+			               , anUsername printString) recordInfo.
+			              result := self glhApi usersSearchByUsername:
+				                        anUsername.
+			              searchResult := NeoJSONReader fromString: result.
+
+			              (searchResult class = Dictionary and: [
+				               (searchResult at: #message) includesSubstring:
+					               '403 Forbidden' ])
+				              ifTrue: [ "if the result is an 403 error we fake a new user"
+					              self glhModel
+						              add: (GLHUser new
+								               username: anUsername;
+								               name: anUsername;
+								               yourself)
+						              unless: [ :nu :ou | nu username = ou username ] ]
+				              ifFalse: [
+					              searchResult
+						              ifEmpty: [ "results can be empty thus we force a new user with the info we have "
+							              self glhModel
+								              add: (GLHUser new
+										               username: anUsername;
+										               name: anUsername;
+										               yourself)
+								              unless: [ :nu :ou | nu username = ou username ] ]
+						              ifNotEmpty: [ "because we may already have the researched user, we look by ID in the model"
+							              userId := searchResult first at: #id.
+							              (self glhModel allWithType: GLHUser)
+								              detect: [ :user | user id = userId ]
+								              ifNone: [ self importUser: userId ] ] ] ].
+
+	self userCatalogue addUser: resultUser withName: anUsername.
+
+	^ resultUser
 ]
 
 { #category : #initialization }
@@ -918,7 +915,7 @@ GLHModelImporter >> initialize [
 	withInitialCommits := false.
 	withInitialMergeRequest := false.
 	withCommitsSince := (Date today - 1 week) asDateAndTime.
-	userCatalogue := GLHUserCatalogue new. 
+	userCatalogue := GLHUserCatalogue new anImporter: self; yourself.
 	self initReader
 ]
 

@@ -136,8 +136,8 @@ GLHUserCatalogueTest >> testCollectUsernames [
 
 ]
 
-{ #category : #test }
-GLHUserCatalogueTest >> testExportToJson [
+{ #category : #tests }
+GLHUserCatalogueTest >> testExportAndLoad [
 
 	| user json catalogue res |
 	user := GLHUser new
@@ -149,34 +149,44 @@ GLHUserCatalogueTest >> testExportToJson [
 	catalogue addUser: user.
 	json := catalogue exportToJson.
 
-	res := (STONJSON fromString: json) asDictionary.
-	self assert: res size equals: catalogue size.
-	self
-		assert: (res at: user name) size
-		equals: (catalogue at: user) size.
+	res := GLHUserCatalogue loadFromJson: json.
+	self assert: res size equals: catalogue size
+]
 
-	self
-		assert: ((res at: user name) includes: ((catalogue at: user) anyOne))
-		equals: true
+{ #category : #test }
+GLHUserCatalogueTest >> testExportToJson [
+
+	| user user2 json catalogue res |
+	user := GLHUser new
+		        username: 'testUser';
+		        name: 'test user';
+				id: 1;
+		        yourself.
+	user2  := GLHUser new
+		        username: 'testUser2';
+		        name: 'test user2';
+		id: 2;
+		        yourself.
+	catalogue := GLHUserCatalogue new.
+
+	catalogue addUser: user; addUser: user2.
+	json := catalogue exportToJson.
+
+	res := (STONJSON fromString: json).
+	self assert: res size equals: catalogue size.
+	self assert: ((res at: 'test user2') at: #foundNames) size equals: 2 .
+	self assert: ((res at: 'test user') at: #foundNames) size equals: 2 .
+	
 ]
 
 { #category : #tests }
 GLHUserCatalogueTest >> testLoadFromJson [
 
-	| user json catalogue res|
-	user := GLHUser new
-		        username: 'testUser';
-		        name: 'test user';
-		        yourself.
-	catalogue := GLHUserCatalogue new.
+	| json res |
+	json := '{"Benoit VERHAEGHE":{"id":1,"username":"Benoit.VERHAEGHE","foundNames":["Benoit VERHAEGHE","Benoit.VERHAEGHE","Benoît VERHAEGHE","Benoît Verhaeghe"],"name":"Benoit VERHAEGHE"},"HLAD Nicolas":{"id":2,"username":"Nicolas.HLAD","foundNames":["Nicolas Hlad","Nicolas.HLAD","HLAD Nicolas"],"name":"HLAD Nicolas"}}'.
 
-	catalogue addUser: user.
-	json := catalogue exportToJson.
-
-	res:= (GLHUserCatalogue loadFromJson: json).
-	self
-		assert: res size
-		equals: catalogue size.
-
-	
+	res := GLHUserCatalogue loadFromJson: json.
+	self assert: res size equals: 2.
+	self assert: (res searchUserWithName: 'Nicolas') isNotEmpty equals: true.
+		self assert: (res searchUserWithName: 'VERHAEGHE') isNotEmpty equals: true.
 ]
