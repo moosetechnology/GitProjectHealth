@@ -8,6 +8,39 @@ Class {
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
+{ #category : #metrics }
+GitMetric4User >> averageTimeBetweenTwoCommitSince: since until: until [
+
+	| commits commitSortedByDate commits1 commits2 differences totalDifference average |
+	gitAnalyzer := GitAnalyzer new
+		               onModel: glhModel;
+		               glhImporter: glhImporter.
+
+	glhImporter withCommitDiffs: false.
+	commits := self
+		           loadCommitsFromProjectsIds: itsProjects keys
+		           since: since
+		           until: until.
+	glhImporter withCommitDiffs: true.
+	commits := commits reject: [ :commit | commit commitCreator ~= user ].
+
+	commitSortedByDate := commits sorted: [ :commit1 :commit2 |
+		                      commit1 committed_date
+		                      < commit2 committed_date ].
+
+	differences := (1 to: commitSortedByDate size - 1) collect: [ :i |
+		               commits1 := commitSortedByDate at: i.
+		               commits2 := commitSortedByDate at: i + 1.
+
+		               commits2 committed_date - commits1 committed_date ].
+
+	totalDifference := differences
+		                   inject: 0
+		                   into: [ :sum :each | sum + each asSeconds ].
+
+	^ average := totalDifference / differences size
+]
+
 { #category : #churn }
 GitMetric4User >> codeChurnSince: since until: until onACommitWindowOf: commitLimit overA: aDateWeekMonthOrYear [
 
