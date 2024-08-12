@@ -271,7 +271,7 @@ GLHModelImporter >> glhModel: anObject [
 
 { #category : #'as yet unclassified' }
 GLHModelImporter >> importActiveHumanUsers [
-	
+
 	| newlyFoundUser page foundUsers |
 	page := 0.
 	foundUsers := OrderedCollection new.
@@ -280,19 +280,23 @@ GLHModelImporter >> importActiveHumanUsers [
 		| results |
 		page := page + 1.
 		('import users page ' , page printString) recordInfo.
-		results := GLHApi current
-			        	  usersHuman: true active: true withoutProjectBots: true perPage: 100 page: page.
+		results := self glhApi
+			           usersHuman: true
+			           active: true
+			           withoutProjectBots: true
+			           perPage: 100
+			           page: page.
 
 		newlyFoundUser := self parseUsersResult: results.
 		"newlyFoundCommit do: [ :c | c repository: aProject repository ]."
-		
-		foundUsers addAll: (self glhModel addAll: newlyFoundUser
+
+		foundUsers addAll:
+			(self glhModel
+				 addAll: newlyFoundUser
 				 unless: self blockOnIdEquality) ].
 
 
 	^ foundUsers
-	
-
 ]
 
 { #category : #api }
@@ -396,7 +400,7 @@ GLHModelImporter >> importCommitsOProject: aProject since: fromDate until: toDat
 		| results |
 		page := page + 1.
 		('import commit page ' , page printString) recordInfo.
-		results := GLHApi current
+		results := self glhApi
 			           commitsOfProject: aProject id
 			           forRefName: nil
 			           since:
@@ -546,7 +550,7 @@ GLHModelImporter >> importContributedProjectsOfUser: aGLHUser [
 		page := page + 1.
 		('import contributed project of user ' , aGLHUser name , ' page '
 		 , page printString) recordInfo.
-		results := GLHApi current
+		results := self glhApi 
 			           contributedProjectsOfUserId: aGLHUser id
 			           orderBy: 'last_activity_at'
 			           simple: true
@@ -814,7 +818,7 @@ GLHModelImporter >> importRepository: aGLHRepository [
 	('import the repository of project ' , aGLHRepository project name)
 		recordInfo.
 
-	resultBranches := GLHApi current branchesOfRepository:
+	resultBranches := self glhApi branchesOfRepository:
 		                  aGLHRepository project id.
 	branches := self parseBranchesResult: resultBranches.
 
@@ -843,7 +847,7 @@ GLHModelImporter >> importUser: aUserID [
 		detect: [ :user | user id = aUserID ]
 		ifFound: [ :user | ^ user ].
 	('Import user: ' , aUserID printString) recordInfo.
-	result := GLHApi current user: aUserID.
+	result := self glhApi user: aUserID.
 	userResult := self parseUserResult: result.
 	^ self glhModel add: userResult unless: self blockOnIdEquality
 ]
