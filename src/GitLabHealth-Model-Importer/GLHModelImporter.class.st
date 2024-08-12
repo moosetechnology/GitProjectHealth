@@ -588,6 +588,18 @@ GLHModelImporter >> importPipelinesOfProject: aGLHProject [
 		aGLHProject pipelines add: pipeline unless: self blockOnIdEquality]
 ]
 
+{ #category : #projects }
+GLHModelImporter >> importProject: aProjectID [
+
+	| result projectResult |
+	('Import project with id: ' , aProjectID printString) recordInfo.
+
+	result := self glhApi project: aProjectID.
+	projectResult := self parseProjectResult: result.
+
+	^ self completeImportProject: projectResult
+]
+
 { #category : #imports }
 GLHModelImporter >> importProjects [
 
@@ -596,11 +608,8 @@ GLHModelImporter >> importProjects [
 
 { #category : #projects }
 GLHModelImporter >> importProjects: aCollectionOfProjectID [
-	
-	^ aCollectionOfProjectID collect: [ :id |
-		self importProject: id.
-		 ]
-	 
+
+	^ aCollectionOfProjectID collect: [ :id | self importProject: id ]
 ]
 
 { #category : #imports }
@@ -931,6 +940,17 @@ GLHModelImporter >> parsePipelinesResult: result [
 		customDo: [ :customMappting |
 		customMappting listOfElementSchema: GLHPipeline ].
 	^ reader nextAs: #ArrayOfPipelines
+]
+
+{ #category : #parsing }
+GLHModelImporter >> parseProjectResult: aResult [ 
+		| reader |
+	reader := NeoJSONReader on: aResult readStream.
+	reader for: GLHProject do: [ :mapping |
+		mapping mapInstVars. ].
+"	reader mapInstVarsFor: GLHProject."
+
+	^ reader nextAs: GLHProject
 ]
 
 { #category : #private }

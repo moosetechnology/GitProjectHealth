@@ -380,18 +380,6 @@ GLPHModelImporter >> importMergeResquestMerger: aGLPHEMergeRequest [
 	aGLPHEMergeRequest merge_user: (self importUser: authorID)
 ]
 
-{ #category : #'as yet unclassified' }
-GLPHModelImporter >> importProject: aProjectID [
-
-	| result projectResult |
-	('Import project with id:  ' , aProjectID printString) recordInfo.
-
-	result := self glhApi project: aProjectID.
-	projectResult := self parseProjectResult: result.
-
-	^ self completeImportProject: projectResult
-]
-
 { #category : #'private - api' }
 GLPHModelImporter >> importRepository: aGLHRepository [
 
@@ -463,17 +451,6 @@ GLPHModelImporter >> parseMergeRequestResult: result [
 
 	generalReader on: result readStream.
 	^ generalReader nextAs: #ArrayOfMergeRequest
-]
-
-{ #category : #parsing }
-GLPHModelImporter >> parseProjectResult: aResult [ 
-		| reader |
-	reader := NeoJSONReader on: aResult readStream.
-	reader for: GLHProject do: [ :mapping |
-		mapping mapInstVars. ].
-"	reader mapInstVarsFor: GLHProject."
-
-	^ reader nextAs: GLHProject
 ]
 
 { #category : #accessing }
