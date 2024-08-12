@@ -7,6 +7,11 @@ Class {
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
+{ #category : #import }
+GLHUserCatalogue class >> loadFromJson: aString [ 
+	^ STON fromString: aString.
+]
+
 { #category : #'as yet unclassified' }
 GLHUserCatalogue class >> scrapeContributedProjectsForCommitAuthorsRelatedToUser: aGLHUser [
 	"get all "
@@ -35,57 +40,90 @@ GLHUserCatalogue class >> scrapeContributedProjectsForCommitAuthorsRelatedToUser
 { #category : #adding }
 GLHUserCatalogue >> addUser: aGLHUser [
 
-	self add: (User2CommitAuthor new user: aGLHUser)
+	self at: aGLHUser ifAbsentPut: [ Set new add: (aGLHUser username); add:  (aGLHUser name) ; yourself ]. 
 ]
 
 { #category : #adding }
 GLHUserCatalogue >> addUser: aGLHUser withName: name [
 
 	self at: aGLHUser ifPresent: [ :names | names add: name  ] ifAbsentPut: [
-		Set new
-			add: name;
-			yourself ]
+		Set new add: (aGLHUser username); add:  (aGLHUser name) ; add: name; yourself ]
+]
+
+{ #category : #adding }
+GLHUserCatalogue >> addUser: aGLHUser withNames: aCollectionOfNames [
+
+	self
+		at: aGLHUser
+		ifPresent: [ :names | names addAll: aCollectionOfNames ]
+		ifAbsentPut: [
+			Set new
+				add: aGLHUser username;
+				add: aGLHUser name;
+				addAll: aCollectionOfNames;
+				yourself ]
 ]
 
 { #category : #'as yet unclassified' }
 GLHUserCatalogue >> collectUsernames [
-	|username2User|
-	self ifEmpty: [ ^ {  } ]. 
-	
-	username2User := OrderedCollection new.
-	
-	self associationsDo: [ :assoc |
-			|user|
-			user := assoc key.
-			assoc value do: [ :username |
-				username2User add: (username -> user).
-				 ].
-		 ]. 
-	
-	^ username2User. 
 
+	| username2User |
+	self ifEmpty: [ ^ {  } ].
+
+	username2User := OrderedCollection new.
+
+	self associationsDo: [ :assoc |
+		| user |
+		user := assoc key.
+		assoc value do: [ :username | username2User add: username -> user ] ].
+
+	^ username2User asDictionary.
 ]
 
 { #category : #completion }
 GLHUserCatalogue >> completeAuthorNameOfUser: aGLHUser with: authorName [
 
-	| assoc |
-	assoc := self associationAt: aGLHUser.
-	assoc value add: authorName
+	self
+		deprecated: 'Use #addUser:withName: instead'
+		on: '12 August 2024'
+		in:
+		'Pharo-11.0.0+build.726.sha.aece1b5473acf3830a0e082c1bc3a15d4ff3522b (64 Bit)'.
+
+	self addUser: aGLHUser withName: authorName
 ]
 
 { #category : #completion }
 GLHUserCatalogue >> completeAuthorNameOfUser: aGLHUser withAll: authorNames [
 
-	| assoc |
-	assoc := self associationAt: aGLHUser.
-	assoc value addAll: authorNames
+	self
+		deprecated: 'Use #addUser:withNames: instead'
+		on: '12 August 2024'
+		in:
+		'Pharo-11.0.0+build.726.sha.aece1b5473acf3830a0e082c1bc3a15d4ff3522b (64 Bit)'.
+
+
+	self addUser: aGLHUser withNames: authorNames
+]
+
+{ #category : #export }
+GLHUserCatalogue >> exportToJson [
+
+	| tempDic |
+	tempDic := self associations collect: [ :assoc | (assoc key name) -> (assoc value asArray) ].
+
+	^ STON toString: tempDic
 ]
 
 { #category : #initialization }
 GLHUserCatalogue >> initialize [
 
 	
+]
+
+{ #category : #import }
+GLHUserCatalogue >> loadFromJson: aString [
+
+	^ STON fromString: aString
 ]
 
 { #category : #'as yet unclassified' }
@@ -98,10 +136,12 @@ GLHUserCatalogue >> scrapeAuthorNameForAllUsers [
 ]
 
 { #category : #'as yet unclassified' }
-GLHUserCatalogue >> scrapeAuthorNameForUser: aGLHUser [ 
+GLHUserCatalogue >> scrapeAuthorNameForUser: aGLHUser [
+
 	| assoc |
 	assoc := self associationAt: aGLHUser.
-	assoc value addAll: (GLHUserCatalogue scrapeContributedProjectsForCommitAuthorsRelatedToUser: aGLHUser).
+	assoc value addAll: (GLHUserCatalogue
+			 scrapeContributedProjectsForCommitAuthorsRelatedToUser: aGLHUser)
 ]
 
 { #category : #completion }
