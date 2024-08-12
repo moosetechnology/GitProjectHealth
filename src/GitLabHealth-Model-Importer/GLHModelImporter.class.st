@@ -390,51 +390,6 @@ GLHModelImporter >> importCommitsOProject: aProject since: fromDate until: toDat
 	^ self glhModel addAll: foundCommit unless: self blockOnIdEquality
 ]
 
-{ #category : #api }
-GLHModelImporter >> importCommitsOf: aGLHProject withStats: aBoolean until: toDate [
-
-	| newlyFoundCommit page |
-	
-	self deprecated: [  ] .
-	
-	page := 0.
-	newlyFoundCommit := { true }.
-	[ newlyFoundCommit isNotEmpty ] whileTrue: [
-		| results parsedResults existingCommits |
-		page := page + 1.
-		('import commit page ' , page printString) recordInfo.
-		results := self glhApi
-			           commitsOfProject: aGLHProject id
-			           forRefName: nil
-			           since: nil
-			           until: nil
-			           path: nil
-			           author: nil
-			           all: nil
-			           with_stats: aBoolean
-			           firstParent: nil
-			           order: nil
-			           trailers: nil
-			           perPage: 100
-			           page: page.
-		parsedResults := self parseCommitsResult: results.
-		existingCommits := aGLHProject mooseModel allWithType: GLHCommit.
-
-		newlyFoundCommit := parsedResults reject: [ :commitParsed |
-			                    (toDate isNil or: [
-				                     commitParsed committed_date
-				                     < toDate asDateAndTime ]) or: [
-				                    existingCommits anySatisfy: [ :existingCommit |
-					                    existingCommit id = commitParsed id ] ] ].
-		aGLHProject mooseModel addAll: newlyFoundCommit.
-		aGLHProject repository commits addAll: newlyFoundCommit ].
-
-
-	self withCommitDiffs ifTrue: [
-		aGLHProject repository commits do: [ :commit |
-			self importDiffOfCommit: commit ] ]
-]
-
 { #category : #commit }
 GLHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName since: fromDate [
 
@@ -599,32 +554,6 @@ GLHModelImporter >> importJobsOf: aPipeline [
 	jobs do: [ :job | aPipeline addJob: job ].
 	self glhModel addAll: jobs
 
-]
-
-{ #category : #commit }
-GLHModelImporter >> importParentCommitsOfCommit: aGLHCommit forOnly: number [
-
-	| parentsIds commits |
-	commits := OrderedCollection new.
-	number = 0 ifTrue: [
-		^ commits
-			  add: aGLHCommit;
-			  yourself ].
-
-	parentsIds := aGLHCommit parent_ids.
-
-	commits addAll: (parentsIds collect: [ :id |
-			 self
-				 importCommitOfProject: aGLHCommit repository project
-				 withId: id.
-			 (self selectEntityType: GLHCommit overAttribut: #id equalTo: id)
-				 first ]).
-
-
-	^ commits , (commits collect: [ :parentCommit |
-		   self
-			   importParentCommitsOfCommit: parentCommit
-			   forOnly: number - 1 ]) flatten
 ]
 
 { #category : #commit }
@@ -921,28 +850,6 @@ GLHModelImporter >> parseCommitsResult: result [
 ]
 
 { #category : #private }
-GLHModelImporter >> parseDiffResult: result [
-
-	| reader |
-	self
-		deprecated: 'Use #newParseDiffResult: instead'
-		on: '28 June 2024'
-		in:
-		'Pharo-11.0.0+build.726.sha.aece1b5473acf3830a0e082c1bc3a15d4ff3522b (64 Bit)'.
-	reader := NeoJSONReader on: result readStream.
-	reader for: GLHDiff do: [ :mapping |
-		mapping mapInstVars:
-			#( deleted_file new_file new_path old_path renamed_file ).
-		mapping mapInstVar: #diffString to: #diff ].
-
-	reader
-		for: #ArrayOfDiffs
-		customDo: [ :customMappting |
-		customMappting listOfElementSchema: GLHDiff ].
-	^ reader nextAs: #ArrayOfDiffs
-]
-
-{ #category : #private }
 GLHModelImporter >> parseFileTreeResult: aResult [
 
 	| reader |
@@ -1051,13 +958,6 @@ GLHModelImporter >> pipelinesOf: aProjectID [
 	('Search pipelines of: ' , aProjectID printString) recordInfo.
 	result := self glhApi pipelinesOfProject: aProjectID.
 	^ self parsePipelinesResult: result
-]
-
-{ #category : #'as yet unclassified' }
-GLHModelImporter >> selectEntityType: aType overAttribut: aSelector equalTo: value [
-
-	^ (self glhModel allWithType: aType)
-		select: [ :entity | (entity perform: aSelector) = value ]
 ]
 
 { #category : #'private - api' }

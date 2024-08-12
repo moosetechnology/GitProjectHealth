@@ -216,7 +216,7 @@ GLPHModelImporter >> importDiffOfMergeRequest: aMergeRequest [
 		          diffsMergeRequestOfProject: aMergeRequest project_id
 		          withId: aMergeRequest iid.
 
-	diffsResult := self parseDiffResult: result.
+	diffsResult := self newParseDiffResult: result.
 
 
 	aMergeRequest diffs
