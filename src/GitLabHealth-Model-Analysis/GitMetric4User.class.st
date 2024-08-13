@@ -38,7 +38,7 @@ GitMetric4User >> averageTimeBetweenTwoCommitSince: since until: until [
 		                   inject: 0
 		                   into: [ :sum :each | sum + each asSeconds ].
 
-	^ average := totalDifference / differences size
+	^average := (totalDifference / differences size) asDuration.
 ]
 
 { #category : #churn }

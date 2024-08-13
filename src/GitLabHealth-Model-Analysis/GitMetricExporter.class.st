@@ -236,7 +236,7 @@ GitMetricExporter >> exportInCSVOver: aCollectionOfDateWeekMonthOrYear [
 	exportBrowserModel
 		addColumnForQuery: [ :analysis | analysis averageTimeBetweenCommits  ]
 		withName:
-			'average time between commits (in seconds)' asSymbol.
+			'average time between commits' asSymbol.
 
 	aCollectionOfDateWeekMonthOrYear do: [ :aDateWeekMonthOrYear |
 		over := aDateWeekMonthOrYear.
