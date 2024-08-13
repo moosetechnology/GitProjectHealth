@@ -341,3 +341,42 @@ GitMetricExporter >> onlyImportProjectsOfGroup: groupId [
 	group := glhImporter importGroup: groupId.
 	projectCache := group toScope: GLHProject
 ]
+
+{ #category : #adding }
+GitMetricExporter >> setupAnalysisForUsersWithNames: userNames [
+	"import all the project since a certain time"
+
+	| users |
+
+	users := userNames collect: [ :username |
+		         glhImporter importUserByUsername: username ].
+	
+	glhImporter userCatalogue scrapeAuthorNameForAllUsers.
+
+	entities addAll: (users collect: [:user |
+		 | itsProjects metrics i size |
+			 itsProjects := glhImporter importContributedProjectsOfUser: user. 
+				          
+			 metrics := GitMetric4User new.
+			 metrics
+				 glhImporter: glhImporter;
+				 user: user.
+				
+			 i := 0.
+			 size := itsProjects  size.
+			 metrics itsProjects: (itsProjects collect: [ :p |
+					  (' ' join: {
+							   'complete import of project:'.
+							   p name printString.
+							   '['.
+							   (i := i + 1) printString.
+							   '/'.
+							   size.
+							   ']' }) recordInfo.
+
+					  p id -> (glhImporter completeImportProject: p) ]) asDictionary.
+		]
+	). 
+
+	^ self
+]
