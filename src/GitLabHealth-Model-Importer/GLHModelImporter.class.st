@@ -9,7 +9,8 @@ Class {
 		'withCommitsSince',
 		'withInitialCommits',
 		'withInitialMergeRequest',
-		'generalReader'
+		'generalReader',
+		'userCatalogue'
 	],
 	#classVars : [
 		'currentImporter'
@@ -86,12 +87,39 @@ GLHModelImporter >> blockOnNameEquality [
 	^ self blockEqualityOn: #name
 ]
 
+{ #category : #commit }
+GLHModelImporter >> chainsCommitsFrom: commitsCollection [
+
+	| dic |
+	
+	('Chains ', commitsCollection size printString , ' commits') recordInfo.
+	
+	dic := ((self glhModel allWithType: GLHCommit) collect: [ :commit |
+		        commit id -> commit ]) asSet asDictionary.
+
+	commitsCollection do: [ :commit |
+		commit parent_ids do: [ :parentId | 
+			dic
+				at: parentId
+				ifPresent: [ :parentCommit |
+					parentCommit childCommits
+						add: commit
+						unless: self blockOnIdEquality ]
+				ifAbsent: [  ] ] ].
+	^ commitsCollection
+]
+
 { #category : #'private - api' }
 GLHModelImporter >> completeImportProject: aGLHProject [
-	|importedProject|
+
+	| importedProject |
 	('Complete import of project: ' , aGLHProject id printString)
 		recordInfo.
-	importedProject := self glhModel add: aGLHProject unless: (self blockOnIdEquality ).
+	aGLHProject repository ifNotNil: [ ^ aGLHProject ].
+	
+	importedProject := self glhModel
+		                   add: aGLHProject
+		                   unless: self blockOnIdEquality.
 
 	self importPipelinesOfProject: importedProject.
 
@@ -241,6 +269,36 @@ GLHModelImporter >> glhModel: anObject [
 	glhModel := anObject
 ]
 
+{ #category : #'as yet unclassified' }
+GLHModelImporter >> importActiveHumanUsers [
+
+	| newlyFoundUser page foundUsers |
+	page := 0.
+	foundUsers := OrderedCollection new.
+	newlyFoundUser := { true }.
+	[ newlyFoundUser isNotEmpty ] whileTrue: [
+		| results |
+		page := page + 1.
+		('import users page ' , page printString) recordInfo.
+		results := self glhApi
+			           usersHuman: true
+			           active: true
+			           withoutProjectBots: true
+			           perPage: 100
+			           page: page.
+
+		newlyFoundUser := self parseUsersResult: results.
+		"newlyFoundCommit do: [ :c | c repository: aProject repository ]."
+
+		foundUsers addAll:
+			(self glhModel
+				 addAll: newlyFoundUser
+				 unless: self blockOnIdEquality) ].
+
+
+	^ foundUsers
+]
+
 { #category : #api }
 GLHModelImporter >> importAllGroups [
 
@@ -260,11 +318,22 @@ GLHModelImporter >> importAllGroups [
 	^ foundGroups
 ]
 
+{ #category : #'as yet unclassified' }
+GLHModelImporter >> importAndLoadLatestsCommitsOfProject: aGLHProject [
+
+	| commits |
+	self completeImportProject: aGLHProject.
+	commits := self importLastestCommitsOfProject: aGLHProject.
+	commits do: [ :commit | self completeImportedCommit: commit ].
+	self chainsCommitsFrom: commits.
+	^ commits
+]
+
 { #category : #'private - api' }
 GLHModelImporter >> importCommit: aCommitID ofProject: aGLHProject [
 
 	| result parsedResult |
-	(glhModel allWithType: GLHCommit) asOrderedCollection
+	(self glhModel allWithType: GLHCommit) asOrderedCollection
 		detect: [ :commit | commit id = aCommitID ]
 		ifFound: [ :commit | ^ commit ].
 	result := self glhApi
@@ -305,37 +374,6 @@ GLHModelImporter >> importCommitOfProject: anProject withId: anID [
 	^ commit
 ]
 
-{ #category : #'private - api' }
-GLHModelImporter >> importCommits: aGLHProject [
-	"limited to the last 20 commits"
-
-	| results parsedResults |
-	results := self glhApi
-		           commitsOfProject: aGLHProject id
-		           forRefName: nil
-		           since: nil
-		           until: nil
-		           path: nil
-		           author: nil
-		           all: nil
-		           with_stats: true
-		           firstParent: nil
-		           order: nil
-		           trailers: nil
-		           perPage: nil
-		           page: nil.
-	parsedResults := self parseCommitsResult: results.
-	self glhModel addAll: parsedResults unless: self blockOnIdEquality.
-
-	parsedResults do: [ :commit |
-		commit repository: aGLHProject repository ].
-
-	self withCommitDiffs ifTrue: [
-		parsedResults do: [ :commit | self importDiffOfCommit: commit ] ].
-	
-	^ parsedResults. 
-]
-
 { #category : #'as yet unclassified' }
 GLHModelImporter >> importCommitsFollowing: aCommit upToDays: aNumberOfDay [
 	"import the 'n' commits of a project starting from an initial 'aCommit' commit. 
@@ -362,7 +400,7 @@ GLHModelImporter >> importCommitsOProject: aProject since: fromDate until: toDat
 		| results |
 		page := page + 1.
 		('import commit page ' , page printString) recordInfo.
-		results := GLHApi current
+		results := self glhApi
 			           commitsOfProject: aProject id
 			           forRefName: nil
 			           since:
@@ -456,10 +494,47 @@ GLHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName until:
 ]
 
 { #category : #'as yet unclassified' }
+GLHModelImporter >> importContributedProjectsOfUser: aGLHUser [
+
+	| newlyFoundElmts page foundElmts |
+	page := 0.
+	foundElmts := OrderedCollection new.
+	newlyFoundElmts := { true }.
+	[ newlyFoundElmts isNotEmpty ] whileTrue: [
+		| results |
+		page := page + 1.
+		('import contributed project of user ' , aGLHUser name , ' page '
+		 , page printString) recordInfo.
+		results := self glhApi 
+			           contributedProjectsOfUserId: aGLHUser id
+			           orderBy: 'last_activity_at'
+			           simple: true
+			           sort: 'desc'
+			           perPage: 100
+			           page: page.
+
+		newlyFoundElmts := self parseArrayOfProject: results.
+
+		foundElmts addAll:
+			(self glhModel
+				 addAll: newlyFoundElmts
+				 unless: self blockOnIdEquality) ].
+
+
+	aGLHUser contributedProjects
+		addAll: foundElmts
+		unless: self blockOnIdEquality.
+
+	^ foundElmts
+]
+
+{ #category : #'as yet unclassified' }
 GLHModelImporter >> importCreatorOfCommit: aCommit [
-	
+
 	aCommit commitCreator ifNil: [
+				
 		aCommit commitCreator:
+		
 			(self importUserByUsername: aCommit author_name) ]
 ]
 
@@ -556,6 +631,38 @@ GLHModelImporter >> importJobsOf: aPipeline [
 
 ]
 
+{ #category : #'private - api' }
+GLHModelImporter >> importLastestCommitsOfProject: aGLHProject [
+	"limited to the last 50 commits"
+
+	| results parsedResults |
+	results := self glhApi
+		           commitsOfProject: aGLHProject id
+		           forRefName: nil
+		           since: nil
+		           until: nil
+		           path: nil
+		           author: nil
+		           all: nil
+		           with_stats: true
+		           firstParent: nil
+		           order: nil
+		           trailers: nil
+		           perPage: 50
+		           page: nil.
+	parsedResults := self parseCommitsResult: results.
+	parsedResults := self glhModel addAll: parsedResults unless: self blockOnIdEquality.
+
+	aGLHProject repository commits addAll: parsedResults unless: self blockOnIdEquality.
+	"parsedResults do: [ :commit |
+		commit repository: aGLHProject repository ]."
+
+	self withCommitDiffs ifTrue: [
+		parsedResults do: [ :commit | self importDiffOfCommit: commit ] ].
+
+	^ parsedResults
+]
+
 { #category : #commit }
 GLHModelImporter >> importParentCommitsOfCommit: aGLHCommit since: aDate [
 
@@ -619,7 +726,7 @@ GLHModelImporter >> importProjectsSince: since [
 	"copy import from commits"
 
 	| newlyFoundProjects page foundProject amount |
-	('import all Projects since: ', since printString) recordInfo.
+	('import all Projects since: ' , since printString) recordInfo.
 
 	"number of projects per page"
 	amount := 100.
@@ -630,10 +737,10 @@ GLHModelImporter >> importProjectsSince: since [
 		| results |
 		page := page + 1.
 		('import projects page #' , page printString) recordInfo.
-		
+
 		results := self glhApi projects: amount since: since page: page.
 
-		newlyFoundProjects := glhModel
+		newlyFoundProjects := self glhModel
 			                      addAll: (self parseArrayOfProject: results)
 			                      unless: self blockOnIdEquality.
 		foundProject addAll: newlyFoundProjects ].
@@ -653,12 +760,14 @@ GLHModelImporter >> importRepository: aGLHRepository [
 		                  aGLHRepository project id.
 	branches := self parseBranchesResult: resultBranches.
 
-	('import the branches of project ') recordInfo.
+	'import the branches of project ' recordInfo.
 
 	branches := aGLHRepository branches
-		addAll: branches
-		unless: self blockOnNameEquality.
-	branches := self glhModel addAll: branches unless: self blockOnNameEquality.
+		            addAll: branches
+		            unless: self blockOnNameEquality.
+	branches := self glhModel
+		            addAll: branches
+		            unless: self blockOnNameEquality.
 
 
 	self withFiles ifTrue: [
@@ -672,46 +781,63 @@ GLHModelImporter >> importRepository: aGLHRepository [
 GLHModelImporter >> importUser: aUserID [
 
 	| result userResult |
-	(glhModel allWithType: GLHUser)
+	(self glhModel allWithType: GLHUser)
 		detect: [ :user | user id = aUserID ]
 		ifFound: [ :user | ^ user ].
 	('Import user: ' , aUserID printString) recordInfo.
 	result := self glhApi user: aUserID.
 	userResult := self parseUserResult: result.
-	^ glhModel add: userResult unless: self blockOnIdEquality
+	^ self glhModel add: userResult unless: self blockOnIdEquality
 ]
 
 { #category : #user }
 GLHModelImporter >> importUserByUsername: anUsername [
 
-	| dicUsername |
+	| dicUsername resultUser |
 	dicUsername := ((self glhModel allWithType: GLHUser) collect: [ :user |
 		                user username -> user ]) asSet asDictionary.
 
-	^ dicUsername at: anUsername ifPresent: [ :user | user ] ifAbsent: [
-		  | result userId searchResult |
-		  ('Import user with username: ' , anUsername printString)
-			  recordInfo.
-		  result := self glhApi usersSearchByUsername: anUsername.
-		  searchResult := NeoJSONReader fromString: result.
+	dicUsername addAll: self userCatalogue collectUsernames.
 
-		  (searchResult class = Dictionary and: [
-			   (searchResult at: #message) includesSubstring: '403 Forbidden' ])
-			  ifTrue: [
-				  glhModel
-					  add: (GLHUser new username: anUsername; name: anUsername; yourself )
-					  unless: [ :nu :ou | nu username = ou username ] ]
-			  ifFalse: [
-				  searchResult
-					  ifEmpty: [
-						  GLHUser new
-							  username: anUsername;
-							  yourself ]
-					  ifNotEmpty: [
-						  userId := searchResult first at: #id.
-						  (self glhModel allWithType: GLHUser)
-							  detect: [ :user | user id = userId ]
-							  ifNone: [ self importUser: userId ] ] ] ]
+
+	resultUser := dicUsername
+		              at: anUsername
+		              ifAbsent: [ "thus we have to import this new user"
+			              | result userId searchResult |
+			              ('Import user with username: '
+			               , anUsername printString) recordInfo.
+			              result := self glhApi usersSearchByUsername:
+				                        anUsername.
+			              searchResult := NeoJSONReader fromString: result.
+
+			              (searchResult class = Dictionary and: [
+				               (searchResult at: #message) includesSubstring:
+					               '403 Forbidden' ])
+				              ifTrue: [ "if the result is an 403 error we fake a new user"
+					              self glhModel
+						              add: (GLHUser new
+								               username: anUsername;
+								               name: anUsername;
+								               yourself)
+						              unless: [ :nu :ou | nu username = ou username ] ]
+				              ifFalse: [
+					              searchResult
+						              ifEmpty: [ "results can be empty thus we force a new user with the info we have "
+							              self glhModel
+								              add: (GLHUser new
+										               username: anUsername;
+										               name: anUsername;
+										               yourself)
+								              unless: [ :nu :ou | nu username = ou username ] ]
+						              ifNotEmpty: [ "because we may already have the researched user, we look by ID in the model"
+							              userId := searchResult first at: #id.
+							              (self glhModel allWithType: GLHUser)
+								              detect: [ :user | user id = userId ]
+								              ifNone: [ self importUser: userId ] ] ] ].
+
+	self userCatalogue addUser: resultUser withName: anUsername.
+
+	^ resultUser
 ]
 
 { #category : #initialization }
@@ -731,8 +857,8 @@ GLHModelImporter >> initialize [
 	withInitialCommits := false.
 	withInitialMergeRequest := false.
 	withCommitsSince := (Date today - 1 week) asDateAndTime.
-	self initReader.
-	currentImporter := self. 
+	userCatalogue := GLHUserCatalogue new anImporter: self; yourself.
+	self initReader
 ]
 
 { #category : #importer }
@@ -741,6 +867,11 @@ GLHModelImporter >> loadAllProjectsFromRepositorySoftware [
 	|projects|
 	
 	projects := self glhApi projects. 
+]
+
+{ #category : #'as yet unclassified' }
+GLHModelImporter >> makeGlobal [
+	currentImporter := self
 ]
 
 { #category : #private }
@@ -971,6 +1102,22 @@ GLHModelImporter >> parseUserResult: result [
 	^ reader nextAs: GLHUser
 ]
 
+{ #category : #private }
+GLHModelImporter >> parseUsersResult: result [
+
+	| reader |
+	reader := NeoJSONReader on: result readStream.
+
+	reader mapInstVarsFor: GLHUser.
+
+	reader
+		for: #ArrayOfUser
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHUser ].
+
+	^ reader nextAs: #ArrayOfUser
+]
+
 { #category : #'private - api' }
 GLHModelImporter >> pipelinesOf: aProjectID [
 
@@ -996,6 +1143,17 @@ GLHModelImporter >> subGroupsOf: aGroupID [
 				page := page + 1. ].
 	
 	^ results
+]
+
+{ #category : #accessing }
+GLHModelImporter >> userCatalogue [
+	^ userCatalogue 
+]
+
+{ #category : #accessing }
+GLHModelImporter >> userCatalogue: aGLHUserCatalogue [
+
+	userCatalogue := aGLHUserCatalogue
 ]
 
 { #category : #accessing }
