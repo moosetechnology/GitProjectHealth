@@ -10,7 +10,8 @@ Class {
 		'commentContribution',
 		'mergeRequestDuration',
 		'codeChurn',
-		'delayUntilFirstChurn'
+		'delayUntilFirstChurn',
+		'averageTimeBetweenCommits'
 	],
 	#category : #'GitLabHealth-Model-Analysis'
 }
@@ -18,6 +19,18 @@ Class {
 { #category : #testing }
 AnalysisReport class >> isVoyageRoot [
 	^true
+]
+
+{ #category : #accessing }
+AnalysisReport >> averageTimeBetweenCommits [
+
+	^ averageTimeBetweenCommits
+]
+
+{ #category : #accessing }
+AnalysisReport >> averageTimeBetweenCommits: anObject [
+
+	averageTimeBetweenCommits := anObject
 ]
 
 { #category : #accessing }

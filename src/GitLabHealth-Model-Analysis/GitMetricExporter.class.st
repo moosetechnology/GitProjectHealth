@@ -231,6 +231,12 @@ GitMetricExporter >> exportInCSVOver: aCollectionOfDateWeekMonthOrYear [
 		withName:
 			'delay Until First Churn (W=' , maxCommitWindow printString
 			, ') ' asSymbol.
+			
+	"average time between commits"
+	exportBrowserModel
+		addColumnForQuery: [ :analysis | analysis averageTimeBetweenCommits  ]
+		withName:
+			'average time between commits (in seconds)' asSymbol.
 
 	aCollectionOfDateWeekMonthOrYear do: [ :aDateWeekMonthOrYear |
 		over := aDateWeekMonthOrYear.

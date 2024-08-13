@@ -543,7 +543,7 @@ GitMetric4User >> foundSuccessorOf: userCommits andCompleteImportForMax: commitL
 { #category : #'as yet unclassified' }
 GitMetric4User >> generateAnalysisForPeriod: period over: over withMaxCommitWindows: maxCommitWindow [
 
-	| contribution codeAddition codeDeletion commitFrequency commentContribution mergeRequestDuration codeChurn delayUntilFirstChurn |
+	| contribution codeAddition codeDeletion commitFrequency commentContribution mergeRequestDuration codeChurn delayUntilFirstChurn averageTimeBetweenCommits |
 	
 	contribution := self
 		                codeContributionsSince: (period at: #since)
@@ -581,6 +581,8 @@ GitMetric4User >> generateAnalysisForPeriod: period over: over withMaxCommitWind
 		                         until: (period at: #until)
 		                         onACommitWindowOf: maxCommitWindow
 		                         overA: over) at: #avgDelay.
+		
+	averageTimeBetweenCommits := self averageTimeBetweenTwoCommitSince: (period at: #since) until: (period at: #until).
 
 	^ AnalysisReport new
 		  username: self user name;
@@ -591,7 +593,8 @@ GitMetric4User >> generateAnalysisForPeriod: period over: over withMaxCommitWind
 		  commentContribution: commentContribution;
 		  mergeRequestDuration: mergeRequestDuration;
 		  codeChurn: codeChurn;
-		  delayUntilFirstChurn: delayUntilFirstChurn
+		  delayUntilFirstChurn: delayUntilFirstChurn;
+		  averageTimeBetweenCommits: averageTimeBetweenCommits.
 ]
 
 { #category : #initialization }
