@@ -443,6 +443,6 @@ GitMetricExporter >> maxCommitWindow: anInteger [
 GitMetricExporter >> onlyImportProjectsOfGroup: groupId [
 
 	| group |
-	group := GLHModelImporter current importGroup: groupId.
-	projectCache := (group toScope: GLHProject)
+	group := glhImporter importGroup: groupId.
+	projectCache := group toScope: GLHProject
 ]
