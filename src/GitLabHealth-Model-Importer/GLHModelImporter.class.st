@@ -857,7 +857,9 @@ GLHModelImporter >> initialize [
 	withInitialCommits := false.
 	withInitialMergeRequest := false.
 	withCommitsSince := (Date today - 1 week) asDateAndTime.
-	userCatalogue := GLHUserCatalogue new anImporter: self; yourself.
+	userCatalogue := GLHUserCatalogueV2 new
+		                 anImporter: self;
+		                 yourself.
 	self initReader
 ]
 
