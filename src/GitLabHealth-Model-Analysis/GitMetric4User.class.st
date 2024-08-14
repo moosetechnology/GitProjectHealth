@@ -9,9 +9,15 @@ Class {
 }
 
 { #category : #metrics }
-GitMetric4User >> averageTimeBetweenTwoCommitSince: since until: until [
+GitMetric4User >> averageTimeBetweenCommitSince: since until: until over: aDateWeekMonthOrYear [
 
-	| commits commitSortedByDate commits1 commits2 differences totalDifference average |
+	| commits commitSortedByDate commits1 commits2 differences groupedByDate dateOver |
+	
+	groupedByDate := self
+		                 setupGroupedDateFrom: since
+		                 to: until
+		                 over: aDateWeekMonthOrYear.
+	
 	gitAnalyzer := GitAnalyzer new
 		               onModel: glhModel;
 		               glhImporter: glhImporter.
@@ -27,18 +33,38 @@ GitMetric4User >> averageTimeBetweenTwoCommitSince: since until: until [
 	commitSortedByDate := commits sorted: [ :commit1 :commit2 |
 		                      commit1 committed_date
 		                      < commit2 committed_date ].
+	
+	dateOver := self
+			            transformDate: (commitSortedByDate at: 1) committed_date 
+			            to: aDateWeekMonthOrYear.
+			
+	commitSortedByDate do: [ :commit | 
+		 dateOver := self
+			            transformDate: commit committed_date 
+			            to: aDateWeekMonthOrYear.
+		
+		groupedByDate at: dateOver printString ifPresent: [ :value | value add: commit ].
+	].
 
-	differences := (1 to: commitSortedByDate size - 1) collect: [ :i |
-		               commits1 := commitSortedByDate at: i.
-		               commits2 := commitSortedByDate at: i + 1.
+	groupedByDate := groupedByDate collect: [ :group | 
+		differences := (1 to: group size - 1) collect: [ :i |
+		               commits1 := group at: i.
+		               commits2 := group at: i + 1.
 
-		               commits2 committed_date - commits1 committed_date ].
+		               (commits2 committed_date - commits1 committed_date) asSeconds ].
 
-	totalDifference := differences
-		                   inject: 0
-		                   into: [ :sum :each | sum + each asSeconds ].
+		differences := differences ifEmpty: [differences ] ifNotEmpty: [differences average asDuration].    
+	].
 
-	^average := (totalDifference / differences size) asDuration.
+	^{
+		  (#overEach -> aDateWeekMonthOrYear name).
+		  (#forOver -> (groupedByDate keys size printString
+		    , aDateWeekMonthOrYear printString)).
+		  (#average
+		   ->
+		   (groupedByDate at: (groupedByDate keys first))).
+		  (#details -> groupedByDate).
+		  (#userCommits -> commits size) } asDictionary.
 ]
 
 { #category : #churn }
@@ -582,7 +608,7 @@ GitMetric4User >> generateAnalysisForPeriod: period over: over withMaxCommitWind
 		                         onACommitWindowOf: maxCommitWindow
 		                         overA: over) at: #avgDelay.
 		
-	averageTimeBetweenCommits := self averageTimeBetweenTwoCommitSince: (period at: #since) until: (period at: #until).
+	averageTimeBetweenCommits := (self averageTimeBetweenCommitSince: (period at: #since) until: (period at: #until) over: over) at: #average.
 
 	^ AnalysisReport new
 		  username: self user name;
