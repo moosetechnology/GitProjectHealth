@@ -4,6 +4,7 @@ Class {
 	#instVars : [
 		'username',
 		'period',
+		'over',
 		'codeAddition',
 		'codeDeletion',
 		'commitFrequency',
@@ -102,6 +103,18 @@ AnalysisReport >> mergeRequestDuration [
 AnalysisReport >> mergeRequestDuration: anObject [
 
 	mergeRequestDuration := anObject
+]
+
+{ #category : #accessing }
+AnalysisReport >> over [
+
+	^ over
+]
+
+{ #category : #accessing }
+AnalysisReport >> over: anObject [
+
+	over := anObject
 ]
 
 { #category : #accessing }

@@ -511,54 +511,52 @@ GitMetric4User >> foundSuccessorOf: userCommits andCompleteImportForMax: commitL
 GitMetric4User >> generateAnalysisForPeriod: period over: aDateWeekMonthOrYear withMaxCommitWindows: maxCommitWindow [
 
 	| contribution commitFrequency commentContribution mergeRequestDuration codeChurn delayUntilFirstChurn |
-	
-		contribution := self
+	contribution := self
 		                codeContributionsSince: (period at: #since)
 		                until: (period at: #until)
 		                overA: aDateWeekMonthOrYear.
 
-		commitFrequency := self
-		                    commitFrequencySince: (period at: #since)
-		                    until: (period at: #until)
-		                    overA: aDateWeekMonthOrYear.
+	commitFrequency := self
+		                   commitFrequencySince: (period at: #since)
+		                   until: (period at: #until)
+		                   overA: aDateWeekMonthOrYear.
 
-		commentContribution := self
-		                        commentsContributionsSince:
+	commentContribution := self
+		                       commentsContributionsSince:
+		                       (period at: #since)
+		                       until: (period at: #until)
+		                       overA: aDateWeekMonthOrYear.
+
+	mergeRequestDuration := self
+		                        mergeRequestDurationSince:
 		                        (period at: #since)
 		                        until: (period at: #until)
 		                        overA: aDateWeekMonthOrYear.
 
-		mergeRequestDuration := self
-		                         mergeRequestDurationSince:
-		                         (period at: #since)
-		                         until: (period at: #until)
-		                         overA: aDateWeekMonthOrYear.
+	codeChurn := self
+		             codeChurnSince: (period at: #since)
+		             until: (period at: #until)
+		             onACommitWindowOf: maxCommitWindow
+		             overA: aDateWeekMonthOrYear.
 
-		codeChurn := self
-		              codeChurnSince: (period at: #since)
-		              until: (period at: #until)
-		              onACommitWindowOf: maxCommitWindow
-		              overA: aDateWeekMonthOrYear.
+	delayUntilFirstChurn := self
+		                        delayUntilFirstChurnSince:
+		                        (period at: #since)
+		                        until: (period at: #until)
+		                        onACommitWindowOf: maxCommitWindow
+		                        overA: aDateWeekMonthOrYear.
 
-		delayUntilFirstChurn := self
-		                         delayUntilFirstChurnSince:
-		                         (period at: #since)
-		                         until: (period at: #until)
-		                         onACommitWindowOf: maxCommitWindow
-		                         overA: aDateWeekMonthOrYear.
-
-		^ AnalysisReport new
-		  	username: self user name;
-		  	period: period;
-		  	codeAddition: (contribution at: #avgAddition);
-		  	codeDeletion: (contribution at: #avgDeletion);
-		  	commitFrequency: (commitFrequency at: #averageFloat);
-		  	commentContribution: (commentContribution at: #avgComments);
-		  	mergeRequestDuration: (mergeRequestDuration at: #avgDuration);
-		  	codeChurn: (codeChurn at: #churn);
-		  	delayUntilFirstChurn: (delayUntilFirstChurn at: #avgDelay)
-	
-	
+	^ AnalysisReport new
+		  username: self user name;
+		  period: period;
+		  over: aDateWeekMonthOrYear asString;
+		  codeAddition: (contribution at: #avgAddition);
+		  codeDeletion: (contribution at: #avgDeletion);
+		  commitFrequency: (commitFrequency at: #averageFloat);
+		  commentContribution: (commentContribution at: #avgComments);
+		  mergeRequestDuration: (mergeRequestDuration at: #avgDuration);
+		  codeChurn: (codeChurn at: #churn);
+		  delayUntilFirstChurn: (delayUntilFirstChurn at: #avgDelay)
 ]
 
 { #category : #initialization }

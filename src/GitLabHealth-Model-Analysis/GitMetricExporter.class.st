@@ -156,6 +156,10 @@ GitMetricExporter >> exportInCSV [
 	exportBrowserModel
 		addColumnForQuery: [ :analysis | analysis period ]
 		withName: #Period.
+		
+	exportBrowserModel
+		addColumnForQuery: [ :analysis | analysis over ]
+		withName: #Over.
 
 	"Code Contribution "
 	exportBrowserModel
