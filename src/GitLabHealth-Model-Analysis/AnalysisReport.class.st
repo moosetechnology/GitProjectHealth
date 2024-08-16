@@ -10,7 +10,8 @@ Class {
 		'commentContribution',
 		'mergeRequestDuration',
 		'codeChurn',
-		'delayUntilFirstChurn'
+		'delayUntilFirstChurn',
+		'numberOfProjectWithCommit'
 	],
 	#category : #'GitLabHealth-Model-Analysis'
 }
@@ -102,6 +103,18 @@ AnalysisReport >> mergeRequestDuration [
 AnalysisReport >> mergeRequestDuration: anObject [
 
 	mergeRequestDuration := anObject
+]
+
+{ #category : #accessing }
+AnalysisReport >> numberOfProjectWithCommit [
+
+	^ numberOfProjectWithCommit
+]
+
+{ #category : #accessing }
+AnalysisReport >> numberOfProjectWithCommit: anObject [
+
+	numberOfProjectWithCommit := anObject
 ]
 
 { #category : #accessing }

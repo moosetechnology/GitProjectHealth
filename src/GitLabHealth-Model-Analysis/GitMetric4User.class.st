@@ -560,7 +560,8 @@ GitMetric4User >> generateAnalysisForPeriod: period over: over withMaxCommitWind
 		  commentContribution: commentContribution;
 		  mergeRequestDuration: mergeRequestDuration;
 		  codeChurn: codeChurn;
-		  delayUntilFirstChurn: delayUntilFirstChurn
+		  delayUntilFirstChurn: delayUntilFirstChurn;
+		numberOfProjectWithCommit: (numberOfProjectWithCommit at: #average)
 ]
 
 { #category : #initialization }
