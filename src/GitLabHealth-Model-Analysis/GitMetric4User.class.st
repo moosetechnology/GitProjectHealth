@@ -510,7 +510,7 @@ GitMetric4User >> foundSuccessorOf: userCommits andCompleteImportForMax: commitL
 { #category : #'as yet unclassified' }
 GitMetric4User >> generateAnalysisForPeriod: period over: over withMaxCommitWindows: maxCommitWindow [
 
-	| contribution codeAddition codeDeletion commitFrequency commentContribution mergeRequestDuration codeChurn delayUntilFirstChurn |
+	| contribution codeAddition codeDeletion commitFrequency commentContribution mergeRequestDuration codeChurn delayUntilFirstChurn numberOfProjectWithCommit |
 	
 	contribution := self
 		                codeContributionsSince: (period at: #since)
@@ -548,7 +548,9 @@ GitMetric4User >> generateAnalysisForPeriod: period over: over withMaxCommitWind
 		                         until: (period at: #until)
 		                         onACommitWindowOf: maxCommitWindow
 		                         overA: over) at: #avgDelay.
-
+		
+	numberOfProjectWithCommit := self numberOfProjectWithCommitSince: (period at: #since) until: (period at: #until) overA: over.
+	
 	^ AnalysisReport new
 		  username: self user name;
 		  period: period;
@@ -668,6 +670,52 @@ GitMetric4User >> mergeRequestDurationSince: since until: until overA: aDateWeek
 		    , aDateWeekMonthOrYear printString)).
 		  (#totalMergeRequest -> mergeRequest size).
 		  (#details -> groupedByDate) } asDictionary
+]
+
+{ #category : #metrics }
+GitMetric4User >> numberOfProjectWithCommitSince: since until: until overA: aDateWeekMonthOrYear [
+	| groupedByDate commits userCommits dateOver projects |
+	groupedByDate := self
+		                 setupGroupedDateFrom: since
+		                 to: until
+		                 over: aDateWeekMonthOrYear.
+		
+	gitAnalyzer := GitAnalyzer new
+		               onModel: glhModel;
+		               glhImporter: glhImporter.
+
+	glhImporter withCommitDiffs: false.
+	commits := self
+		           loadCommitsFromProjectsIds: itsProjects keys
+		           since: since
+		           until: until.
+	glhImporter withCommitDiffs: true.
+	userCommits := commits reject: [ :commit | commit commitCreator ~= user ].
+	
+
+	userCommits do: [ :userCommit |
+		 dateOver := self
+			            transformDate: userCommit committed_date 
+			            to: aDateWeekMonthOrYear.
+			
+		groupedByDate at: dateOver printString ifPresent: [ :value | value add: (userCommit repository project) ].
+	].
+
+	groupedByDate := groupedByDate collect: [ :group |		 
+		projects := Set newFrom: group.		
+		projects size.
+	].
+
+	^ {
+		  (#overEach -> aDateWeekMonthOrYear name).
+		  (#forOver -> (groupedByDate keys size printString
+		    , aDateWeekMonthOrYear printString)).
+		  (#average
+		   ->
+		   groupedByDate average asFloat).
+		  (#details -> groupedByDate).
+		  (#userCommits -> commits size) } asDictionary
+
 ]
 
 { #category : #accessing }
