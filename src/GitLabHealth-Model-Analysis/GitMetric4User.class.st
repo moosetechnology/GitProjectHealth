@@ -46,6 +46,9 @@ GitMetric4User >> averageTimeBetweenCommitSince: since until: until over: aDateW
 		groupedByDate at: dateOver printString ifPresent: [ :value | value add: commit ].
 	].
 
+	groupedByDate := groupedByDate select:  [ :group | group size >= 2 ].
+	
+
 	groupedByDate := groupedByDate collect: [ :group | 
 		differences := (1 to: group size - 1) collect: [ :i |
 		               commits1 := group at: i.
@@ -53,16 +56,15 @@ GitMetric4User >> averageTimeBetweenCommitSince: since until: until over: aDateW
 
 		               (commits2 committed_date - commits1 committed_date) asSeconds ].
 
-		differences := differences ifEmpty: [differences ] ifNotEmpty: [differences average asDuration].    
+		differences average asDuration.    
 	].
+	
 
 	^{
 		  (#overEach -> aDateWeekMonthOrYear name).
 		  (#forOver -> (groupedByDate keys size printString
 		    , aDateWeekMonthOrYear printString)).
-		  (#average
-		   ->
-		   (groupedByDate at: (groupedByDate keys first))).
+		  (#average -> groupedByDate average).
 		  (#details -> groupedByDate).
 		  (#userCommits -> commits size) } asDictionary.
 ]
