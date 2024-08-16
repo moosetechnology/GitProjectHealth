@@ -33,10 +33,6 @@ GitMetric4User >> averageTimeBetweenCommitSince: since until: until over: aDateW
 	commitSortedByDate := commits sorted: [ :commit1 :commit2 |
 		                      commit1 committed_date
 		                      < commit2 committed_date ].
-	
-	dateOver := self
-			            transformDate: (commitSortedByDate at: 1) committed_date 
-			            to: aDateWeekMonthOrYear.
 			
 	commitSortedByDate do: [ :commit | 
 		 dateOver := self
