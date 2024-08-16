@@ -154,9 +154,13 @@ GitMetricExporter >> exportInCSV [
 		withName: #'User name'.
 
 	exportBrowserModel
-		addColumnForQuery: [ :analysis | analysis period ]
-		withName: #Period.
-		
+		addColumnForQuery: [ :analysis | analysis period at: #since ]
+		withName: #Since.
+
+	exportBrowserModel
+		addColumnForQuery: [ :analysis | analysis period at: #until ]
+		withName: #Until.
+
 	exportBrowserModel
 		addColumnForQuery: [ :analysis | analysis over ]
 		withName: #Over.
