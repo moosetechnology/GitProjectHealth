@@ -11,7 +11,7 @@ Class {
 { #category : #metrics }
 GitMetric4User >> averageTimeBetweenCommitSince: since until: until overA: aDateWeekMonthOrYear [
 
-	| commits commitSortedByDate commits1 commits2 differences groupedByDate dateOver |
+	| commits commitSortedByDate commits1 commits2 differences groupedByDate dateOver average |
 	groupedByDate := self
 		                 setupGroupedDateFrom: since
 		                 to: until
@@ -55,13 +55,16 @@ GitMetric4User >> averageTimeBetweenCommitSince: since until: until overA: aDate
 				                                asSeconds ].
 
 		                 differences average asDuration ].
-
+	
+	average := groupedByDate
+		           ifEmpty: [ nil ]
+		           ifNotEmpty: [ groupedByDate average ].
 
 	^ {
 		  (#overEach -> aDateWeekMonthOrYear name).
 		  (#forOver -> (groupedByDate keys size printString
 		    , aDateWeekMonthOrYear printString)).
-		  (#average -> groupedByDate average).
+		  (#average -> average).
 		  (#details -> groupedByDate).
 		  (#userCommits -> commits size) } asDictionary
 ]
