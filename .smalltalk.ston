@@ -6,7 +6,7 @@ SmalltalkCISpec {
       #directory : 'src',
       #load : [ 'default', 'Jira' ],
       #platforms : [ #pharo ],
-      #onConflict : #useIncoming,
+      #onConflict : #useLoaded,
       #onUpgrade : #useIncoming
     }
   ],
