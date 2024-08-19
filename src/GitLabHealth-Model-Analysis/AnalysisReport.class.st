@@ -129,6 +129,10 @@ AnalysisReport >> over [
 AnalysisReport >> over: anObject [
 
 	over := anObject
+
+]
+
+{ #category : #accessing }
 AnalysisReport >> numberOfProjectWithCommit [
 
 	^ numberOfProjectWithCommit
