@@ -11,7 +11,7 @@ Class {
 		'mergeRequestDuration',
 		'codeChurn',
 		'delayUntilFirstChurn',
-		'numberOfProjectWithCommit'
+		'numberOfProjectWithCommit',
 		'averageTimeBetweenCommits'
 	],
 	#category : #'GitLabHealth-Model-Analysis'
