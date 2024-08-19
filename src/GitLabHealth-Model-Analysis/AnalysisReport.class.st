@@ -120,6 +120,18 @@ AnalysisReport >> mergeRequestDuration: anObject [
 ]
 
 { #category : #accessing }
+AnalysisReport >> numberOfProjectWithCommit [
+
+	^ numberOfProjectWithCommit
+]
+
+{ #category : #accessing }
+AnalysisReport >> numberOfProjectWithCommit: anObject [
+
+	numberOfProjectWithCommit := anObject
+]
+
+{ #category : #accessing }
 AnalysisReport >> over [
 
 	^ over
@@ -130,18 +142,6 @@ AnalysisReport >> over: anObject [
 
 	over := anObject
 
-]
-
-{ #category : #accessing }
-AnalysisReport >> numberOfProjectWithCommit [
-
-	^ numberOfProjectWithCommit
-]
-
-{ #category : #accessing }
-AnalysisReport >> numberOfProjectWithCommit: anObject [
-
-	numberOfProjectWithCommit := anObject
 ]
 
 { #category : #accessing }
