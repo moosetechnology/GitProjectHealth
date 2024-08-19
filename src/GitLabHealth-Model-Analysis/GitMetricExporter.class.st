@@ -232,12 +232,17 @@ GitMetricExporter >> exportInCSVOver: aCollectionOfDateWeekMonthOrYear [
 			'delay Until First Churn (W=' , maxCommitWindow printString
 			, ') ' asSymbol.
 			
-	
 	"number of project with minimum one commit of user"
 	exportBrowserModel
 		addColumnForQuery: [ :analysis | analysis numberOfProjectWithCommit ]
 		withName:
 			'number of project with min 1 commit of user' asSymbol.
+      
+	"average time between commits"
+	exportBrowserModel
+		addColumnForQuery: [ :analysis | analysis averageTimeBetweenCommits  ]
+		withName:
+			'average time between commits' asSymbol.
 
 	aCollectionOfDateWeekMonthOrYear do: [ :aDateWeekMonthOrYear |
 		over := aDateWeekMonthOrYear.
@@ -259,6 +264,24 @@ GitMetricExporter >> exportInDB: repository [
 
 	self analyses ifNil: [ self generateAnalyses ].
 	self analyses do: [ :analysis | analysis save ]
+]
+
+{ #category : #exporting }
+GitMetricExporter >> exportInS3: bucketName accessKey: accessKey secretKey: secretKey region: region [
+  | s3 bucket ston date |
+AWSS3Config default 
+  accessKeyId: accessKey;
+  secretKey: secretKey;
+  regionName: region.
+
+	s3 := AWSS3 new.
+	bucket:= s3 bucketNamed: bucketName.
+	
+	ston := STON toString: analyses.
+	
+	date := (Date today asString) copyReplaceAll: ' 'asString with: '-'.
+	
+	bucket atKey:'analyses-', date, '.ston' putObject: ston.
 ]
 
 { #category : #projects }

@@ -8,6 +8,63 @@ Class {
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
+{ #category : #metrics }
+GitMetric4User >> averageTimeBetweenCommitSince: since until: until over: aDateWeekMonthOrYear [
+
+	| commits commitSortedByDate commits1 commits2 differences groupedByDate dateOver |
+	
+	groupedByDate := self
+		                 setupGroupedDateFrom: since
+		                 to: until
+		                 over: aDateWeekMonthOrYear.
+	
+	gitAnalyzer := GitAnalyzer new
+		               onModel: glhModel;
+		               glhImporter: glhImporter.
+
+	glhImporter withCommitDiffs: false.
+	commits := self
+		           loadCommitsFromProjectsIds: itsProjects keys
+		           since: since
+		           until: until.
+	glhImporter withCommitDiffs: true.
+	commits := commits reject: [ :commit | commit commitCreator ~= user ].
+
+	commitSortedByDate := commits sorted: [ :commit1 :commit2 |
+		                      commit1 committed_date
+		                      < commit2 committed_date ].
+			
+	commitSortedByDate do: [ :commit | 
+		 dateOver := self
+			            transformDate: commit committed_date 
+			            to: aDateWeekMonthOrYear.
+		
+		groupedByDate at: dateOver printString ifPresent: [ :value | value add: commit ].
+	].
+
+	groupedByDate := groupedByDate select:  [ :group | group size >= 2 ].
+	
+
+	groupedByDate := groupedByDate collect: [ :group | 
+		differences := (1 to: group size - 1) collect: [ :i |
+		               commits1 := group at: i.
+		               commits2 := group at: i + 1.
+
+		               (commits2 committed_date - commits1 committed_date) asSeconds ].
+
+		differences average asDuration.    
+	].
+	
+
+	^{
+		  (#overEach -> aDateWeekMonthOrYear name).
+		  (#forOver -> (groupedByDate keys size printString
+		    , aDateWeekMonthOrYear printString)).
+		  (#average -> groupedByDate average).
+		  (#details -> groupedByDate).
+		  (#userCommits -> commits size) } asDictionary.
+]
+
 { #category : #churn }
 GitMetric4User >> codeChurnSince: since until: until onACommitWindowOf: commitLimit overA: aDateWeekMonthOrYear [
 
@@ -510,7 +567,7 @@ GitMetric4User >> foundSuccessorOf: userCommits andCompleteImportForMax: commitL
 { #category : #'as yet unclassified' }
 GitMetric4User >> generateAnalysisForPeriod: period over: over withMaxCommitWindows: maxCommitWindow [
 
-	| contribution codeAddition codeDeletion commitFrequency commentContribution mergeRequestDuration codeChurn delayUntilFirstChurn numberOfProjectWithCommit |
+	| contribution codeAddition codeDeletion commitFrequency commentContribution mergeRequestDuration codeChurn delayUntilFirstChurn averageTimeBetweenCommits averageTimeBetweenCommits |
 	
 	contribution := self
 		                codeContributionsSince: (period at: #since)
@@ -549,8 +606,9 @@ GitMetric4User >> generateAnalysisForPeriod: period over: over withMaxCommitWind
 		                         onACommitWindowOf: maxCommitWindow
 		                         overA: over) at: #avgDelay.
 		
-	numberOfProjectWithCommit := self numberOfProjectWithCommitSince: (period at: #since) until: (period at: #until) overA: over.
-	
+	numberOfProjectWithCommit := self numberOfProjectWithCommitSince: (period at: #since) until: (period at: #until) overA: over.	
+	averageTimeBetweenCommits := (self averageTimeBetweenCommitSince: (period at: #since) until: (period at: #until) over: over) at: #average.
+
 	^ AnalysisReport new
 		  username: self user name;
 		  period: period;
@@ -562,6 +620,7 @@ GitMetric4User >> generateAnalysisForPeriod: period over: over withMaxCommitWind
 		  codeChurn: codeChurn;
 		  delayUntilFirstChurn: delayUntilFirstChurn;
 		numberOfProjectWithCommit: (numberOfProjectWithCommit at: #average)
+		  averageTimeBetweenCommits: averageTimeBetweenCommits.
 ]
 
 { #category : #initialization }
