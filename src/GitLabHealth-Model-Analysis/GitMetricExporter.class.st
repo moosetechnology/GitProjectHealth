@@ -235,20 +235,26 @@ GitMetricExporter >> exportInDB: repository [
 
 { #category : #exporting }
 GitMetricExporter >> exportInS3: bucketName accessKey: accessKey secretKey: secretKey region: region [
-  | s3 bucket ston date |
-AWSS3Config default 
-  accessKeyId: accessKey;
-  secretKey: secretKey;
-  regionName: region.
+
+	| s3 bucket ston date fileName |
+	AWSS3Config default
+		accessKeyId: accessKey;
+		secretKey: secretKey;
+		regionName: region.
 
 	s3 := AWSS3 new.
-	bucket:= s3 bucketNamed: bucketName.
-	
+	bucket := s3 bucketNamed: bucketName.
+
 	ston := STON toString: analyses.
-	
-	date := (Date today asString) copyReplaceAll: ' 'asString with: '-'.
-	
-	bucket atKey:'analyses-', date, '.ston' putObject: ston.
+
+	date := Date today asString copyReplaceAll: ' ' asString with: '-'.
+	fileName := ('-' join: {
+			             'analyse'.
+			             label.
+			             over asString.
+			             date }) , '.ston'.
+
+	bucket atKey: fileName putObject: ston
 ]
 
 { #category : #projects }
