@@ -619,7 +619,7 @@ GitMetric4User >> generateAnalysisForPeriod: period over: over withMaxCommitWind
 		  mergeRequestDuration: mergeRequestDuration;
 		  codeChurn: codeChurn;
 		  delayUntilFirstChurn: delayUntilFirstChurn;
-		numberOfProjectWithCommit: (numberOfProjectWithCommit at: #average)
+		numberOfProjectWithCommit: (numberOfProjectWithCommit at: #average);
 		  averageTimeBetweenCommits: averageTimeBetweenCommits.
 ]
 
