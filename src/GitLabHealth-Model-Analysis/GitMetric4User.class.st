@@ -9,15 +9,14 @@ Class {
 }
 
 { #category : #metrics }
-GitMetric4User >> averageTimeBetweenCommitSince: since until: until over: aDateWeekMonthOrYear [
+GitMetric4User >> averageTimeBetweenCommitSince: since until: until overA: aDateWeekMonthOrYear [
 
 	| commits commitSortedByDate commits1 commits2 differences groupedByDate dateOver |
-	
 	groupedByDate := self
 		                 setupGroupedDateFrom: since
 		                 to: until
 		                 over: aDateWeekMonthOrYear.
-	
+
 	gitAnalyzer := GitAnalyzer new
 		               onModel: glhModel;
 		               glhImporter: glhImporter.
@@ -33,36 +32,38 @@ GitMetric4User >> averageTimeBetweenCommitSince: since until: until over: aDateW
 	commitSortedByDate := commits sorted: [ :commit1 :commit2 |
 		                      commit1 committed_date
 		                      < commit2 committed_date ].
-			
-	commitSortedByDate do: [ :commit | 
-		 dateOver := self
-			            transformDate: commit committed_date 
+
+	commitSortedByDate do: [ :commit |
+		dateOver := self
+			            transformDate: commit committed_date
 			            to: aDateWeekMonthOrYear.
-		
-		groupedByDate at: dateOver printString ifPresent: [ :value | value add: commit ].
-	].
 
-	groupedByDate := groupedByDate select:  [ :group | group size >= 2 ].
-	
+		groupedByDate
+			at: dateOver printString
+			ifPresent: [ :value | value add: commit ] ].
 
-	groupedByDate := groupedByDate collect: [ :group | 
-		differences := (1 to: group size - 1) collect: [ :i |
-		               commits1 := group at: i.
-		               commits2 := group at: i + 1.
+	groupedByDate := groupedByDate select: [ :group | group size >= 2 ].
 
-		               (commits2 committed_date - commits1 committed_date) asSeconds ].
 
-		differences average asDuration.    
-	].
-	
+	groupedByDate := groupedByDate collect: [ :group |
+		                 differences := (1 to: group size - 1) collect: [ :i |
+			                                commits1 := group at: i.
+			                                commits2 := group at: i + 1.
 
-	^{
+			                                (commits2 committed_date
+			                                 - commits1 committed_date)
+				                                asSeconds ].
+
+		                 differences average asDuration ].
+
+
+	^ {
 		  (#overEach -> aDateWeekMonthOrYear name).
 		  (#forOver -> (groupedByDate keys size printString
 		    , aDateWeekMonthOrYear printString)).
 		  (#average -> groupedByDate average).
 		  (#details -> groupedByDate).
-		  (#userCommits -> commits size) } asDictionary.
+		  (#userCommits -> commits size) } asDictionary
 ]
 
 { #category : #churn }
@@ -314,7 +315,7 @@ GitMetric4User >> commitFrequencySince: since until: until overA: aDateWeekMonth
 		  (#details -> groupedByDate) } asOrderedDictionary
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #metrics }
 GitMetric4User >> commitsProducedOnProject: projectId since: sinceDate until: untilDate [
 
 	| frequencies |
@@ -564,63 +565,71 @@ GitMetric4User >> foundSuccessorOf: userCommits andCompleteImportForMax: commitL
 	^ analyzingCommits
 ]
 
-{ #category : #'as yet unclassified' }
-GitMetric4User >> generateAnalysisForPeriod: period over: over withMaxCommitWindows: maxCommitWindow [
+{ #category : #analysis }
+GitMetric4User >> generateAnalysisForPeriod: period over: aDateWeekMonthOrYear withMaxCommitWindows: maxCommitWindow [
 
-	| contribution codeAddition codeDeletion commitFrequency commentContribution mergeRequestDuration codeChurn delayUntilFirstChurn averageTimeBetweenCommits averageTimeBetweenCommits |
-	
+	| contribution commitFrequency commentContribution mergeRequestDuration codeChurn delayUntilFirstChurn averageTimeBetweenCommits numberOfProjectWithCommit |
 	contribution := self
 		                codeContributionsSince: (period at: #since)
 		                until: (period at: #until)
-		                overA: over.
-	codeAddition := contribution at: #avgAddition.
-	codeDeletion := contribution at: #avgDeletion.
+		                overA: aDateWeekMonthOrYear.
 
-	commitFrequency := (self
-		                    commitFrequencySince: (period at: #since)
-		                    until: (period at: #until)
-		                    overA: over) at: #averageFloat.
+	commitFrequency := self
+		                   commitFrequencySince: (period at: #since)
+		                   until: (period at: #until)
+		                   overA: aDateWeekMonthOrYear.
 
-	commentContribution := (self
-		                        commentsContributionsSince:
+	commentContribution := self
+		                       commentsContributionsSince:
+		                       (period at: #since)
+		                       until: (period at: #until)
+		                       overA: aDateWeekMonthOrYear.
+
+	mergeRequestDuration := self
+		                        mergeRequestDurationSince:
 		                        (period at: #since)
 		                        until: (period at: #until)
-		                        overA: over) at: #avgComments.
+		                        overA: aDateWeekMonthOrYear.
 
-	mergeRequestDuration := (self
-		                         mergeRequestDurationSince:
-		                         (period at: #since)
-		                         until: (period at: #until)
-		                         overA: over) at: #avgDuration.
+	codeChurn := self
+		             codeChurnSince: (period at: #since)
+		             until: (period at: #until)
+		             onACommitWindowOf: maxCommitWindow
+		             overA: aDateWeekMonthOrYear.
 
-	codeChurn := (self
-		              codeChurnSince: (period at: #since)
-		              until: (period at: #until)
-		              onACommitWindowOf: maxCommitWindow
-		              overA: over) at: #churn.
+	delayUntilFirstChurn := self
+		                        delayUntilFirstChurnSince:
+		                        (period at: #since)
+		                        until: (period at: #until)
+		                        onACommitWindowOf: maxCommitWindow
+		                        overA: aDateWeekMonthOrYear.
 
-	delayUntilFirstChurn := (self
-		                         delayUntilFirstChurnSince:
-		                         (period at: #since)
-		                         until: (period at: #until)
-		                         onACommitWindowOf: maxCommitWindow
-		                         overA: over) at: #avgDelay.
-		
-	numberOfProjectWithCommit := self numberOfProjectWithCommitSince: (period at: #since) until: (period at: #until) overA: over.	
-	averageTimeBetweenCommits := (self averageTimeBetweenCommitSince: (period at: #since) until: (period at: #until) over: over) at: #average.
+	numberOfProjectWithCommit := self
+		                             numberOfProjectWithCommitSince:
+		                             (period at: #since)
+		                             until: (period at: #until)
+		                             overA: aDateWeekMonthOrYear.
+	averageTimeBetweenCommits := self
+		                             averageTimeBetweenCommitSince:
+		                             (period at: #since)
+		                             until: (period at: #until)
+		                             overA: aDateWeekMonthOrYear.
 
 	^ AnalysisReport new
 		  username: self user name;
 		  period: period;
-		  codeAddition: codeAddition;
-		  codeDeletion: codeDeletion;
-		  commitFrequency: commitFrequency;
-		  commentContribution: commentContribution;
-		  mergeRequestDuration: mergeRequestDuration;
-		  codeChurn: codeChurn;
-		  delayUntilFirstChurn: delayUntilFirstChurn;
-		numberOfProjectWithCommit: (numberOfProjectWithCommit at: #average);
-		  averageTimeBetweenCommits: averageTimeBetweenCommits.
+		  over: aDateWeekMonthOrYear asString;
+		  codeAddition: (contribution at: #avgAddition);
+		  codeDeletion: (contribution at: #avgDeletion);
+		  commitFrequency: (commitFrequency at: #averageFloat);
+		  commentContribution: (commentContribution at: #avgComments);
+		  mergeRequestDuration: (mergeRequestDuration at: #avgDuration);
+		  codeChurn: (codeChurn at: #churn);
+		  delayUntilFirstChurn: (delayUntilFirstChurn at: #avgDelay);
+		  numberOfProjectWithCommit:
+			  (numberOfProjectWithCommit at: #average);
+		  averageTimeBetweenCommits:
+			  (averageTimeBetweenCommits at: #average)
 ]
 
 { #category : #initialization }

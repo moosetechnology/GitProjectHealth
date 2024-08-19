@@ -4,6 +4,7 @@ Class {
 	#instVars : [
 		'username',
 		'period',
+		'over',
 		'codeAddition',
 		'codeDeletion',
 		'commitFrequency',
@@ -128,6 +129,19 @@ AnalysisReport >> numberOfProjectWithCommit [
 AnalysisReport >> numberOfProjectWithCommit: anObject [
 
 	numberOfProjectWithCommit := anObject
+]
+
+{ #category : #accessing }
+AnalysisReport >> over [
+
+	^ over
+]
+
+{ #category : #accessing }
+AnalysisReport >> over: anObject [
+
+	over := anObject
+
 ]
 
 { #category : #accessing }

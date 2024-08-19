@@ -117,44 +117,6 @@ GitMetricExporter >> constructFilePath: runningOver [
 	^ file
 ]
 
-{ #category : #exporting }
-GitMetricExporter >> debugExportOver: aCollectionOfDateWeekMonthOrYear [
-
-	| period |
-	over := Date.
-
-	period := runningPeriods first.
-
-
-	1 halt.
-	"Code Contribution "
-
-	(entities collect: (self blockCodeAdditionSince: period)) recordInfo.
-	(entities collect: (self blockCodeDeletionSince: period)) recordInfo.
-
-	"Commit frequencies "
-	(entities collect: (self blockCommitFrequencySince: period))
-		recordInfo.
-
-	"comment contribution "
-	(entities collect: (self blockCommentsContributionSince: period))
-		recordInfo.
-
-	"merge Request Duration "
-	(entities collect: (self blockMergeRequestDurationSince: period))
-		recordInfo.
-
-	"code churn"
-	(entities collect: (self blockCodeChurnSince: period)) recordInfo.
-
-	"delay Until First Churn"
-	(entities collect: (self blockDelayUntilFirstChurnSince: period))
-		recordInfo.
-
-
-	'Done computing debug' recordInfo
-]
-
 { #category : #accessing }
 GitMetricExporter >> entities: aCollection [ 
 	entities := aCollection
@@ -176,7 +138,7 @@ GitMetricExporter >> exportFor: usersWithProjects over: aCollectionOfDateWeekMon
 ]
 
 { #category : #exporting }
-GitMetricExporter >> exportInCSVOver: aCollectionOfDateWeekMonthOrYear [
+GitMetricExporter >> exportInCSV [
 
 	| exportBrowserModel file |
 	exportBrowserModel := MiExportModel new.
@@ -192,8 +154,16 @@ GitMetricExporter >> exportInCSVOver: aCollectionOfDateWeekMonthOrYear [
 		withName: #'User name'.
 
 	exportBrowserModel
-		addColumnForQuery: [ :analysis | analysis period ]
-		withName: #Period.
+		addColumnForQuery: [ :analysis | analysis period at: #since ]
+		withName: #Since.
+
+	exportBrowserModel
+		addColumnForQuery: [ :analysis | analysis period at: #until ]
+		withName: #Until.
+
+	exportBrowserModel
+		addColumnForQuery: [ :analysis | analysis over ]
+		withName: #Over.
 
 	"Code Contribution "
 	exportBrowserModel
@@ -244,15 +214,12 @@ GitMetricExporter >> exportInCSVOver: aCollectionOfDateWeekMonthOrYear [
 		withName:
 			'average time between commits' asSymbol.
 
-	aCollectionOfDateWeekMonthOrYear do: [ :aDateWeekMonthOrYear |
-		over := aDateWeekMonthOrYear.
-		file := self constructFilePath: over.
-
-		file writeStreamDo: [ :aStream |
-			aStream
-				<< 'sep=,';
-				<< OSPlatform current lineEnding.
-			exportBrowserModel writeCSVOn: aStream ] ].
+	file := self constructFilePath: over.
+	file writeStreamDo: [ :aStream |
+		aStream
+			<< 'sep=,';
+			<< OSPlatform current lineEnding.
+		exportBrowserModel writeCSVOn: aStream ].
 
 	'Done computing' recordInfo
 ]
@@ -323,6 +290,25 @@ GitMetricExporter >> findProjectsOfUser: aCollection [
 GitMetricExporter >> generateAnalyses [
 
 	| newAnalyses |
+	newAnalyses := OrderedCollection new.
+
+	runningPeriods do: [ :period |
+		newAnalyses addAll: (entities collect: [ :entity |
+			entity
+				generateAnalysisForPeriod: period
+				over: over
+				withMaxCommitWindows: maxCommitWindow ]) ].
+
+	self analyses: newAnalyses.
+
+	^ newAnalyses
+]
+
+{ #category : #analysis }
+GitMetricExporter >> generateAnalysesOver: aDateWeekMonthOrYear [
+
+	| newAnalyses |
+	over := aDateWeekMonthOrYear.
 	newAnalyses := OrderedCollection new.
 
 	runningPeriods do: [ :period |
