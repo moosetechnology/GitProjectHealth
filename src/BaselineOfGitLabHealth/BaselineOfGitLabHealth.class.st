@@ -38,11 +38,16 @@ BaselineOfGitLabHealth >> defineDependencies: spec [
 	spec
 		baseline: 'MoreLogger'
 		with: [ spec repository: 'github://badetitou/MoreLogger:main/src' ].
-			spec
+	spec
 		baseline: 'Voyage'
 		with: [ spec
 			loads: #('mongo'); 
-			repository: 'github://pharo-nosql/voyage/mc' ]
+			repository: 'github://pharo-nosql/voyage/mc' ].
+	spec
+		baseline: 'AWS'
+		with: [ 
+			  spec repository: 'github://newapplesho/aws-sdk-smalltalk/pharo-repository'
+		]
 ]
 
 { #category : #baselines }
