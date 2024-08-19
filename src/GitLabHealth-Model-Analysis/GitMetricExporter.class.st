@@ -232,6 +232,12 @@ GitMetricExporter >> exportInCSVOver: aCollectionOfDateWeekMonthOrYear [
 			'delay Until First Churn (W=' , maxCommitWindow printString
 			, ') ' asSymbol.
 			
+	"number of project with minimum one commit of user"
+	exportBrowserModel
+		addColumnForQuery: [ :analysis | analysis numberOfProjectWithCommit ]
+		withName:
+			'number of project with min 1 commit of user' asSymbol.
+      
 	"average time between commits"
 	exportBrowserModel
 		addColumnForQuery: [ :analysis | analysis averageTimeBetweenCommits  ]
