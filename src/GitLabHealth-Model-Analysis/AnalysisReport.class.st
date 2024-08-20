@@ -14,9 +14,9 @@ Class {
 		'delayUntilFirstChurn',
 		'numberOfProjectWithCommit',
 		'averageTimeBetweenCommits',
-		'averageNumberOfOpenMergeRequest',
-		'averageNumberOfMergedMergeRequest',
-		'averageClosedMergeRequests'
+		'openMergeRequest',
+		'mergedMergeRequest',
+		'closedMergeRequests'
 	],
 	#category : #'GitLabHealth-Model-Analysis'
 }
@@ -24,42 +24,6 @@ Class {
 { #category : #testing }
 AnalysisReport class >> isVoyageRoot [
 	^true
-]
-
-{ #category : #accessing }
-AnalysisReport >> averageClosedMergeRequests [
-
-	^ averageClosedMergeRequests
-]
-
-{ #category : #accessing }
-AnalysisReport >> averageClosedMergeRequests: anObject [
-
-	averageClosedMergeRequests := anObject
-]
-
-{ #category : #accessing }
-AnalysisReport >> averageNumberOfMergedMergeRequest [
-
-	^ averageNumberOfMergedMergeRequest
-]
-
-{ #category : #accessing }
-AnalysisReport >> averageNumberOfMergedMergeRequest: anObject [
-
-	averageNumberOfMergedMergeRequest := anObject
-]
-
-{ #category : #accessing }
-AnalysisReport >> averageNumberOfOpenMergeRequest [
-
-	^ averageNumberOfOpenMergeRequest
-]
-
-{ #category : #accessing }
-AnalysisReport >> averageNumberOfOpenMergeRequest: anObject [
-
-	averageNumberOfOpenMergeRequest := anObject
 ]
 
 { #category : #accessing }
@@ -72,6 +36,18 @@ AnalysisReport >> averageTimeBetweenCommits [
 AnalysisReport >> averageTimeBetweenCommits: anObject [
 
 	averageTimeBetweenCommits := anObject
+]
+
+{ #category : #accessing }
+AnalysisReport >> closedMergeRequests [
+
+	^ closedMergeRequests
+]
+
+{ #category : #accessing }
+AnalysisReport >> closedMergeRequests: anObject [
+
+	closedMergeRequests := anObject
 ]
 
 { #category : #accessing }
@@ -159,6 +135,18 @@ AnalysisReport >> mergeRequestDuration: anObject [
 ]
 
 { #category : #accessing }
+AnalysisReport >> mergedMergeRequest [
+
+	^ mergedMergeRequest
+]
+
+{ #category : #accessing }
+AnalysisReport >> mergedMergeRequest: anObject [
+
+	mergedMergeRequest := anObject
+]
+
+{ #category : #accessing }
 AnalysisReport >> numberOfProjectWithCommit [
 
 	^ numberOfProjectWithCommit
@@ -168,6 +156,18 @@ AnalysisReport >> numberOfProjectWithCommit [
 AnalysisReport >> numberOfProjectWithCommit: anObject [
 
 	numberOfProjectWithCommit := anObject
+]
+
+{ #category : #accessing }
+AnalysisReport >> openMergeRequest [
+
+	^ openMergeRequest
+]
+
+{ #category : #accessing }
+AnalysisReport >> openMergeRequest: anObject [
+
+	openMergeRequest := anObject
 ]
 
 { #category : #accessing }

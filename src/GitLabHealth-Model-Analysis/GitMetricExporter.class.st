@@ -184,11 +184,6 @@ GitMetricExporter >> exportInCSV [
 		addColumnForQuery: [ :analysis | analysis commentContribution ]
 		withName: 'comment contribution (avg)' asSymbol.
 
-	"merge Request Duration "
-	exportBrowserModel
-		addColumnForQuery: [ :analysis | analysis mergeRequestDuration ]
-		withName: 'merge Request Duration ' asSymbol.
-
 	"code churn"
 	exportBrowserModel
 		addColumnForQuery: [ :analysis | analysis codeChurn ]
@@ -207,30 +202,32 @@ GitMetricExporter >> exportInCSV [
 		addColumnForQuery: [ :analysis | analysis numberOfProjectWithCommit ]
 		withName: 'number of project with min 1 commit of user' asSymbol.
 
+	"merge Request Duration "
+	exportBrowserModel
+		addColumnForQuery: [ :analysis | analysis mergeRequestDuration ]
+		withName: 'merge Request Duration ' asSymbol.
+
 	"average time between commits"
 	exportBrowserModel
 		addColumnForQuery: [ :analysis | analysis averageTimeBetweenCommits ]
 		withName: 'average time between commits' asSymbol.
 
-	"average number of open merge request"
+	"number of open merge request"
 	exportBrowserModel
-		addColumnForQuery: [ :analysis |
-		analysis averageNumberOfOpenMergeRequest ]
-		withName: 'average number of open merge request' asSymbol.
+		addColumnForQuery: [ :analysis | analysis openMergeRequest ]
+		withName: 'number of open merge request' asSymbol.
 
 
-	"average number of merged merge request"
+	"number of merged merge request"
 	exportBrowserModel
-		addColumnForQuery: [ :analysis |
-		analysis averageNumberOfMergedMergeRequest ]
-		withName: 'average number of merged merge request' asSymbol.
-	
-	"Average number of merge requests closed and not merged"
+		addColumnForQuery: [ :analysis | analysis mergedMergeRequest ]
+		withName: 'number of merged merge request' asSymbol.
+
+	"number of merge requests closed and not merged"
 	exportBrowserModel
-		addColumnForQuery: [ :analysis |
-		analysis averageClosedMergeRequests ]
-		withName: 'average number of merge requests closed and not merged' asSymbol.
-	
+		addColumnForQuery: [ :analysis | analysis closedMergeRequests ]
+		withName: 'number of merge requests closed and not merged' asSymbol.
+
 
 	file := self constructFilePath: over.
 	file writeStreamDo: [ :aStream |

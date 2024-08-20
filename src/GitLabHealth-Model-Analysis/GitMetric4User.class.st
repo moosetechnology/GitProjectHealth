@@ -693,10 +693,10 @@ GitMetric4User >> generateAnalysisForPeriod: period over: aDateWeekMonthOrYear w
 			  (numberOfProjectWithCommit at: #average);
 		  averageTimeBetweenCommits:
 			  (averageTimeBetweenCommits at: #average);
-		  averageNumberOfOpenMergeRequest: (openMergeRequests at: #average);
-		  averageNumberOfMergedMergeRequest:
+		  openMergeRequest: (openMergeRequests at: #average);
+		  mergedMergeRequest: 
 			  (mergedMergeRequests at: #average);
-		  averageClosedMergeRequests: (closedMergeRequests at: #average)
+		  closedMergeRequests: (closedMergeRequests at: #average)
 ]
 
 { #category : #initialization }
