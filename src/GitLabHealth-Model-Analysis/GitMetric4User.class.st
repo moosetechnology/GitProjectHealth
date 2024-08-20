@@ -571,7 +571,7 @@ GitMetric4User >> foundSuccessorOf: userCommits andCompleteImportForMax: commitL
 { #category : #analysis }
 GitMetric4User >> generateAnalysisForPeriod: period over: aDateWeekMonthOrYear withMaxCommitWindows: maxCommitWindow [
 
-	| contribution commitFrequency commentContribution mergeRequestDuration codeChurn delayUntilFirstChurn averageTimeBetweenCommits numberOfProjectWithCommit until since numberOfOpenMergeRequest |
+	| contribution commitFrequency commentContribution mergeRequestDuration codeChurn delayUntilFirstChurn averageTimeBetweenCommits numberOfProjectWithCommit until since numberOfOpenMergeRequest numberOfMergedMergeRequest |
 	since := period at: #since.
 	until := period at: #until.
 
@@ -620,10 +620,14 @@ GitMetric4User >> generateAnalysisForPeriod: period over: aDateWeekMonthOrYear w
 		                        overA: aDateWeekMonthOrYear.
 
 	numberOfOpenMergeRequest := self
-		                                   numberOfOpenMergeRequestSince:
-		                                   since
-		                                   until: until
-		                                   overA: aDateWeekMonthOrYear.
+		                            numberOfOpenMergeRequestSince: since
+		                            until: until
+		                            overA: aDateWeekMonthOrYear.
+
+	numberOfMergedMergeRequest := self
+		                              numberOfMergedMergeRequestSince: since
+		                              until: until
+		                              overA: aDateWeekMonthOrYear.
 
 	^ AnalysisReport new
 		  username: self user name;
@@ -641,7 +645,9 @@ GitMetric4User >> generateAnalysisForPeriod: period over: aDateWeekMonthOrYear w
 		  averageTimeBetweenCommits:
 			  (averageTimeBetweenCommits at: #average);
 		  averageNumberOfOpenMergeRequest:
-			  (numberOfOpenMergeRequest at: #average)
+			  (numberOfOpenMergeRequest at: #average);
+		  averageNumberOfMergedMergeRequest:
+			  (numberOfMergedMergeRequest at: #average)
 ]
 
 { #category : #initialization }
@@ -764,6 +770,40 @@ GitMetric4User >> mergeRequestDurationSince: since until: until overA: aDateWeek
 		    , aDateWeekMonthOrYear printString)).
 		  (#totalMergeRequest -> mergeRequest size).
 		  (#details -> groupedByDate) } asDictionary
+]
+
+{ #category : #'metrics - merge request' }
+GitMetric4User >> numberOfMergedMergeRequestSince: since until: until overA: aDateWeekMonthOrYear [
+
+	| groupedByDate userMergeRequests dateOver average userMergedMergeRequests |
+	groupedByDate := self
+		                 setupGroupedDateFrom: since
+		                 to: until
+		                 over: aDateWeekMonthOrYear.
+	userMergeRequests := self
+		                     loadItsMergeRequestsSince: since
+		                     until: until.
+	userMergedMergeRequests := userMergeRequests select: [
+		                           :userMergeRequest |
+		                           userMergeRequest merged_at isNotNil ].
+	userMergedMergeRequests do: [ :userMergeRequest |
+		dateOver := self
+			            transformDate: userMergeRequest created_at
+			            to: aDateWeekMonthOrYear.
+		groupedByDate
+			at: dateOver printString
+			ifPresent: [ :value | value add: userMergeRequest ] ].
+	groupedByDate := groupedByDate collect: [ :group | group size ].
+	average := groupedByDate
+		           ifEmpty: [ 0 ]
+		           ifNotEmpty: [ groupedByDate average ].
+	^ {
+		  (#overEach -> aDateWeekMonthOrYear name).
+		  (#forOver -> (groupedByDate keys size printString
+		    , aDateWeekMonthOrYear printString)).
+		  (#average -> average asFloat).
+		  (#details -> groupedByDate).
+		  (#userMergeRequests -> userMergeRequests size) } asDictionary
 ]
 
 { #category : #'metrics - merge request' }

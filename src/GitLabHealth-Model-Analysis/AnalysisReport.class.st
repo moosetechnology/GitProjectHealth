@@ -14,7 +14,8 @@ Class {
 		'delayUntilFirstChurn',
 		'numberOfProjectWithCommit',
 		'averageTimeBetweenCommits',
-		'averageNumberOfOpenMergeRequest'
+		'averageNumberOfOpenMergeRequest',
+		'averageNumberOfMergedMergeRequest'
 	],
 	#category : #'GitLabHealth-Model-Analysis'
 }
@@ -22,6 +23,18 @@ Class {
 { #category : #testing }
 AnalysisReport class >> isVoyageRoot [
 	^true
+]
+
+{ #category : #accessing }
+AnalysisReport >> averageNumberOfMergedMergeRequest [
+
+	^ averageNumberOfMergedMergeRequest
+]
+
+{ #category : #accessing }
+AnalysisReport >> averageNumberOfMergedMergeRequest: anObject [
+
+	averageNumberOfMergedMergeRequest := anObject
 ]
 
 { #category : #accessing }
