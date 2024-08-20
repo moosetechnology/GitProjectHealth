@@ -571,7 +571,7 @@ GitMetric4User >> foundSuccessorOf: userCommits andCompleteImportForMax: commitL
 { #category : #analysis }
 GitMetric4User >> generateAnalysisForPeriod: period over: aDateWeekMonthOrYear withMaxCommitWindows: maxCommitWindow [
 
-	| contribution commitFrequency commentContribution mergeRequestDuration codeChurn delayUntilFirstChurn averageTimeBetweenCommits numberOfProjectWithCommit until since numberOfOpenMergeRequests numberOfMergedMergeRequests numberOfClosedMergeRequests |
+	| contribution commitFrequency commentContribution mergeRequestDuration codeChurn delayUntilFirstChurn averageTimeBetweenCommits numberOfProjectWithCommit until since numberOfOpenMergeRequests numberOfMergedMergeRequests numberOfClosedMergeRequests numberOfMergeRequestWithoutReview |
 	since := period at: #since.
 	until := period at: #until.
 
@@ -636,6 +636,12 @@ GitMetric4User >> generateAnalysisForPeriod: period over: aDateWeekMonthOrYear w
 		                               until: until
 		                               overA: aDateWeekMonthOrYear.
 
+	numberOfMergeRequestWithoutReview := self
+		                                     numberOfMergeRequestsMergedWithoutReviewSince:
+		                                     since
+		                                     until: until
+		                                     overA: aDateWeekMonthOrYear.
+
 	^ AnalysisReport new
 		  username: self user name;
 		  period: period;
@@ -651,9 +657,13 @@ GitMetric4User >> generateAnalysisForPeriod: period over: aDateWeekMonthOrYear w
 			  (numberOfProjectWithCommit at: #average);
 		  averageTimeBetweenCommits:
 			  (averageTimeBetweenCommits at: #average);
-		  numberOfOpenMergeRequests: (numberOfOpenMergeRequests at: #average);
-		  numberOfMergedMergeRequest: (numberOfMergedMergeRequests at: #average);
-		  numberOfClosedMergeRequests: (numberOfClosedMergeRequests at: #average)
+		  numberOfOpenMergeRequests:
+			  (numberOfOpenMergeRequests at: #average);
+		  numberOfMergedMergeRequest:
+			  (numberOfMergedMergeRequests at: #average);
+		  numberOfClosedMergeRequests:
+			  (numberOfClosedMergeRequests at: #average);
+		  numberOfMergeRequestsWithoutReview: (numberOfMergeRequestWithoutReview at: #average).
 ]
 
 { #category : #initialization }
@@ -797,6 +807,66 @@ GitMetric4User >> numberOfClosedMergeRequestSince: since until: until overA: aDa
 			                           userMergeRequest state = 'closed' ].
 
 	userClosedMergeRequests do: [ :userMergeRequest |
+		dateOver := self
+			            transformDate: userMergeRequest created_at
+			            to: aDateWeekMonthOrYear.
+
+		groupedByDate
+			at: dateOver printString
+			ifPresent: [ :value | value add: userMergeRequest ] ].
+
+
+	groupedByDate := groupedByDate collect: [ :group | group size ].
+
+
+	average := groupedByDate
+		           ifEmpty: [ 0 ]
+		           ifNotEmpty: [ groupedByDate average ].
+
+	^ {
+		  (#overEach -> aDateWeekMonthOrYear name).
+		  (#forOver -> (groupedByDate keys size printString
+		    , aDateWeekMonthOrYear printString)).
+		  (#average -> average asFloat).
+		  (#details -> groupedByDate).
+		  (#userMergeRequests -> userMergeRequests size) } asDictionary
+]
+
+{ #category : #'metrics - merge request' }
+GitMetric4User >> numberOfMergeRequestsMergedWithoutReviewSince: since until: until overA: aDateWeekMonthOrYear [
+
+	| groupedByDate userMergeRequests dateOver average noVerificationMergeRequests mergedMergeRequest |
+	groupedByDate := self
+		                 setupGroupedDateFrom: since
+		                 to: until
+		                 over: aDateWeekMonthOrYear.
+
+	userMergeRequests := self
+		                     loadItsMergeRequestsSince: since
+		                     until: until.
+
+	mergedMergeRequest := userMergeRequests select: [ :mr |
+		                      mr merged_at isNotNil ].
+
+
+	noVerificationMergeRequests := mergedMergeRequest select: [
+		                               :userMergeRequest |
+		                               | validation |
+		                               glhImporter
+			                               importMergeResquestMerger:
+			                               userMergeRequest.
+
+		                               validation := gitAnalyzer
+			                                             analyseMergeResquestValidation:
+			                                             userMergeRequest.
+
+		                               userMergeRequest merge_user
+		                               = userMergeRequest author and:
+			                               (validation at: #duration)
+			                               < 1 minutes ].
+
+
+	noVerificationMergeRequests do: [ :userMergeRequest |
 		dateOver := self
 			            transformDate: userMergeRequest created_at
 			            to: aDateWeekMonthOrYear.
