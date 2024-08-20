@@ -14,8 +14,9 @@ Class {
 		'delayUntilFirstChurn',
 		'numberOfProjectWithCommit',
 		'averageTimeBetweenCommits',
-		'averageNumberOfOpenMergeRequest',
-		'averageNumberOfMergedMergeRequest'
+		'numberOfOpenMergeRequests',
+		'numberOfMergedMergeRequest',
+		'numberOfClosedMergeRequests'
 	],
 	#category : #'GitLabHealth-Model-Analysis'
 }
@@ -23,30 +24,6 @@ Class {
 { #category : #testing }
 AnalysisReport class >> isVoyageRoot [
 	^true
-]
-
-{ #category : #accessing }
-AnalysisReport >> averageNumberOfMergedMergeRequest [
-
-	^ averageNumberOfMergedMergeRequest
-]
-
-{ #category : #accessing }
-AnalysisReport >> averageNumberOfMergedMergeRequest: anObject [
-
-	averageNumberOfMergedMergeRequest := anObject
-]
-
-{ #category : #accessing }
-AnalysisReport >> averageNumberOfOpenMergeRequest [
-
-	^ averageNumberOfOpenMergeRequest
-]
-
-{ #category : #accessing }
-AnalysisReport >> averageNumberOfOpenMergeRequest: anObject [
-
-	averageNumberOfOpenMergeRequest := anObject
 ]
 
 { #category : #accessing }
@@ -143,6 +120,42 @@ AnalysisReport >> mergeRequestDuration [
 AnalysisReport >> mergeRequestDuration: anObject [
 
 	mergeRequestDuration := anObject
+]
+
+{ #category : #accessing }
+AnalysisReport >> numberOfClosedMergeRequests [
+
+	^ numberOfClosedMergeRequests
+]
+
+{ #category : #accessing }
+AnalysisReport >> numberOfClosedMergeRequests: anObject [
+
+	numberOfClosedMergeRequests := anObject
+]
+
+{ #category : #accessing }
+AnalysisReport >> numberOfMergedMergeRequest [
+
+	^ numberOfMergedMergeRequest
+]
+
+{ #category : #accessing }
+AnalysisReport >> numberOfMergedMergeRequest: anObject [
+
+	numberOfMergedMergeRequest := anObject
+]
+
+{ #category : #accessing }
+AnalysisReport >> numberOfOpenMergeRequests [
+
+	^ numberOfOpenMergeRequests
+]
+
+{ #category : #accessing }
+AnalysisReport >> numberOfOpenMergeRequests: anObject [
+
+	numberOfOpenMergeRequests := anObject
 ]
 
 { #category : #accessing }
