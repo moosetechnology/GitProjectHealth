@@ -122,7 +122,10 @@ GitMetric >> loadMergeRequestsFromProjectsIds: aCollection since: since until: u
 
 	| allMr period |
 	"itsMergeRequests ifNil: [ itsMergeRequests := Dictionary new ]."
-	period := self cacheSymbolFor: GLPHEMergeRequest since: since until: until.
+	period := self
+		          cacheSymbolFor: GLPHEMergeRequest
+		          since: since
+		          until: until.
 
 	allMr := aCollection collect: [ :idProject |
 		         | project mr |

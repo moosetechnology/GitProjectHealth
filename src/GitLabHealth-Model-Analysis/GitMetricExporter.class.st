@@ -201,18 +201,21 @@ GitMetricExporter >> exportInCSV [
 		withName:
 			'delay Until First Churn (W=' , maxCommitWindow printString
 			, ') ' asSymbol.
-			
+
 	"number of project with minimum one commit of user"
 	exportBrowserModel
 		addColumnForQuery: [ :analysis | analysis numberOfProjectWithCommit ]
-		withName:
-			'number of project with min 1 commit of user' asSymbol.
-      
+		withName: 'number of project with min 1 commit of user' asSymbol.
+
 	"average time between commits"
 	exportBrowserModel
-		addColumnForQuery: [ :analysis | analysis averageTimeBetweenCommits  ]
-		withName:
-			'average time between commits' asSymbol.
+		addColumnForQuery: [ :analysis | analysis averageTimeBetweenCommits ]
+		withName: 'average time between commits' asSymbol.
+		
+	"average number of open merge request"
+	exportBrowserModel
+		addColumnForQuery: [ :analysis | analysis averageNumberOfOpenMergeRequest ]
+		withName: 'average number of open merge request' asSymbol.
 
 	file := self constructFilePath: over.
 	file writeStreamDo: [ :aStream |
