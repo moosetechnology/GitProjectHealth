@@ -8,6 +8,47 @@ Class {
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
+{ #category : #'metrics - merge request' }
+GitMetric4User >> averageNumberOfOpenMergeRequestSince: since until: until overA: aDateWeekMonthOrYear [
+
+	| groupedByDate userMergeRequests dateOver average |
+	groupedByDate := self
+		                 setupGroupedDateFrom: since
+		                 to: until
+		                 over: aDateWeekMonthOrYear.
+
+	userMergeRequests := self
+		                     loadItsMergeRequestsSince: since
+		                     until: until.
+
+	userMergeRequests do: [ :userMergeRequest |
+		dateOver := self
+			            transformDate: userMergeRequest created_at
+			            to: aDateWeekMonthOrYear.
+
+		groupedByDate
+			at: dateOver printString
+			ifPresent: [ :value | value add: userMergeRequest ] ].
+
+
+	groupedByDate := groupedByDate collect: [ :group | group size ].
+	
+
+	average := groupedByDate
+		           ifEmpty: [ 0 ]
+		           ifNotEmpty: [ groupedByDate average ].
+
+	^ {
+		  (#overEach -> aDateWeekMonthOrYear name).
+		  (#forOver -> (groupedByDate keys size printString
+		    , aDateWeekMonthOrYear printString)).
+		  (#average -> average).
+		  (#details -> groupedByDate).
+		  (#userMergeRequests -> userMergeRequests size) } asDictionary
+	
+	
+]
+
 { #category : #'metrics - commits' }
 GitMetric4User >> averageTimeBetweenCommitSince: since until: until overA: aDateWeekMonthOrYear [
 
