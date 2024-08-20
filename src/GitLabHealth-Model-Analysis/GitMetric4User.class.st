@@ -69,6 +69,50 @@ GitMetric4User >> averageTimeBetweenCommitSince: since until: until overA: aDate
 		  (#userCommits -> commits size) } asDictionary
 ]
 
+{ #category : #'metrics - merge request' }
+GitMetric4User >> closedMergeRequestSince: since until: until overA: aDateWeekMonthOrYear [
+
+	| groupedByDate userMergeRequests dateOver average userClosedMergeRequests |
+	groupedByDate := self
+		                 setupGroupedDateFrom: since
+		                 to: until
+		                 over: aDateWeekMonthOrYear.
+
+	userMergeRequests := self
+		                     loadItsMergeRequestsSince: since
+		                     until: until.
+
+	userClosedMergeRequests := userMergeRequests select: [
+		                           :userMergeRequest |
+		                           userMergeRequest merged_at isNil and:
+			                           userMergeRequest state = 'closed' ].
+
+	userClosedMergeRequests do: [ :userMergeRequest |
+		dateOver := self
+			            transformDate: userMergeRequest created_at
+			            to: aDateWeekMonthOrYear.
+
+		groupedByDate
+			at: dateOver printString
+			ifPresent: [ :value | value add: userMergeRequest ] ].
+
+
+	groupedByDate := groupedByDate collect: [ :group | group size ].
+
+
+	average := groupedByDate
+		           ifEmpty: [ 0 ]
+		           ifNotEmpty: [ groupedByDate average ].
+
+	^ {
+		  (#overEach -> aDateWeekMonthOrYear name).
+		  (#forOver -> (groupedByDate keys size printString
+		    , aDateWeekMonthOrYear printString)).
+		  (#average -> average asFloat).
+		  (#details -> groupedByDate).
+		  (#userMergeRequests -> userMergeRequests size) } asDictionary
+]
+
 { #category : #churn }
 GitMetric4User >> codeChurnSince: since until: until onACommitWindowOf: commitLimit overA: aDateWeekMonthOrYear [
 
@@ -783,9 +827,11 @@ GitMetric4User >> numberOfMergedMergeRequestSince: since until: until overA: aDa
 	userMergeRequests := self
 		                     loadItsMergeRequestsSince: since
 		                     until: until.
+		
 	userMergedMergeRequests := userMergeRequests select: [
 		                           :userMergeRequest |
 		                           userMergeRequest merged_at isNotNil ].
+
 	userMergedMergeRequests do: [ :userMergeRequest |
 		dateOver := self
 			            transformDate: userMergeRequest created_at
@@ -794,6 +840,7 @@ GitMetric4User >> numberOfMergedMergeRequestSince: since until: until overA: aDa
 			at: dateOver printString
 			ifPresent: [ :value | value add: userMergeRequest ] ].
 	groupedByDate := groupedByDate collect: [ :group | group size ].
+
 	average := groupedByDate
 		           ifEmpty: [ 0 ]
 		           ifNotEmpty: [ groupedByDate average ].
