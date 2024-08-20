@@ -615,7 +615,7 @@ GitMetric4User >> foundSuccessorOf: userCommits andCompleteImportForMax: commitL
 { #category : #analysis }
 GitMetric4User >> generateAnalysisForPeriod: period over: aDateWeekMonthOrYear withMaxCommitWindows: maxCommitWindow [
 
-	| contribution commitFrequency commentContribution mergeRequestDuration codeChurn delayUntilFirstChurn averageTimeBetweenCommits numberOfProjectWithCommit until since numberOfOpenMergeRequest numberOfMergedMergeRequest |
+	| contribution commitFrequency commentContribution mergeRequestDuration codeChurn delayUntilFirstChurn averageTimeBetweenCommits numberOfProjectWithCommit until since numberOfOpenMergeRequest numberOfMergedMergeRequest closedMergeRequests |
 	since := period at: #since.
 	until := period at: #until.
 
@@ -673,6 +673,11 @@ GitMetric4User >> generateAnalysisForPeriod: period over: aDateWeekMonthOrYear w
 		                              until: until
 		                              overA: aDateWeekMonthOrYear.
 
+	closedMergeRequests := self
+		                       closedMergeRequestSince: since
+		                       until: until
+		                       overA: aDateWeekMonthOrYear.
+
 	^ AnalysisReport new
 		  username: self user name;
 		  period: period;
@@ -691,7 +696,8 @@ GitMetric4User >> generateAnalysisForPeriod: period over: aDateWeekMonthOrYear w
 		  averageNumberOfOpenMergeRequest:
 			  (numberOfOpenMergeRequest at: #average);
 		  averageNumberOfMergedMergeRequest:
-			  (numberOfMergedMergeRequest at: #average)
+			  (numberOfMergedMergeRequest at: #average);
+		  averageClosedMergeRequests: (closedMergeRequests at: #average)
 ]
 
 { #category : #initialization }

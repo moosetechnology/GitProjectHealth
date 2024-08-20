@@ -15,7 +15,8 @@ Class {
 		'numberOfProjectWithCommit',
 		'averageTimeBetweenCommits',
 		'averageNumberOfOpenMergeRequest',
-		'averageNumberOfMergedMergeRequest'
+		'averageNumberOfMergedMergeRequest',
+		'averageClosedMergeRequests'
 	],
 	#category : #'GitLabHealth-Model-Analysis'
 }
@@ -23,6 +24,18 @@ Class {
 { #category : #testing }
 AnalysisReport class >> isVoyageRoot [
 	^true
+]
+
+{ #category : #accessing }
+AnalysisReport >> averageClosedMergeRequests [
+
+	^ averageClosedMergeRequests
+]
+
+{ #category : #accessing }
+AnalysisReport >> averageClosedMergeRequests: anObject [
+
+	averageClosedMergeRequests := anObject
 ]
 
 { #category : #accessing }
