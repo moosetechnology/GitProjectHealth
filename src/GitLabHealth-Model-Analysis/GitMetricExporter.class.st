@@ -211,11 +211,19 @@ GitMetricExporter >> exportInCSV [
 	exportBrowserModel
 		addColumnForQuery: [ :analysis | analysis averageTimeBetweenCommits ]
 		withName: 'average time between commits' asSymbol.
-		
+
 	"average number of open merge request"
 	exportBrowserModel
-		addColumnForQuery: [ :analysis | analysis averageNumberOfOpenMergeRequest ]
+		addColumnForQuery: [ :analysis |
+		analysis averageNumberOfOpenMergeRequest ]
 		withName: 'average number of open merge request' asSymbol.
+		
+	
+	"average number of merged merge request"
+	exportBrowserModel
+		addColumnForQuery: [ :analysis |
+		analysis averageNumberOfMergedMergeRequest ]
+		withName: 'average number of merged merge request' asSymbol.
 
 	file := self constructFilePath: over.
 	file writeStreamDo: [ :aStream |
