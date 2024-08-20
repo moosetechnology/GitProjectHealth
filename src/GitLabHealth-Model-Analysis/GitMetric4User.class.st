@@ -8,7 +8,7 @@ Class {
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
-{ #category : #metrics }
+{ #category : #'metrics - commits' }
 GitMetric4User >> averageTimeBetweenCommitSince: since until: until overA: aDateWeekMonthOrYear [
 
 	| commits commitSortedByDate commits1 commits2 differences groupedByDate dateOver average |
@@ -155,7 +155,7 @@ GitMetric4User >> codeChurnSince: since until: until onACommitWindowOf: commitLi
 		  (#churnWindow -> commitLimit) } asDictionary
 ]
 
-{ #category : #metrics }
+{ #category : #'metrics - commits' }
 GitMetric4User >> codeContributionsSince: since until: until overA: aDateWeekMonthOrYear [
 
 	| commits contributions groupedByDate |
@@ -218,7 +218,7 @@ GitMetric4User >> codeContributionsSince: since until: until overA: aDateWeekMon
 		  (#userCommits -> commits size) } asDictionary
 ]
 
-{ #category : #metrics }
+{ #category : #'metrics - commits' }
 GitMetric4User >> commentsContributionsSince: since until: until overA: aDateWeekMonthOrYear [
 
 	| commits contributions groupedByDate |
@@ -278,7 +278,7 @@ GitMetric4User >> commentsContributionsSince: since until: until overA: aDateWee
 		  (#userCommits -> commits size) } asDictionary
 ]
 
-{ #category : #metrics }
+{ #category : #'metrics - commits' }
 GitMetric4User >> commitFrequencySince: since until: until overA: aDateWeekMonthOrYear [
 
 	| periods total groupedByDate userCommits |
@@ -318,7 +318,7 @@ GitMetric4User >> commitFrequencySince: since until: until overA: aDateWeekMonth
 		  (#details -> groupedByDate) } asOrderedDictionary
 ]
 
-{ #category : #metrics }
+{ #category : #'metrics - commits' }
 GitMetric4User >> commitsProducedOnProject: projectId since: sinceDate until: untilDate [
 
 	| frequencies |
@@ -348,7 +348,7 @@ GitMetric4User >> commitsProducedOnProject: projectId since: sinceDate until: un
 	^ frequencies 
 ]
 
-{ #category : #metrics }
+{ #category : #'metrics - commits' }
 GitMetric4User >> commitsProducedOnProject: aProjectId since: since until: until overA: aWeekOrMonthOrYear [
 	"'aWeekOrMonthOrYear' should be the class of Data, Week, Month or Year"
 
@@ -666,6 +666,29 @@ GitMetric4User >> loadCommitOfProjects: aCollection since: aTimespan [
 	^ self userCommits.
 ]
 
+{ #category : #loading }
+GitMetric4User >> loadItsMergeRequestsSince: since until: until [
+
+	| mergeRequests |
+	gitAnalyzer := GitAnalyzer new
+		               glhImporter: glhImporter;
+		               onModel: glhModel.
+
+	glhImporter withCommitDiffs: false.
+	mergeRequests := self
+		                 loadMergeRequestsFromProjectsIds: itsProjects keys
+		                 since: since
+		                 until: until.
+	glhImporter withCommitDiffs: true.
+
+	mergeRequests do: [ :mr | glhImporter importMergeResquestAuthor: mr ].
+
+	itsMergeRequests := mergeRequests select: [ :mergeRequest |
+		                    mergeRequest author = self user ].
+
+	^ itsMergeRequests
+]
+
 { #category : #metrics }
 GitMetric4User >> mergeRequestDurationSince: since until: until overA: aDateWeekMonthOrYear [
 
@@ -744,7 +767,7 @@ GitMetric4User >> mergeRequestDurationSince: since until: until overA: aDateWeek
 		  (#details -> groupedByDate) } asDictionary
 ]
 
-{ #category : #metrics }
+{ #category : #'metrics - commits' }
 GitMetric4User >> numberOfProjectWithCommitSince: since until: until overA: aDateWeekMonthOrYear [
 	| groupedByDate commits userCommits dateOver projects |
 	groupedByDate := self
