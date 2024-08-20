@@ -214,18 +214,18 @@ GitMetricExporter >> exportInCSV [
 
 	"number of open merge request"
 	exportBrowserModel
-		addColumnForQuery: [ :analysis | analysis openMergeRequest ]
+		addColumnForQuery: [ :analysis | analysis numberOfOpenMergeRequests  ]
 		withName: 'number of open merge request' asSymbol.
 
 
 	"number of merged merge request"
 	exportBrowserModel
-		addColumnForQuery: [ :analysis | analysis mergedMergeRequest ]
+		addColumnForQuery: [ :analysis | analysis numberOfMergedMergeRequest ]
 		withName: 'number of merged merge request' asSymbol.
 
 	"number of merge requests closed and not merged"
 	exportBrowserModel
-		addColumnForQuery: [ :analysis | analysis closedMergeRequests ]
+		addColumnForQuery: [ :analysis | analysis numberOfClosedMergeRequests ]
 		withName: 'number of merge requests closed and not merged' asSymbol.
 
 

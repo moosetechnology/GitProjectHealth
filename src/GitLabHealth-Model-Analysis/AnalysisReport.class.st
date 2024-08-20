@@ -14,9 +14,9 @@ Class {
 		'delayUntilFirstChurn',
 		'numberOfProjectWithCommit',
 		'averageTimeBetweenCommits',
-		'openMergeRequest',
-		'mergedMergeRequest',
-		'closedMergeRequests'
+		'numberOfOpenMergeRequests',
+		'numberOfMergedMergeRequest',
+		'numberOfClosedMergeRequests'
 	],
 	#category : #'GitLabHealth-Model-Analysis'
 }
@@ -36,18 +36,6 @@ AnalysisReport >> averageTimeBetweenCommits [
 AnalysisReport >> averageTimeBetweenCommits: anObject [
 
 	averageTimeBetweenCommits := anObject
-]
-
-{ #category : #accessing }
-AnalysisReport >> closedMergeRequests [
-
-	^ closedMergeRequests
-]
-
-{ #category : #accessing }
-AnalysisReport >> closedMergeRequests: anObject [
-
-	closedMergeRequests := anObject
 ]
 
 { #category : #accessing }
@@ -135,15 +123,39 @@ AnalysisReport >> mergeRequestDuration: anObject [
 ]
 
 { #category : #accessing }
-AnalysisReport >> mergedMergeRequest [
+AnalysisReport >> numberOfClosedMergeRequests [
 
-	^ mergedMergeRequest
+	^ numberOfClosedMergeRequests
 ]
 
 { #category : #accessing }
-AnalysisReport >> mergedMergeRequest: anObject [
+AnalysisReport >> numberOfClosedMergeRequests: anObject [
 
-	mergedMergeRequest := anObject
+	numberOfClosedMergeRequests := anObject
+]
+
+{ #category : #accessing }
+AnalysisReport >> numberOfMergedMergeRequest [
+
+	^ numberOfMergedMergeRequest
+]
+
+{ #category : #accessing }
+AnalysisReport >> numberOfMergedMergeRequest: anObject [
+
+	numberOfMergedMergeRequest := anObject
+]
+
+{ #category : #accessing }
+AnalysisReport >> numberOfOpenMergeRequests [
+
+	^ numberOfOpenMergeRequests
+]
+
+{ #category : #accessing }
+AnalysisReport >> numberOfOpenMergeRequests: anObject [
+
+	numberOfOpenMergeRequests := anObject
 ]
 
 { #category : #accessing }
@@ -156,18 +168,6 @@ AnalysisReport >> numberOfProjectWithCommit [
 AnalysisReport >> numberOfProjectWithCommit: anObject [
 
 	numberOfProjectWithCommit := anObject
-]
-
-{ #category : #accessing }
-AnalysisReport >> openMergeRequest [
-
-	^ openMergeRequest
-]
-
-{ #category : #accessing }
-AnalysisReport >> openMergeRequest: anObject [
-
-	openMergeRequest := anObject
 ]
 
 { #category : #accessing }
