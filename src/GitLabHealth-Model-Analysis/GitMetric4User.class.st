@@ -689,7 +689,7 @@ GitMetric4User >> loadItsMergeRequestsSince: since until: until [
 	^ itsMergeRequests
 ]
 
-{ #category : #metrics }
+{ #category : #'metrics - merge request' }
 GitMetric4User >> mergeRequestDurationSince: since until: until overA: aDateWeekMonthOrYear [
 
 	| mergeRequest res groupedByDate filterGroups avg |
@@ -698,16 +698,7 @@ GitMetric4User >> mergeRequestDurationSince: since until: until overA: aDateWeek
 		                 to: until
 		                 over: aDateWeekMonthOrYear.
 
-	gitAnalyzer := GitAnalyzer new
-		               glhImporter: glhImporter;
-		               onModel: glhModel.
-
-	glhImporter withCommitDiffs: false.
-	mergeRequest := self
-		                loadMergeRequestsFromProjectsIds: itsProjects keys
-		                since: since
-		                until: until.
-	glhImporter withCommitDiffs: true.
+	mergeRequest := self loadItsMergeRequestsSince: since until: until.
 
 	mergeRequest ifEmpty: [
 		^ {
@@ -751,9 +742,8 @@ GitMetric4User >> mergeRequestDurationSince: since until: until overA: aDateWeek
 
 		filterGroups at: assoc key put: sum / denominator ].
 
-
+	avg := 0.
 	filterGroups keys
-		ifEmpty: [ avg := 0 ]
 		ifNotEmpty: [
 		avg := filterGroups values sum / filterGroups keys size ].
 
