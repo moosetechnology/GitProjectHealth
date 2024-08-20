@@ -612,52 +612,59 @@ GitMetric4User >> foundSuccessorOf: userCommits andCompleteImportForMax: commitL
 { #category : #analysis }
 GitMetric4User >> generateAnalysisForPeriod: period over: aDateWeekMonthOrYear withMaxCommitWindows: maxCommitWindow [
 
-	| contribution commitFrequency commentContribution mergeRequestDuration codeChurn delayUntilFirstChurn averageTimeBetweenCommits numberOfProjectWithCommit |
+	| contribution commitFrequency commentContribution mergeRequestDuration codeChurn delayUntilFirstChurn averageTimeBetweenCommits numberOfProjectWithCommit until since averageNumberOfOpenMergeRequest |
+	since := period at: #since.
+	until := period at: #until.
+
+	"COMMITS"
 	contribution := self
-		                codeContributionsSince: (period at: #since)
-		                until: (period at: #until)
+		                codeContributionsSince: since
+		                until: until
 		                overA: aDateWeekMonthOrYear.
 
 	commitFrequency := self
-		                   commitFrequencySince: (period at: #since)
-		                   until: (period at: #until)
+		                   commitFrequencySince: since
+		                   until: until
 		                   overA: aDateWeekMonthOrYear.
 
 	commentContribution := self
-		                       commentsContributionsSince:
-		                       (period at: #since)
-		                       until: (period at: #until)
+		                       commentsContributionsSince: since
+		                       until: until
 		                       overA: aDateWeekMonthOrYear.
 
-	mergeRequestDuration := self
-		                        mergeRequestDurationSince:
-		                        (period at: #since)
-		                        until: (period at: #until)
-		                        overA: aDateWeekMonthOrYear.
-
 	codeChurn := self
-		             codeChurnSince: (period at: #since)
-		             until: (period at: #until)
+		             codeChurnSince: since
+		             until: until
 		             onACommitWindowOf: maxCommitWindow
 		             overA: aDateWeekMonthOrYear.
 
 	delayUntilFirstChurn := self
-		                        delayUntilFirstChurnSince:
-		                        (period at: #since)
-		                        until: (period at: #until)
+		                        delayUntilFirstChurnSince: since
+		                        until: until
 		                        onACommitWindowOf: maxCommitWindow
 		                        overA: aDateWeekMonthOrYear.
 
 	numberOfProjectWithCommit := self
-		                             numberOfProjectWithCommitSince:
-		                             (period at: #since)
-		                             until: (period at: #until)
+		                             numberOfProjectWithCommitSince: since
+		                             until: until
 		                             overA: aDateWeekMonthOrYear.
 	averageTimeBetweenCommits := self
-		                             averageTimeBetweenCommitSince:
-		                             (period at: #since)
-		                             until: (period at: #until)
+		                             averageTimeBetweenCommitSince: since
+		                             until: until
 		                             overA: aDateWeekMonthOrYear.
+
+	"MERGE REQUESTS"
+
+	mergeRequestDuration := self
+		                        mergeRequestDurationSince: since
+		                        until: until
+		                        overA: aDateWeekMonthOrYear.
+
+	averageNumberOfOpenMergeRequest := self
+		                                   averageNumberOfOpenMergeRequestSince:
+		                                   since
+		                                   until: until
+		                                   overA: aDateWeekMonthOrYear.
 
 	^ AnalysisReport new
 		  username: self user name;
@@ -673,7 +680,8 @@ GitMetric4User >> generateAnalysisForPeriod: period over: aDateWeekMonthOrYear w
 		  numberOfProjectWithCommit:
 			  (numberOfProjectWithCommit at: #average);
 		  averageTimeBetweenCommits:
-			  (averageTimeBetweenCommits at: #average)
+			  (averageTimeBetweenCommits at: #average);
+		  averageNumberOfOpenMergeRequest: (averageNumberOfOpenMergeRequest at: #average).
 ]
 
 { #category : #initialization }
