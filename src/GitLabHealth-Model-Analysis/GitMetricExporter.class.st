@@ -359,6 +359,30 @@ GitMetricExporter >> glhImporter: anImporter [
 	glhImporter := anImporter withInitialCommits: false; yourself. 
 ]
 
+{ #category : #adding }
+GitMetricExporter >> importAnalysesFromS3: bucketName accessKey: accessKey secretKey: secretKey region: region [
+
+	| s3 bucket xmlObjects contentElements filesContent |
+	AWSS3Config default
+		accessKeyId: accessKey;
+		secretKey: secretKey;
+		regionName: region.
+
+	s3 := AWSS3 new.
+	bucket := s3 bucketNamed: bucketName.
+	xmlObjects := bucket listObjects.
+	contentElements := xmlObjects root elementsSelect: [ :element |
+		                   element isNamed: 'Contents' ].
+
+	filesContent := contentElements collect: [ :contentElement |
+		                | keyValue |
+		                keyValue := contentElement contentStringAt: 'Key'.
+		                bucket getObject: keyValue ].
+
+	^ analyses := (filesContent collect: [ :file | STON fromString: file ])
+		              flattened
+]
+
 { #category : #initialization }
 GitMetricExporter >> initialize [
 
