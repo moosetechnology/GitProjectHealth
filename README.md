@@ -16,7 +16,7 @@ In the Moose image, in a playground (`Ctrl+O`, `Ctrl+W`), perform:
 Metacello new
   repository: 'github://moosetechnology/GitProjectHealth:main/src';
   baseline: 'GitLabHealth';
-  onConflict: [ :ex | ex useIncoming ];
+  onConflict: [ :ex | ex useLoaded ];
   onUpgrade: [ :ex | ex useIncoming ];
   onDowngrade: [ :ex | ex useLoaded ];
   load
