@@ -12,18 +12,24 @@ Class {
 GLHUserCatalogue class >> loadFromJson: aString [
 
 	| catalogue dic |
-	catalogue := GLHUserCatalogue new.
+	catalogue := self new.
 	dic := (STONJSON fromString: aString) asDictionary.
 	dic associationsDo: [ :assoc |
-		| itsName itsUsername itsCommitNames itsId|
+		| itsName itsUsername itsCommitNames itsId |
 		itsName := assoc key.
 		itsCommitNames := assoc value at: #foundNames.
-		itsUsername :=  assoc value at: #username.
+		itsUsername := assoc value at: #username.
 		itsId := assoc value at: #id.
-		
-		catalogue addUser: (GLHUser new id: itsId; username: itsUsername; name: itsName; yourself ) withNames: itsCommitNames ].
-	
-	^ catalogue . 
+
+		catalogue
+			addUser: (GLHUser new
+					 id: itsId;
+					 username: itsUsername;
+					 name: itsName;
+					 yourself)
+			withNames: itsCommitNames ].
+
+	^ catalogue
 ]
 
 { #category : #'as yet unclassified' }
@@ -121,13 +127,20 @@ GLHUserCatalogue >> anImporter: aGLHModelImporter [
 	
 ]
 
+{ #category : #accessing }
+GLHUserCatalogue >> atWithId: anId [ 
+	|res |
+	res := self associations detect: [ :assoc | assoc key id = anId ] ifNone: [ nil ].
+	^ res ifNotNil: [ res value ].
+]
+
 { #category : #'as yet unclassified' }
 GLHUserCatalogue >> collectUsernames [
 
 	| username2User |
 	self ifEmpty: [ ^ {  } ].
 
-	username2User := Dictionary new.
+	username2User := OrderedDictionary new.
 
 	self associationsDo: [ :assoc |
 		| user |
@@ -190,7 +203,15 @@ GLHUserCatalogue >> initialize [
 ]
 
 { #category : #'as yet unclassified' }
-GLHUserCatalogue >> loadAllUsers [
+GLHUserCatalogue >> namesAt: aGLHUser [
+
+	| assoc |
+	assoc := self associationAt: aGLHUser.
+	^ assoc value
+]
+
+{ #category : #'as yet unclassified' }
+GLHUserCatalogue >> reImportAllUsers [
 	"use it after a catalogue import from JSON"
 
 	self associationsDo: [ :assoc |
@@ -220,6 +241,14 @@ GLHUserCatalogue >> scrapeAuthorNameForUser: aGLHUser [
 	assoc value addAll: (GLHUserCatalogue
 			 scrapeWithImporter: anImporter
 				 contributedProjectsForCommitAuthorsRelatedToUser: aGLHUser)
+]
+
+{ #category : #scrape }
+GLHUserCatalogue >> scrapeAuthorNamesForUsers: aUserCollection [ 
+	
+	aUserCollection do: [ :aGLHUser |
+		self scrapeAuthorNameForUser: aGLHUser
+		 ].
 ]
 
 { #category : #completion }
