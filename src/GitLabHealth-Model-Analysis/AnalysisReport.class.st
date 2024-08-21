@@ -16,7 +16,8 @@ Class {
 		'averageTimeBetweenCommits',
 		'numberOfOpenMergeRequests',
 		'numberOfMergedMergeRequest',
-		'numberOfClosedMergeRequests'
+		'numberOfClosedMergeRequests',
+		'numberOfMergeRequestsWithoutReview'
 	],
 	#category : #'GitLabHealth-Model-Analysis'
 }
@@ -132,6 +133,18 @@ AnalysisReport >> numberOfClosedMergeRequests [
 AnalysisReport >> numberOfClosedMergeRequests: anObject [
 
 	numberOfClosedMergeRequests := anObject
+]
+
+{ #category : #accessing }
+AnalysisReport >> numberOfMergeRequestsWithoutReview [
+
+	^ numberOfMergeRequestsWithoutReview
+]
+
+{ #category : #accessing }
+AnalysisReport >> numberOfMergeRequestsWithoutReview: anObject [
+
+	numberOfMergeRequestsWithoutReview := anObject
 ]
 
 { #category : #accessing }
