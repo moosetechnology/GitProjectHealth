@@ -117,6 +117,48 @@ GitMetricExporter >> constructFilePath: runningOver [
 	^ file
 ]
 
+{ #category : #exporting }
+GitMetricExporter >> csvMetrics [
+
+	^ OrderedDictionary newFrom: {
+			  ('code addition (avg)' -> [ :analysis | analysis codeAddition ]).
+
+			  ('code deletion (avg)' -> [ :analysis | analysis codeDeletion ]).
+
+			  ('commits frequency (avg)'
+			   -> [ :analysis | analysis commitFrequency ]).
+
+			  ('comment contribution (avg)'
+			   -> [ :analysis | analysis commentContribution ]).
+
+			  ('churn % (W=' , maxCommitWindow printString , ') '
+			   -> [ :analysis | analysis codeChurn ]).
+
+			  ('delay Until First Churn (W=' , maxCommitWindow printString
+			   , ') ' -> [ :analysis | analysis delayUntilFirstChurn ]).
+
+			  ('number of project with min 1 commit of user'
+			   -> [ :analysis | analysis numberOfProjectWithCommit ]).
+
+			  ('merge Request Duration'
+			   -> [ :analysis | analysis mergeRequestDuration ]).
+
+			  ('average time between commits'
+			   -> [ :analysis | analysis averageTimeBetweenCommits ]).
+
+			  ('number of open merge request'
+			   -> [ :analysis | analysis numberOfOpenMergeRequests ]).
+
+			  ('number of merged merge request'
+			   -> [ :analysis | analysis numberOfMergedMergeRequest ]).
+
+			  ('number of merge requests closed and not merged'
+			   -> [ :analysis | analysis numberOfClosedMergeRequests ]).
+
+			  ('number of merge requests without review'
+			   -> [ :analysis | analysis numberOfMergeRequestsWithoutReview ]) }
+]
+
 { #category : #accessing }
 GitMetricExporter >> entities: aCollection [ 
 	entities := aCollection
@@ -140,104 +182,30 @@ GitMetricExporter >> exportFor: usersWithProjects over: aCollectionOfDateWeekMon
 { #category : #exporting }
 GitMetricExporter >> exportInCSV [
 
-	| exportBrowserModel file period analysesDate |
+	| exportBrowserModel file period analysesDate metrics |
 	exportBrowserModel := MiExportModel new.
-
 	self analyses ifNil: [ self generateAnalyses ].
-
+	metrics := self csvMetrics.
 	period := runningPeriods at: 1.
 	analysesDate := (period at: #since) asString.
-
 	exportBrowserModel entitiesList: self analyses.
-
 	exportBrowserModel removeColumnForQueryNamed: #Type.
 	exportBrowserModel removeColumnForQueryNamed: #Name.
-
 	exportBrowserModel
 		addColumnForQuery: [ :analysis | analysis username ]
 		withName: #'User name'.
-
-	"Code Contribution "
-	exportBrowserModel
-		addColumnForQuery: [ :analysis | analysis codeAddition ]
-		withName: 'code addition (avg)' , ' - ', analysesDate.
-
-	exportBrowserModel
-		addColumnForQuery: [ :analysis | analysis codeDeletion ]
-		withName: 'code deletion (avg)' , ' - ', analysesDate.
-
-	"Commit frequencies "
-	exportBrowserModel
-		addColumnForQuery: [ :analysis | analysis commitFrequency ]
-		withName: 'commits frequency (avg)',' - ', analysesDate.
-
-	"comment contribution "
-	exportBrowserModel
-		addColumnForQuery: [ :analysis | analysis commentContribution ]
-		withName: 'comment contribution (avg)', ' - ', analysesDate.
-
-	"code churn"
-	exportBrowserModel
-		addColumnForQuery: [ :analysis | analysis codeChurn ]
-		withName:
-		'churn % (W=' , maxCommitWindow printString , ') ' , ' - ', analysesDate.
-
-	"delay Until First Churn"
-	exportBrowserModel
-		addColumnForQuery: [ :analysis | analysis delayUntilFirstChurn ]
-		withName:
-			'delay Until First Churn (W=' , maxCommitWindow printString , ') ' , ' - ', analysesDate.
-
-	"number of project with minimum one commit of user"
-	exportBrowserModel
-		addColumnForQuery: [ :analysis | analysis numberOfProjectWithCommit ]
-		withName:
-		'number of project with min 1 commit of user' , ' - ', analysesDate.
-
-	"merge Request Duration "
-	exportBrowserModel
-		addColumnForQuery: [ :analysis | analysis mergeRequestDuration ]
-		withName: 'merge Request Duration ' , ' - ', analysesDate.
-
-	"average time between commits"
-	exportBrowserModel
-		addColumnForQuery: [ :analysis | analysis averageTimeBetweenCommits ]
-		withName: 'average time between commits' , ' - ', analysesDate.
-
-	"number of open merge request"
-	exportBrowserModel
-		addColumnForQuery: [ :analysis | analysis numberOfOpenMergeRequests ]
-		withName: 'number of open merge request' , ' - ', analysesDate.
-
-
-	"number of merged merge request"
-	exportBrowserModel
-		addColumnForQuery: [ :analysis |
-		analysis numberOfMergedMergeRequest ]
-		withName: 'number of merged merge request' , ' - ', analysesDate.
-
-	"number of merge requests closed and not merged"
-	exportBrowserModel
-		addColumnForQuery: [ :analysis |
-		analysis numberOfClosedMergeRequests ]
-		withName:
-		'number of merge requests closed and not merged' , ' - ', analysesDate.
-
-
-	"number of merge requests withour review"
-	exportBrowserModel
-		addColumnForQuery: [ :analysis |
-		analysis numberOfMergeRequestsWithoutReview ]
-		withName: 'number of merge requests without review' , ' - ', analysesDate.
-
-
+	metrics associations do: [ :association |
+		exportBrowserModel
+			addColumnForQuery: association value
+			withName: (' - ' join: {
+						 association key.
+						 analysesDate }) ].
 	file := self constructFilePath: over.
 	file writeStreamDo: [ :aStream |
 		aStream
 			<< 'sep=,';
 			<< OSPlatform current lineEnding.
 		exportBrowserModel writeCSVOn: aStream ].
-
 	'Done computing' recordInfo
 ]
 
