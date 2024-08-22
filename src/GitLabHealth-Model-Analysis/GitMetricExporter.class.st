@@ -191,11 +191,10 @@ GitMetricExporter >> exportInCSV [
 	runningPeriods do: [ :period |
 		| periodAnalyses analysesDate |
 		periodAnalyses := self analyses select: [ :analysis |
-			                  (analysis period at: #since) = period
-				                  at: #since
+			                  ((analysis period at: #since) = (period at: #since))
 				                  and:
-				                  (analysis period at: #until)
-				                  = (period at: #until) ].
+				                  ((analysis period at: #until)
+				                  = (period at: #until)) ].
 		analysesDate := (period at: #since) asString.
 
 		exportBrowserModel entitiesList: periodAnalyses.
