@@ -159,6 +159,87 @@ GitMetricExporter >> csvMetrics [
 			   -> [ :analysis | analysis numberOfMergeRequestsWithoutReview ]) }
 ]
 
+{ #category : #exporting }
+GitMetricExporter >> csvMetricsFor: date [
+
+	^ OrderedDictionary newFrom: {
+			  ('code addition (avg) - ' , date asString -> [ :groupAnalyses |
+			   | analysis |
+			   analysis := self getAnalysisWithDate: date from: groupAnalyses.
+			   analysis ifNil: [ nil ] ifNotNil: [ analysis codeAddition ] ]).
+
+			  ('code deletion (avg) - ' , date asString -> [ :groupAnalyses |
+			   | analysis |
+			   analysis := self getAnalysisWithDate: date from: groupAnalyses.
+			   analysis ifNil: [ nil ] ifNotNil: [ analysis codeDeletion ] ]).
+
+			  ('commits frequency (avg) - ' , date asString
+			   -> [ :groupAnalyses |
+			   | analysis |
+			   analysis := self getAnalysisWithDate: date from: groupAnalyses.
+			   analysis ifNil: [ nil ] ifNotNil: [ analysis commitFrequency ] ]).
+
+			  ('comment contribution (avg) - ' , date asString
+			   -> [ :groupAnalyses |
+			   | analysis |
+			   analysis := self getAnalysisWithDate: date from: groupAnalyses.
+			   analysis ifNil: [ nil ] ifNotNil: [ analysis commentContribution ] ]).
+
+			  ('churn % (W=' , maxCommitWindow printString , ')  - '
+			   , date asString -> [ :groupAnalyses |
+			   | analysis |
+			   analysis := self getAnalysisWithDate: date from: groupAnalyses.
+			   analysis ifNil: [ nil ] ifNotNil: [ analysis codeChurn ] ]).
+
+			  ('delay Until First Churn (W=' , maxCommitWindow printString
+			   , ')  - ' , date asString -> [ :groupAnalyses |
+			   | analysis |
+			   analysis := self getAnalysisWithDate: date from: groupAnalyses.
+			   analysis ifNil: [ nil ] ifNotNil: [ analysis delayUntilFirstChurn ] ]).
+
+			  ('number of project with min 1 commit of user - ' , date asString
+			   -> [ :groupAnalyses |
+				   (groupAnalyses
+					    detect: [ :analysis | (analysis period at: #since) = date ]
+					    ifNone: [ '' ]) numberOfProjectWithCommit ]).
+
+			  ('merge Request Duration - ' , date asString
+			   -> [ :groupAnalyses |
+			   | analysis |
+			   analysis := self getAnalysisWithDate: date from: groupAnalyses.
+			   analysis ifNil: [ nil ] ifNotNil: [ analysis mergeRequestDuration ] ]).
+
+			  ('average time between commits - ' , date asString
+			   -> [ :groupAnalyses |
+				   (groupAnalyses
+					    detect: [ :analysis | (analysis period at: #since) = date ]
+					    ifNone: [ '' ]) averageTimeBetweenCommits ]).
+
+			  ('number of open merge request - ' , date asString
+			   -> [ :groupAnalyses |
+			   | analysis |
+			   analysis := self getAnalysisWithDate: date from: groupAnalyses.
+			   analysis ifNil: [ nil ] ifNotNil: [ analysis numberOfOpenMergeRequests ] ]).
+
+			  ('number of merged merge request - ' , date asString
+			   -> [ :groupAnalyses |
+			   | analysis |
+			   analysis := self getAnalysisWithDate: date from: groupAnalyses.
+			   analysis ifNil: [ nil ] ifNotNil: [ analysis numberOfMergedMergeRequest ] ]).
+
+			  ('number of merge requests closed and not merged - '
+			   , date asString -> [ :groupAnalyses |
+			   | analysis |
+			   analysis := self getAnalysisWithDate: date from: groupAnalyses.
+			   analysis ifNil: [ nil ] ifNotNil: [ analysis numberOfClosedMergeRequests ] ]).
+
+			  ('number of merge requests without review - ' , date asString
+			   -> [ :groupAnalyses |
+			   | analysis |
+			   analysis := self getAnalysisWithDate: date from: groupAnalyses.
+			   analysis ifNil: [ nil ] ifNotNil: [ analysis numberOfMergeRequestsWithoutReview ] ]) }
+]
+
 { #category : #accessing }
 GitMetricExporter >> entities: aCollection [ 
 	entities := aCollection
@@ -182,40 +263,41 @@ GitMetricExporter >> exportFor: usersWithProjects over: aCollectionOfDateWeekMon
 { #category : #exporting }
 GitMetricExporter >> exportInCSV [
 
-	| exportBrowserModel file metrics |
+	| exportBrowserModel file metrics groupedByOver groupByName periods group groupOver |
 	exportBrowserModel := MiExportModel new.
 
 	self analyses ifNil: [ self generateAnalyses ].
 	metrics := self csvMetrics.
 
-	runningPeriods do: [ :period |
-		| periodAnalyses analysesDate |
-		periodAnalyses := self analyses select: [ :analysis |
-			                  ((analysis period at: #since) = (period at: #since))
-				                  and:
-				                  ((analysis period at: #until)
-				                  = (period at: #until)) ].
-		analysesDate := (period at: #since) asString.
+	groupedByOver := self analyses groupedBy: #over.
 
-		exportBrowserModel entitiesList: periodAnalyses.
+	groupedByOver associations do: [ :groupAssociation |
+		group := groupAssociation value.
+		groupOver := groupAssociation key.
+		groupByName := group groupedBy: #username.
+
+		exportBrowserModel entitiesList: groupByName.
 
 		exportBrowserModel removeColumnForQueryNamed: #Type.
 		exportBrowserModel removeColumnForQueryNamed: #Name.
 
 		exportBrowserModel
-			addColumnForQuery: [ :analysis | analysis username ]
+			addColumnForQuery: [ :groupAnalyses |
+			(groupAnalyses at: 1) username ]
 			withName: #'User name'.
 
+		periods := (group groupedBy: #period) keys.
 
-		metrics associations do: [ :association |
-			exportBrowserModel
-				addColumnForQuery: association value
-				withName: (' - ' join: {
-							 association key.
-							 analysesDate }) ].
+		periods do: [ :period |
+			metrics := self csvMetricsFor: (period at: #since).
 
 
-		file := self constructFilePath: over.
+			metrics associations do: [ :association |
+				exportBrowserModel
+					addColumnForQuery: association value
+					withName: association key ] ].
+
+		file := self constructFilePath: groupOver.
 		file writeStreamDo: [ :aStream |
 			aStream
 				<< 'sep=,';
@@ -328,6 +410,14 @@ GitMetricExporter >> generateAnalysesOver: aDateWeekMonthOrYear [
 	self analyses: newAnalyses.
 
 	^ newAnalyses
+]
+
+{ #category : #utilities }
+GitMetricExporter >> getAnalysisWithDate: date from: analysisCollection [
+
+	^analysisCollection
+		detect: [ :groupAnalysis | (groupAnalysis period at: #since) = date ]
+		ifNone: [ nil ]
 ]
 
 { #category : #accessing }
