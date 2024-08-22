@@ -182,30 +182,47 @@ GitMetricExporter >> exportFor: usersWithProjects over: aCollectionOfDateWeekMon
 { #category : #exporting }
 GitMetricExporter >> exportInCSV [
 
-	| exportBrowserModel file period analysesDate metrics |
+	| exportBrowserModel file metrics |
 	exportBrowserModel := MiExportModel new.
+
 	self analyses ifNil: [ self generateAnalyses ].
 	metrics := self csvMetrics.
-	period := runningPeriods at: 1.
-	analysesDate := (period at: #since) asString.
-	exportBrowserModel entitiesList: self analyses.
-	exportBrowserModel removeColumnForQueryNamed: #Type.
-	exportBrowserModel removeColumnForQueryNamed: #Name.
-	exportBrowserModel
-		addColumnForQuery: [ :analysis | analysis username ]
-		withName: #'User name'.
-	metrics associations do: [ :association |
+
+	runningPeriods do: [ :period |
+		| periodAnalyses analysesDate |
+		periodAnalyses := self analyses select: [ :analysis |
+			                  (analysis period at: #since) = period
+				                  at: #since
+				                  and:
+				                  (analysis period at: #until)
+				                  = (period at: #until) ].
+		analysesDate := (period at: #since) asString.
+
+		exportBrowserModel entitiesList: periodAnalyses.
+
+		exportBrowserModel removeColumnForQueryNamed: #Type.
+		exportBrowserModel removeColumnForQueryNamed: #Name.
+
 		exportBrowserModel
-			addColumnForQuery: association value
-			withName: (' - ' join: {
-						 association key.
-						 analysesDate }) ].
-	file := self constructFilePath: over.
-	file writeStreamDo: [ :aStream |
-		aStream
-			<< 'sep=,';
-			<< OSPlatform current lineEnding.
-		exportBrowserModel writeCSVOn: aStream ].
+			addColumnForQuery: [ :analysis | analysis username ]
+			withName: #'User name'.
+
+
+		metrics associations do: [ :association |
+			exportBrowserModel
+				addColumnForQuery: association value
+				withName: (' - ' join: {
+							 association key.
+							 analysesDate }) ].
+
+
+		file := self constructFilePath: over.
+		file writeStreamDo: [ :aStream |
+			aStream
+				<< 'sep=,';
+				<< OSPlatform current lineEnding.
+			exportBrowserModel writeCSVOn: aStream ] ].
+
 	'Done computing' recordInfo
 ]
 
