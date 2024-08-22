@@ -117,6 +117,87 @@ GitMetricExporter >> constructFilePath: runningOver [
 	^ file
 ]
 
+{ #category : #exporting }
+GitMetricExporter >> csvMetricsFor: date [
+
+	^ OrderedDictionary newFrom: {
+			  ('code addition (avg) - ' , date asString -> [ :groupAnalyses |
+			   | analysis |
+			   analysis := self getAnalysisWithDate: date from: groupAnalyses.
+			   analysis ifNil: [ nil ] ifNotNil: [ analysis codeAddition ] ]).
+
+			  ('code deletion (avg) - ' , date asString -> [ :groupAnalyses |
+			   | analysis |
+			   analysis := self getAnalysisWithDate: date from: groupAnalyses.
+			   analysis ifNil: [ nil ] ifNotNil: [ analysis codeDeletion ] ]).
+
+			  ('commits frequency (avg) - ' , date asString
+			   -> [ :groupAnalyses |
+			   | analysis |
+			   analysis := self getAnalysisWithDate: date from: groupAnalyses.
+			   analysis ifNil: [ nil ] ifNotNil: [ analysis commitFrequency ] ]).
+
+			  ('comment contribution (avg) - ' , date asString
+			   -> [ :groupAnalyses |
+			   | analysis |
+			   analysis := self getAnalysisWithDate: date from: groupAnalyses.
+			   analysis ifNil: [ nil ] ifNotNil: [ analysis commentContribution ] ]).
+
+			  ('churn % (W=' , maxCommitWindow printString , ')  - '
+			   , date asString -> [ :groupAnalyses |
+			   | analysis |
+			   analysis := self getAnalysisWithDate: date from: groupAnalyses.
+			   analysis ifNil: [ nil ] ifNotNil: [ analysis codeChurn ] ]).
+
+			  ('delay Until First Churn (W=' , maxCommitWindow printString
+			   , ')  - ' , date asString -> [ :groupAnalyses |
+			   | analysis |
+			   analysis := self getAnalysisWithDate: date from: groupAnalyses.
+			   analysis ifNil: [ nil ] ifNotNil: [ analysis delayUntilFirstChurn ] ]).
+
+			  ('number of project with min 1 commit of user - ' , date asString
+			   -> [ :groupAnalyses |
+				   (groupAnalyses
+					    detect: [ :analysis | (analysis period at: #since) = date ]
+					    ifNone: [ '' ]) numberOfProjectWithCommit ]).
+
+			  ('merge Request Duration - ' , date asString
+			   -> [ :groupAnalyses |
+			   | analysis |
+			   analysis := self getAnalysisWithDate: date from: groupAnalyses.
+			   analysis ifNil: [ nil ] ifNotNil: [ analysis mergeRequestDuration ] ]).
+
+			  ('average time between commits - ' , date asString
+			   -> [ :groupAnalyses |
+				   (groupAnalyses
+					    detect: [ :analysis | (analysis period at: #since) = date ]
+					    ifNone: [ '' ]) averageTimeBetweenCommits ]).
+
+			  ('number of open merge request - ' , date asString
+			   -> [ :groupAnalyses |
+			   | analysis |
+			   analysis := self getAnalysisWithDate: date from: groupAnalyses.
+			   analysis ifNil: [ nil ] ifNotNil: [ analysis numberOfOpenMergeRequests ] ]).
+
+			  ('number of merged merge request - ' , date asString
+			   -> [ :groupAnalyses |
+			   | analysis |
+			   analysis := self getAnalysisWithDate: date from: groupAnalyses.
+			   analysis ifNil: [ nil ] ifNotNil: [ analysis numberOfMergedMergeRequest ] ]).
+
+			  ('number of merge requests closed and not merged - '
+			   , date asString -> [ :groupAnalyses |
+			   | analysis |
+			   analysis := self getAnalysisWithDate: date from: groupAnalyses.
+			   analysis ifNil: [ nil ] ifNotNil: [ analysis numberOfClosedMergeRequests ] ]).
+
+			  ('number of merge requests without review - ' , date asString
+			   -> [ :groupAnalyses |
+			   | analysis |
+			   analysis := self getAnalysisWithDate: date from: groupAnalyses.
+			   analysis ifNil: [ nil ] ifNotNil: [ analysis numberOfMergeRequestsWithoutReview ] ]) }
+]
+
 { #category : #accessing }
 GitMetricExporter >> entities: aCollection [ 
 	entities := aCollection
@@ -140,110 +221,45 @@ GitMetricExporter >> exportFor: usersWithProjects over: aCollectionOfDateWeekMon
 { #category : #exporting }
 GitMetricExporter >> exportInCSV [
 
-	| exportBrowserModel file |
+	| exportBrowserModel file metrics groupedByOver groupByName periods group groupOver |
 	exportBrowserModel := MiExportModel new.
 
 	self analyses ifNil: [ self generateAnalyses ].
-	exportBrowserModel entitiesList: self analyses.
+	groupedByOver := self analyses groupedBy: #over.
 
-	exportBrowserModel removeColumnForQueryNamed: #Type.
-	exportBrowserModel removeColumnForQueryNamed: #Name.
+	groupedByOver associations do: [ :groupAssociation |
+		group := groupAssociation value.
+		groupOver := groupAssociation key.
+		
+		
+		groupByName := group groupedBy: #username.
+		exportBrowserModel entitiesList: groupByName.
 
-	exportBrowserModel
-		addColumnForQuery: [ :analysis | analysis username ]
-		withName: #'User name'.
+		exportBrowserModel removeColumnForQueryNamed: #Type.
+		exportBrowserModel removeColumnForQueryNamed: #Name.
 
-	exportBrowserModel
-		addColumnForQuery: [ :analysis | analysis period at: #since ]
-		withName: #Since.
+		exportBrowserModel
+			addColumnForQuery: [ :groupAnalyses |
+			(groupAnalyses at: 1) username ]
+			withName: #'User name'.
 
-	exportBrowserModel
-		addColumnForQuery: [ :analysis | analysis period at: #until ]
-		withName: #Until.
+		periods := (group groupedBy: #period) keys.
 
-	exportBrowserModel
-		addColumnForQuery: [ :analysis | analysis over ]
-		withName: #Over.
-
-	"Code Contribution "
-	exportBrowserModel
-		addColumnForQuery: [ :analysis | analysis codeAddition ]
-		withName: 'code addition (avg)' asSymbol.
-
-	exportBrowserModel
-		addColumnForQuery: [ :analysis | analysis codeDeletion ]
-		withName: 'code deletion (avg)' asSymbol.
-
-	"Commit frequencies "
-	exportBrowserModel
-		addColumnForQuery: [ :analysis | analysis commitFrequency ]
-		withName: 'commits frequency (avg) ' asSymbol.
-
-	"comment contribution "
-	exportBrowserModel
-		addColumnForQuery: [ :analysis | analysis commentContribution ]
-		withName: 'comment contribution (avg)' asSymbol.
-
-	"code churn"
-	exportBrowserModel
-		addColumnForQuery: [ :analysis | analysis codeChurn ]
-		withName:
-		'churn % (W=' , maxCommitWindow printString , ') ' asSymbol.
-
-	"delay Until First Churn"
-	exportBrowserModel
-		addColumnForQuery: [ :analysis | analysis delayUntilFirstChurn ]
-		withName:
-			'delay Until First Churn (W=' , maxCommitWindow printString
-			, ') ' asSymbol.
-
-	"number of project with minimum one commit of user"
-	exportBrowserModel
-		addColumnForQuery: [ :analysis | analysis numberOfProjectWithCommit ]
-		withName: 'number of project with min 1 commit of user' asSymbol.
-
-	"merge Request Duration "
-	exportBrowserModel
-		addColumnForQuery: [ :analysis | analysis mergeRequestDuration ]
-		withName: 'merge Request Duration ' asSymbol.
-
-	"average time between commits"
-	exportBrowserModel
-		addColumnForQuery: [ :analysis | analysis averageTimeBetweenCommits ]
-		withName: 'average time between commits' asSymbol.
-
-	"number of open merge request"
-	exportBrowserModel
-		addColumnForQuery: [ :analysis | analysis numberOfOpenMergeRequests ]
-		withName: 'number of open merge request' asSymbol.
+		periods do: [ :period |
+			metrics := self csvMetricsFor: (period at: #since).
 
 
-	"number of merged merge request"
-	exportBrowserModel
-		addColumnForQuery: [ :analysis |
-		analysis numberOfMergedMergeRequest ]
-		withName: 'number of merged merge request' asSymbol.
+			metrics associations do: [ :association |
+				exportBrowserModel
+					addColumnForQuery: association value
+					withName: association key ] ].
 
-	"number of merge requests closed and not merged"
-	exportBrowserModel
-		addColumnForQuery: [ :analysis |
-		analysis numberOfClosedMergeRequests ]
-		withName: 'number of merge requests closed and not merged' asSymbol.
-
-
-	"number of merge requests withour review"
-	exportBrowserModel
-		addColumnForQuery: [ :analysis |
-		analysis numberOfMergeRequestsWithoutReview ]
-		withName: 'number of merge requests without review' asSymbol.
-
-
-	file := self constructFilePath: over.
-	file writeStreamDo: [ :aStream |
-		aStream
-			<< 'sep=,';
-			<< OSPlatform current lineEnding.
-		exportBrowserModel writeCSVOn: aStream ].
+		file := self constructFilePath: groupOver.
+		file writeStreamDo: [ :aStream |
+			aStream
+				<< 'sep=,';
+				<< OSPlatform current lineEnding.
+			exportBrowserModel writeCSVOn: aStream ] ].
 
 	'Done computing' recordInfo
 ]
@@ -351,6 +367,14 @@ GitMetricExporter >> generateAnalysesOver: aDateWeekMonthOrYear [
 	self analyses: newAnalyses.
 
 	^ newAnalyses
+]
+
+{ #category : #utilities }
+GitMetricExporter >> getAnalysisWithDate: date from: analysisCollection [
+
+	^analysisCollection
+		detect: [ :groupAnalysis | (groupAnalysis period at: #since) = date ]
+		ifNone: [ nil ]
 ]
 
 { #category : #accessing }
