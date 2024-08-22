@@ -140,10 +140,14 @@ GitMetricExporter >> exportFor: usersWithProjects over: aCollectionOfDateWeekMon
 { #category : #exporting }
 GitMetricExporter >> exportInCSV [
 
-	| exportBrowserModel file |
+	| exportBrowserModel file period analysesDate |
 	exportBrowserModel := MiExportModel new.
 
 	self analyses ifNil: [ self generateAnalyses ].
+
+	period := runningPeriods at: 1.
+	analysesDate := (period at: #since) asString.
+
 	exportBrowserModel entitiesList: self analyses.
 
 	exportBrowserModel removeColumnForQueryNamed: #Type.
@@ -153,89 +157,78 @@ GitMetricExporter >> exportInCSV [
 		addColumnForQuery: [ :analysis | analysis username ]
 		withName: #'User name'.
 
-	exportBrowserModel
-		addColumnForQuery: [ :analysis | analysis period at: #since ]
-		withName: #Since.
-
-	exportBrowserModel
-		addColumnForQuery: [ :analysis | analysis period at: #until ]
-		withName: #Until.
-
-	exportBrowserModel
-		addColumnForQuery: [ :analysis | analysis over ]
-		withName: #Over.
-
 	"Code Contribution "
 	exportBrowserModel
 		addColumnForQuery: [ :analysis | analysis codeAddition ]
-		withName: 'code addition (avg)' asSymbol.
+		withName: 'code addition (avg)' , ' - ', analysesDate.
 
 	exportBrowserModel
 		addColumnForQuery: [ :analysis | analysis codeDeletion ]
-		withName: 'code deletion (avg)' asSymbol.
+		withName: 'code deletion (avg)' , ' - ', analysesDate.
 
 	"Commit frequencies "
 	exportBrowserModel
 		addColumnForQuery: [ :analysis | analysis commitFrequency ]
-		withName: 'commits frequency (avg) ' asSymbol.
+		withName: 'commits frequency (avg)',' - ', analysesDate.
 
 	"comment contribution "
 	exportBrowserModel
 		addColumnForQuery: [ :analysis | analysis commentContribution ]
-		withName: 'comment contribution (avg)' asSymbol.
+		withName: 'comment contribution (avg)', ' - ', analysesDate.
 
 	"code churn"
 	exportBrowserModel
 		addColumnForQuery: [ :analysis | analysis codeChurn ]
 		withName:
-		'churn % (W=' , maxCommitWindow printString , ') ' asSymbol.
+		'churn % (W=' , maxCommitWindow printString , ') ' , ' - ', analysesDate.
 
 	"delay Until First Churn"
 	exportBrowserModel
 		addColumnForQuery: [ :analysis | analysis delayUntilFirstChurn ]
 		withName:
-			'delay Until First Churn (W=' , maxCommitWindow printString
-			, ') ' asSymbol.
+			'delay Until First Churn (W=' , maxCommitWindow printString , ') ' , ' - ', analysesDate.
 
 	"number of project with minimum one commit of user"
 	exportBrowserModel
 		addColumnForQuery: [ :analysis | analysis numberOfProjectWithCommit ]
-		withName: 'number of project with min 1 commit of user' asSymbol.
+		withName:
+		'number of project with min 1 commit of user' , ' - ', analysesDate.
 
 	"merge Request Duration "
 	exportBrowserModel
 		addColumnForQuery: [ :analysis | analysis mergeRequestDuration ]
-		withName: 'merge Request Duration ' asSymbol.
+		withName: 'merge Request Duration ' , ' - ', analysesDate.
 
 	"average time between commits"
 	exportBrowserModel
 		addColumnForQuery: [ :analysis | analysis averageTimeBetweenCommits ]
-		withName: 'average time between commits' asSymbol.
+		withName: 'average time between commits' , ' - ', analysesDate.
 
 	"number of open merge request"
 	exportBrowserModel
 		addColumnForQuery: [ :analysis | analysis numberOfOpenMergeRequests ]
-		withName: 'number of open merge request' asSymbol.
+		withName: 'number of open merge request' , ' - ', analysesDate.
 
 
 	"number of merged merge request"
 	exportBrowserModel
 		addColumnForQuery: [ :analysis |
 		analysis numberOfMergedMergeRequest ]
-		withName: 'number of merged merge request' asSymbol.
+		withName: 'number of merged merge request' , ' - ', analysesDate.
 
 	"number of merge requests closed and not merged"
 	exportBrowserModel
 		addColumnForQuery: [ :analysis |
 		analysis numberOfClosedMergeRequests ]
-		withName: 'number of merge requests closed and not merged' asSymbol.
+		withName:
+		'number of merge requests closed and not merged' , ' - ', analysesDate.
 
 
 	"number of merge requests withour review"
 	exportBrowserModel
 		addColumnForQuery: [ :analysis |
 		analysis numberOfMergeRequestsWithoutReview ]
-		withName: 'number of merge requests without review' asSymbol.
+		withName: 'number of merge requests without review' , ' - ', analysesDate.
 
 
 	file := self constructFilePath: over.
