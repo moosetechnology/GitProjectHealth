@@ -118,48 +118,6 @@ GitMetricExporter >> constructFilePath: runningOver [
 ]
 
 { #category : #exporting }
-GitMetricExporter >> csvMetrics [
-
-	^ OrderedDictionary newFrom: {
-			  ('code addition (avg)' -> [ :analysis | analysis codeAddition ]).
-
-			  ('code deletion (avg)' -> [ :analysis | analysis codeDeletion ]).
-
-			  ('commits frequency (avg)'
-			   -> [ :analysis | analysis commitFrequency ]).
-
-			  ('comment contribution (avg)'
-			   -> [ :analysis | analysis commentContribution ]).
-
-			  ('churn % (W=' , maxCommitWindow printString , ') '
-			   -> [ :analysis | analysis codeChurn ]).
-
-			  ('delay Until First Churn (W=' , maxCommitWindow printString
-			   , ') ' -> [ :analysis | analysis delayUntilFirstChurn ]).
-
-			  ('number of project with min 1 commit of user'
-			   -> [ :analysis | analysis numberOfProjectWithCommit ]).
-
-			  ('merge Request Duration'
-			   -> [ :analysis | analysis mergeRequestDuration ]).
-
-			  ('average time between commits'
-			   -> [ :analysis | analysis averageTimeBetweenCommits ]).
-
-			  ('number of open merge request'
-			   -> [ :analysis | analysis numberOfOpenMergeRequests ]).
-
-			  ('number of merged merge request'
-			   -> [ :analysis | analysis numberOfMergedMergeRequest ]).
-
-			  ('number of merge requests closed and not merged'
-			   -> [ :analysis | analysis numberOfClosedMergeRequests ]).
-
-			  ('number of merge requests without review'
-			   -> [ :analysis | analysis numberOfMergeRequestsWithoutReview ]) }
-]
-
-{ #category : #exporting }
 GitMetricExporter >> csvMetricsFor: date [
 
 	^ OrderedDictionary newFrom: {
@@ -267,15 +225,14 @@ GitMetricExporter >> exportInCSV [
 	exportBrowserModel := MiExportModel new.
 
 	self analyses ifNil: [ self generateAnalyses ].
-	metrics := self csvMetrics.
-
 	groupedByOver := self analyses groupedBy: #over.
 
 	groupedByOver associations do: [ :groupAssociation |
 		group := groupAssociation value.
 		groupOver := groupAssociation key.
+		
+		
 		groupByName := group groupedBy: #username.
-
 		exportBrowserModel entitiesList: groupByName.
 
 		exportBrowserModel removeColumnForQueryNamed: #Type.
