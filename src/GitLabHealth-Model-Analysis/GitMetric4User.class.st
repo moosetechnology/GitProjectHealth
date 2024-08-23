@@ -1033,6 +1033,47 @@ GitMetric4User >> numberOfProjectWithCommitSince: since until: until overA: aDat
 
 ]
 
+{ #category : #'metrics -jira' }
+GitMetric4User >> numberOfTicketsClosedSince: since until: until overA: aDateWeekMonthOrYear [
+
+	| groupedByDate itsMergeRequestsWithJiraIssue dateOver average mergedMergeRequestWithJiraIssue |
+	groupedByDate := self
+		                 setupGroupedDateFrom: since
+		                 to: until
+		                 over: aDateWeekMonthOrYear.
+
+	itsMergeRequestsWithJiraIssue := self
+		                                 loadItsMergeRequesWithJiraIssueSince:
+		                                 since
+		                                 until: until.
+
+	mergedMergeRequestWithJiraIssue := itsMergeRequestsWithJiraIssue
+		                                   select: [ :mr |
+		                                   mr merged_at isNotNil ].
+
+	mergedMergeRequestWithJiraIssue do: [ :userMergeRequest |
+		dateOver := self
+			            transformDate: userMergeRequest created_at
+			            to: aDateWeekMonthOrYear.
+		groupedByDate
+			at: dateOver printString
+			ifPresent: [ :value | value add: userMergeRequest ] ].
+
+	groupedByDate := groupedByDate collect: [ :group | group size ].
+
+	average := groupedByDate
+		           ifEmpty: [ 0 ]
+		           ifNotEmpty: [ groupedByDate average ].
+	^ {
+		  (#overEach -> aDateWeekMonthOrYear name).
+		  (#forOver -> (groupedByDate keys size printString
+		    , aDateWeekMonthOrYear printString)).
+		  (#average -> average asFloat).
+		  (#details -> groupedByDate).
+		  (#userMergeRequestsWithJiraIssue -> itsMergeRequestsWithJiraIssue size) }
+		  asDictionary
+]
+
 { #category : #accessing }
 GitMetric4User >> user [
 	^ user
