@@ -3,6 +3,7 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'glhImporter',
+		'jiraImporter',
 		'label',
 		'entities',
 		'projectCache',
@@ -45,11 +46,14 @@ GitMetricExporter >> addEntitiesFromUserNames: userNames [
 	"then collect the project in which the user has be seen commited"
 	entities addAll: (userNames collect: [ :username |
 			 | projects metrics i size |
-			 projects := self findParticipationOfCommitAuthorNamed: username amongProjects: projectCache.
+			 projects := self
+				             findParticipationOfCommitAuthorNamed: username
+				             amongProjects: projectCache.
 
 			 metrics := GitMetric4User new.
 			 metrics
 				 glhImporter: glhImporter;
+				jiraImporter: jiraImporter;
 				 findUserNamed: username.
 
 
@@ -77,17 +81,18 @@ GitMetricExporter >> addEntitiesFromUserNames: userNames [
 GitMetricExporter >> addEntitiesFromUserNamesAndProjects: usersWithProjects [
 
 	entities addAll: (usersWithProjects associations collect: [ :assoc |
-		            | username projects metrics |
-		            username := assoc key.
-		            projects := assoc value.
+			 | username projects metrics |
+			 username := assoc key.
+			 projects := assoc value.
 
-		            metrics := GitMetric4User new.
-		            metrics
-			            glhImporter: glhImporter;
-			            findUserNamed: username.
-		            metrics loadProjectsFromIds: projects.
+			 metrics := GitMetric4User new.
+			 metrics
+				 glhImporter: glhImporter;
+				 jiraImporter: jiraImporter;
+				 findUserNamed: username.
+			 metrics loadProjectsFromIds: projects.
 
-		            metrics ]).
+			 metrics ]).
 
 	^ self
 ]
@@ -416,6 +421,12 @@ GitMetricExporter >> initialize [
 	runningPeriods := OrderedCollection new.
 	maxCommitWindow := 3.
 	over := Date
+]
+
+{ #category : #accessing }
+GitMetricExporter >> jiraImporter: anObject [
+
+	jiraImporter := anObject
 ]
 
 { #category : #accessing }

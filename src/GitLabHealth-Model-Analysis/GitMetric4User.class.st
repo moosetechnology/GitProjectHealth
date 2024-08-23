@@ -698,6 +698,25 @@ GitMetric4User >> loadCommitOfProjects: aCollection since: aTimespan [
 ]
 
 { #category : #loading }
+GitMetric4User >> loadItsMergeRequesWithJiraIssueSince: since until: until [
+
+	itsMergeRequests := self
+		                    loadItsMergeRequestsSince: since
+		                    until: until.
+
+	jiraImporter importAllCurrentAndPastIssuesOf:
+		user commits anyOne author_email.
+
+	GPJCConnector new
+		gpModel: glhImporter glhModel;
+		jiraModel: jiraImporter model;
+		connect.
+
+	^ itsMergeRequests select: [ :mergeRequest |
+		  mergeRequest jiraIssue isNotNil ]
+]
+
+{ #category : #loading }
 GitMetric4User >> loadItsMergeRequestsSince: since until: until [
 
 	| mergeRequests |
