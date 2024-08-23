@@ -571,38 +571,31 @@ GitMetric4User >> foundSuccessorOf: userCommits andCompleteImportForMax: commitL
 { #category : #analysis }
 GitMetric4User >> generateAnalysisForPeriod: period over: aDateWeekMonthOrYear withMaxCommitWindows: maxCommitWindow [
 
-	| contribution commitFrequency commentContribution mergeRequestDuration codeChurn delayUntilFirstChurn averageTimeBetweenCommits numberOfProjectWithCommit until since numberOfOpenMergeRequests numberOfMergedMergeRequests numberOfClosedMergeRequests numberOfMergeRequestWithoutReview |
+	| contribution commitFrequency commentContribution mergeRequestDuration codeChurn delayUntilFirstChurn averageTimeBetweenCommits numberOfProjectWithCommit until since numberOfOpenMergeRequests numberOfMergedMergeRequests numberOfClosedMergeRequests numberOfMergeRequestWithoutReview numberOfTicketsClosed |
 	since := period at: #since.
 	until := period at: #until.
-
-	"COMMITS"
 	contribution := self
 		                codeContributionsSince: since
 		                until: until
 		                overA: aDateWeekMonthOrYear.
-
 	commitFrequency := self
 		                   commitFrequencySince: since
 		                   until: until
 		                   overA: aDateWeekMonthOrYear.
-
 	commentContribution := self
 		                       commentsContributionsSince: since
 		                       until: until
 		                       overA: aDateWeekMonthOrYear.
-
 	codeChurn := self
 		             codeChurnSince: since
 		             until: until
 		             onACommitWindowOf: maxCommitWindow
 		             overA: aDateWeekMonthOrYear.
-
 	delayUntilFirstChurn := self
 		                        delayUntilFirstChurnSince: since
 		                        until: until
 		                        onACommitWindowOf: maxCommitWindow
 		                        overA: aDateWeekMonthOrYear.
-
 	numberOfProjectWithCommit := self
 		                             numberOfProjectWithCommitSince: since
 		                             until: until
@@ -611,37 +604,33 @@ GitMetric4User >> generateAnalysisForPeriod: period over: aDateWeekMonthOrYear w
 		                             averageTimeBetweenCommitSince: since
 		                             until: until
 		                             overA: aDateWeekMonthOrYear.
-
-	"MERGE REQUESTS"
-
 	mergeRequestDuration := self
 		                        mergeRequestDurationSince: since
 		                        until: until
 		                        overA: aDateWeekMonthOrYear.
-
 	numberOfOpenMergeRequests := self
 		                             numberOfOpenMergeRequestsSince: since
 		                             until: until
 		                             overA: aDateWeekMonthOrYear.
-
 	numberOfMergedMergeRequests := self
 		                               numberOfMergedMergeRequestsSince:
 		                               since
 		                               until: until
 		                               overA: aDateWeekMonthOrYear.
-
 	numberOfClosedMergeRequests := self
 		                               numberOfClosedMergeRequestSince:
 		                               since
 		                               until: until
 		                               overA: aDateWeekMonthOrYear.
-
 	numberOfMergeRequestWithoutReview := self
 		                                     numberOfMergeRequestsMergedWithoutReviewSince:
 		                                     since
 		                                     until: until
 		                                     overA: aDateWeekMonthOrYear.
-
+	numberOfTicketsClosed := self
+		                         numberOfTicketsClosedSince: since
+		                         until: until
+		                         overA: aDateWeekMonthOrYear.
 	^ AnalysisReport new
 		  username: self user name;
 		  period: period;
@@ -663,7 +652,9 @@ GitMetric4User >> generateAnalysisForPeriod: period over: aDateWeekMonthOrYear w
 			  (numberOfMergedMergeRequests at: #average);
 		  numberOfClosedMergeRequests:
 			  (numberOfClosedMergeRequests at: #average);
-		  numberOfMergeRequestsWithoutReview: (numberOfMergeRequestWithoutReview at: #average).
+		  numberOfMergeRequestsWithoutReview:
+			  (numberOfMergeRequestWithoutReview at: #average);
+		  numberOfTicketsClosed: (numberOfTicketsClosed at: #average)
 ]
 
 { #category : #initialization }
