@@ -4,6 +4,7 @@ Class {
 	#instVars : [
 		'user',
 		'glhImporter',
+		'jiraImporter',
 		'itsProjects',
 		'gitAnalyzer',
 		'glhModel'
@@ -83,6 +84,12 @@ GitMetric >> findUserNamed: aUsername [
 { #category : #accessing }
 GitMetric >> glhImporter: aGLPHModelImporter [ 
 	glhImporter := aGLPHModelImporter
+]
+
+{ #category : #accessing }
+GitMetric >> jiraImporter: anObject [
+
+	jiraImporter := anObject
 ]
 
 { #category : #churn }

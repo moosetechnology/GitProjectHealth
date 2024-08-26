@@ -571,38 +571,31 @@ GitMetric4User >> foundSuccessorOf: userCommits andCompleteImportForMax: commitL
 { #category : #analysis }
 GitMetric4User >> generateAnalysisForPeriod: period over: aDateWeekMonthOrYear withMaxCommitWindows: maxCommitWindow [
 
-	| contribution commitFrequency commentContribution mergeRequestDuration codeChurn delayUntilFirstChurn averageTimeBetweenCommits numberOfProjectWithCommit until since numberOfOpenMergeRequests numberOfMergedMergeRequests numberOfClosedMergeRequests numberOfMergeRequestWithoutReview |
+	| contribution commitFrequency commentContribution mergeRequestDuration codeChurn delayUntilFirstChurn averageTimeBetweenCommits numberOfProjectWithCommit until since numberOfOpenMergeRequests numberOfMergedMergeRequests numberOfClosedMergeRequests numberOfMergeRequestWithoutReview numberOfTicketsClosed |
 	since := period at: #since.
 	until := period at: #until.
-
-	"COMMITS"
 	contribution := self
 		                codeContributionsSince: since
 		                until: until
 		                overA: aDateWeekMonthOrYear.
-
 	commitFrequency := self
 		                   commitFrequencySince: since
 		                   until: until
 		                   overA: aDateWeekMonthOrYear.
-
 	commentContribution := self
 		                       commentsContributionsSince: since
 		                       until: until
 		                       overA: aDateWeekMonthOrYear.
-
 	codeChurn := self
 		             codeChurnSince: since
 		             until: until
 		             onACommitWindowOf: maxCommitWindow
 		             overA: aDateWeekMonthOrYear.
-
 	delayUntilFirstChurn := self
 		                        delayUntilFirstChurnSince: since
 		                        until: until
 		                        onACommitWindowOf: maxCommitWindow
 		                        overA: aDateWeekMonthOrYear.
-
 	numberOfProjectWithCommit := self
 		                             numberOfProjectWithCommitSince: since
 		                             until: until
@@ -611,37 +604,33 @@ GitMetric4User >> generateAnalysisForPeriod: period over: aDateWeekMonthOrYear w
 		                             averageTimeBetweenCommitSince: since
 		                             until: until
 		                             overA: aDateWeekMonthOrYear.
-
-	"MERGE REQUESTS"
-
 	mergeRequestDuration := self
 		                        mergeRequestDurationSince: since
 		                        until: until
 		                        overA: aDateWeekMonthOrYear.
-
 	numberOfOpenMergeRequests := self
 		                             numberOfOpenMergeRequestsSince: since
 		                             until: until
 		                             overA: aDateWeekMonthOrYear.
-
 	numberOfMergedMergeRequests := self
 		                               numberOfMergedMergeRequestsSince:
 		                               since
 		                               until: until
 		                               overA: aDateWeekMonthOrYear.
-
 	numberOfClosedMergeRequests := self
 		                               numberOfClosedMergeRequestSince:
 		                               since
 		                               until: until
 		                               overA: aDateWeekMonthOrYear.
-
 	numberOfMergeRequestWithoutReview := self
 		                                     numberOfMergeRequestsMergedWithoutReviewSince:
 		                                     since
 		                                     until: until
 		                                     overA: aDateWeekMonthOrYear.
-
+	numberOfTicketsClosed := self
+		                         numberOfTicketsClosedSince: since
+		                         until: until
+		                         overA: aDateWeekMonthOrYear.
 	^ AnalysisReport new
 		  username: self user name;
 		  period: period;
@@ -663,7 +652,9 @@ GitMetric4User >> generateAnalysisForPeriod: period over: aDateWeekMonthOrYear w
 			  (numberOfMergedMergeRequests at: #average);
 		  numberOfClosedMergeRequests:
 			  (numberOfClosedMergeRequests at: #average);
-		  numberOfMergeRequestsWithoutReview: (numberOfMergeRequestWithoutReview at: #average).
+		  numberOfMergeRequestsWithoutReview:
+			  (numberOfMergeRequestWithoutReview at: #average);
+		  numberOfTicketsClosed: (numberOfTicketsClosed at: #average)
 ]
 
 { #category : #initialization }
@@ -695,6 +686,25 @@ GitMetric4User >> loadCommitOfProjects: aCollection since: aTimespan [
 		 ].
 
 	^ self userCommits.
+]
+
+{ #category : #loading }
+GitMetric4User >> loadItsMergeRequesWithJiraIssueSince: since until: until [
+
+	itsMergeRequests := self
+		                    loadItsMergeRequestsSince: since
+		                    until: until.
+
+	jiraImporter importAllCurrentAndPastIssuesOf:
+		user commits anyOne author_email.
+
+	GPJCConnector new
+		gpModel: glhImporter glhModel;
+		jiraModel: jiraImporter model;
+		connect.
+
+	^ itsMergeRequests select: [ :mergeRequest |
+		  mergeRequest jiraIssue isNotNil ]
 ]
 
 { #category : #loading }
@@ -1012,6 +1022,47 @@ GitMetric4User >> numberOfProjectWithCommitSince: since until: until overA: aDat
 		  (#details -> groupedByDate).
 		  (#userCommits -> commits size) } asDictionary
 
+]
+
+{ #category : #'metrics -jira' }
+GitMetric4User >> numberOfTicketsClosedSince: since until: until overA: aDateWeekMonthOrYear [
+
+	| groupedByDate itsMergeRequestsWithJiraIssue dateOver average mergedMergeRequestWithJiraIssue |
+	groupedByDate := self
+		                 setupGroupedDateFrom: since
+		                 to: until
+		                 over: aDateWeekMonthOrYear.
+
+	itsMergeRequestsWithJiraIssue := self
+		                                 loadItsMergeRequesWithJiraIssueSince:
+		                                 since
+		                                 until: until.
+
+	mergedMergeRequestWithJiraIssue := itsMergeRequestsWithJiraIssue
+		                                   select: [ :mr |
+		                                   mr merged_at isNotNil ].
+
+	mergedMergeRequestWithJiraIssue do: [ :userMergeRequest |
+		dateOver := self
+			            transformDate: userMergeRequest created_at
+			            to: aDateWeekMonthOrYear.
+		groupedByDate
+			at: dateOver printString
+			ifPresent: [ :value | value add: userMergeRequest ] ].
+
+	groupedByDate := groupedByDate collect: [ :group | group size ].
+
+	average := groupedByDate
+		           ifEmpty: [ 0 ]
+		           ifNotEmpty: [ groupedByDate average ].
+	^ {
+		  (#overEach -> aDateWeekMonthOrYear name).
+		  (#forOver -> (groupedByDate keys size printString
+		    , aDateWeekMonthOrYear printString)).
+		  (#average -> average asFloat).
+		  (#details -> groupedByDate).
+		  (#userMergeRequestsWithJiraIssue -> itsMergeRequestsWithJiraIssue size) }
+		  asDictionary
 ]
 
 { #category : #accessing }

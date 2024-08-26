@@ -3,6 +3,7 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'glhImporter',
+		'jiraImporter',
 		'label',
 		'entities',
 		'projectCache',
@@ -45,11 +46,14 @@ GitMetricExporter >> addEntitiesFromUserNames: userNames [
 	"then collect the project in which the user has be seen commited"
 	entities addAll: (userNames collect: [ :username |
 			 | projects metrics i size |
-			 projects := self findParticipationOfCommitAuthorNamed: username amongProjects: projectCache.
+			 projects := self
+				             findParticipationOfCommitAuthorNamed: username
+				             amongProjects: projectCache.
 
 			 metrics := GitMetric4User new.
 			 metrics
 				 glhImporter: glhImporter;
+				jiraImporter: jiraImporter;
 				 findUserNamed: username.
 
 
@@ -77,17 +81,18 @@ GitMetricExporter >> addEntitiesFromUserNames: userNames [
 GitMetricExporter >> addEntitiesFromUserNamesAndProjects: usersWithProjects [
 
 	entities addAll: (usersWithProjects associations collect: [ :assoc |
-		            | username projects metrics |
-		            username := assoc key.
-		            projects := assoc value.
+			 | username projects metrics |
+			 username := assoc key.
+			 projects := assoc value.
 
-		            metrics := GitMetric4User new.
-		            metrics
-			            glhImporter: glhImporter;
-			            findUserNamed: username.
-		            metrics loadProjectsFromIds: projects.
+			 metrics := GitMetric4User new.
+			 metrics
+				 glhImporter: glhImporter;
+				 jiraImporter: jiraImporter;
+				 findUserNamed: username.
+			 metrics loadProjectsFromIds: projects.
 
-		            metrics ]).
+			 metrics ]).
 
 	^ self
 ]
@@ -133,15 +138,17 @@ GitMetricExporter >> csvMetricsFor: date [
 
 			  ('commits frequency (avg) - ' , date asString
 			   -> [ :groupAnalyses |
-			   | analysis |
-			   analysis := self getAnalysisWithDate: date from: groupAnalyses.
-			   analysis ifNil: [ nil ] ifNotNil: [ analysis commitFrequency ] ]).
+				   | analysis |
+				   analysis := self getAnalysisWithDate: date from: groupAnalyses.
+				   analysis ifNil: [ nil ] ifNotNil: [ analysis commitFrequency ] ]).
 
 			  ('comment contribution (avg) - ' , date asString
 			   -> [ :groupAnalyses |
-			   | analysis |
-			   analysis := self getAnalysisWithDate: date from: groupAnalyses.
-			   analysis ifNil: [ nil ] ifNotNil: [ analysis commentContribution ] ]).
+				   | analysis |
+				   analysis := self getAnalysisWithDate: date from: groupAnalyses.
+				   analysis
+					   ifNil: [ nil ]
+					   ifNotNil: [ analysis commentContribution ] ]).
 
 			  ('churn % (W=' , maxCommitWindow printString , ')  - '
 			   , date asString -> [ :groupAnalyses |
@@ -153,7 +160,9 @@ GitMetricExporter >> csvMetricsFor: date [
 			   , ')  - ' , date asString -> [ :groupAnalyses |
 			   | analysis |
 			   analysis := self getAnalysisWithDate: date from: groupAnalyses.
-			   analysis ifNil: [ nil ] ifNotNil: [ analysis delayUntilFirstChurn ] ]).
+			   analysis
+				   ifNil: [ nil ]
+				   ifNotNil: [ analysis delayUntilFirstChurn ] ]).
 
 			  ('number of project with min 1 commit of user - ' , date asString
 			   -> [ :groupAnalyses |
@@ -163,9 +172,11 @@ GitMetricExporter >> csvMetricsFor: date [
 
 			  ('merge Request Duration - ' , date asString
 			   -> [ :groupAnalyses |
-			   | analysis |
-			   analysis := self getAnalysisWithDate: date from: groupAnalyses.
-			   analysis ifNil: [ nil ] ifNotNil: [ analysis mergeRequestDuration ] ]).
+				   | analysis |
+				   analysis := self getAnalysisWithDate: date from: groupAnalyses.
+				   analysis
+					   ifNil: [ nil ]
+					   ifNotNil: [ analysis mergeRequestDuration ] ]).
 
 			  ('average time between commits - ' , date asString
 			   -> [ :groupAnalyses |
@@ -175,27 +186,43 @@ GitMetricExporter >> csvMetricsFor: date [
 
 			  ('number of open merge request - ' , date asString
 			   -> [ :groupAnalyses |
-			   | analysis |
-			   analysis := self getAnalysisWithDate: date from: groupAnalyses.
-			   analysis ifNil: [ nil ] ifNotNil: [ analysis numberOfOpenMergeRequests ] ]).
+				   | analysis |
+				   analysis := self getAnalysisWithDate: date from: groupAnalyses.
+				   analysis
+					   ifNil: [ nil ]
+					   ifNotNil: [ analysis numberOfOpenMergeRequests ] ]).
 
 			  ('number of merged merge request - ' , date asString
 			   -> [ :groupAnalyses |
-			   | analysis |
-			   analysis := self getAnalysisWithDate: date from: groupAnalyses.
-			   analysis ifNil: [ nil ] ifNotNil: [ analysis numberOfMergedMergeRequest ] ]).
+				   | analysis |
+				   analysis := self getAnalysisWithDate: date from: groupAnalyses.
+				   analysis
+					   ifNil: [ nil ]
+					   ifNotNil: [ analysis numberOfMergedMergeRequest ] ]).
 
 			  ('number of merge requests closed and not merged - '
 			   , date asString -> [ :groupAnalyses |
 			   | analysis |
 			   analysis := self getAnalysisWithDate: date from: groupAnalyses.
-			   analysis ifNil: [ nil ] ifNotNil: [ analysis numberOfClosedMergeRequests ] ]).
+			   analysis
+				   ifNil: [ nil ]
+				   ifNotNil: [ analysis numberOfClosedMergeRequests ] ]).
 
 			  ('number of merge requests without review - ' , date asString
 			   -> [ :groupAnalyses |
-			   | analysis |
-			   analysis := self getAnalysisWithDate: date from: groupAnalyses.
-			   analysis ifNil: [ nil ] ifNotNil: [ analysis numberOfMergeRequestsWithoutReview ] ]) }
+				   | analysis |
+				   analysis := self getAnalysisWithDate: date from: groupAnalyses.
+				   analysis
+					   ifNil: [ nil ]
+					   ifNotNil: [ analysis numberOfMergeRequestsWithoutReview ] ]).
+				
+				('number of merge request with jira ticket closed  - ' , date asString
+			   -> [ :groupAnalyses |
+				   | analysis |
+				   analysis := self getAnalysisWithDate: date from: groupAnalyses.
+				   analysis
+					   ifNil: [ nil ]
+					   ifNotNil: [ analysis numberOfTicketsClosed ] ]) }
 ]
 
 { #category : #accessing }
@@ -416,6 +443,12 @@ GitMetricExporter >> initialize [
 	runningPeriods := OrderedCollection new.
 	maxCommitWindow := 3.
 	over := Date
+]
+
+{ #category : #accessing }
+GitMetricExporter >> jiraImporter: anObject [
+
+	jiraImporter := anObject
 ]
 
 { #category : #accessing }

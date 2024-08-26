@@ -17,7 +17,8 @@ Class {
 		'numberOfOpenMergeRequests',
 		'numberOfMergedMergeRequest',
 		'numberOfClosedMergeRequests',
-		'numberOfMergeRequestsWithoutReview'
+		'numberOfMergeRequestsWithoutReview',
+		'numberOfTicketsClosed'
 	],
 	#category : #'GitLabHealth-Model-Analysis'
 }
@@ -181,6 +182,18 @@ AnalysisReport >> numberOfProjectWithCommit [
 AnalysisReport >> numberOfProjectWithCommit: anObject [
 
 	numberOfProjectWithCommit := anObject
+]
+
+{ #category : #accessing }
+AnalysisReport >> numberOfTicketsClosed [
+
+	^ numberOfTicketsClosed
+]
+
+{ #category : #accessing }
+AnalysisReport >> numberOfTicketsClosed: anObject [
+
+	numberOfTicketsClosed := anObject
 ]
 
 { #category : #accessing }
