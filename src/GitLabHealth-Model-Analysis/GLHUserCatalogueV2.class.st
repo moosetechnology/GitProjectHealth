@@ -11,15 +11,21 @@ GLHUserCatalogueV2 class >> loadFromJson: aString [
 	catalogue := self new.
 	dic := (STONJSON fromString: aString) asDictionary.
 	dic associationsDo: [ :assoc |
-		| itsName itsUsername itsCommitNames itsId|
+		| itsName itsUsername itsCommitNames itsId |
 		itsName := assoc key.
 		itsCommitNames := assoc value at: #foundNames.
-		itsUsername :=  assoc value at: #username.
+		itsUsername := assoc value at: #username.
 		itsId := assoc value at: #id.
-		
-		catalogue addUser: (GLHUser new id: itsId; username: itsUsername; name: itsName; yourself ) withNames: itsCommitNames ].
-	
-	^ catalogue . 
+
+		catalogue
+			addUser: (GLHUser new
+					 id: itsId;
+					 username: itsUsername;
+					 name: itsName;
+					 yourself)
+			withNames: itsCommitNames ].
+
+	^ catalogue
 ]
 
 { #category : #'as yet unclassified' }

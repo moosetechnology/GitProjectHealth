@@ -3,7 +3,8 @@ Class {
 	#superclass : #GitMetric,
 	#instVars : [
 		'itsCommits',
-		'itsMergeRequests'
+		'itsMergeRequests',
+		'emailDomain'
 	],
 	#category : #'GitLabHealth-Model-Analysis'
 }
@@ -691,12 +692,15 @@ GitMetric4User >> loadCommitOfProjects: aCollection since: aTimespan [
 { #category : #loading }
 GitMetric4User >> loadItsMergeRequesWithJiraIssueSince: since until: until [
 
+	|email|
 	itsMergeRequests := self
 		                    loadItsMergeRequestsSince: since
 		                    until: until.
 
+	email := ('' join:  {user username . '@berger-levrault.com'}) asLowercase .
+
 	jiraImporter importAllCurrentAndPastIssuesOf:
-		user commits anyOne author_email.
+		email.
 
 	GPJCConnector new
 		gpModel: glhImporter glhModel;

@@ -11,7 +11,8 @@ Class {
 		'runningPeriods',
 		'maxCommitWindow',
 		'over',
-		'analyses'
+		'analyses',
+		'emailDomain'
 	],
 	#category : #'GitLabHealth-Model-Analysis'
 }
