@@ -156,6 +156,7 @@ GitMetricExporter >> constructFilePath: runningOver [
 GitMetricExporter >> csvMetricsFor: date [
 
 	| csvMetrics |
+	
 	csvMetrics := metrics collect: [ :metric |
 		              metric description , ' - ' , date asString
 		              -> [ :groupAnalyses |
@@ -165,9 +166,10 @@ GitMetricExporter >> csvMetricsFor: date [
 				                          from: groupAnalyses.
 			              analysis
 				              ifNil: [ nil ]
-				              ifNotNil: [ (analysis metrics at: metric name) average ] ] ].
+				              ifNotNil: [
+				              (analysis metrics at: metric name) average asFloat ] ] ].
 
-	^ csvMetrics asDictionary
+	^ csvMetrics asOrderedDictionary
 ]
 
 { #category : #accessing }
