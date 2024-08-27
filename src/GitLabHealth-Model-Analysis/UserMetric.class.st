@@ -9,14 +9,14 @@ Class {
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #utils }
 UserMetric >> cacheSymbolFor: anEntityType since: since until: until [
 
 	^ (anEntityType printString , ' since ' , since printString , ' to '
 	   , until printString) asSymbol
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #calculating }
 UserMetric >> calculate [
 
 	^ self subclassResponsibility
@@ -34,7 +34,7 @@ UserMetric >> load [
 	^ self subclassResponsibility
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #loading }
 UserMetric >> loadUserCommits [
 
 	| allCommits cacheSymbol |
@@ -64,7 +64,7 @@ UserMetric >> loadUserCommits [
 		                 commit commitCreator ~= user ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #loading }
 UserMetric >> loadUserProjects [
 
 	userProjects := glhImporter importContributedProjectsOfUser: user.

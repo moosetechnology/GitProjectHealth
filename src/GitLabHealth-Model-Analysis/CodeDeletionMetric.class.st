@@ -4,7 +4,7 @@ Class {
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #calculating }
 CodeDeletionMetric >> calculate [
 
 	| gitAnalyzer contributions groupedByDate |

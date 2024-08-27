@@ -110,7 +110,7 @@ GitMetricExporter >> analyses: anObject [
 	analyses := anObject
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #calculating }
 GitMetricExporter >> calculateAllMetricsOver: aDateWeekMonthOrYear [
 
 	| entity period userAnalysisReport result |

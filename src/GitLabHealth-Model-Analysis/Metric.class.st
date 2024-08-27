@@ -9,7 +9,7 @@ Class {
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #calculating }
 Metric >> calculate [
 
 	^self subclassResponsibility
@@ -52,7 +52,7 @@ Metric >> setPeriodSince: since until: until [
 			(#until -> until asDate) } asDictionary
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'utils - date' }
 Metric >> setupGroupedDate [
 
 	| groupedByDate start end increment overSymbol |
@@ -98,7 +98,7 @@ Metric >> setupGroupedDate [
 	^ groupedByDate
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'utils - date' }
 Metric >> transformDate: date to: aWeekOrMonthOrYear [
 
 	aWeekOrMonthOrYear = Month ifTrue: [ ^ date asDate month asDate ].
