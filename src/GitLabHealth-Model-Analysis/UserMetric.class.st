@@ -22,6 +22,12 @@ UserMetric >> calculate [
 	^ self subclassResponsibility
 ]
 
+{ #category : #accessing }
+UserMetric >> description [
+
+	^ self subclassResponsibility
+]
+
 { #category : #loading }
 UserMetric >> load [
 
@@ -64,6 +70,12 @@ UserMetric >> loadUserProjects [
 	userProjects := glhImporter importContributedProjectsOfUser: user.
 	
 	userProjects do: [ :project | glhImporter completeImportProject: project]
+]
+
+{ #category : #accessing }
+UserMetric >> name [
+
+	^ self subclassResponsibility
 ]
 
 { #category : #accessing }

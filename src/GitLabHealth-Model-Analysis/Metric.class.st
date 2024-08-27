@@ -18,6 +18,12 @@ Metric >> calculate [
 ]
 
 { #category : #accessing }
+Metric >> description [
+
+	^ self subclassResponsibility
+]
+
+{ #category : #accessing }
 Metric >> glhImporter: anObject [
 
 	glhImporter := anObject
@@ -26,6 +32,12 @@ Metric >> glhImporter: anObject [
 { #category : #loading }
 Metric >> load [
 	^self subclassResponsibility
+]
+
+{ #category : #accessing }
+Metric >> name [
+
+	^ self subclassResponsibility
 ]
 
 { #category : #accessing }

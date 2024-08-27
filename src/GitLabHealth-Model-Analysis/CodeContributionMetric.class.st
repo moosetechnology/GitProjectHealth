@@ -41,9 +41,21 @@ CodeContributionMetric >> calculate [
 	^ groupedByDate
 ]
 
+{ #category : #accessing }
+CodeContributionMetric >> description [
+
+	^ 'code addition (avg)'
+]
+
 { #category : #loading }
 CodeContributionMetric >> load [
 
 	self loadUserProjects.
 	self loadUserCommits.
+]
+
+{ #category : #accessing }
+CodeContributionMetric >> name [
+
+	^ 'codeContribution'
 ]
