@@ -9,6 +9,20 @@ Class {
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
+{ #category : #'email' }
+GitMetric4User >> withUserEmailDomain: aEmailDomain [
+	emailDomain :=  aEmailDomain. 
+]
+
+{ #category : #'email' }
+GitMetric4User >> userEmail [
+	"overide this method to adapt on your situation"
+ 
+	^ ('' join: {
+			          user username.
+			          emailDomain }) asLowercase.
+]
+
 { #category : #'metrics - commits' }
 GitMetric4User >> averageTimeBetweenCommitSince: since until: until overA: aDateWeekMonthOrYear [
 
@@ -664,7 +678,9 @@ GitMetric4User >> initialize [
 	user := GLHUser new.
 	itsProjects := Dictionary new.
 	itsCommits := Dictionary new.
-	itsMergeRequests := Dictionary new
+	itsMergeRequests := Dictionary new.
+	
+	emailDomain := '@generic-domain.com'
 ]
 
 { #category : #accessing }
@@ -697,7 +713,7 @@ GitMetric4User >> loadItsMergeRequesWithJiraIssueSince: since until: until [
 		                    loadItsMergeRequestsSince: since
 		                    until: until.
 
-	email := ('' join:  {user username . '@berger-levrault.com'}) asLowercase .
+	email := self userEmail. 
 
 	jiraImporter importAllCurrentAndPastIssuesOf:
 		email.

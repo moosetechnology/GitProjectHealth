@@ -1155,7 +1155,8 @@ GLHModelImporter >> userCatalogue [
 { #category : #accessing }
 GLHModelImporter >> userCatalogue: aGLHUserCatalogue [
 
-	userCatalogue := aGLHUserCatalogue
+	userCatalogue := aGLHUserCatalogue.
+	aGLHUserCatalogue anImporter: self. 
 ]
 
 { #category : #accessing }
