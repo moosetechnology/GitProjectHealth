@@ -1,17 +1,16 @@
 Class {
-	#name : #CodeContributionMetric,
+	#name : #CodeAdditionMetric,
 	#superclass : #UserMetric,
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
 { #category : #'as yet unclassified' }
-CodeContributionMetric >> calculate [
+CodeAdditionMetric >> calculate [
 
 	| gitAnalyzer contributions groupedByDate |
 	groupedByDate := self setupGroupedDate.
 
-	gitAnalyzer := GitAnalyzer new
-		               glhImporter: glhImporter.
+	gitAnalyzer := GitAnalyzer new glhImporter: glhImporter.
 
 	contributions := userCommits collect: [ :commit |
 		                 commit -> (gitAnalyzer
@@ -31,31 +30,29 @@ CodeContributionMetric >> calculate [
 					yourself ] ].
 
 	groupedByDate := groupedByDate collect: [ :contribs |
-		                 | totalAdd totalDele |
-		                 totalAdd := contribs sum: [ :v | v at: #addition ].
-		                 totalDele := contribs sum: [ :v | v at: #deletion ].
-		                 {
-			                 (#addition -> totalAdd).
-			                 (#deletion -> totalDele) } asDictionary ].
+		               
+		                contribs sum: [ :v | v at: #addition ].
+		       
+		                  ].
 
 	^ groupedByDate
 ]
 
 { #category : #accessing }
-CodeContributionMetric >> description [
+CodeAdditionMetric >> description [
 
 	^ 'code addition (avg)'
 ]
 
 { #category : #loading }
-CodeContributionMetric >> load [
+CodeAdditionMetric >> load [
 
 	self loadUserProjects.
-	self loadUserCommits.
+	self loadUserCommits
 ]
 
 { #category : #accessing }
-CodeContributionMetric >> name [
+CodeAdditionMetric >> name [
 
 	^ 'codeContribution'
 ]

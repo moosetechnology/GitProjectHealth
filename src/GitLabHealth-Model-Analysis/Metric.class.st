@@ -2,8 +2,6 @@ Class {
 	#name : #Metric,
 	#superclass : #Object,
 	#instVars : [
-		'name',
-		'description',
 		'period',
 		'over',
 		'glhImporter'
