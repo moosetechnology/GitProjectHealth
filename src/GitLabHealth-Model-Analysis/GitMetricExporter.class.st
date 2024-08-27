@@ -391,7 +391,10 @@ GitMetricExporter >> initialize [
 	maxCommitWindow := 3.
 	over := Date.
 
-	metrics := { CodeAdditionMetric new . CodeDeletionMetric new. }
+	metrics := {
+		           CodeAdditionMetric new.
+		           CodeDeletionMetric new.
+			CommentContributionMetric new. }
 ]
 
 { #category : #accessing }
