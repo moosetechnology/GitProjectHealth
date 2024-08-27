@@ -157,7 +157,7 @@ GitMetricExporter >> csvMetricsFor: date [
 
 	| csvMetrics |
 	csvMetrics := metrics collect: [ :metric |
-		              metric description ,' - ', date asString
+		              metric description , ' - ' , date asString
 		              -> [ :groupAnalyses |
 			              | analysis |
 			              analysis := self
@@ -165,7 +165,7 @@ GitMetricExporter >> csvMetricsFor: date [
 				                          from: groupAnalyses.
 			              analysis
 				              ifNil: [ nil ]
-				              ifNotNil: [ analysis metrics at: metric name ] ] ].
+				              ifNotNil: [ (analysis metrics at: metric name) average ] ] ].
 
 	^ csvMetrics asDictionary
 ]
