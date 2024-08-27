@@ -3,10 +3,25 @@ Class {
 	#superclass : #GitMetric,
 	#instVars : [
 		'itsCommits',
-		'itsMergeRequests'
+		'itsMergeRequests',
+		'emailDomain'
 	],
 	#category : #'GitLabHealth-Model-Analysis'
 }
+
+{ #category : #'email' }
+GitMetric4User >> withUserEmailDomain: aEmailDomain [
+	emailDomain :=  aEmailDomain. 
+]
+
+{ #category : #'email' }
+GitMetric4User >> userEmail [
+	"overide this method to adapt on your situation"
+ 
+	^ ('' join: {
+			          user username.
+			          emailDomain }) asLowercase.
+]
 
 { #category : #'metrics - commits' }
 GitMetric4User >> averageTimeBetweenCommitSince: since until: until overA: aDateWeekMonthOrYear [
@@ -663,7 +678,9 @@ GitMetric4User >> initialize [
 	user := GLHUser new.
 	itsProjects := Dictionary new.
 	itsCommits := Dictionary new.
-	itsMergeRequests := Dictionary new
+	itsMergeRequests := Dictionary new.
+	
+	emailDomain := '@generic-domain.com'
 ]
 
 { #category : #accessing }
@@ -691,12 +708,15 @@ GitMetric4User >> loadCommitOfProjects: aCollection since: aTimespan [
 { #category : #loading }
 GitMetric4User >> loadItsMergeRequesWithJiraIssueSince: since until: until [
 
+	|email|
 	itsMergeRequests := self
 		                    loadItsMergeRequestsSince: since
 		                    until: until.
 
+	email := self userEmail. 
+
 	jiraImporter importAllCurrentAndPastIssuesOf:
-		user commits anyOne author_email.
+		email.
 
 	GPJCConnector new
 		gpModel: glhImporter glhModel;
