@@ -113,30 +113,32 @@ GitMetricExporter >> analyses: anObject [
 { #category : #calculating }
 GitMetricExporter >> calculateAllMetricsOver: aDateWeekMonthOrYear [
 
-	| entity period userAnalysisReport result |
-	entity := entities at: 1.
-	period := runningPeriods at: 1.
+	| userAnalysisReport result analysesReport |
+	runningPeriods do: [ :period |
+		analysesReport := entities collect: [ :entity |
+			userAnalysisReport := UserAnalysisReport new
+				                      username: entity user name;
+				                      period: period;
+				                      over: aDateWeekMonthOrYear.
+
+			metrics do: [ :metric |
+				metric
+					glhImporter: glhImporter;
+					setPeriodSince: (period at: #since) until: (period at: #until);
+					over: aDateWeekMonthOrYear;
+					user: entity user.
 
 
-	userAnalysisReport := UserAnalysisReport new
-		                      username: entity user name;
-		                      period: period;
-		                      over: aDateWeekMonthOrYear.
+				metric load.
+				result := metric calculate.
+				userAnalysisReport metrics at: metric name put: result ].
+			
+		userAnalysisReport
+ ].
+self analyses addAll: analysesReport.
+].
 
-	metrics do: [ :metric |
-		metric
-			glhImporter: glhImporter;
-			setPeriodSince: (period at: #since) until: (period at: #until);
-			over: aDateWeekMonthOrYear;
-			user: entity user.
-
-
-		metric load.
-		result := metric calculate.
-		userAnalysisReport metrics at: metric name put: result ].
-
-	self analyses: { userAnalysisReport }.
-	^ userAnalysisReport
+	^ analyses
 ]
 
 { #category : #utilities }
@@ -390,11 +392,13 @@ GitMetricExporter >> initialize [
 	runningPeriods := OrderedCollection new.
 	maxCommitWindow := 3.
 	over := Date.
+	
+	analyses := OrderedCollection new.
 
 	metrics := {
 		           CodeAdditionMetric new.
 		           CodeDeletionMetric new.
-			CommentContributionMetric new. }
+		           CommentContributionMetric new }
 ]
 
 { #category : #accessing }
