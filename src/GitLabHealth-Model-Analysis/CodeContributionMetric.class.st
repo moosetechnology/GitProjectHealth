@@ -11,7 +11,6 @@ CodeContributionMetric >> calculate [
 	groupedByDate := self setupGroupedDate.
 
 	gitAnalyzer := GitAnalyzer new
-		               onModel: glhModel;
 		               glhImporter: glhImporter.
 
 	contributions := userCommits collect: [ :commit |

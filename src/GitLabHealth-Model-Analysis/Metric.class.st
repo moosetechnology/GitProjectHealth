@@ -6,8 +6,7 @@ Class {
 		'description',
 		'period',
 		'over',
-		'glhImporter',
-		'glhModel'
+		'glhImporter'
 	],
 	#category : #'GitLabHealth-Model-Analysis'
 }
