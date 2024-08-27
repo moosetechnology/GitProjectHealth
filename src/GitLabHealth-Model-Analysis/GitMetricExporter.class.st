@@ -157,7 +157,7 @@ GitMetricExporter >> csvMetricsFor: date [
 
 	| csvMetrics |
 	csvMetrics := metrics collect: [ :metric |
-		              metric description , date asString
+		              metric description ,' - ', date asString
 		              -> [ :groupAnalyses |
 			              | analysis |
 			              analysis := self
