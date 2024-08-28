@@ -158,7 +158,6 @@ GitMetricExporter >> constructFilePath: runningOver [
 GitMetricExporter >> csvMetricsFor: date [
 
 	| csvMetrics |
-	
 	csvMetrics := metrics collect: [ :metric |
 		              metric description , ' - ' , date asString
 		              -> [ :groupAnalyses |
@@ -169,7 +168,7 @@ GitMetricExporter >> csvMetricsFor: date [
 			              analysis
 				              ifNil: [ nil ]
 				              ifNotNil: [
-				              (analysis metrics at: metric name) average asFloat ] ] ].
+				              (analysis metrics at: metric name) average ] ] ].
 
 	^ csvMetrics asOrderedDictionary
 ]
@@ -400,8 +399,9 @@ GitMetricExporter >> initialize [
 		           CodeDeletionMetric new.
 		           CommentContributionMetric new.
 		           CommitFrequencyMetric new.
-					ContributedProjectMetric new.
-		 		 }
+		           ContributedProjectMetric new.
+		TimeBetweenCommitMetric new.
+				 }
 ]
 
 { #category : #accessing }
