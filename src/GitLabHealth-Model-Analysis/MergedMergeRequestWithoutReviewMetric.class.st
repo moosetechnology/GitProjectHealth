@@ -1,11 +1,11 @@
 Class {
-	#name : #MergedMergeRequest,
+	#name : #MergedMergeRequestWithoutReviewMetric,
 	#superclass : #UserMetric,
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
 { #category : #calculating }
-MergedMergeRequest >> calculate [
+MergedMergeRequestWithoutReviewMetric >> calculate [
 
 	| groupedByDate mergedMergeRequest noVerificationMergeRequests dateOver gitAnalyzer |
 	groupedByDate := self setupGroupedDate.
@@ -47,20 +47,20 @@ MergedMergeRequest >> calculate [
 ]
 
 { #category : #accessing }
-MergedMergeRequest >> description [
+MergedMergeRequestWithoutReviewMetric >> description [
 
-	^ 'number of merged merge request'
+	^ 'number of merge requests merged without review'
 ]
 
 { #category : #loading }
-MergedMergeRequest >> load [
+MergedMergeRequestWithoutReviewMetric >> load [
 
 	self loadUserProjects.
 	self loadUserMergeRequests
 ]
 
 { #category : #accessing }
-MergedMergeRequest >> name [
+MergedMergeRequestWithoutReviewMetric >> name [
 
-	^ 'mergedMergeRequest'
+	^ 'mergeRequestMergedWithoutReview'
 ]
