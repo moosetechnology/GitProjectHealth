@@ -139,20 +139,7 @@ GitMetric4User >> codeChurnSince: since until: until onACommitWindowOf: commitLi
 			                 (#churn -> totalChurn).
 			                 (#contribution -> totalContribution).
 			                 (#percentage -> percentage) } asDictionary ].
-	^ {
-		  (#details -> groupedByDate).
-		  (#totalContribution -> (totalContributions
-			    ifEmpty: [ 0 ]
-			    ifNotEmpty: [ totalContributions sum ])).
-		  (#totalChurn -> (groupedByDate sum: [ :date | date at: #churn ])).
-		  (#churn
-		   ->
-		   (groupedByDate collect: [ :date | date at: #percentage ]) average).
-		  (#overEach -> aDateWeekMonthOrYear name).
-		  (#forOver -> (groupedByDate keys size printString
-		    , aDateWeekMonthOrYear printString)).
-		  (#userCommits -> commits size).
-		  (#churnWindow -> commitLimit) } asDictionary
+	^ groupedByDate collect: [ :date | date at: #percentage ]
 ]
 
 { #category : #'metrics - commits' }

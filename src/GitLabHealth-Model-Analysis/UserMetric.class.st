@@ -29,6 +29,29 @@ UserMetric >> description [
 	^ self subclassResponsibility
 ]
 
+{ #category : #churn }
+UserMetric >> foundSuccessorOf: commits andCompleteImportForMax: commitLimit [
+
+	| analyzingCommits gitAnalyzer |
+	analyzingCommits := Set new.
+
+	gitAnalyzer := GitAnalyzer new
+		               glhImporter: glhImporter;
+		               maxChildCommit: commitLimit.
+
+	glhImporter withCommitDiffs: true.
+
+	userCommits do: [ :c |
+		gitAnalyzer
+			visitChildCommits: c childCommits
+			toStoreThemIn: analyzingCommits
+			upto: commitLimit ].
+
+	analyzingCommits do: [ :c | glhImporter completeImportedCommit: c ].
+
+	^ analyzingCommits
+]
+
 { #category : #initialization }
 UserMetric >> initialize [
 	over := Date
