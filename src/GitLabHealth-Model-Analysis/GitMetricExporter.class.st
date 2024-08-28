@@ -401,7 +401,10 @@ GitMetricExporter >> initialize [
 		           CommitFrequencyMetric new.
 		           ContributedProjectMetric new.
 		           TimeBetweenCommitMetric new.
-		MergeRequestDurationMetric new. }
+		           MergeRequestDurationMetric new.
+		           ClosedMergeRequestMetric new.
+					  MergedMergeRequest new.
+		 }
 ]
 
 { #category : #accessing }

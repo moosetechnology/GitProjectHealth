@@ -1,0 +1,66 @@
+Class {
+	#name : #MergedMergeRequest,
+	#superclass : #UserMetric,
+	#category : #'GitLabHealth-Model-Analysis'
+}
+
+{ #category : #calculating }
+MergedMergeRequest >> calculate [
+
+	| groupedByDate mergedMergeRequest noVerificationMergeRequests dateOver gitAnalyzer |
+	groupedByDate := self setupGroupedDate.
+
+	gitAnalyzer := GitAnalyzer new glhImporter: glhImporter.
+
+	mergedMergeRequest := userMergeRequests select: [ :mr |
+		                      mr merged_at isNotNil ].
+
+
+	noVerificationMergeRequests := mergedMergeRequest select: [
+		                               :userMergeRequest |
+		                               | validation |
+		                               glhImporter
+			                               importMergeResquestMerger:
+			                               userMergeRequest.
+
+		                               validation := gitAnalyzer
+			                                             analyseMergeResquestValidation:
+			                                             userMergeRequest.
+
+		                               userMergeRequest merge_user
+		                               = userMergeRequest author and:
+			                               (validation at: #duration)
+			                               < 1 minutes ].
+
+
+	noVerificationMergeRequests do: [ :userMergeRequest |
+		dateOver := self transformDate: userMergeRequest created_at to: over.
+
+		groupedByDate
+			at: dateOver printString
+			ifPresent: [ :value | value add: userMergeRequest ] ].
+
+
+	groupedByDate := groupedByDate collect: [ :group | group size ].
+
+	^ groupedByDate
+]
+
+{ #category : #accessing }
+MergedMergeRequest >> description [
+
+	^ 'number of merged merge request'
+]
+
+{ #category : #loading }
+MergedMergeRequest >> load [
+
+	self loadUserProjects.
+	self loadUserMergeRequests
+]
+
+{ #category : #accessing }
+MergedMergeRequest >> name [
+
+	^ 'mergedMergeRequest'
+]
