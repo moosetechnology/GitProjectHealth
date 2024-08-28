@@ -1,0 +1,69 @@
+Class {
+	#name : #MergeRequestDurationMetric,
+	#superclass : #UserMetric,
+	#category : #'GitLabHealth-Model-Analysis'
+}
+
+{ #category : #calculating }
+MergeRequestDurationMetric >> calculate [
+
+	| groupedByDate gitAnalyzer mergeRequestsValidation filterGroups |
+	groupedByDate := self setupGroupedDate.
+
+	userMergeRequests ifEmpty: [ ^ nil ].
+
+	gitAnalyzer := GitAnalyzer new glhImporter: glhImporter.
+
+	mergeRequestsValidation := userMergeRequests collect: [ :mr |
+		                           gitAnalyzer
+			                           analyseMergeResquestValidation: mr ].
+
+
+	mergeRequestsValidation do: [ :dic |
+		| overDate |
+		overDate := self transformDate: (dic at: #created_at) to: over.
+
+		groupedByDate
+			at: overDate printString
+			ifPresent: [ :durations | durations add: (dic at: #duration) ]
+			ifAbsentPut: [
+				OrderedCollection new
+					add: (dic at: #duration);
+					yourself ] ].
+
+
+	filterGroups := groupedByDate reject: [ :array | array isEmpty ].
+
+	filterGroups associations do: [ :assoc |
+		| sum denominator |
+		denominator := assoc value size.
+
+		sum := assoc value sum: [ :v |
+			       v ifNil: [
+				       denominator := denominator - 1.
+				       0 asDuration ] ].
+		denominator = 0 ifTrue: [ denominator := 1 ].
+
+		filterGroups at: assoc key put: sum / denominator ].
+
+	^ filterGroups
+]
+
+{ #category : #accessing }
+MergeRequestDurationMetric >> description [
+
+	^ 'merge request duration'
+]
+
+{ #category : #loading }
+MergeRequestDurationMetric >> load [
+
+	self loadUserProjects.
+	self loadUserMergeRequests.
+]
+
+{ #category : #accessing }
+MergeRequestDurationMetric >> name [
+
+	^ 'mergeRequestDuration'
+]

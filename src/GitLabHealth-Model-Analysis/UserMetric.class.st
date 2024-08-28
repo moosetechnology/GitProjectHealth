@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'user',
 		'userProjects',
-		'userCommits'
+		'userCommits',
+		'userMergeRequests'
 	],
 	#category : #'GitLabHealth-Model-Analysis'
 }
@@ -67,6 +68,35 @@ UserMetric >> loadUserCommits [
 
 	^ userCommits := allCommits reject: [ :commit |
 		                 commit commitCreator ~= user ]
+]
+
+{ #category : #loading }
+UserMetric >> loadUserMergeRequests [
+
+	| mergeRequests cacheSymbol |
+	glhImporter withCommitDiffs: false.
+	cacheSymbol := self
+		          cacheSymbolFor: GLPHEMergeRequest
+		          since: (period at: #since)
+		          until: (period at: #until).
+
+	mergeRequests := userProjects collect: [ :project |
+		                 | mr |
+		                 project cacheAt: cacheSymbol ifAbsentPut: [
+			                 mr := glhImporter
+				                       importMergeRequests: project
+				                       since: (period at: #since)
+				                       until: (period at: #until).
+			                 mr ] ].
+
+	mergeRequests := mergeRequests flattened.
+	glhImporter withCommitDiffs: true.
+
+	mergeRequests do: [ :mr | glhImporter importMergeResquestAuthor: mr ].
+
+	userMergeRequests := mergeRequests select: [ :mergeRequest |
+		                     mergeRequest author = user ].
+	^ userMergeRequests
 ]
 
 { #category : #loading }
