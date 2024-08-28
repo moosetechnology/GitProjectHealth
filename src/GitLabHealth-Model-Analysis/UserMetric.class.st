@@ -28,6 +28,11 @@ UserMetric >> description [
 	^ self subclassResponsibility
 ]
 
+{ #category : #initialization }
+UserMetric >> initialize [
+	over := Date
+]
+
 { #category : #loading }
 UserMetric >> load [
 

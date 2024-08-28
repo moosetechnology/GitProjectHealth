@@ -392,13 +392,15 @@ GitMetricExporter >> initialize [
 	runningPeriods := OrderedCollection new.
 	maxCommitWindow := 3.
 	over := Date.
-	
+
 	analyses := OrderedCollection new.
 
 	metrics := {
 		           CodeAdditionMetric new.
 		           CodeDeletionMetric new.
-		           CommentContributionMetric new }
+		           CommentContributionMetric new.
+					  CommitFrequencyMetric new.
+					}
 ]
 
 { #category : #accessing }
