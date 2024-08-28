@@ -399,8 +399,9 @@ GitMetricExporter >> initialize [
 		           CodeAdditionMetric new.
 		           CodeDeletionMetric new.
 		           CommentContributionMetric new.
-					  CommitFrequencyMetric new.
-					}
+		           CommitFrequencyMetric new.
+					ContributedProjectMetric new.
+		 		 }
 ]
 
 { #category : #accessing }
