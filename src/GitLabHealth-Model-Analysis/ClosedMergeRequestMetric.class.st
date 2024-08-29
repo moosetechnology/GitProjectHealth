@@ -1,6 +1,6 @@
 Class {
 	#name : #ClosedMergeRequestMetric,
-	#superclass : #UserMetric,
+	#superclass : #UserMergeRequestMetric,
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
@@ -34,12 +34,6 @@ ClosedMergeRequestMetric >> calculate [
 ClosedMergeRequestMetric >> description [
 
 	^ 'number of merge requests closed and not merged'
-]
-
-{ #category : #loading }
-ClosedMergeRequestMetric >> load [
-
-	userMergeRequests := user loadMergeRequestsSince: (period at: #since) until: (period at: #until). 
 ]
 
 { #category : #accessing }

@@ -1,6 +1,6 @@
 Class {
 	#name : #CodeAdditionMetric,
-	#superclass : #UserMetric,
+	#superclass : #UserCommitsMetric,
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
@@ -40,12 +40,6 @@ CodeAdditionMetric >> calculate [
 CodeAdditionMetric >> description [
 
 	^ 'code addition (avg)'
-]
-
-{ #category : #loading }
-CodeAdditionMetric >> load [
-
-	userCommits := user loadCommitsSince: (period at: #since) until: (period at: #until). 
 ]
 
 { #category : #accessing }

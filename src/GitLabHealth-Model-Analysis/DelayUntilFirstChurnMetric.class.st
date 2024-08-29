@@ -1,6 +1,6 @@
 Class {
 	#name : #DelayUntilFirstChurnMetric,
-	#superclass : #UserMetric,
+	#superclass : #UserCommitsMetric,
 	#instVars : [
 		'maxCommitWindow'
 	],
@@ -80,15 +80,6 @@ DelayUntilFirstChurnMetric >> description [
 DelayUntilFirstChurnMetric >> initialize [
 	super initialize.
 	maxCommitWindow := 3
-]
-
-{ #category : #loading }
-DelayUntilFirstChurnMetric >> load [
-
-	
-	userCommits := user
-		               loadCommitsSince: (period at: #since)
-		               until: (period at: #until)
 ]
 
 { #category : #accessing }

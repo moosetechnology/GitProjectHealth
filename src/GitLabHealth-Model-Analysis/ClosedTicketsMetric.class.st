@@ -1,6 +1,6 @@
 Class {
 	#name : #ClosedTicketsMetric,
-	#superclass : #UserMetric,
+	#superclass : #UserJiraMetric,
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
@@ -27,12 +27,6 @@ ClosedTicketsMetric >> calculate [
 ClosedTicketsMetric >> description [
 
 	^ 'number of merge request with jira ticket closed'
-]
-
-{ #category : #loading }
-ClosedTicketsMetric >> load [
-
-	userMergeRequests := user loadMergeRequesWithJiraIssueSince: (period at: #since) until: (period at: #until). 
 ]
 
 { #category : #accessing }

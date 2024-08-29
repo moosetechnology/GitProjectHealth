@@ -1,6 +1,6 @@
 Class {
 	#name : #CodeChurnMetric,
-	#superclass : #UserMetric,
+	#superclass : #UserCommitsMetric,
 	#instVars : [
 		'maxCommitWindow'
 	],
@@ -74,12 +74,6 @@ CodeChurnMetric >> description [
 { #category : #initialization }
 CodeChurnMetric >> initialize [ 
 	maxCommitWindow := 3
-]
-
-{ #category : #loading }
-CodeChurnMetric >> load [
-
-	userCommits := user loadCommitsSince: (period at: #since) until: (period at: #until) 
 ]
 
 { #category : #accessing }

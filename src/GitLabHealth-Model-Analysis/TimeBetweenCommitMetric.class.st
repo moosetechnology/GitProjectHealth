@@ -1,6 +1,6 @@
 Class {
 	#name : #TimeBetweenCommitMetric,
-	#superclass : #UserMetric,
+	#superclass : #UserCommitsMetric,
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
@@ -47,14 +47,6 @@ TimeBetweenCommitMetric >> calculate [
 TimeBetweenCommitMetric >> description [
 
 	^ 'average time between commits'
-]
-
-{ #category : #loading }
-TimeBetweenCommitMetric >> load [
-
-		userCommits := user
-		               loadCommitsSince: (period at: #since)
-		               until: (period at: #until)
 ]
 
 { #category : #accessing }

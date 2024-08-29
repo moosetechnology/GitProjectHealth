@@ -1,6 +1,6 @@
 Class {
 	#name : #MergedMergeRequestWithoutReviewMetric,
-	#superclass : #UserMetric,
+	#superclass : #UserMergeRequestMetric,
 	#category : #'GitLabHealth-Model-Analysis'
 }
 

@@ -1,6 +1,6 @@
 Class {
 	#name : #MergeRequestDurationMetric,
-	#superclass : #UserMetric,
+	#superclass : #UserMergeRequestMetric,
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
@@ -54,15 +54,6 @@ MergeRequestDurationMetric >> calculate [
 MergeRequestDurationMetric >> description [
 
 	^ 'merge request duration'
-]
-
-{ #category : #loading }
-MergeRequestDurationMetric >> load [
-
-	
-	userMergeRequests := user
-		                     loadMergeRequestsSince: (period at: #since)
-		                     until: (period at: #until)
 ]
 
 { #category : #accessing }

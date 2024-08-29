@@ -1,6 +1,6 @@
 Class {
 	#name : #OpenedMergeRequestMetric,
-	#superclass : #UserMetric,
+	#superclass : #UserMergeRequestMetric,
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
@@ -27,15 +27,6 @@ OpenedMergeRequestMetric >> calculate [
 OpenedMergeRequestMetric >> description [
 
 	^'number of opened merge request'
-]
-
-{ #category : #loading }
-OpenedMergeRequestMetric >> load [
-
-	
-	userMergeRequests := user
-		                     loadMergeRequestsSince: (period at: #since)
-		                     until: (period at: #until)
 ]
 
 { #category : #accessing }

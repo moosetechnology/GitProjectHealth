@@ -1,6 +1,6 @@
 Class {
 	#name : #CodeDeletionMetric,
-	#superclass : #UserMetric,
+	#superclass : #UserCommitsMetric,
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
@@ -40,12 +40,6 @@ CodeDeletionMetric >> calculate [
 CodeDeletionMetric >> description [
 
 	^'code deletion (avg)'
-]
-
-{ #category : #loading }
-CodeDeletionMetric >> load [
-
-	userCommits := user loadCommitsSince: (period at: #since) until: (period at: #until) 
 ]
 
 { #category : #accessing }

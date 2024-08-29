@@ -1,6 +1,6 @@
 Class {
 	#name : #ContributedProjectMetric,
-	#superclass : #UserMetric,
+	#superclass : #UserCommitsMetric,
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
@@ -29,12 +29,6 @@ ContributedProjectMetric >> calculate [
 ContributedProjectMetric >> description [
 
 	^ 'number of project with min 1 commit of user'
-]
-
-{ #category : #loading }
-ContributedProjectMetric >> load [
-
-	userCommits := user loadCommitsSince: (period at: #since) until: (period at: #until). 
 ]
 
 { #category : #accessing }

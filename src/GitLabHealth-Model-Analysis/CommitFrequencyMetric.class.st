@@ -1,6 +1,6 @@
 Class {
 	#name : #CommitFrequencyMetric,
-	#superclass : #UserMetric,
+	#superclass : #UserCommitsMetric,
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
@@ -25,12 +25,6 @@ CommitFrequencyMetric >> calculate [
 CommitFrequencyMetric >> description [
 
 	^'commits frequency (avg)'
-]
-
-{ #category : #loading }
-CommitFrequencyMetric >> load [
-
-	userCommits := user loadCommitsSince: (period at: #since) until: (period at: #until). 
 ]
 
 { #category : #accessing }

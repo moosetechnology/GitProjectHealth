@@ -1,6 +1,6 @@
 Class {
 	#name : #CommentContributionMetric,
-	#superclass : #UserMetric,
+	#superclass : #UserCommitsMetric,
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
@@ -47,8 +47,7 @@ CommentContributionMetric >> description [
 
 { #category : #loading }
 CommentContributionMetric >> load [
-
-	userCommits := user loadCompleteCommitsSince: (period at: #since) until: (period at: #until).
+	userCommits := user loadCompleteCommitsSince: (period at: #since) until: (period at: #until). 
 ]
 
 { #category : #accessing }

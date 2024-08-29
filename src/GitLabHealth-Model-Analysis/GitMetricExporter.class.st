@@ -400,8 +400,8 @@ GitMetricExporter >> initialize [
 		           CodeDeletionMetric.
 		           CommentContributionMetric.
 		           CommitFrequencyMetric.
-		           CodeChurnMetric
-		           "DelayUntilFirstChurnMetric.
+		           CodeChurnMetric.
+		           DelayUntilFirstChurnMetric.
 		           TimeBetweenCommitMetric.
 		           ContributedProjectMetric.
 		           MergeRequestDurationMetric.
@@ -409,7 +409,7 @@ GitMetricExporter >> initialize [
 		           ClosedMergeRequestMetric.
 		           MergedMergeRequestMetric.
 		           MergedMergeRequestWithoutReviewMetric.
-		           ClosedTicketsMetric " }
+		           ClosedTicketsMetric}
 ]
 
 { #category : #accessing }
