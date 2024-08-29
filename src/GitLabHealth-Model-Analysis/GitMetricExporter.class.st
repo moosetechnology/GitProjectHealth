@@ -11,7 +11,8 @@ Class {
 		'runningPeriods',
 		'maxCommitWindow',
 		'over',
-		'analyses'
+		'analyses',
+		'emailDomain'
 	],
 	#category : #'GitLabHealth-Model-Analysis'
 }
@@ -436,7 +437,7 @@ GitMetricExporter >> onlyImportProjectsOfGroup: groupId [
 	projectCache := group toScope: GLHProject
 ]
 
-{ #category : #adding }
+{ #category : #setup }
 GitMetricExporter >> setupAnalysisForUsersWithNames: userNames [
 	"import all the project since a certain time"
 
@@ -453,6 +454,8 @@ GitMetricExporter >> setupAnalysisForUsersWithNames: userNames [
 			 metrics := GitMetric4User new.
 			 metrics
 				 glhImporter: glhImporter;
+				 jiraImporter: jiraImporter;
+				 withUserEmailDomain: emailDomain;
 				 user: user.
 
 			 i := 0.
@@ -470,4 +473,11 @@ GitMetricExporter >> setupAnalysisForUsersWithNames: userNames [
 					  p id -> (glhImporter completeImportProject: p) ]) asDictionary ]).
 
 	^ self
+]
+
+{ #category : #setup }
+GitMetricExporter >> withEmailDomain: anEmailDomain [
+
+	"define the email domain of your Git user. Usefull to link them between service (i.e. Jira)"
+	emailDomain := anEmailDomain
 ]
