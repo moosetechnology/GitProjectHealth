@@ -111,37 +111,6 @@ GitMetricExporter >> analyses: anObject [
 	analyses := anObject
 ]
 
-{ #category : #calculating }
-GitMetricExporter >> calculateAllMetricsOver: aDateWeekMonthOrYear [
-
-	| userAnalysisReport result analysesReport newMetric |
-	runningPeriods do: [ :period |
-		analysesReport := entities collect: [ :entity |
-			                  userAnalysisReport := UserAnalysisReport new
-				                                        username: entity user name;
-				                                        period: period;
-				                                        over: aDateWeekMonthOrYear.
-
-			                  metrics do: [ :metric |
-				                  newMetric := metric new
-					                               setPeriodSince:
-						                               (period at: #since)
-					                               until: (period at: #until);
-					                               over: aDateWeekMonthOrYear;
-					                               user: entity.
-
-
-				                  result := newMetric calculate.
-				                  userAnalysisReport metrics
-					                  at: newMetric name
-					                  put: result ].
-
-			                  userAnalysisReport ].
-		self analyses addAll: analysesReport ].
-
-	^ analyses
-]
-
 { #category : #utilities }
 GitMetricExporter >> constructFilePath: runningOver [
 
@@ -309,40 +278,34 @@ GitMetricExporter >> findProjectsOfUser: aCollection [
 ]
 
 { #category : #analysis }
-GitMetricExporter >> generateAnalyses [
-
-	| newAnalyses |
-	newAnalyses := OrderedCollection new.
-
-	runningPeriods do: [ :period |
-		newAnalyses addAll: (entities collect: [ :entity |
-			entity
-				generateAnalysisForPeriod: period
-				over: over
-				withMaxCommitWindows: maxCommitWindow ]) ].
-
-	self analyses: newAnalyses.
-
-	^ newAnalyses
-]
-
-{ #category : #analysis }
 GitMetricExporter >> generateAnalysesOver: aDateWeekMonthOrYear [
 
-	| newAnalyses |
-	over := aDateWeekMonthOrYear.
-	newAnalyses := OrderedCollection new.
-
+		| userAnalysisReport result analysesReport newMetric |
 	runningPeriods do: [ :period |
-		newAnalyses addAll: (entities collect: [ :entity |
-			entity
-				generateAnalysisForPeriod: period
-				over: over
-				withMaxCommitWindows: maxCommitWindow ]) ].
+		analysesReport := entities collect: [ :entity |
+			                  userAnalysisReport := UserAnalysisReport new
+				                                        username: entity user name;
+				                                        period: period;
+				                                        over: aDateWeekMonthOrYear.
 
-	self analyses: newAnalyses.
+			                  metrics do: [ :metric |
+				                  newMetric := metric new
+					                               setPeriodSince:
+						                               (period at: #since)
+					                               until: (period at: #until);
+					                               over: aDateWeekMonthOrYear;
+					                               user: entity.
 
-	^ newAnalyses
+
+				                  result := newMetric calculate.
+				                  userAnalysisReport metrics
+					                  at: newMetric name
+					                  put: result ].
+
+			                  userAnalysisReport ].
+		self analyses addAll: analysesReport ].
+
+	^ analyses
 ]
 
 { #category : #utilities }
