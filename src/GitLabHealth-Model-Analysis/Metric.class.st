@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'period',
 		'over',
-		'glhImporter'
+		'glhImporter',
+		'jiraImporter'
 	],
 	#category : #'GitLabHealth-Model-Analysis'
 }
@@ -25,6 +26,12 @@ Metric >> description [
 Metric >> glhImporter: anObject [
 
 	glhImporter := anObject
+]
+
+{ #category : #accessing }
+Metric >> jiraImporter: anObject [
+
+	jiraImporter := anObject
 ]
 
 { #category : #loading }

@@ -116,27 +116,29 @@ GitMetricExporter >> calculateAllMetricsOver: aDateWeekMonthOrYear [
 	| userAnalysisReport result analysesReport |
 	runningPeriods do: [ :period |
 		analysesReport := entities collect: [ :entity |
-			userAnalysisReport := UserAnalysisReport new
-				                      username: entity user name;
-				                      period: period;
-				                      over: aDateWeekMonthOrYear.
+			                  userAnalysisReport := UserAnalysisReport new
+				                                        username: entity user name;
+				                                        period: period;
+				                                        over: aDateWeekMonthOrYear.
 
-			metrics do: [ :metric |
-				metric
-					glhImporter: glhImporter;
-					setPeriodSince: (period at: #since) until: (period at: #until);
-					over: aDateWeekMonthOrYear;
-					user: entity user.
+			                  metrics do: [ :metric |
+				                  metric
+					                  glhImporter: glhImporter;
+						jiraImporter: jiraImporter;
+					                  setPeriodSince: (period at: #since)
+					                  until: (period at: #until);
+					                  over: aDateWeekMonthOrYear;
+					                  user: entity user.
 
 
-				metric load.
-				result := metric calculate.
-				userAnalysisReport metrics at: metric name put: result ].
-			
-		userAnalysisReport
- ].
-self analyses addAll: analysesReport.
-].
+				                  metric load.
+				                  result := metric calculate.
+				                  userAnalysisReport metrics
+					                  at: metric name
+					                  put: result ].
+
+			                  userAnalysisReport ].
+		self analyses addAll: analysesReport ].
 
 	^ analyses
 ]
@@ -399,6 +401,8 @@ GitMetricExporter >> initialize [
 		           CodeDeletionMetric new.
 		           CommentContributionMetric new.
 		           CommitFrequencyMetric new.
+		           CodeChurnMetric new.
+		           DelayUntilFirstChurnMetric new.
 		           ContributedProjectMetric new.
 		           TimeBetweenCommitMetric new.
 		           MergeRequestDurationMetric new.
@@ -406,8 +410,7 @@ GitMetricExporter >> initialize [
 		           ClosedMergeRequestMetric new.
 		           MergedMergeRequestMetric new.
 		           MergedMergeRequestWithoutReviewMetric new.
-					  CodeChurnMetric new.
-		}
+		ClosedTicketsMetric new }
 ]
 
 { #category : #accessing }
