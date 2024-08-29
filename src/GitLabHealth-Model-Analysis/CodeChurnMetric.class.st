@@ -63,7 +63,7 @@ CodeChurnMetric >> calculate [
 			                 (#contribution -> totalContribution).
 			                 (#percentage -> percentage) } asDictionary ].
 
-	^ groupedByDate collect: [ :date | date at: #percentage ]
+	^ (groupedByDate collect: [ :date | date at: #percentage ]) average
 ]
 
 { #category : #accessing }

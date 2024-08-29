@@ -17,7 +17,7 @@ CommitFrequencyMetric >> calculate [
 
 	groupedByDate := groupedByDate collect: [ :group | group size ].
 
-	^ groupedByDate
+	^ groupedByDate average asFloat
 ]
 
 { #category : #accessing }

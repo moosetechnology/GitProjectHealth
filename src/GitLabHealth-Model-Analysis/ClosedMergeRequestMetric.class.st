@@ -8,8 +8,7 @@ Class {
 ClosedMergeRequestMetric >> calculate [
 
 	| groupedByDate userClosedMergeRequests dateOver |
-	groupedByDate := self
-		                 setupGroupedDate.
+	groupedByDate := self setupGroupedDate.
 
 	userClosedMergeRequests := userMergeRequests select: [
 		                           :userMergeRequest |
@@ -17,9 +16,7 @@ ClosedMergeRequestMetric >> calculate [
 			                           userMergeRequest state = 'closed' ].
 
 	userClosedMergeRequests do: [ :userMergeRequest |
-		dateOver := self
-			            transformDate: userMergeRequest created_at
-			            to: over.
+		dateOver := self transformDate: userMergeRequest created_at to: over.
 
 		groupedByDate
 			at: dateOver printString
@@ -27,9 +24,9 @@ ClosedMergeRequestMetric >> calculate [
 
 
 	groupedByDate := groupedByDate collect: [ :group | group size ].
+ 
 
-
-	^ groupedByDate
+	^ groupedByDate average asFloat
 ]
 
 { #category : #accessing }

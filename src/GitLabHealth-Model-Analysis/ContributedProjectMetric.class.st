@@ -21,7 +21,7 @@ ContributedProjectMetric >> calculate [
 		                 projects := Set newFrom: group.
 		                 projects size ].
 
-	^ groupedByDate
+	^ groupedByDate average asFloat
 ]
 
 { #category : #accessing }

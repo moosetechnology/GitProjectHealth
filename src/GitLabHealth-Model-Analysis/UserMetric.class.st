@@ -5,7 +5,8 @@ Class {
 		'user',
 		'userProjects',
 		'userCommits',
-		'userMergeRequests'
+		'userMergeRequests',
+		'emailDomain'
 	],
 	#category : #'GitLabHealth-Model-Analysis'
 }
@@ -27,6 +28,12 @@ UserMetric >> calculate [
 UserMetric >> description [
 
 	^ self subclassResponsibility
+]
+
+{ #category : #accessing }
+UserMetric >> emailDomain: anObject [
+
+	emailDomain := anObject
 ]
 
 { #category : #churn }
@@ -140,4 +147,11 @@ UserMetric >> name [
 UserMetric >> user: anObject [
 
 	user := anObject
+]
+
+{ #category : #email }
+UserMetric >> userEmail [
+		^ ('' join: {
+			   user username.
+			   emailDomain }) asLowercase
 ]

@@ -12,7 +12,8 @@ Class {
 		'maxCommitWindow',
 		'over',
 		'analyses',
-		'emailDomain'
+		'emailDomain',
+		'metrics'
 	],
 	#category : #'GitLabHealth-Model-Analysis'
 }
@@ -117,18 +118,19 @@ GitMetricExporter >> calculateAllMetricsOver: aDateWeekMonthOrYear [
 	runningPeriods do: [ :period |
 		analysesReport := entities collect: [ :entity |
 			                  userAnalysisReport := UserAnalysisReport new
-				                                        username: entity user name;
+				                                        username: entity name;
 				                                        period: period;
 				                                        over: aDateWeekMonthOrYear.
 
 			                  metrics do: [ :metric |
 				                  metric
 					                  glhImporter: glhImporter;
-						jiraImporter: jiraImporter;
+					                  jiraImporter: jiraImporter;
 					                  setPeriodSince: (period at: #since)
 					                  until: (period at: #until);
 					                  over: aDateWeekMonthOrYear;
-					                  user: entity user.
+					                  user: entity;
+					                  emailDomain: emailDomain.
 
 
 				                  metric load.
@@ -170,7 +172,7 @@ GitMetricExporter >> csvMetricsFor: date [
 			              analysis
 				              ifNil: [ nil ]
 				              ifNotNil: [
-				              (analysis metrics at: metric name) average ] ] ].
+				              analysis metrics at: metric name ] ] ].
 
 	^ csvMetrics asOrderedDictionary
 ]
@@ -447,30 +449,7 @@ GitMetricExporter >> setupAnalysisForUsersWithNames: userNames [
 
 	glhImporter userCatalogue scrapeAuthorNamesForUsers: users.
 
-	entities addAll: (users collect: [ :user |
-			 | itsProjects metrics i size |
-			 itsProjects := glhImporter importContributedProjectsOfUser: user.
-
-			 metrics := GitMetric4User new.
-			 metrics
-				 glhImporter: glhImporter;
-				 jiraImporter: jiraImporter;
-				 withUserEmailDomain: emailDomain;
-				 user: user.
-
-			 i := 0.
-			 size := itsProjects size.
-			 metrics itsProjects: (itsProjects collect: [ :p |
-					  (' ' join: {
-							   'complete import of project:'.
-							   p name printString.
-							   '['.
-							   (i := i + 1) printString.
-							   '/'.
-							   size.
-							   ']' }) recordInfo.
-
-					  p id -> (glhImporter completeImportProject: p) ]) asDictionary ]).
+	entities addAll: users.
 
 	^ self
 ]

@@ -8,23 +8,20 @@ Class {
 MergedMergeRequestMetric >> calculate [
 
 	| groupedByDate userMergedMergeRequests dateOver |
-	groupedByDate := self
-		                 setupGroupedDate.
+	groupedByDate := self setupGroupedDate.
 
 	userMergedMergeRequests := userMergeRequests select: [
 		                           :userMergeRequest |
 		                           userMergeRequest merged_at isNotNil ].
 
 	userMergedMergeRequests do: [ :userMergeRequest |
-		dateOver := self
-			            transformDate: userMergeRequest created_at
-			            to: over.
+		dateOver := self transformDate: userMergeRequest created_at to: over.
 		groupedByDate
 			at: dateOver printString
 			ifPresent: [ :value | value add: userMergeRequest ] ].
 	groupedByDate := groupedByDate collect: [ :group | group size ].
 
-	^ groupedByDate
+	^ groupedByDate average asFloat
 ]
 
 { #category : #accessing }

@@ -30,12 +30,9 @@ CodeAdditionMetric >> calculate [
 					yourself ] ].
 
 	groupedByDate := groupedByDate collect: [ :contribs |
-		               
-		                contribs sum: [ :v | v at: #addition ].
-		       
-		                  ].
+		                 contribs sum: [ :v | v at: #addition ] ].
 
-	^ groupedByDate
+	^ groupedByDate average asFloat
 ]
 
 { #category : #accessing }

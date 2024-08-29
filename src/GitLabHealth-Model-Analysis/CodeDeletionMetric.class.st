@@ -32,7 +32,7 @@ CodeDeletionMetric >> calculate [
 	groupedByDate := groupedByDate collect: [ :contribs |
 		                 contribs sum: [ :v | v at: #deletion ] ].
 
-	^ groupedByDate
+	^ groupedByDate average asFloat
 ]
 
 { #category : #accessing }

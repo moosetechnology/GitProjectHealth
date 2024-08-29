@@ -7,7 +7,7 @@ Class {
 { #category : #calculating }
 ClosedTicketsMetric >> calculate [
 
-	| groupedByDate dateOver average |
+	| groupedByDate dateOver |
 	groupedByDate := self setupGroupedDate.
 
 
@@ -19,11 +19,7 @@ ClosedTicketsMetric >> calculate [
 
 	groupedByDate := groupedByDate collect: [ :group | group size ].
 
-	average := groupedByDate
-		           ifEmpty: [ 0 ]
-		           ifNotEmpty: [ groupedByDate average ].
-
-	^ groupedByDate
+	^ groupedByDate average asFloat
 ]
 
 { #category : #accessing }
@@ -39,7 +35,7 @@ ClosedTicketsMetric >> load [
 	self loadUserMergeRequests.
 
 	jiraImporter importAllCurrentAndPastIssuesOf:
-		user commits anyOne author_email.
+		self userEmail.
 
 	GPJCConnector new
 		gpModel: glhImporter glhModel;
@@ -47,8 +43,7 @@ ClosedTicketsMetric >> load [
 		connect.
 
 	userMergeRequests := userMergeRequests select: [ :mergeRequest |
-		                     mergeRequest jiraIssue isNotNil ].
-	
+		                     mergeRequest jiraIssue isNotNil ]
 ]
 
 { #category : #accessing }

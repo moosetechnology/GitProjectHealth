@@ -8,8 +8,7 @@ Class {
 CommentContributionMetric >> calculate [
 
 	| groupedByDate gitAnalyzer contributions |
-	groupedByDate := self
-		                 setupGroupedDate.
+	groupedByDate := self setupGroupedDate.
 
 	gitAnalyzer := GitAnalyzer new glhImporter: glhImporter.
 
@@ -36,7 +35,7 @@ CommentContributionMetric >> calculate [
 			                 ifEmpty: [ 0 ] ].
 
 
-	^ groupedByDate
+	^ groupedByDate average asFloat
 ]
 
 { #category : #accessing }

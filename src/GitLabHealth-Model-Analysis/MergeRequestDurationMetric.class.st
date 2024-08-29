@@ -46,7 +46,7 @@ MergeRequestDurationMetric >> calculate [
 
 		filterGroups at: assoc key put: sum / denominator ].
 
-	^ filterGroups
+	^ filterGroups average asDuration
 ]
 
 { #category : #accessing }

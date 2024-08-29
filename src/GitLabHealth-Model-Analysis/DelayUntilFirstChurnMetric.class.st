@@ -10,7 +10,7 @@ Class {
 { #category : #calculating }
 DelayUntilFirstChurnMetric >> calculate [
 
-	| commits groupedByDate res |
+	| commits groupedByDate res average |
 	groupedByDate := self setupGroupedDate.
 	commits := self
 		           foundSuccessorOf: userCommits
@@ -62,7 +62,11 @@ DelayUntilFirstChurnMetric >> calculate [
 
 	res := res reject: #isNil.
 
-	^ res
+	average := res
+		           ifEmpty: [ nil ]
+		           ifNotEmpty: [ res values average asFloat ].
+
+	^ average
 ]
 
 { #category : #accessing }
