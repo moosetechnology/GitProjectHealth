@@ -120,27 +120,6 @@ GitMetric4User >> loadCompleteMergeRequestsSince: since until: until [
 ]
 
 { #category : #loading }
-GitMetric4User >> loadMergeRequesWithJiraIssueSince: since until: until [
-
-	| email |
-	itsMergeRequests := self
-		                    loadMergeRequestsSince: since
-		                    until: until.
-
-	email := self userEmail.
-
-	jiraImporter importAllCurrentAndPastIssuesOf: email.
-
-	GPJCConnector new
-		gpModel: glhImporter glhModel;
-		jiraModel: jiraImporter model;
-		connect.
-
-	^ itsMergeRequests select: [ :mergeRequest |
-		  mergeRequest jiraIssue isNotNil ]
-]
-
-{ #category : #loading }
 GitMetric4User >> loadMergeRequestsSince: since until: until [
 	
 	| cacheSymbol mergeRequests userMergeRequests |
@@ -168,6 +147,25 @@ GitMetric4User >> loadMergeRequestsSince: since until: until [
 	userMergeRequests := mergeRequests select: [ :mergeRequest |
 		                     mergeRequest author = user ].
 	^ userMergeRequests
+]
+
+{ #category : #loading }
+GitMetric4User >> loadMergeRequestsWithJiraIssueSince: since until: until [
+
+	| email |
+	itsMergeRequests := self loadMergeRequestsSince: since until: until.
+
+	email := self userEmail.
+
+	jiraImporter importAllCurrentAndPastIssuesOf: email.
+
+	GPJCConnector new
+		gpModel: glhImporter glhModel;
+		jiraModel: jiraImporter model;
+		connect.
+
+	^ itsMergeRequests select: [ :mergeRequest |
+		  mergeRequest jiraIssue isNotNil ]
 ]
 
 { #category : #loading }
