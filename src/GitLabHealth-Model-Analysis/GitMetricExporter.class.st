@@ -114,29 +114,26 @@ GitMetricExporter >> analyses: anObject [
 { #category : #calculating }
 GitMetricExporter >> calculateAllMetricsOver: aDateWeekMonthOrYear [
 
-	| userAnalysisReport result analysesReport |
+	| userAnalysisReport result analysesReport newMetric |
 	runningPeriods do: [ :period |
 		analysesReport := entities collect: [ :entity |
 			                  userAnalysisReport := UserAnalysisReport new
-				                                        username: entity name;
+				                                        username: entity user name;
 				                                        period: period;
 				                                        over: aDateWeekMonthOrYear.
 
 			                  metrics do: [ :metric |
-				                  metric
-					                  glhImporter: glhImporter;
-					                  jiraImporter: jiraImporter;
-					                  setPeriodSince: (period at: #since)
-					                  until: (period at: #until);
-					                  over: aDateWeekMonthOrYear;
-					                  user: entity;
-					                  emailDomain: emailDomain.
+				                  newMetric := metric new
+					                               setPeriodSince:
+						                               (period at: #since)
+					                               until: (period at: #until);
+					                               over: aDateWeekMonthOrYear;
+					                               user: entity.
 
 
-				                  metric load.
-				                  result := metric calculate.
+				                  result := newMetric calculate.
 				                  userAnalysisReport metrics
-					                  at: metric name
+					                  at: newMetric name
 					                  put: result ].
 
 			                  userAnalysisReport ].
@@ -163,7 +160,7 @@ GitMetricExporter >> csvMetricsFor: date [
 
 	| csvMetrics |
 	csvMetrics := metrics collect: [ :metric |
-		              metric description , ' - ' , date asString
+		              metric new description , ' - ' , date asString
 		              -> [ :groupAnalyses |
 			              | analysis |
 			              analysis := self
@@ -172,7 +169,7 @@ GitMetricExporter >> csvMetricsFor: date [
 			              analysis
 				              ifNil: [ nil ]
 				              ifNotNil: [
-				              analysis metrics at: metric name ] ] ].
+				              analysis metrics at: metric new name ] ] ].
 
 	^ csvMetrics asOrderedDictionary
 ]
@@ -399,20 +396,20 @@ GitMetricExporter >> initialize [
 	analyses := OrderedCollection new.
 
 	metrics := {
-		           CodeAdditionMetric new.
-		           CodeDeletionMetric new.
-		           CommentContributionMetric new.
-		           CommitFrequencyMetric new.
-		           CodeChurnMetric new.
-		           DelayUntilFirstChurnMetric new.
-		           ContributedProjectMetric new.
-		           TimeBetweenCommitMetric new.
-		           MergeRequestDurationMetric new.
-		           OpenedMergeRequestMetric new.
-		           ClosedMergeRequestMetric new.
-		           MergedMergeRequestMetric new.
-		           MergedMergeRequestWithoutReviewMetric new.
-		ClosedTicketsMetric new }
+		           CodeAdditionMetric.
+		           CodeDeletionMetric.
+		           CommentContributionMetric.
+		           CommitFrequencyMetric.
+		           CodeChurnMetric
+		           "DelayUntilFirstChurnMetric.
+		           TimeBetweenCommitMetric.
+		           ContributedProjectMetric.
+		           MergeRequestDurationMetric.
+		           OpenedMergeRequestMetric.
+		           ClosedMergeRequestMetric.
+		           MergedMergeRequestMetric.
+		           MergedMergeRequestWithoutReviewMetric.
+		           ClosedTicketsMetric " }
 ]
 
 { #category : #accessing }
@@ -449,7 +446,17 @@ GitMetricExporter >> setupAnalysisForUsersWithNames: userNames [
 
 	glhImporter userCatalogue scrapeAuthorNamesForUsers: users.
 
-	entities addAll: users.
+	entities addAll: (users collect: [ :user |
+			 | metricUser |
+			 metricUser := GitMetric4User new.
+			 metricUser
+				 glhImporter: glhImporter;
+				 jiraImporter: jiraImporter;
+				 withUserEmailDomain: emailDomain;
+				 user: user.
+
+			 metricUser loadProjects.
+			 metricUser ]).
 
 	^ self
 ]

@@ -8,9 +8,10 @@ Class {
 CommentContributionMetric >> calculate [
 
 	| groupedByDate gitAnalyzer contributions |
+	userCommits ifNil: [ self load ].
 	groupedByDate := self setupGroupedDate.
 
-	gitAnalyzer := GitAnalyzer new glhImporter: glhImporter.
+	gitAnalyzer := GitAnalyzer new.
 
 	contributions := userCommits collect: [ :commit |
 		                 commit -> (gitAnalyzer
@@ -47,10 +48,7 @@ CommentContributionMetric >> description [
 { #category : #loading }
 CommentContributionMetric >> load [
 
-	self loadUserProjects.
-	self loadUserCommits.
-	
-	userCommits do: [ :commit | glhImporter completeImportedCommit: commit ].
+	userCommits := user loadCompleteCommitsSince: (period at: #since) until: (period at: #until).
 ]
 
 { #category : #accessing }

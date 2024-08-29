@@ -5,8 +5,7 @@ Class {
 		'user',
 		'userProjects',
 		'userCommits',
-		'userMergeRequests',
-		'emailDomain'
+		'userMergeRequests'
 	],
 	#category : #'GitLabHealth-Model-Analysis'
 }
@@ -30,35 +29,6 @@ UserMetric >> description [
 	^ self subclassResponsibility
 ]
 
-{ #category : #accessing }
-UserMetric >> emailDomain: anObject [
-
-	emailDomain := anObject
-]
-
-{ #category : #churn }
-UserMetric >> foundSuccessorOf: commits andCompleteImportForMax: commitLimit [
-
-	| analyzingCommits gitAnalyzer |
-	analyzingCommits := Set new.
-
-	gitAnalyzer := GitAnalyzer new
-		               glhImporter: glhImporter;
-		               maxChildCommit: commitLimit.
-
-	glhImporter withCommitDiffs: true.
-
-	userCommits do: [ :c |
-		gitAnalyzer
-			visitChildCommits: c childCommits
-			toStoreThemIn: analyzingCommits
-			upto: commitLimit ].
-
-	analyzingCommits do: [ :c | glhImporter completeImportedCommit: c ].
-
-	^ analyzingCommits
-]
-
 { #category : #initialization }
 UserMetric >> initialize [
 	over := Date
@@ -72,32 +42,8 @@ UserMetric >> load [
 
 { #category : #loading }
 UserMetric >> loadUserCommits [
-
-	| allCommits cacheSymbol |
-	userProjects ifNil: [ self loadUserProjects ].
-	glhImporter withCommitDiffs: false.
-
-	cacheSymbol := self
-		               cacheSymbolFor: GLHCommit
-		               since: (period at: #since)
-		               until: (period at: #until).
-
-	"download commits unless project cache is not empty"
-	allCommits := userProjects collect: [ :project |
-									
-				              glhImporter
-					                              importCommitsOProject: project
-					                              since: (period at: #since)
-					                              until: (period at: #until).
-				              ].
-
-	allCommits := allCommits flatten.
-	allCommits do: [ :commit | glhImporter importCreatorOfCommit: commit ].
-	glhImporter chainsCommitsFrom: allCommits.
-	glhImporter withCommitDiffs: true.
-
-	^ userCommits := allCommits reject: [ :commit |
-		                 commit commitCreator ~= user ]
+	
+	userCommits := user loadCommitsSince: (period at: #since) until: (period at: #until) 
 ]
 
 { #category : #loading }
@@ -147,11 +93,4 @@ UserMetric >> name [
 UserMetric >> user: anObject [
 
 	user := anObject
-]
-
-{ #category : #email }
-UserMetric >> userEmail [
-		^ ('' join: {
-			   user username.
-			   emailDomain }) asLowercase
 ]

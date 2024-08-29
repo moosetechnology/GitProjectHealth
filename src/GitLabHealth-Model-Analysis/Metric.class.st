@@ -3,9 +3,7 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'period',
-		'over',
-		'glhImporter',
-		'jiraImporter'
+		'over'
 	],
 	#category : #'GitLabHealth-Model-Analysis'
 }
@@ -20,18 +18,6 @@ Metric >> calculate [
 Metric >> description [
 
 	^ self subclassResponsibility
-]
-
-{ #category : #accessing }
-Metric >> glhImporter: anObject [
-
-	glhImporter := anObject
-]
-
-{ #category : #accessing }
-Metric >> jiraImporter: anObject [
-
-	jiraImporter := anObject
 ]
 
 { #category : #loading }

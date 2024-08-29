@@ -8,6 +8,7 @@ Class {
 ClosedMergeRequestMetric >> calculate [
 
 	| groupedByDate userClosedMergeRequests dateOver |
+	userMergeRequests ifNil: [ self load ].
 	groupedByDate := self setupGroupedDate.
 
 	userClosedMergeRequests := userMergeRequests select: [
@@ -24,7 +25,7 @@ ClosedMergeRequestMetric >> calculate [
 
 
 	groupedByDate := groupedByDate collect: [ :group | group size ].
- 
+
 
 	^ groupedByDate average asFloat
 ]
@@ -38,8 +39,7 @@ ClosedMergeRequestMetric >> description [
 { #category : #loading }
 ClosedMergeRequestMetric >> load [
 
-	self loadUserProjects.
-	self loadUserMergeRequests
+	userMergeRequests := user loadMergeRequestsSince: (period at: #since) until: (period at: #until). 
 ]
 
 { #category : #accessing }

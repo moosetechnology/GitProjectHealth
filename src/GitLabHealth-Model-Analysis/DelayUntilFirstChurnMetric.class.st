@@ -11,15 +11,16 @@ Class {
 DelayUntilFirstChurnMetric >> calculate [
 
 	| commits groupedByDate res average |
+	userCommits ifNil: [ self load ].
 	groupedByDate := self setupGroupedDate.
-	commits := self
+	commits := user
 		           foundSuccessorOf: userCommits
 		           andCompleteImportForMax: maxCommitWindow.
 
 
 	"class commit by dates, filter none user commits"
 	commits do: [ :commit |
-		commit commitCreator = user ifTrue: [
+		commit commitCreator = user user ifTrue: [
 			| overDate |
 			overDate := self transformDate: commit created_at to: over.
 
@@ -38,7 +39,6 @@ DelayUntilFirstChurnMetric >> calculate [
 		       commits4Date collect: [ :commitA |
 			       | commitB |
 			       commitB := GitAnalyzer new
-				                  glhImporter: glhImporter;
 				                  fromCommit: commitA;
 				                  maxChildCommit: maxCommitWindow;
 				                  analyseDelayUntilFirstChurn.
@@ -59,7 +59,7 @@ DelayUntilFirstChurnMetric >> calculate [
 			       ifFalse: [
 			       (filtered sum: [ :v | v asDuration asSeconds ])
 			       / filtered size ] ].
-
+	
 	res := res reject: #isNil.
 
 	average := res
@@ -85,8 +85,10 @@ DelayUntilFirstChurnMetric >> initialize [
 { #category : #loading }
 DelayUntilFirstChurnMetric >> load [
 
-	self loadUserProjects.
-	self loadUserCommits.
+	
+	userCommits := user
+		               loadCommitsSince: (period at: #since)
+		               until: (period at: #until)
 ]
 
 { #category : #accessing }

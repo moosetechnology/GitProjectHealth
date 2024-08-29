@@ -537,20 +537,21 @@ GitMetric4User >> delayUntilFirstChurnSince: since until: until overA: aDateWeek
 { #category : #churn }
 GitMetric4User >> foundSuccessorOf: userCommits andCompleteImportForMax: commitLimit [
 
-	| analyzingCommits i size|
+	| analyzingCommits i size |
 	analyzingCommits := Set new.
 	glhImporter withCommitDiffs: true.
 
 	userCommits do: [ :c |
-		gitAnalyzer
+		GitAnalyzer new
 			visitChildCommits: c childCommits
 			toStoreThemIn: analyzingCommits
 			upto: commitLimit ].
 
 	i := 0.
-	size := analyzingCommits size. 
+	size := analyzingCommits size.
 	analyzingCommits do: [ :c |
-		('import complete commits  [' , (i:=i+1) printString, '/', size printString , ']'  ) recordInfo.
+		('import complete commits  [' , (i := i + 1) printString , '/'
+		 , size printString , ']') recordInfo.
 		glhImporter completeImportedCommit: c ].
 
 	^ analyzingCommits
@@ -649,10 +650,9 @@ GitMetric4User >> generateAnalysisForPeriod: period over: aDateWeekMonthOrYear w
 GitMetric4User >> initialize [
 
 	user := GLHUser new.
-	itsProjects := Dictionary new.
 	itsCommits := Dictionary new.
 	itsMergeRequests := Dictionary new.
-	
+
 	emailDomain := '@generic-domain.com'
 ]
 
@@ -679,17 +679,71 @@ GitMetric4User >> loadCommitOfProjects: aCollection since: aTimespan [
 ]
 
 { #category : #loading }
-GitMetric4User >> loadItsMergeRequesWithJiraIssueSince: since until: until [
+GitMetric4User >> loadCommitsSince: since until: until [
 
-	|email|
+	| cacheSymbol allCommits userCommits |
+	itsProjects ifNil: [ self loadProjects ].
+
+	glhImporter withCommitDiffs: false.
+
+	cacheSymbol := self
+		               cacheSymbolFor: GLHCommit
+		               since: since
+		               until: until.
+
+	"download commits unless project cache is not empty"
+	allCommits := itsProjects collect: [ :project |
+		              project repository cacheAt: cacheSymbol ifAbsentPut: [
+			              | foundCommits |
+			              foundCommits := glhImporter
+				                              importCommitsOProject: project
+				                              since: since
+				                              until: until.
+			              foundCommits ] ].
+
+	allCommits := allCommits flatten.
+	allCommits do: [ :commit | glhImporter importCreatorOfCommit: commit ].
+	glhImporter chainsCommitsFrom: allCommits.
+	glhImporter withCommitDiffs: true.
+
+	^ userCommits := allCommits reject: [ :commit |
+		                 commit commitCreator ~= user ]
+]
+
+{ #category : #loading }
+GitMetric4User >> loadCompleteCommitsSince: since until: until [
+
+	| commits |
+	commits := self loadCommitsSince: since until: until.
+	commits do: [ :commit | glhImporter completeImportedCommit: commit ].
+	^commits
+	
+	 
+]
+
+{ #category : #loading }
+GitMetric4User >> loadCompleteMergeRequestsSince: since until: until [
+
+	| mergeRequests |
+	mergeRequests := self loadMergeRequestsSince: since until: until.
+
+	mergeRequests do: [ :mergeRequest |
+		glhImporter importMergeResquestMerger: mergeRequest ].
+	
+	^mergeRequests
+]
+
+{ #category : #loading }
+GitMetric4User >> loadMergeRequesWithJiraIssueSince: since until: until [
+
+	| email |
 	itsMergeRequests := self
-		                    loadItsMergeRequestsSince: since
+		                    loadMergeRequestsSince: since
 		                    until: until.
 
-	email := self userEmail. 
+	email := self userEmail.
 
-	jiraImporter importAllCurrentAndPastIssuesOf:
-		email.
+	jiraImporter importAllCurrentAndPastIssuesOf: email.
 
 	GPJCConnector new
 		gpModel: glhImporter glhModel;
@@ -701,26 +755,46 @@ GitMetric4User >> loadItsMergeRequesWithJiraIssueSince: since until: until [
 ]
 
 { #category : #loading }
-GitMetric4User >> loadItsMergeRequestsSince: since until: until [
-
-	| mergeRequests |
-	gitAnalyzer := GitAnalyzer new
-		               glhImporter: glhImporter;
-		               onModel: glhModel.
-
+GitMetric4User >> loadMergeRequestsSince: since until: until [
+	
+	| cacheSymbol mergeRequests userMergeRequests |
+	itsProjects ifNil: [ self loadProjects ].
 	glhImporter withCommitDiffs: false.
-	mergeRequests := self
-		                 loadMergeRequestsFromProjectsIds: itsProjects keys
-		                 since: since
-		                 until: until.
+	cacheSymbol := self
+		               cacheSymbolFor: GLPHEMergeRequest
+		               since: since
+		               until: until.
+
+	mergeRequests := itsProjects collect: [ :project |
+		                 | mr |
+		                 project cacheAt: cacheSymbol ifAbsentPut: [
+			                 mr := glhImporter
+				                       importMergeRequests: project
+				                       since: since
+				                       until: until.
+			                 mr ] ].
+
+	mergeRequests := mergeRequests flattened.
 	glhImporter withCommitDiffs: true.
 
 	mergeRequests do: [ :mr | glhImporter importMergeResquestAuthor: mr ].
 
-	itsMergeRequests := mergeRequests select: [ :mergeRequest |
-		                    mergeRequest author = self user ].
+	userMergeRequests := mergeRequests select: [ :mergeRequest |
+		                     mergeRequest author = user ].
+	^ userMergeRequests
+]
 
-	^ itsMergeRequests
+{ #category : #loading }
+GitMetric4User >> loadProjects [
+
+	itsProjects ifNotNil: [ ^ itsProjects ].
+
+	itsProjects := glhImporter importContributedProjectsOfUser: user.
+
+	itsProjects do: [ :project |
+		glhImporter completeImportProject: project ].
+
+	^ itsProjects
 ]
 
 { #category : #'metrics - merge request' }

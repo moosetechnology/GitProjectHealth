@@ -8,6 +8,7 @@ Class {
 TimeBetweenCommitMetric >> calculate [
 
 	| commitSortedByDate commits1 commits2 differences groupedByDate dateOver average |
+	userCommits ifNil: [ self load ].
 	groupedByDate := self setupGroupedDate.
 
 	commitSortedByDate := userCommits sorted: [ :commit1 :commit2 |
@@ -34,8 +35,8 @@ TimeBetweenCommitMetric >> calculate [
 				                                asSeconds ].
 
 		                 differences average asDuration ].
-	
-		average := groupedByDate
+
+	average := groupedByDate
 		           ifEmpty: [ nil ]
 		           ifNotEmpty: [ groupedByDate average ].
 
@@ -51,8 +52,9 @@ TimeBetweenCommitMetric >> description [
 { #category : #loading }
 TimeBetweenCommitMetric >> load [
 
-	self loadUserProjects.
-	self loadUserCommits.
+		userCommits := user
+		               loadCommitsSince: (period at: #since)
+		               until: (period at: #until)
 ]
 
 { #category : #accessing }

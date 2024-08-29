@@ -8,6 +8,7 @@ Class {
 ContributedProjectMetric >> calculate [
 
 	| groupedByDate dateOver projects |
+	userCommits ifNil: [ self load ].
 	groupedByDate := self setupGroupedDate.
 
 	userCommits do: [ :userCommit |
@@ -33,8 +34,7 @@ ContributedProjectMetric >> description [
 { #category : #loading }
 ContributedProjectMetric >> load [
 
-	self loadUserProjects.
-	self loadUserCommits.
+	userCommits := user loadCommitsSince: (period at: #since) until: (period at: #until). 
 ]
 
 { #category : #accessing }

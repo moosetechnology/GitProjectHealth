@@ -8,9 +8,10 @@ Class {
 CodeAdditionMetric >> calculate [
 
 	| gitAnalyzer contributions groupedByDate |
+	userCommits ifNil: [ self load ].
 	groupedByDate := self setupGroupedDate.
 
-	gitAnalyzer := GitAnalyzer new glhImporter: glhImporter.
+	gitAnalyzer := GitAnalyzer new.
 
 	contributions := userCommits collect: [ :commit |
 		                 commit -> (gitAnalyzer
@@ -44,8 +45,7 @@ CodeAdditionMetric >> description [
 { #category : #loading }
 CodeAdditionMetric >> load [
 
-	self loadUserProjects.
-	self loadUserCommits
+	userCommits := user loadCommitsSince: (period at: #since) until: (period at: #until). 
 ]
 
 { #category : #accessing }

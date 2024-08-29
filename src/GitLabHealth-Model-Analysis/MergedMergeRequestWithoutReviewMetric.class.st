@@ -8,9 +8,10 @@ Class {
 MergedMergeRequestWithoutReviewMetric >> calculate [
 
 	| groupedByDate mergedMergeRequest noVerificationMergeRequests dateOver gitAnalyzer |
+	userMergeRequests ifNil: [ self load ].
 	groupedByDate := self setupGroupedDate.
 
-	gitAnalyzer := GitAnalyzer new glhImporter: glhImporter.
+	gitAnalyzer := GitAnalyzer new.
 
 	mergedMergeRequest := userMergeRequests select: [ :mr |
 		                      mr merged_at isNotNil ].
@@ -19,10 +20,6 @@ MergedMergeRequestWithoutReviewMetric >> calculate [
 	noVerificationMergeRequests := mergedMergeRequest select: [
 		                               :userMergeRequest |
 		                               | validation |
-		                               glhImporter
-			                               importMergeResquestMerger:
-			                               userMergeRequest.
-
 		                               validation := gitAnalyzer
 			                                             analyseMergeResquestValidation:
 			                                             userMergeRequest.
@@ -55,8 +52,10 @@ MergedMergeRequestWithoutReviewMetric >> description [
 { #category : #loading }
 MergedMergeRequestWithoutReviewMetric >> load [
 
-	self loadUserProjects.
-	self loadUserMergeRequests
+	userMergeRequests := user
+		                     loadCompleteMergeRequestsSince:
+		                     (period at: #since)
+		                     until: (period at: #until)
 ]
 
 { #category : #accessing }

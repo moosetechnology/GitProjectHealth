@@ -11,16 +11,15 @@ Class {
 CodeChurnMetric >> calculate [
 
 	| commits res groupedByDate totalContributions gitAnalyzer |
+	userCommits ifNil: [ self load ].
+	
 	totalContributions := OrderedCollection new.
 	groupedByDate := self setupGroupedDate.
-	gitAnalyzer := GitAnalyzer new
-		               glhImporter: glhImporter;
-		               maxChildCommit: maxCommitWindow.
-	glhImporter withCommitDiffs: false.
-	commits := self
+	gitAnalyzer := GitAnalyzer new maxChildCommit: maxCommitWindow.
+
+	commits := user
 		           foundSuccessorOf: userCommits
 		           andCompleteImportForMax: maxCommitWindow.
-
 
 	res := commits collect: [ :commit |
 		       commit -> (gitAnalyzer
@@ -80,8 +79,7 @@ CodeChurnMetric >> initialize [
 { #category : #loading }
 CodeChurnMetric >> load [
 
-	self loadUserProjects.
-	self loadUserCommits.
+	userCommits := user loadCommitsSince: (period at: #since) until: (period at: #until) 
 ]
 
 { #category : #accessing }

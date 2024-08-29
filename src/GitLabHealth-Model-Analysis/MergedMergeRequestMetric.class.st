@@ -8,6 +8,7 @@ Class {
 MergedMergeRequestMetric >> calculate [
 
 	| groupedByDate userMergedMergeRequests dateOver |
+		userMergeRequests ifNil: [ self load ].
 	groupedByDate := self setupGroupedDate.
 
 	userMergedMergeRequests := userMergeRequests select: [
@@ -33,8 +34,10 @@ MergedMergeRequestMetric >> description [
 { #category : #loading }
 MergedMergeRequestMetric >> load [
 
-	self loadUserProjects.
-	self loadUserMergeRequests.
+	
+	userMergeRequests := user
+		                     loadMergeRequestsSince: (period at: #since)
+		                     until: (period at: #until)
 ]
 
 { #category : #accessing }

@@ -8,6 +8,7 @@ Class {
 CommitFrequencyMetric >> calculate [
 
 	| groupedByDate |
+	userCommits ifNil: [ self load ].
 	groupedByDate := self setupGroupedDate.
 
 	userCommits do: [ :c |
@@ -29,8 +30,7 @@ CommitFrequencyMetric >> description [
 { #category : #loading }
 CommitFrequencyMetric >> load [
 
-	self loadUserProjects.
-	self loadUserCommits.
+	userCommits := user loadCommitsSince: (period at: #since) until: (period at: #until). 
 ]
 
 { #category : #accessing }

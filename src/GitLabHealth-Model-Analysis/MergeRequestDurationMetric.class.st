@@ -8,11 +8,12 @@ Class {
 MergeRequestDurationMetric >> calculate [
 
 	| groupedByDate gitAnalyzer mergeRequestsValidation filterGroups |
+		userMergeRequests ifNil: [ self load ].
 	groupedByDate := self setupGroupedDate.
 
 	userMergeRequests ifEmpty: [ ^ nil ].
 
-	gitAnalyzer := GitAnalyzer new glhImporter: glhImporter.
+	gitAnalyzer := GitAnalyzer new.
 
 	mergeRequestsValidation := userMergeRequests collect: [ :mr |
 		                           gitAnalyzer
@@ -58,8 +59,10 @@ MergeRequestDurationMetric >> description [
 { #category : #loading }
 MergeRequestDurationMetric >> load [
 
-	self loadUserProjects.
-	self loadUserMergeRequests.
+	
+	userMergeRequests := user
+		                     loadMergeRequestsSince: (period at: #since)
+		                     until: (period at: #until)
 ]
 
 { #category : #accessing }

@@ -8,6 +8,7 @@ Class {
 ClosedTicketsMetric >> calculate [
 
 	| groupedByDate dateOver |
+	userMergeRequests ifNil: [ self load ].
 	groupedByDate := self setupGroupedDate.
 
 
@@ -31,19 +32,7 @@ ClosedTicketsMetric >> description [
 { #category : #loading }
 ClosedTicketsMetric >> load [
 
-	self loadUserProjects.
-	self loadUserMergeRequests.
-
-	jiraImporter importAllCurrentAndPastIssuesOf:
-		self userEmail.
-
-	GPJCConnector new
-		gpModel: glhImporter glhModel;
-		jiraModel: jiraImporter model;
-		connect.
-
-	userMergeRequests := userMergeRequests select: [ :mergeRequest |
-		                     mergeRequest jiraIssue isNotNil ]
+	userMergeRequests := user loadMergeRequesWithJiraIssueSince: (period at: #since) until: (period at: #until). 
 ]
 
 { #category : #accessing }
