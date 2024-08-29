@@ -9,20 +9,6 @@ Class {
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
-{ #category : #'email' }
-GitMetric4User >> withUserEmailDomain: aEmailDomain [
-	emailDomain :=  aEmailDomain. 
-]
-
-{ #category : #'email' }
-GitMetric4User >> userEmail [
-	"overide this method to adapt on your situation"
- 
-	^ ('' join: {
-			          user username.
-			          emailDomain }) asLowercase.
-]
-
 { #category : #'metrics - commits' }
 GitMetric4User >> averageTimeBetweenCommitSince: since until: until overA: aDateWeekMonthOrYear [
 
@@ -1098,4 +1084,18 @@ GitMetric4User >> user: anUser [
 { #category : #accessing }
 GitMetric4User >> userCommits [
 	^ user commits
+]
+
+{ #category : #email }
+GitMetric4User >> userEmail [
+	"overide this method to adapt on your situation"
+ 
+	^ ('' join: {
+			          user username.
+			          emailDomain }) asLowercase.
+]
+
+{ #category : #email }
+GitMetric4User >> withUserEmailDomain: aEmailDomain [
+	emailDomain :=  aEmailDomain. 
 ]

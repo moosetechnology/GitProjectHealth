@@ -184,6 +184,30 @@ GLHUserCatalogueV2Test >> testExportToJson [
 	self assert: ((res at: 'test user') at: #foundNames) size equals: 2
 ]
 
+{ #category : #'as yet unclassified' }
+GLHUserCatalogueV2Test >> testLevenshteinDistanceBetweenBenoitAndNicolas [
+	self assert: ('benoit' levenshteinDistanceWith: 'nicolas') equals: 6
+	
+]
+
+{ #category : #'as yet unclassified' }
+GLHUserCatalogueV2Test >> testLevenshteinDistanceBetweenExamenAndExaman [
+	self assert: ('examen' levenshteinDistanceWith: 'examan') equals: 1
+	
+]
+
+{ #category : #'as yet unclassified' }
+GLHUserCatalogueV2Test >> testLevenshteinDistanceBetweenExamenAndExamen [
+	self assert: ('examen' levenshteinDistanceWith: 'examen') equals: 0
+	
+]
+
+{ #category : #'as yet unclassified' }
+GLHUserCatalogueV2Test >> testLevenshteinDistanceBetweenNicolasAndNico [
+	self assert: ('nicolas' levenshteinDistanceWith: 'nico') equals: 3
+	
+]
+
 { #category : #tests }
 GLHUserCatalogueV2Test >> testLoadFromJson [
 

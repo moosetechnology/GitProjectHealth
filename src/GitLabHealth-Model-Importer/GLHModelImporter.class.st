@@ -1060,6 +1060,9 @@ GLHModelImporter >> parseJobsResult: result ofProject: aProject [
 GLHModelImporter >> parsePipelinesResult: result [
 
 	| reader |
+	
+	result = '{"message":"403 Forbidden"}' ifTrue: [ ^ {  } ].
+	
 	reader := NeoJSONReader on: result readStream.
 	reader mapInstVarsFor: GLHPipeline.
 	reader for: GLHPipeline do: [ :mapping |
@@ -1126,7 +1129,7 @@ GLHModelImporter >> pipelinesOf: aProjectID [
 	| result |
 	('Search pipelines of: ' , aProjectID printString) recordInfo.
 	result := self glhApi pipelinesOfProject: aProjectID.
-	^ self parsePipelinesResult: result
+	^ self parsePipelinesResult: result .
 ]
 
 { #category : #'private - api' }

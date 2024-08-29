@@ -17,8 +17,6 @@ Class {
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
-
-
 { #category : #'as yet unclassified' }
 GitMetricExporter class >> demoPeriod [
 
@@ -26,13 +24,6 @@ GitMetricExporter class >> demoPeriod [
 		  addAPeriodFrom: '01 march 2023' to: '31 may 2023';
 		  addAPeriodFrom: '01 december 2023' to: '29 february 2024';
 		  addAPeriodFrom: '01 march 2024' to: '31 may 2024'
-]
-
-{ #category : #setup }
-GitMetricExporter >> withEmailDomain: anEmailDomain [
-
-	"define the email domain of your Git user. Usefull to link them between service (i.e. Jira)"
-	emailDomain := anEmailDomain
 ]
 
 { #category : #adding }
@@ -515,4 +506,11 @@ GitMetricExporter >> setupAnalysisForUsersWithNames: userNames [
 					  p id -> (glhImporter completeImportProject: p) ]) asDictionary ]).
 
 	^ self
+]
+
+{ #category : #setup }
+GitMetricExporter >> withEmailDomain: anEmailDomain [
+
+	"define the email domain of your Git user. Usefull to link them between service (i.e. Jira)"
+	emailDomain := anEmailDomain
 ]
