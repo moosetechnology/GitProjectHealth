@@ -336,7 +336,7 @@ GLHUser >> name [
 
 	<FMProperty: #name type: #String>
 	<generated>
-	^ name
+	^ name 
 ]
 
 { #category : #accessing }

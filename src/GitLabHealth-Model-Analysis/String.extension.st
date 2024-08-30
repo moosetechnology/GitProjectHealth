@@ -1,6 +1,12 @@
 Extension { #name : #String }
 
 { #category : #'*GitLabHealth-Model-Analysis' }
+String >> absLevenshteinDistanceWith: aString [ 
+	        ^ { self levenshteinDistanceWith: aString .
+					aString levenshteinDistanceWith: self  } max.
+]
+
+{ #category : #'*GitLabHealth-Model-Analysis' }
 String >> levenshteinDistanceWith: aString [ 
 	          | m n distances cost |
 
