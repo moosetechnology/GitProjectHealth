@@ -169,7 +169,6 @@ GitMetricExporter >> exportInCSV [
 	| exportBrowserModel file groupedByOver groupByName periods group groupOver csvMetrics |
 	exportBrowserModel := MiExportModel new.
 
-	self analyses ifNil: [ self generateAnalyses ].
 	groupedByOver := self analyses groupedBy: #over.
 
 	groupedByOver associations do: [ :groupAssociation |
@@ -280,7 +279,7 @@ GitMetricExporter >> findProjectsOfUser: aCollection [
 { #category : #analysis }
 GitMetricExporter >> generateAnalysesOver: aDateWeekMonthOrYear [
 
-		| userAnalysisReport result analysesReport newMetric |
+	| userAnalysisReport result analysesReport newMetric |
 	runningPeriods do: [ :period |
 		analysesReport := entities collect: [ :entity |
 			                  userAnalysisReport := UserAnalysisReport new
