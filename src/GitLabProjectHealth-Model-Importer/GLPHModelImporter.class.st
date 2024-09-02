@@ -296,7 +296,7 @@ GLPHModelImporter >> importMergeRequests: aGLHProject since: fromDate until: toD
 	self withCommitDiffs ifTrue: [
 		aGLHProject mergeRequests do: [ :mr |
 			self importDiffOfMergeRequest: mr ] ].
-	
+
 	self glhModel addAll: foundMR unless: (self blockEqualityOn: #iid).
 
 	^ foundMR
