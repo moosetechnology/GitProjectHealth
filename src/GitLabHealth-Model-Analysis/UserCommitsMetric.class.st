@@ -19,7 +19,7 @@ UserCommitsMetric >> description [
 { #category : #loading }
 UserCommitsMetric >> load [
 
-		userCommits := user
+	userCommits := self
 		               loadCommitsSince: (period at: #since)
 		               until: (period at: #until)
 ]

@@ -283,7 +283,7 @@ GitMetricExporter >> generateAnalysesOver: aDateWeekMonthOrYear [
 	runningPeriods do: [ :period |
 		analysesReport := entities collect: [ :entity |
 			                  userAnalysisReport := UserAnalysisReport new
-				                                        username: entity user name;
+				                                        username: entity name;
 				                                        period: period;
 				                                        over: aDateWeekMonthOrYear.
 
@@ -293,7 +293,10 @@ GitMetricExporter >> generateAnalysesOver: aDateWeekMonthOrYear [
 						                               (period at: #since)
 					                               until: (period at: #until);
 					                               over: aDateWeekMonthOrYear;
-					                               user: entity.
+					                               user: entity;
+					                               glhImporter: glhImporter;
+					                               jiraImporter: jiraImporter;
+					                               emailDomain: emailDomain.
 
 
 				                  result := newMetric calculate.
@@ -407,18 +410,16 @@ GitMetricExporter >> setupAnalysisForUsersWithNames: userNames [
 		         glhImporter importUserByUsername: username ].
 
 	glhImporter userCatalogue scrapeAuthorNamesForUsers: users.
+	
+	users do: [ :user |
+		|projects |
+		projects := glhImporter importContributedProjectsOfUser: user.
+				projects do: [ :project |
+				glhImporter completeImportProject: project ].	 
+		
+	].
 
-	entities addAll: (users collect: [ :user |
-			 | metricUser |
-			 metricUser := GitMetric4User new.
-			 metricUser
-				 glhImporter: glhImporter;
-				 jiraImporter: jiraImporter;
-				 withUserEmailDomain: emailDomain;
-				 user: user.
-
-			 metricUser loadProjects.
-			 metricUser ]).
+	entities addAll: users.
 
 	^ self
 ]

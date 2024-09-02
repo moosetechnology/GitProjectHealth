@@ -12,12 +12,12 @@ CodeChurnMetric >> calculate [
 
 	| commits res groupedByDate totalContributions gitAnalyzer |
 	userCommits ifNil: [ self load ].
-	
+
 	totalContributions := OrderedCollection new.
 	groupedByDate := self setupGroupedDate.
 	gitAnalyzer := GitAnalyzer new maxChildCommit: maxCommitWindow.
 
-	commits := user
+	commits := self
 		           foundSuccessorOf: userCommits
 		           andCompleteImportForMax: maxCommitWindow.
 
