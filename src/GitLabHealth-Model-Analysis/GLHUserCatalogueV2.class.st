@@ -83,6 +83,46 @@ GLHUserCatalogueV2 class >> scrapeWithImporter: anImporter contributedProjectsFo
 	^ (aGLHUser commits collect: [ :commit | commit author_name ]) asSet
 ]
 
+{ #category : #'as yet unclassified' }
+GLHUserCatalogueV2 >> RSHeatMapLevenshtein [
+	
+		| builder|
+	builder := RSHeatmap new.
+	builder objectsX: self keys.
+	builder objectsY: self keys.
+
+	builder dataMatrix: self levenshteinMatrix.
+
+	builder build.
+	builder gradientLegend remove.
+	builder canvas open
+]
+
+{ #category : #'as yet unclassified' }
+GLHUserCatalogueV2 >> RSHeatMapLevenshteinTrimedAt: aBlockCondition [
+	
+		| builder matrice|
+	builder := RSHeatmap new.
+	builder objectsX: self keys.
+	builder objectsY: self keys.
+	
+
+	matrice := self levenshteinMatrix.
+	1 to: matrice size do: [ :i |
+		1 to: (matrice at: i) size do: [ :j |
+			|val|
+			val := ((matrice at: i) at: j).
+			(matrice at: i) at: j put: ( aBlockCondition value: val ).
+			 ] ].
+	
+	
+	builder dataMatrix: matrice.
+
+	builder build.
+	builder gradientLegend remove.
+	builder canvas open
+]
+
 { #category : #adding }
 GLHUserCatalogueV2 >> addUser: aGLHUser [
 
@@ -189,10 +229,36 @@ GLHUserCatalogueV2 >> exportToJson [
 	^ STONJSON toString: tempDic
 ]
 
+{ #category : #fuse }
+GLHUserCatalogueV2 >> fuse: mainUser with: subUser [ 
+	self at: mainUser ifPresent: [ :entry |
+		self at: subUser ifAbsent: [ ^ self ]. 
+		(entry at: #names) addAll: (self at: subUser at: #names ).
+		self removeKey: subUser.
+		 ].
+]
+
 { #category : #initialization }
 GLHUserCatalogueV2 >> initialize [
 
 	anImporter := GLHModelImporter current.
+]
+
+{ #category : #'as yet unclassified' }
+GLHUserCatalogueV2 >> levenshteinMatrix [ 
+	| matrix|
+
+	matrix := Array new: self keys size .
+	1 to: matrix size do: [ :i | matrix at: i put: (Array new: self keys size) ]. 
+	
+	1 to: self keys size do: [ :i |
+		1 to: self keys size do: [ :j |
+			
+			(matrix at: i) at: j put: ( (self keys at: i) absLevenshteinDistanceWith: (self keys at: j) ). 
+			  ].
+		  ].
+
+	^ matrix.
 ]
 
 { #category : #'accessing - name' }
