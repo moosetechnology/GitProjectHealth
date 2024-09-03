@@ -52,7 +52,7 @@ MergedMergeRequestWithoutReviewMetric >> description [
 { #category : #loading }
 MergedMergeRequestWithoutReviewMetric >> load [
 
-	userMergeRequests := user
+	userMergeRequests := self
 		                     loadCompleteMergeRequestsSince:
 		                     (period at: #since)
 		                     until: (period at: #until)
