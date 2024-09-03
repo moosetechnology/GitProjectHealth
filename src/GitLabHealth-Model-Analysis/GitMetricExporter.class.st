@@ -11,9 +11,9 @@ Class {
 		'runningPeriods',
 		'maxCommitWindow',
 		'over',
-		'analyses',
 		'emailDomain',
-		'metrics'
+		'metrics',
+		'userAnalyses'
 	],
 	#category : #'GitLabHealth-Model-Analysis'
 }
@@ -99,18 +99,6 @@ GitMetricExporter >> addEntitiesFromUserNamesAndProjects: usersWithProjects [
 	^ self
 ]
 
-{ #category : #accessing }
-GitMetricExporter >> analyses [
-
-	^ analyses
-]
-
-{ #category : #accessing }
-GitMetricExporter >> analyses: anObject [
-
-	analyses := anObject
-]
-
 { #category : #utilities }
 GitMetricExporter >> constructFilePath: runningOver [
 
@@ -169,7 +157,7 @@ GitMetricExporter >> exportInCSV [
 	| exportBrowserModel file groupedByOver groupByName periods group groupOver csvMetrics |
 	exportBrowserModel := MiExportModel new.
 
-	groupedByOver := self analyses groupedBy: #over.
+	groupedByOver := userAnalyses groupedBy: #over.
 
 	groupedByOver associations do: [ :groupAssociation |
 		group := groupAssociation value.
@@ -229,7 +217,7 @@ GitMetricExporter >> exportInS3: bucketName accessKey: accessKey secretKey: secr
 	s3 := AWSS3 new.
 	bucket := s3 bucketNamed: bucketName.
 
-	ston := STON toString: analyses.
+	ston := STON toString: userAnalyses.
 
 	date := Date today asString copyReplaceAll: ' ' asString with: '-'.
 	fileName := ('-' join: {
@@ -302,9 +290,9 @@ GitMetricExporter >> generateAnalysesOver: aDateWeekMonthOrYear [
 					                  put: result ].
 
 			                  userAnalysisReport ].
-		self analyses addAll: analysesReport ].
+		userAnalyses addAll: analysesReport ].
 
-	^ analyses
+	^ userAnalyses
 ]
 
 { #category : #utilities }
@@ -341,7 +329,7 @@ GitMetricExporter >> importAnalysesFromS3: bucketName accessKey: accessKey secre
 		                keyValue := contentElement contentStringAt: 'Key'.
 		                bucket getObject: keyValue ].
 
-	^ analyses := (filesContent collect: [ :file | STON fromString: file ])
+	^ userAnalyses := (filesContent collect: [ :file | STON fromString: file ])
 		              flattened
 ]
 
@@ -355,7 +343,7 @@ GitMetricExporter >> initialize [
 	maxCommitWindow := 3.
 	over := Date.
 
-	analyses := OrderedCollection new.
+	userAnalyses := OrderedCollection new.
 
 	metrics := {
 		           CodeAdditionMetric.
