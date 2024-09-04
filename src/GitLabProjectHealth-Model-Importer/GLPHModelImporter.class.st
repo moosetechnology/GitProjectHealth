@@ -231,7 +231,7 @@ GLPHModelImporter >> importDiffRangesForDiff: aGLHDiff [
 { #category : #'import - merge request' }
 GLPHModelImporter >> importMergeRequests: aGLHProject [
 
-	| results parsedResults |
+	| results parsedResults mrs|
 	('Import merge request of Project: ' , aGLHProject id printString)
 		recordInfo.
 
@@ -242,7 +242,7 @@ GLPHModelImporter >> importMergeRequests: aGLHProject [
 		addAll: parsedResults
 		unless: self blockOnIdEquality.
 
-	self glhModel
+	mrs := self glhModel
 		addAll: aGLHProject mergeRequests
 		unless: self blockOnIdEquality.
 
@@ -254,7 +254,9 @@ GLPHModelImporter >> importMergeRequests: aGLHProject [
 
 	self withCommitDiffs ifTrue: [
 		aGLHProject mergeRequests do: [ :mr |
-			self importDiffOfMergeRequest: mr ] ]
+			self importDiffOfMergeRequest: mr ] ].
+	
+	^ mrs
 ]
 
 { #category : #'import - merge request' }

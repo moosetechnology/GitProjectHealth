@@ -11,11 +11,12 @@ GLHUserCatalogueV2 class >> loadFromJson: aString [
 	catalogue := self new.
 	dic := (STONJSON fromString: aString) asDictionary.
 	dic associationsDo: [ :assoc |
-		| itsName itsUsername itsCommitNames itsId |
+		| itsName itsUsername itsCommitNames itsId itsProjectIDs|
 		itsName := assoc key.
 		itsCommitNames := assoc value at: #foundNames.
 		itsUsername := assoc value at: #username.
 		itsId := assoc value at: #id.
+		itsProjectIDs := assoc value at: #contributedProjects ifAbsent: [{}].
 
 		catalogue
 			addUser: (GLHUser new
@@ -23,7 +24,8 @@ GLHUserCatalogueV2 class >> loadFromJson: aString [
 					 username: itsUsername;
 					 name: itsName;
 					 yourself)
-			withNames: itsCommitNames ].
+			withNames: itsCommitNames
+			withProjects: itsProjectIDs ].
 
 	^ catalogue
 ]
@@ -126,41 +128,70 @@ GLHUserCatalogueV2 >> RSHeatMapLevenshteinTrimedAt: aBlockCondition [
 { #category : #adding }
 GLHUserCatalogueV2 >> addUser: aGLHUser [
 
-	self at: aGLHUser name ifAbsentPut: [
-		self newEntryForUser: aGLHUser ]
+	^ self at: aGLHUser name ifAbsentPut: [
+		self initACatalogueEntryForUser: aGLHUser ]
 ]
 
 { #category : #adding }
 GLHUserCatalogueV2 >> addUser: aGLHUser withName: name [
 
-	self
-		at: aGLHUser name
-		ifPresent: [ :entry | (entry at: #names) add: name ]
-		ifAbsentPut: [
-			|entry|
-			entry := (self newEntryForUser:  aGLHUser).
-			(entry at: #names) add: name.
-			entry
-			 ]
+	^ self addUser: aGLHUser withNames: { name }
+	
 ]
 
 { #category : #adding }
 GLHUserCatalogueV2 >> addUser: aGLHUser withNames: aCollectionOfNames [
-
-	self
+	| entry |
+	entry := (self
 		at: aGLHUser name
-		ifPresent: [ :entry | (entry at: #names) addAll: aCollectionOfNames ]
-		ifAbsentPut: [
-			|entry|
-			entry := (self newEntryForUser: aGLHUser ).
-			(entry at: #names ) addAll: aCollectionOfNames. 
-		entry ]
+		ifAbsentPut: [ (self initACatalogueEntryForUser: aGLHUser ). ]).
+	(entry  at: #names)  addAll: aCollectionOfNames. 
+	^ entry
+]
+
+{ #category : #adding }
+GLHUserCatalogueV2 >> addUser: aGLHUser withNames: aCollectionOfNames withProject: aProjectID [
+
+	^ self addUser: aGLHUser withNames: aCollectionOfNames withProjects: { aProjectID }
+]
+
+{ #category : #adding }
+GLHUserCatalogueV2 >> addUser: aGLHUser withNames: aCollectionOfNames withProjects: aCollectionOfProjectIDs [
+	|entry|
+	
+	entry := self addUser: aGLHUser withNames: aCollectionOfNames.
+	(entry at: #contributedProjects) addAll: aCollectionOfProjectIDs.
+	^ entry. 
+	
+]
+
+{ #category : #adding }
+GLHUserCatalogueV2 >> addUser: aGLHUser withProject: aProjectID [
+	
+	^ self addUser: aGLHUser withProjects: {aProjectID}.
+	
+]
+
+{ #category : #adding }
+GLHUserCatalogueV2 >> addUser: aGLHUser withProjects: aCollectionOfProjectIDs [
+	|entry|
+
+	entry := self addUser: aGLHUser.
+	(entry at: #contributedProjects) addAll: aCollectionOfProjectIDs.
+	^ entry.
+	
 ]
 
 { #category : #accessing }
 GLHUserCatalogueV2 >> anImporter: aGLHModelImporter [
 	anImporter := aGLHModelImporter
 	
+]
+
+{ #category : #accessing }
+GLHUserCatalogueV2 >> atId: anId [ 
+	^ self detect: [ :entry |
+		(entry at: #user) id =  anId ]
 ]
 
 { #category : #'as yet unclassified' }
@@ -214,15 +245,17 @@ GLHUserCatalogueV2 >> exportToJson [
 			           (#id -> assoc key id) } asDictionary); yourself ]."
 	tempDic := Dictionary new.
 	self associationsDo: [ :assoc |
-		|entry user names|
+		|entry user names projectIDs|
 		entry := assoc value.
 		user := entry at: #user.
 		names := entry at: #names.
+		projectIDs := entry at: #contributedProjects.
 		tempDic
 			at: assoc key put: {
 					(#name -> user name).
 					(#username -> user username).
 					(#foundNames -> names asArray).
+					(#contributedProjects -> projectIDs asArray).
 					(#id -> user id) } asDictionary;
 			yourself ].
 
@@ -236,6 +269,21 @@ GLHUserCatalogueV2 >> fuse: mainUser with: subUser [
 		(entry at: #names) addAll: (self at: subUser at: #names ).
 		self removeKey: subUser.
 		 ].
+]
+
+{ #category : #'instance creation' }
+GLHUserCatalogueV2 >> initACatalogueEntryForUser: aGLHUser [.
+
+^ Dictionary new
+			at: #user put: aGLHUser;
+			at: #names put: (Set new
+					 add: aGLHUser username;
+					 add: aGLHUser name;
+					 yourself);
+			at: #contributedProjects put: (Set new 
+					addAll: (aGLHUser contributedProjects collect: #id); 
+					yourself );
+			yourself
 ]
 
 { #category : #initialization }
@@ -271,18 +319,6 @@ GLHUserCatalogueV2 >> namesAt: aGLHUser [
 	^ (self at: aGLHUser name) at: #names.
 ]
 
-{ #category : #'instance creation' }
-GLHUserCatalogueV2 >> newEntryForUser: aGLHUser [.
-
-^ Dictionary new
-			at: #user put: aGLHUser;
-			at: #names put: (Set new
-					 add: aGLHUser username;
-					 add: aGLHUser name;
-					 yourself);
-			yourself
-]
-
 { #category : #'as yet unclassified' }
 GLHUserCatalogueV2 >> reImportAllUsers [
 	"use it after a catalogue import from JSON"
@@ -300,9 +336,36 @@ GLHUserCatalogueV2 >> reImportAllUsers [
 ]
 
 { #category : #'as yet unclassified' }
+GLHUserCatalogueV2 >> reImportUser: aGLHUser [
+	"use it after a catalogue import from JSON"
+	|user|
+	user := anImporter
+			        ifNotNil: [
+				        aGLHUser id
+					        ifNotNil: [ anImporter importUser: aGLHUser id ]
+					        ifNil: [ anImporter importUserByUsername: aGLHUser username ] ]
+			        ifNil: [aGLHUser].
+	
+	
+	self at: aGLHUser name at: #user put: (user).
+	
+]
+
+{ #category : #scrape }
+GLHUserCatalogueV2 >> scrapeAuthorNameForAllRealUsers [
+	
+	|listOfUsers|
+	listOfUsers := self users select: [ :user | user id isNotNil ].
+	listOfUsers do: [ :user | self scrapeAuthorNameForUser: user ].
+]
+
+{ #category : #'as yet unclassified' }
 GLHUserCatalogueV2 >> scrapeAuthorNameForAllUsers [
 
-	self users do: [ :user | self scrapeAuthorNameForUser: user ]
+	|listOfUsers|
+	
+	listOfUsers := self users. 
+	listOfUsers do: [ :user | self scrapeAuthorNameForUser: user ]
 ]
 
 { #category : #'as yet unclassified' }
