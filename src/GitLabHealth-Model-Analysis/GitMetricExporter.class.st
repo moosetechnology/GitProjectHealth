@@ -11,9 +11,9 @@ Class {
 		'runningPeriods',
 		'maxCommitWindow',
 		'over',
-		'analyses',
 		'emailDomain',
-		'metrics'
+		'metrics',
+		'analyses'
 	],
 	#category : #'GitLabHealth-Model-Analysis'
 }
@@ -111,18 +111,6 @@ GitMetricExporter >> addEntitiesFromUserNamesAndProjects: usersWithProjects [
 	^ self 
 ]
 
-{ #category : #accessing }
-GitMetricExporter >> analyses [
-
-	^ analyses
-]
-
-{ #category : #accessing }
-GitMetricExporter >> analyses: anObject [
-
-	analyses := anObject
-]
-
 { #category : #utilities }
 GitMetricExporter >> constructFilePath: runningOver [
 
@@ -137,10 +125,10 @@ GitMetricExporter >> constructFilePath: runningOver [
 ]
 
 { #category : #exporting }
-GitMetricExporter >> csvMetricsFor: date [
+GitMetricExporter >> csvMetricsFor: metricCollection at: date [
 
 	| csvMetrics |
-	csvMetrics := metrics collect: [ :metric |
+	csvMetrics := metricCollection collect: [ :metric |
 		              metric new description , ' - ' , date asString
 		              -> [ :groupAnalyses |
 			              | analysis |
@@ -149,8 +137,7 @@ GitMetricExporter >> csvMetricsFor: date [
 				                          from: groupAnalyses.
 			              analysis
 				              ifNil: [ nil ]
-				              ifNotNil: [
-				              analysis metrics at: metric new name ] ] ].
+				              ifNotNil: [ analysis metrics at: metric new name ] ] ].
 
 	^ csvMetrics asOrderedDictionary
 ]
@@ -178,55 +165,15 @@ GitMetricExporter >> exportFor: usersWithProjects over: aCollectionOfDateWeekMon
 { #category : #exporting }
 GitMetricExporter >> exportInCSV [
 
-	| exportBrowserModel file groupedByOver groupByName periods group groupOver csvMetrics |
-	exportBrowserModel := MiExportModel new.
-
-	groupedByOver := self analyses groupedBy: #over.
-
-	groupedByOver associations do: [ :groupAssociation |
-		group := groupAssociation value.
-		groupOver := groupAssociation key.
-
-
-		groupByName := group groupedBy: #username.
-		exportBrowserModel entitiesList: groupByName.
-
-		exportBrowserModel removeColumnForQueryNamed: #Type.
-		exportBrowserModel removeColumnForQueryNamed: #Name.
-
-		exportBrowserModel
-			addColumnForQuery: [ :groupAnalyses |
-			(groupAnalyses at: 1) username ]
-			withName: #'User name'.
-
-		periods := (group groupedBy: #period) keys.
-
-		periods do: [ :period |
-			csvMetrics := self csvMetricsFor: (period at: #since).
-
-
-			csvMetrics associations do: [ :association |
-				exportBrowserModel
-					addColumnForQuery: association value
-					withName: association key ] ].
-
-		file := self constructFilePath: groupOver.
-		file writeStreamDo: [ :aStream |
-			aStream
-				<< 'sep=,';
-				<< OSPlatform current lineEnding.
-			exportBrowserModel writeCSVOn: aStream ] ].
-
-	'Done computing' recordInfo
+	self exportUserAnalysesInCSV.
+	self exportProjectAnalysesInCSV.
 ]
 
 { #category : #exporting }
 GitMetricExporter >> exportInDB: repository [
 
 	repository enableSingleton.
-
-	self analyses ifNil: [ self generateAnalyses ].
-	self analyses do: [ :analysis | analysis save ]
+	analyses do: [ :analysis | analysis save ]
 ]
 
 { #category : #exporting }
@@ -251,6 +198,97 @@ GitMetricExporter >> exportInS3: bucketName accessKey: accessKey secretKey: secr
 			             date }) , '.ston'.
 
 	bucket atKey: fileName putObject: ston
+]
+
+{ #category : #exporting }
+GitMetricExporter >> exportProjectAnalysesInCSV [
+
+	| exportBrowserModel groupedByOver group groupOver groupByName periods csvMetrics file |
+	exportBrowserModel := MiExportModel new.
+
+	groupedByOver := self projectAnalyses groupedBy: #over.
+
+	groupedByOver associations do: [ :groupAssociation |
+		group := groupAssociation value.
+		groupOver := groupAssociation key.
+
+
+		groupByName := group groupedBy: #projectName.
+		exportBrowserModel entitiesList: groupByName.
+
+		exportBrowserModel removeColumnForQueryNamed: #Type.
+		exportBrowserModel removeColumnForQueryNamed: #Name.
+
+		exportBrowserModel
+			addColumnForQuery: [ :groupAnalyses |
+			(groupAnalyses at: 1) projectName ]
+			withName: #'Project name'.
+
+		periods := (group groupedBy: #period) keys.
+
+		periods do: [ :period |
+			csvMetrics := self
+				              csvMetricsFor: self projectMetrics
+				              at: (period at: #since).
+
+
+			csvMetrics associations do: [ :association |
+				exportBrowserModel
+					addColumnForQuery: association value
+					withName: association key ] ].
+
+		file := self constructFilePath: groupOver.
+		file writeStreamDo: [ :aStream |
+			aStream
+				<< 'sep=,';
+				<< OSPlatform current lineEnding.
+			exportBrowserModel writeCSVOn: aStream ] ]
+]
+
+{ #category : #exporting }
+GitMetricExporter >> exportUserAnalysesInCSV [
+
+	| exportBrowserModel groupedByOver group groupOver groupByName periods csvMetrics file |
+	exportBrowserModel := MiExportModel new.
+
+	groupedByOver := self userAnalyses groupedBy: #over.
+	
+
+	groupedByOver associations do: [ :groupAssociation |
+		group := groupAssociation value.
+		groupOver := groupAssociation key.
+
+
+		groupByName := group groupedBy: #username.
+		exportBrowserModel entitiesList: groupByName.
+
+		exportBrowserModel removeColumnForQueryNamed: #Type.
+		exportBrowserModel removeColumnForQueryNamed: #Name.
+
+		exportBrowserModel
+			addColumnForQuery: [ :groupAnalyses |
+			(groupAnalyses at: 1) username ]
+			withName: #'User name'.
+
+		periods := (group groupedBy: #period) keys.
+
+		periods do: [ :period |
+			csvMetrics := self
+				              csvMetricsFor: self userMetrics
+				              at: (period at: #since).
+
+
+			csvMetrics associations do: [ :association |
+				exportBrowserModel
+					addColumnForQuery: association value
+					withName: association key ] ].
+
+		file := self constructFilePath: groupOver.
+		file writeStreamDo: [ :aStream |
+			aStream
+				<< 'sep=,';
+				<< OSPlatform current lineEnding.
+			exportBrowserModel writeCSVOn: aStream ] ]
 ]
 
 { #category : #projects }
@@ -291,35 +329,53 @@ GitMetricExporter >> findProjectsOfUser: aCollection [
 { #category : #analysis }
 GitMetricExporter >> generateAnalysesOver: aDateWeekMonthOrYear [
 
-	| userAnalysisReport result analysesReport newMetric |
+	| userAnalyses projectAnalyses |
 	runningPeriods do: [ :period |
-		analysesReport := entities collect: [ :entity |
-			                  userAnalysisReport := UserAnalysisReport new
-				                                        username: entity name;
-				                                        period: period;
-				                                        over: aDateWeekMonthOrYear.
+		userAnalyses := self
+			                generateUsersAnalysesDuringPeriod: period
+			                over: aDateWeekMonthOrYear.
+		projectAnalyses := self
+			                   generateProjectsAnalysesDuringPeriod: period
+			                   over: aDateWeekMonthOrYear ].
 
-			                  metrics do: [ :metric |
-				                  newMetric := metric new
-					                               setPeriodSince:
-						                               (period at: #since)
-					                               until: (period at: #until);
-					                               over: aDateWeekMonthOrYear;
-					                               user: entity;
-					                               glhImporter: glhImporter;
-					                               jiraImporter: jiraImporter;
-					                               emailDomain: emailDomain.
+	^ analyses := userAnalyses, projectAnalyses.
+]
+
+{ #category : #analysis }
+GitMetricExporter >> generateProjectsAnalysesDuringPeriod: period over: aDateWeekMonthOrYear [
+
+	^self projectEntities collect: [ :project |
+		ProjectAnalysisReport new
+			projectName: project name;
+			period: period;
+			over: aDateWeekMonthOrYear ]
+]
+
+{ #category : #analysis }
+GitMetricExporter >> generateUsersAnalysesDuringPeriod: period over: aDateWeekMonthOrYear [
+
+	| userAnalysisReport newMetric result |
+	^ self userEntities collect: [ :user |
+		  userAnalysisReport := UserAnalysisReport new
+			                        username: user name;
+			                        period: period;
+			                        over: aDateWeekMonthOrYear.
+
+		  metrics do: [ :metric |
+			  newMetric := metric new
+				               glhImporter: glhImporter;
+				               jiraImporter: jiraImporter;
+				               setPeriodSince: (period at: #since)
+				               until: (period at: #until);
+				               over: aDateWeekMonthOrYear;
+				               user: user;
+									emailDomain: emailDomain.
 
 
-				                  result := newMetric calculate.
-				                  userAnalysisReport metrics
-					                  at: newMetric name
-					                  put: result ].
+			  result := newMetric calculate.
+			  userAnalysisReport metrics at: newMetric name put: result ].
 
-			                  userAnalysisReport ].
-		self analyses addAll: analysesReport ].
-
-	^ analyses
+		  userAnalysisReport ]
 ]
 
 { #category : #utilities }
@@ -413,6 +469,33 @@ GitMetricExporter >> onlyImportProjectsOfGroup: groupId [
 	projectCache := group toScope: GLHProject
 ]
 
+{ #category : #accessing }
+GitMetricExporter >> projectAnalyses [
+
+	^ analyses select: [ :analysis | analysis class = ProjectAnalysisReport ]
+]
+
+{ #category : #accessing }
+GitMetricExporter >> projectEntities [
+
+	^ entities select: [ :entity | entity class = GLHProject ]
+]
+
+{ #category : #accessing }
+GitMetricExporter >> projectMetrics [
+
+	^ metrics select: [ :metric | metric inheritsFrom: ProjectMetric ]
+]
+
+{ #category : #setup }
+GitMetricExporter >> setupAnalysisForProjectsWithIds: projectIds [
+
+	| projects |
+	projects := glhImporter importProjects: projectIds.
+
+	entities addAll: projects
+]
+
 { #category : #setup }
 GitMetricExporter >> setupAnalysisForUsersWithNames: userNames [
 	"import all the project since a certain time"
@@ -434,6 +517,24 @@ GitMetricExporter >> setupAnalysisForUsersWithNames: userNames [
 	entities addAll: users.
 
 	^ self
+]
+
+{ #category : #accessing }
+GitMetricExporter >> userAnalyses [
+
+	^ analyses select: [ :analysis | analysis class = UserAnalysisReport ]
+]
+
+{ #category : #accessing }
+GitMetricExporter >> userEntities [
+
+	^ entities select: [ :entity | entity class = GLHUser ]
+]
+
+{ #category : #accessing }
+GitMetricExporter >> userMetrics [
+
+	^ metrics select: [ :metric | metric inheritsFrom: UserMetric ]
 ]
 
 { #category : #setup }
