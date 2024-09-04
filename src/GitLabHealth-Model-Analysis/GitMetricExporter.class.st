@@ -252,6 +252,7 @@ GitMetricExporter >> exportUserAnalysesInCSV [
 	exportBrowserModel := MiExportModel new.
 
 	groupedByOver := self userAnalyses groupedBy: #over.
+	
 
 	groupedByOver associations do: [ :groupAssociation |
 		group := groupAssociation value.
@@ -354,18 +355,21 @@ GitMetricExporter >> generateProjectsAnalysesDuringPeriod: period over: aDateWee
 GitMetricExporter >> generateUsersAnalysesDuringPeriod: period over: aDateWeekMonthOrYear [
 
 	| userAnalysisReport newMetric result |
-	^ self userEntities collect: [ :entity |
+	^ self userEntities collect: [ :user |
 		  userAnalysisReport := UserAnalysisReport new
-			                        username: entity user name;
+			                        username: user name;
 			                        period: period;
 			                        over: aDateWeekMonthOrYear.
 
 		  metrics do: [ :metric |
 			  newMetric := metric new
+				               glhImporter: glhImporter;
+				               jiraImporter: jiraImporter;
 				               setPeriodSince: (period at: #since)
 				               until: (period at: #until);
 				               over: aDateWeekMonthOrYear;
-				               user: entity.
+				               user: user;
+									emailDomain: emailDomain.
 
 
 			  result := newMetric calculate.
@@ -524,7 +528,7 @@ GitMetricExporter >> userAnalyses [
 { #category : #accessing }
 GitMetricExporter >> userEntities [
 
-	^ entities select: [ :entity | entity class = GitMetric4User ]
+	^ entities select: [ :entity | entity class = GLHUser ]
 ]
 
 { #category : #accessing }
