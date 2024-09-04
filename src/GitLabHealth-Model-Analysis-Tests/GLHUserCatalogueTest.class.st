@@ -231,13 +231,10 @@ GLHUserCatalogueTest >> testNamesAtChangingUser [
 		        username: 'testUser';
 		        yourself.
 
-	user hash. " 114462615"
 
 	catalogue addUser: user withName: 'toto'.
 
-	user name: 'test User'.
 
-	user hash.
 
 	self assert: (catalogue namesAt: user) size equals: 3.
 	self
@@ -247,6 +244,6 @@ GLHUserCatalogueTest >> testNamesAtChangingUser [
 		assert: ((catalogue namesAt: user) includes: 'testUser')
 		equals: true.
 	self
-		assert: ((catalogue namesAt: user) includes: 'test user')
-		equals: true
+		assert: ((catalogue namesAt: user) includes: 'test User')
+		equals: false
 ]

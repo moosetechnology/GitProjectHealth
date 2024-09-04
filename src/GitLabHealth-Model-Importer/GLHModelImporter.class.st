@@ -496,7 +496,7 @@ GLHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName until:
 { #category : #'as yet unclassified' }
 GLHModelImporter >> importContributedProjectsOfUser: aGLHUser [
 
-	| newlyFoundElmts page foundElmts knownProjects|
+	| newlyFoundElmts page foundElmts remaningProjects|
 	page := 0.
 	foundElmts := OrderedCollection new.
 	newlyFoundElmts := { true }.
@@ -519,12 +519,15 @@ GLHModelImporter >> importContributedProjectsOfUser: aGLHUser [
 			(self glhModel
 				 addAll: newlyFoundElmts
 				 unless: self blockOnIdEquality) ].
-			
-	knownProjects := self importProject: ((self userCatalogue at: aGLHUser name) at: #contributedProjects).
+	
+	
+	remaningProjects := self importProjects: ((foundElmts collect: #id) difference: ((self userCatalogue atId: aGLHUser id) at: #contributedProjects)).
 
 	aGLHUser contributedProjects
-		addAll: (foundElmts, knownProjects)
+		addAll: (foundElmts, remaningProjects)
 		unless: self blockOnIdEquality.
+		
+	self userCatalogue addUser: aGLHUser withProjects: (aGLHUser contributedProjects collect: #id).
 
 	^ foundElmts
 ]
@@ -1062,7 +1065,7 @@ GLHModelImporter >> parsePipelinesResult: result [
 
 	| reader |
 	
-	result = '{"message":"403 Forbidden"}' ifTrue: [ ^ {  } ].
+	(result includesSubstring: '{"message":"40' )ifTrue: [ ^ {  } ].
 	
 	reader := NeoJSONReader on: result readStream.
 	reader mapInstVarsFor: GLHPipeline.

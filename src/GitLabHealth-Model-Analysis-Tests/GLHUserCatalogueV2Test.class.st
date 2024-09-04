@@ -147,14 +147,17 @@ GLHUserCatalogueV2Test >> testExportAndLoad [
 	user := GLHUser new
 		        username: 'testUser';
 		        name: 'test user';
+				  contributedProjects: { GLHProject new id: 11 }; 
 		        yourself.
-
 
 	catalogue addUser: user.
 	json := catalogue exportToJson.
 
-	res := GLHUserCatalogue loadFromJson: json.
-	self assert: res size equals: catalogue size
+	res := GLHUserCatalogueV2 loadFromJson: json.
+	self assert: res size equals: catalogue size.
+	self assert: ((res at: 'test user' at: #contributedProjects) includes: 11) equals: true.
+	self assert: ((res at: 'test user' at: #names) includes: 'test user') equals: true.
+	self assert: ((res at: 'test user' at: #names) includes: 'testUser') equals: true.
 ]
 
 { #category : #test }
@@ -164,12 +167,14 @@ GLHUserCatalogueV2Test >> testExportToJson [
 	user := GLHUser new
 		        username: 'testUser';
 		        name: 'test user';
+				  contributedProjects: { GLHProject new id: 11  } ;
 		        id: 1;
 		        yourself.
 	user2 := GLHUser new
 		         username: 'testUser2';
 		         name: 'test user2';
 		         id: 2;
+					contributedProjects: { GLHProject new id: 21 . GLHProject new id: 22 } ;
 		         yourself.
 
 
@@ -181,7 +186,9 @@ GLHUserCatalogueV2Test >> testExportToJson [
 	res := STONJSON fromString: json.
 	self assert: res size equals: catalogue size.
 	self assert: ((res at: 'test user2') at: #foundNames) size equals: 2.
-	self assert: ((res at: 'test user') at: #foundNames) size equals: 2
+	self assert: ((res at: 'test user') at: #foundNames) size equals: 2.
+	self assert: ((res at: 'test user') at: #contributedProjects) size equals: 1.
+	self assert: ((res at: 'test user2') at: #contributedProjects) size equals: 2.
 ]
 
 { #category : #'as yet unclassified' }
