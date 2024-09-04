@@ -13,7 +13,7 @@ Class {
 		'over',
 		'emailDomain',
 		'metrics',
-		'userAnalyses'
+		'analyses'
 	],
 	#category : #'GitLabHealth-Model-Analysis'
 }
@@ -157,7 +157,7 @@ GitMetricExporter >> exportInCSV [
 	| exportBrowserModel file groupedByOver groupByName periods group groupOver csvMetrics |
 	exportBrowserModel := MiExportModel new.
 
-	groupedByOver := userAnalyses groupedBy: #over.
+	groupedByOver := analyses groupedBy: #over.
 
 	groupedByOver associations do: [ :groupAssociation |
 		group := groupAssociation value.
@@ -200,9 +200,7 @@ GitMetricExporter >> exportInCSV [
 GitMetricExporter >> exportInDB: repository [
 
 	repository enableSingleton.
-
-	self analyses ifNil: [ self generateAnalyses ].
-	self analyses do: [ :analysis | analysis save ]
+	analyses do: [ :analysis | analysis save ]
 ]
 
 { #category : #exporting }
@@ -217,7 +215,7 @@ GitMetricExporter >> exportInS3: bucketName accessKey: accessKey secretKey: secr
 	s3 := AWSS3 new.
 	bucket := s3 bucketNamed: bucketName.
 
-	ston := STON toString: userAnalyses.
+	ston := STON toString: analyses.
 
 	date := Date today asString copyReplaceAll: ' ' asString with: '-'.
 	fileName := ('-' join: {
@@ -267,32 +265,50 @@ GitMetricExporter >> findProjectsOfUser: aCollection [
 { #category : #analysis }
 GitMetricExporter >> generateAnalysesOver: aDateWeekMonthOrYear [
 
-	| userAnalysisReport result analysesReport newMetric |
+	| userAnalyses projectAnalyses |
 	runningPeriods do: [ :period |
-		analysesReport := entities collect: [ :entity |
-			                  userAnalysisReport := UserAnalysisReport new
-				                                        username: entity user name;
-				                                        period: period;
-				                                        over: aDateWeekMonthOrYear.
+		userAnalyses := self
+			                generateUsersAnalysesDuringPeriod: period
+			                over: aDateWeekMonthOrYear.
+		projectAnalyses := self
+			                   generateProjectsAnalysesDuringPeriod: period
+			                   over: aDateWeekMonthOrYear ].
 
-			                  metrics do: [ :metric |
-				                  newMetric := metric new
-					                               setPeriodSince:
-						                               (period at: #since)
-					                               until: (period at: #until);
-					                               over: aDateWeekMonthOrYear;
-					                               user: entity.
+	^ analyses := userAnalyses, projectAnalyses.
+]
+
+{ #category : #analysis }
+GitMetricExporter >> generateProjectsAnalysesDuringPeriod: period over: aDateWeekMonthOrYear [
+
+	^self projectEntities collect: [ :project |
+		ProjectAnalysisReport new
+			projectName: project name;
+			period: period;
+			over: aDateWeekMonthOrYear ]
+]
+
+{ #category : #analysis }
+GitMetricExporter >> generateUsersAnalysesDuringPeriod: period over: aDateWeekMonthOrYear [
+
+	| userAnalysisReport newMetric result |
+	^ self userEntities collect: [ :entity |
+		  userAnalysisReport := UserAnalysisReport new
+			                        username: entity user name;
+			                        period: period;
+			                        over: aDateWeekMonthOrYear.
+
+		  metrics do: [ :metric |
+			  newMetric := metric new
+				               setPeriodSince: (period at: #since)
+				               until: (period at: #until);
+				               over: aDateWeekMonthOrYear;
+				               user: entity.
 
 
-				                  result := newMetric calculate.
-				                  userAnalysisReport metrics
-					                  at: newMetric name
-					                  put: result ].
+			  result := newMetric calculate.
+			  userAnalysisReport metrics at: newMetric name put: result ].
 
-			                  userAnalysisReport ].
-		userAnalyses addAll: analysesReport ].
-
-	^ userAnalyses
+		  userAnalysisReport ]
 ]
 
 { #category : #utilities }
@@ -329,7 +345,7 @@ GitMetricExporter >> importAnalysesFromS3: bucketName accessKey: accessKey secre
 		                keyValue := contentElement contentStringAt: 'Key'.
 		                bucket getObject: keyValue ].
 
-	^ userAnalyses := (filesContent collect: [ :file | STON fromString: file ])
+	^ analyses := (filesContent collect: [ :file | STON fromString: file ])
 		              flattened
 ]
 
@@ -343,7 +359,7 @@ GitMetricExporter >> initialize [
 	maxCommitWindow := 3.
 	over := Date.
 
-	userAnalyses := OrderedCollection new.
+	analyses := OrderedCollection new.
 
 	metrics := {
 		           CodeAdditionMetric.
@@ -386,6 +402,21 @@ GitMetricExporter >> onlyImportProjectsOfGroup: groupId [
 	projectCache := group toScope: GLHProject
 ]
 
+{ #category : #accessing }
+GitMetricExporter >> projectEntities [
+
+	^ entities select: [ :entity | entity class = GLHProject ]
+]
+
+{ #category : #setup }
+GitMetricExporter >> setupAnalysisForProjectsWithIds: projectIds [
+
+	| projects |
+	projects := glhImporter importProjects: projectIds.
+
+	entities addAll: projects
+]
+
 { #category : #setup }
 GitMetricExporter >> setupAnalysisForUsersWithNames: userNames [
 	"import all the project since a certain time"
@@ -409,6 +440,12 @@ GitMetricExporter >> setupAnalysisForUsersWithNames: userNames [
 			 metricUser ]).
 
 	^ self
+]
+
+{ #category : #accessing }
+GitMetricExporter >> userEntities [
+
+	^ entities select: [ :entity | entity class = GitMetric4User ]
 ]
 
 { #category : #setup }
