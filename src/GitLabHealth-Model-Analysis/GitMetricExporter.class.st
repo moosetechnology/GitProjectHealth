@@ -40,6 +40,12 @@ GitMetricExporter >> addAPeriodFrom: since to: until [
 { #category : #adding }
 GitMetricExporter >> addEntitiesFromUserNames: userNames [
 	"import all the project since a certain time"
+	
+	self
+		deprecated: 'Use #setupAnalysesForUsersWithNames instead'
+		on: '03 Sept 2024'
+		in:
+		'Pharo-11.0.0+build.726.sha.aece1b5473acf3830a0e082c1bc3a15d4ff3522b (64 Bit)'.
 
 	'Import all projects from the Git repository' recordInfo.
 	projectCache := projectCache ifNil: [
@@ -47,16 +53,16 @@ GitMetricExporter >> addEntitiesFromUserNames: userNames [
 
 	"then collect the project in which the user has be seen commited"
 	entities addAll: (userNames collect: [ :username |
-			 | projects metrics i size |
+			 | projects  i size |
 			 projects := self
 				             findParticipationOfCommitAuthorNamed: username
 				             amongProjects: projectCache.
 
-			 metrics := GitMetric4User new.
+			"metrics := GitMetric4User new.
 			 metrics
 				 glhImporter: glhImporter;
-				jiraImporter: jiraImporter;
-				 findUserNamed: username.
+				 jiraImporter: jiraImporter;
+				 findUserNamed: username."
 
 
 
@@ -82,21 +88,27 @@ GitMetricExporter >> addEntitiesFromUserNames: userNames [
 { #category : #adding }
 GitMetricExporter >> addEntitiesFromUserNamesAndProjects: usersWithProjects [
 
+	self
+		deprecated: 'Use #setupAnalysesForUsersWithNames instead'
+		on: '03 Sept 2024'
+		in:
+		'Pharo-11.0.0+build.726.sha.aece1b5473acf3830a0e082c1bc3a15d4ff3522b (64 Bit)'.
+
 	entities addAll: (usersWithProjects associations collect: [ :assoc |
-			 | username projects metrics |
+			 | username projects  |
 			 username := assoc key.
 			 projects := assoc value.
 
-			 metrics := GitMetric4User new.
+			" metrics := GitMetric4User new.
 			 metrics
 				 glhImporter: glhImporter;
 				 jiraImporter: jiraImporter;
 				 findUserNamed: username.
-			 metrics loadProjectsFromIds: projects.
+			 metrics loadProjectsFromIds: projects."
 
-			 metrics ]).
+			 username ]).
 
-	^ self
+	^ self 
 ]
 
 { #category : #utilities }
@@ -489,18 +501,16 @@ GitMetricExporter >> setupAnalysisForUsersWithNames: userNames [
 		         glhImporter importUserByUsername: username ].
 
 	glhImporter userCatalogue scrapeAuthorNamesForUsers: users.
+	
+	users do: [ :user |
+		|projects |
+		projects := glhImporter importContributedProjectsOfUser: user.
+				projects do: [ :project |
+				glhImporter completeImportProject: project ].	 
+		
+	].
 
-	entities addAll: (users collect: [ :user |
-			 | metricUser |
-			 metricUser := GitMetric4User new.
-			 metricUser
-				 glhImporter: glhImporter;
-				 jiraImporter: jiraImporter;
-				 withUserEmailDomain: emailDomain;
-				 user: user.
-
-			 metricUser loadProjects.
-			 metricUser ]).
+	entities addAll: users.
 
 	^ self
 ]
