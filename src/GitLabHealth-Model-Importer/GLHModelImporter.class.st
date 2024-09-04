@@ -496,7 +496,7 @@ GLHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName until:
 { #category : #'as yet unclassified' }
 GLHModelImporter >> importContributedProjectsOfUser: aGLHUser [
 
-	| newlyFoundElmts page foundElmts |
+	| newlyFoundElmts page foundElmts knownProjects|
 	page := 0.
 	foundElmts := OrderedCollection new.
 	newlyFoundElmts := { true }.
@@ -519,10 +519,11 @@ GLHModelImporter >> importContributedProjectsOfUser: aGLHUser [
 			(self glhModel
 				 addAll: newlyFoundElmts
 				 unless: self blockOnIdEquality) ].
-
+			
+	knownProjects := self importProject: ((self userCatalogue at: aGLHUser name) at: #contributedProjects).
 
 	aGLHUser contributedProjects
-		addAll: foundElmts
+		addAll: (foundElmts, knownProjects)
 		unless: self blockOnIdEquality.
 
 	^ foundElmts

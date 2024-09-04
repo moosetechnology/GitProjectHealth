@@ -126,35 +126,58 @@ GLHUserCatalogueV2 >> RSHeatMapLevenshteinTrimedAt: aBlockCondition [
 { #category : #adding }
 GLHUserCatalogueV2 >> addUser: aGLHUser [
 
-	self at: aGLHUser name ifAbsentPut: [
-		self newEntryForUser: aGLHUser ]
+	^ self at: aGLHUser name ifAbsentPut: [
+		self initACatalogueEntryForUser: aGLHUser ]
 ]
 
 { #category : #adding }
 GLHUserCatalogueV2 >> addUser: aGLHUser withName: name [
 
-	self
-		at: aGLHUser name
-		ifPresent: [ :entry | (entry at: #names) add: name ]
-		ifAbsentPut: [
-			|entry|
-			entry := (self newEntryForUser:  aGLHUser).
-			(entry at: #names) add: name.
-			entry
-			 ]
+	^ self addUser: aGLHUser withNames: { name }
+	
 ]
 
 { #category : #adding }
 GLHUserCatalogueV2 >> addUser: aGLHUser withNames: aCollectionOfNames [
-
-	self
+	| entry |
+	entry := (self
 		at: aGLHUser name
-		ifPresent: [ :entry | (entry at: #names) addAll: aCollectionOfNames ]
-		ifAbsentPut: [
-			|entry|
-			entry := (self newEntryForUser: aGLHUser ).
-			(entry at: #names ) addAll: aCollectionOfNames. 
-		entry ]
+		ifAbsentPut: [ (self initACatalogueEntryForUser: aGLHUser ). ]).
+	(entry  at: #names)  addAll: aCollectionOfNames. 
+	^ entry
+]
+
+{ #category : #adding }
+GLHUserCatalogueV2 >> addUser: aGLHUser withNames: aCollectionOfNames withProject: aProjectID [
+
+	^ self addUser: aGLHUser withNames: aCollectionOfNames withProjects: { aProjectID }
+]
+
+{ #category : #adding }
+GLHUserCatalogueV2 >> addUser: aGLHUser withNames: aCollectionOfNames withProjects: aCollectionOfProjectIDs [
+	|entry|
+	
+	entry := self addUser: aGLHUser withNames: aCollectionOfNames.
+	(entry at: #contributedProjects) addAll: aCollectionOfProjectIDs.
+	^ entry. 
+	
+]
+
+{ #category : #adding }
+GLHUserCatalogueV2 >> addUser: aGLHUser withProject: aProjectID [
+	
+	^ self addUser: aGLHUser withProjects: {aProjectID}.
+	
+]
+
+{ #category : #adding }
+GLHUserCatalogueV2 >> addUser: aGLHUser withProjects: aCollectionOfProjectIDs [
+	|entry|
+
+	entry := self addUser: aGLHUser.
+	(entry at: #contributedProjects) addAll: aCollectionOfProjectIDs.
+	^ entry.
+	
 ]
 
 { #category : #accessing }
@@ -238,6 +261,19 @@ GLHUserCatalogueV2 >> fuse: mainUser with: subUser [
 		 ].
 ]
 
+{ #category : #'instance creation' }
+GLHUserCatalogueV2 >> initACatalogueEntryForUser: aGLHUser [.
+
+^ Dictionary new
+			at: #user put: aGLHUser;
+			at: #names put: (Set new
+					 add: aGLHUser username;
+					 add: aGLHUser name;
+					 yourself);
+			at: #contributedProjects put: (Set new);
+			yourself
+]
+
 { #category : #initialization }
 GLHUserCatalogueV2 >> initialize [
 
@@ -269,18 +305,6 @@ GLHUserCatalogueV2 >> names [
 { #category : #'as yet unclassified' }
 GLHUserCatalogueV2 >> namesAt: aGLHUser [
 	^ (self at: aGLHUser name) at: #names.
-]
-
-{ #category : #'instance creation' }
-GLHUserCatalogueV2 >> newEntryForUser: aGLHUser [.
-
-^ Dictionary new
-			at: #user put: aGLHUser;
-			at: #names put: (Set new
-					 add: aGLHUser username;
-					 add: aGLHUser name;
-					 yourself);
-			yourself
 ]
 
 { #category : #'as yet unclassified' }
