@@ -8,6 +8,12 @@ Class {
 }
 
 { #category : #accessing }
+ProjectAnalysisReport >> projectName [
+
+	^ projectName
+]
+
+{ #category : #accessing }
 ProjectAnalysisReport >> projectName: anObject [
 
 	projectName := anObject

@@ -113,10 +113,10 @@ GitMetricExporter >> constructFilePath: runningOver [
 ]
 
 { #category : #exporting }
-GitMetricExporter >> csvMetricsFor: date [
+GitMetricExporter >> csvMetricsFor: metricCollection at: date [
 
 	| csvMetrics |
-	csvMetrics := metrics collect: [ :metric |
+	csvMetrics := metricCollection collect: [ :metric |
 		              metric new description , ' - ' , date asString
 		              -> [ :groupAnalyses |
 			              | analysis |
@@ -125,8 +125,7 @@ GitMetricExporter >> csvMetricsFor: date [
 				                          from: groupAnalyses.
 			              analysis
 				              ifNil: [ nil ]
-				              ifNotNil: [
-				              analysis metrics at: metric new name ] ] ].
+				              ifNotNil: [ analysis metrics at: metric new name ] ] ].
 
 	^ csvMetrics asOrderedDictionary
 ]
@@ -154,46 +153,8 @@ GitMetricExporter >> exportFor: usersWithProjects over: aCollectionOfDateWeekMon
 { #category : #exporting }
 GitMetricExporter >> exportInCSV [
 
-	| exportBrowserModel file groupedByOver groupByName periods group groupOver csvMetrics |
-	exportBrowserModel := MiExportModel new.
-
-	groupedByOver := analyses groupedBy: #over.
-
-	groupedByOver associations do: [ :groupAssociation |
-		group := groupAssociation value.
-		groupOver := groupAssociation key.
-
-
-		groupByName := group groupedBy: #username.
-		exportBrowserModel entitiesList: groupByName.
-
-		exportBrowserModel removeColumnForQueryNamed: #Type.
-		exportBrowserModel removeColumnForQueryNamed: #Name.
-
-		exportBrowserModel
-			addColumnForQuery: [ :groupAnalyses |
-			(groupAnalyses at: 1) username ]
-			withName: #'User name'.
-
-		periods := (group groupedBy: #period) keys.
-
-		periods do: [ :period |
-			csvMetrics := self csvMetricsFor: (period at: #since).
-
-
-			csvMetrics associations do: [ :association |
-				exportBrowserModel
-					addColumnForQuery: association value
-					withName: association key ] ].
-
-		file := self constructFilePath: groupOver.
-		file writeStreamDo: [ :aStream |
-			aStream
-				<< 'sep=,';
-				<< OSPlatform current lineEnding.
-			exportBrowserModel writeCSVOn: aStream ] ].
-
-	'Done computing' recordInfo
+	self exportUserAnalysesInCSV.
+	self exportProjectAnalysesInCSV.
 ]
 
 { #category : #exporting }
@@ -225,6 +186,96 @@ GitMetricExporter >> exportInS3: bucketName accessKey: accessKey secretKey: secr
 			             date }) , '.ston'.
 
 	bucket atKey: fileName putObject: ston
+]
+
+{ #category : #exporting }
+GitMetricExporter >> exportProjectAnalysesInCSV [
+
+	| exportBrowserModel groupedByOver group groupOver groupByName periods csvMetrics file |
+	exportBrowserModel := MiExportModel new.
+
+	groupedByOver := self projectAnalyses groupedBy: #over.
+
+	groupedByOver associations do: [ :groupAssociation |
+		group := groupAssociation value.
+		groupOver := groupAssociation key.
+
+
+		groupByName := group groupedBy: #projectName.
+		exportBrowserModel entitiesList: groupByName.
+
+		exportBrowserModel removeColumnForQueryNamed: #Type.
+		exportBrowserModel removeColumnForQueryNamed: #Name.
+
+		exportBrowserModel
+			addColumnForQuery: [ :groupAnalyses |
+			(groupAnalyses at: 1) projectName ]
+			withName: #'Project name'.
+
+		periods := (group groupedBy: #period) keys.
+
+		periods do: [ :period |
+			csvMetrics := self
+				              csvMetricsFor: self projectMetrics
+				              at: (period at: #since).
+
+
+			csvMetrics associations do: [ :association |
+				exportBrowserModel
+					addColumnForQuery: association value
+					withName: association key ] ].
+
+		file := self constructFilePath: groupOver.
+		file writeStreamDo: [ :aStream |
+			aStream
+				<< 'sep=,';
+				<< OSPlatform current lineEnding.
+			exportBrowserModel writeCSVOn: aStream ] ]
+]
+
+{ #category : #exporting }
+GitMetricExporter >> exportUserAnalysesInCSV [
+
+	| exportBrowserModel groupedByOver group groupOver groupByName periods csvMetrics file |
+	exportBrowserModel := MiExportModel new.
+
+	groupedByOver := self userAnalyses groupedBy: #over.
+
+	groupedByOver associations do: [ :groupAssociation |
+		group := groupAssociation value.
+		groupOver := groupAssociation key.
+
+
+		groupByName := group groupedBy: #username.
+		exportBrowserModel entitiesList: groupByName.
+
+		exportBrowserModel removeColumnForQueryNamed: #Type.
+		exportBrowserModel removeColumnForQueryNamed: #Name.
+
+		exportBrowserModel
+			addColumnForQuery: [ :groupAnalyses |
+			(groupAnalyses at: 1) username ]
+			withName: #'User name'.
+
+		periods := (group groupedBy: #period) keys.
+
+		periods do: [ :period |
+			csvMetrics := self
+				              csvMetricsFor: self userMetrics
+				              at: (period at: #since).
+
+
+			csvMetrics associations do: [ :association |
+				exportBrowserModel
+					addColumnForQuery: association value
+					withName: association key ] ].
+
+		file := self constructFilePath: groupOver.
+		file writeStreamDo: [ :aStream |
+			aStream
+				<< 'sep=,';
+				<< OSPlatform current lineEnding.
+			exportBrowserModel writeCSVOn: aStream ] ]
 ]
 
 { #category : #projects }
@@ -403,9 +454,21 @@ GitMetricExporter >> onlyImportProjectsOfGroup: groupId [
 ]
 
 { #category : #accessing }
+GitMetricExporter >> projectAnalyses [
+
+	^ analyses select: [ :analysis | analysis class = ProjectAnalysisReport ]
+]
+
+{ #category : #accessing }
 GitMetricExporter >> projectEntities [
 
 	^ entities select: [ :entity | entity class = GLHProject ]
+]
+
+{ #category : #accessing }
+GitMetricExporter >> projectMetrics [
+
+	^ metrics select: [ :metric | metric inheritsFrom: ProjectMetric ]
 ]
 
 { #category : #setup }
@@ -443,9 +506,21 @@ GitMetricExporter >> setupAnalysisForUsersWithNames: userNames [
 ]
 
 { #category : #accessing }
+GitMetricExporter >> userAnalyses [
+
+	^ analyses select: [ :analysis | analysis class = UserAnalysisReport ]
+]
+
+{ #category : #accessing }
 GitMetricExporter >> userEntities [
 
 	^ entities select: [ :entity | entity class = GitMetric4User ]
+]
+
+{ #category : #accessing }
+GitMetricExporter >> userMetrics [
+
+	^ metrics select: [ :metric | metric inheritsFrom: UserMetric ]
 ]
 
 { #category : #setup }
