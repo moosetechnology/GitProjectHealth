@@ -145,8 +145,7 @@ UserMetric >> loadMergeRequestsSince: since until: until [
 
 	mergeRequests do: [ :mr | glhImporter importMergeResquestAuthor: mr ].
 
-	^mergeRequests select: [ :mergeRequest |
-		                     mergeRequest author = user ].
+	^ mergeRequests select: [ :mergeRequest | mergeRequest author = user ]
 ]
 
 { #category : #loading }

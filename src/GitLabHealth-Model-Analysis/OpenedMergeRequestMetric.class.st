@@ -9,6 +9,7 @@ OpenedMergeRequestMetric >> calculate [
 
 	| groupedByDate dateOver |
 	userMergeRequests ifNil: [ self load ].
+	
 	groupedByDate := self setupGroupedDate.
 
 	userMergeRequests do: [ :userMergeRequest |

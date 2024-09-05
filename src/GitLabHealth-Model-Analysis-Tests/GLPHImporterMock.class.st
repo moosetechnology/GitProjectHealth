@@ -3,7 +3,8 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'commits',
-		'commitDiffs'
+		'commitDiffs',
+		'mergeRequests'
 	],
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
@@ -43,9 +44,34 @@ GLPHImporterMock >> importCreatorOfCommit: commit [
 	^self
 ]
 
+{ #category : #'import - merge request' }
+GLPHImporterMock >> importMergeRequests: project since: since until: until [
+	^mergeRequests
+	
+]
+
+{ #category : #'import - merge request' }
+GLPHImporterMock >> importMergeResquestAuthor: mr [
+	^self
+]
+
 { #category : #initialization }
-GLPHImporterMock >> initialize [ 
-	commits := OrderedCollection new
+GLPHImporterMock >> initialize [
+
+	commits := OrderedCollection new.
+	mergeRequests := OrderedCollection new.
+]
+
+{ #category : #accessing }
+GLPHImporterMock >> mergeRequests [
+
+	^ mergeRequests
+]
+
+{ #category : #accessing }
+GLPHImporterMock >> mergeRequests: anObject [
+
+	mergeRequests := anObject
 ]
 
 { #category : #accessing }
