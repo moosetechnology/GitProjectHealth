@@ -43,3 +43,29 @@ CodeAdditionMetricTest >> testCalculate [
 	"Then"
 	self assert: result equals: 10
 ]
+
+{ #category : #tests }
+CodeAdditionMetricTest >> testCalculateNoCommits [
+	"Given"
+
+	| user glhImporter codeAddition result |
+	user := GLHUser new
+		        username: 'test';
+		        contributedProjects:
+			        { (GLHProject new repository: GLHRepository new) }.
+
+	glhImporter := GLPHImporterMock new.
+
+
+	codeAddition := CodeAdditionMetric new
+		                user: user;
+		                glhImporter: glhImporter;
+		                setPeriodSince: '04-09-2024' until: '04-09-2024';
+		                over: Week.
+
+	"Given"
+	result := codeAddition calculate.
+
+	"Then"
+	self assert: result equals: 0
+]

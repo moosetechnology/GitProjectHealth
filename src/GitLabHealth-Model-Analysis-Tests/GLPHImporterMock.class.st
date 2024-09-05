@@ -26,6 +26,11 @@ GLPHImporterMock >> commits: anObject [
 	commits := anObject
 ]
 
+{ #category : #'as yet unclassified' }
+GLPHImporterMock >> completeImportedCommit: commit [
+	^self
+]
+
 { #category : #commit }
 GLPHImporterMock >> importCommitsOProject: project since: since until: until [
 
@@ -36,6 +41,11 @@ GLPHImporterMock >> importCommitsOProject: project since: since until: until [
 GLPHImporterMock >> importCreatorOfCommit: commit [
 
 	^self
+]
+
+{ #category : #initialization }
+GLPHImporterMock >> initialize [ 
+	commits := OrderedCollection new
 ]
 
 { #category : #accessing }

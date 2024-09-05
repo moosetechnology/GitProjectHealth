@@ -17,17 +17,6 @@ CommitFrequencyMetricTest >> testCalculate [
 			        { (GLHProject new repository: GLHRepository new) }.
 
 	glhImporter := GLPHImporterMock new.
-	glhImporter commits: {
-			(GLHCommit new
-				 id: 1;
-				 created_at: '04-09-2024';
-				 commitCreator: user;
-				 additions: 5).
-			(GLHCommit new
-				 id: 2;
-				 created_at: '04-09-2024';
-				 commitCreator: user;
-				 additions: 5) }.
 
 
 	commitFrequency := CommitFrequencyMetric new
@@ -40,5 +29,30 @@ CommitFrequencyMetricTest >> testCalculate [
 	result := commitFrequency calculate.
 
 	"Then"
-	self assert: result equals: 2
+	self assert: result equals: 0
+]
+
+{ #category : #tests }
+CommitFrequencyMetricTest >> testCalculateNoCommits [
+
+	| user glhImporter result commitFrequency |
+	user := GLHUser new
+		        username: 'test';
+		        contributedProjects:
+			        { (GLHProject new repository: GLHRepository new) }.
+
+	glhImporter := GLPHImporterMock new.
+
+
+	commitFrequency := CommitFrequencyMetric new
+		                   user: user;
+		                   glhImporter: glhImporter;
+		                   setPeriodSince: '04-09-2024' until: '04-09-2024';
+		                   over: Week.
+
+	"Given"
+	result := commitFrequency calculate.
+
+	"Then"
+	self assert: result equals: 0
 ]

@@ -42,3 +42,28 @@ CodeDeletionMetricTest >> testCalculate [
 	"Then"
 	self assert: result equals: 10
 ]
+
+{ #category : #tests }
+CodeDeletionMetricTest >> testCalculateNoCommits [
+
+	| user glhImporter result codeDeletion |
+	user := GLHUser new
+		        username: 'test';
+		        contributedProjects:
+			        { (GLHProject new repository: GLHRepository new) }.
+
+	glhImporter := GLPHImporterMock new.
+
+
+	codeDeletion := CodeDeletionMetric new
+		                user: user;
+		                glhImporter: glhImporter;
+		                setPeriodSince: '04-09-2024' until: '04-09-2024';
+		                over: Week.
+
+	"Given"
+	result := codeDeletion calculate.
+
+	"Then"
+	self assert: result equals: 0
+]

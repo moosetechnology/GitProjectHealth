@@ -46,3 +46,30 @@ ContributedProjectMetricTest >> testCalculate [
 	"Then"
 	self assert: result equals: 1
 ]
+
+{ #category : #tests }
+ContributedProjectMetricTest >> testCalculateNoCommits [
+
+	| user glhImporter result contributedProject project1 repository1 |
+	project1 := GLHProject new repository: GLHRepository new.
+	repository1 := GLHRepository new project: project1.
+	user := GLHUser new
+		        username: 'test';
+		        contributedProjects: { project1 }.
+
+	glhImporter := GLPHImporterMock new.
+
+
+	contributedProject := ContributedProjectMetric new
+		                      user: user;
+		                      glhImporter: glhImporter;
+		                      setPeriodSince: '04-09-2024'
+		                      until: '04-09-2024';
+		                      over: Week.
+
+	"Given"
+	result := contributedProject calculate.
+
+	"Then"
+	self assert: result equals: 0
+]
