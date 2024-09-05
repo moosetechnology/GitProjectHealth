@@ -11,6 +11,7 @@ Class {
 TimeBetweenCommitMetricTest >> testCalculate [
 
 	| user glhImporter result timeBetweenCommit |
+	"Given"
 	user := GLHUser new
 		        username: 'test';
 		        contributedProjects:
@@ -39,7 +40,7 @@ TimeBetweenCommitMetricTest >> testCalculate [
 		                     until: '09-04-2024';
 		                     over: Week.
 
-	"Given"
+	"When"
 	result := timeBetweenCommit calculate.
 
 	"Then"
@@ -50,6 +51,7 @@ TimeBetweenCommitMetricTest >> testCalculate [
 TimeBetweenCommitMetricTest >> testCalculateNoCommits [
 
 	| user glhImporter result timeBetweenCommit |
+	"Given"
 	user := GLHUser new
 		        username: 'test';
 		        contributedProjects:
@@ -65,7 +67,7 @@ TimeBetweenCommitMetricTest >> testCalculateNoCommits [
 		                     until: '09-04-2024';
 		                     over: Week.
 
-	"Given"
+	"When"
 	result := timeBetweenCommit calculate.
 
 	"Then"

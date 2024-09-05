@@ -9,9 +9,9 @@ Class {
 
 { #category : #tests }
 CodeAdditionMetricTest >> testCalculate [
-	"Given"
 
 	| user glhImporter codeAddition result |
+	"Given"
 	user := GLHUser new
 		        username: 'test';
 		        contributedProjects:
@@ -37,7 +37,7 @@ CodeAdditionMetricTest >> testCalculate [
 		                setPeriodSince: '04-09-2024' until: '04-09-2024';
 		                over: Week.
 
-	"Given"
+	"When"
 	result := codeAddition calculate.
 
 	"Then"
@@ -46,9 +46,9 @@ CodeAdditionMetricTest >> testCalculate [
 
 { #category : #tests }
 CodeAdditionMetricTest >> testCalculateNoCommits [
-	"Given"
 
 	| user glhImporter codeAddition result |
+	"Given"
 	user := GLHUser new
 		        username: 'test';
 		        contributedProjects:
@@ -63,7 +63,7 @@ CodeAdditionMetricTest >> testCalculateNoCommits [
 		                setPeriodSince: '04-09-2024' until: '04-09-2024';
 		                over: Week.
 
-	"Given"
+	"When"
 	result := codeAddition calculate.
 
 	"Then"

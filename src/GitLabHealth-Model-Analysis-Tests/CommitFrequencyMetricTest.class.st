@@ -11,6 +11,7 @@ Class {
 CommitFrequencyMetricTest >> testCalculate [
 
 	| user glhImporter result commitFrequency |
+	"Given"
 	user := GLHUser new
 		        username: 'test';
 		        contributedProjects:
@@ -25,7 +26,7 @@ CommitFrequencyMetricTest >> testCalculate [
 		                   setPeriodSince: '04-09-2024' until: '04-09-2024';
 		                   over: Week.
 
-	"Given"
+	"When"
 	result := commitFrequency calculate.
 
 	"Then"
@@ -36,6 +37,7 @@ CommitFrequencyMetricTest >> testCalculate [
 CommitFrequencyMetricTest >> testCalculateNoCommits [
 
 	| user glhImporter result commitFrequency |
+	"Given"
 	user := GLHUser new
 		        username: 'test';
 		        contributedProjects:
@@ -50,7 +52,7 @@ CommitFrequencyMetricTest >> testCalculateNoCommits [
 		                   setPeriodSince: '04-09-2024' until: '04-09-2024';
 		                   over: Week.
 
-	"Given"
+	"When"
 	result := commitFrequency calculate.
 
 	"Then"

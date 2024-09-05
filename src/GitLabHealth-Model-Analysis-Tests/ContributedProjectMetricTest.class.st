@@ -11,6 +11,7 @@ Class {
 ContributedProjectMetricTest >> testCalculate [
 
 	| user glhImporter result contributedProject project1 repository1 |
+	"Given"
 	project1 := GLHProject new repository: GLHRepository new.
 	repository1 := GLHRepository new project: project1.
 	user := GLHUser new
@@ -40,7 +41,7 @@ ContributedProjectMetricTest >> testCalculate [
 		                      until: '04-09-2024';
 		                      over: Week.
 
-	"Given"
+	"When"
 	result := contributedProject calculate.
 
 	"Then"
@@ -51,6 +52,7 @@ ContributedProjectMetricTest >> testCalculate [
 ContributedProjectMetricTest >> testCalculateNoCommits [
 
 	| user glhImporter result contributedProject project1 repository1 |
+	"Given"
 	project1 := GLHProject new repository: GLHRepository new.
 	repository1 := GLHRepository new project: project1.
 	user := GLHUser new
@@ -67,7 +69,7 @@ ContributedProjectMetricTest >> testCalculateNoCommits [
 		                      until: '04-09-2024';
 		                      over: Week.
 
-	"Given"
+	"When"
 	result := contributedProject calculate.
 
 	"Then"

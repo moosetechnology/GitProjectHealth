@@ -11,6 +11,7 @@ Class {
 CodeDeletionMetricTest >> testCalculate [
 
 	| user glhImporter result codeDeletion |
+	"Given"
 	user := GLHUser new
 		        username: 'test';
 		        contributedProjects:
@@ -36,7 +37,7 @@ CodeDeletionMetricTest >> testCalculate [
 		                setPeriodSince: '04-09-2024' until: '04-09-2024';
 		                over: Week.
 
-	"Given"
+	"When"
 	result := codeDeletion calculate.
 
 	"Then"
@@ -47,6 +48,7 @@ CodeDeletionMetricTest >> testCalculate [
 CodeDeletionMetricTest >> testCalculateNoCommits [
 
 	| user glhImporter result codeDeletion |
+	"Given"
 	user := GLHUser new
 		        username: 'test';
 		        contributedProjects:
@@ -61,7 +63,7 @@ CodeDeletionMetricTest >> testCalculateNoCommits [
 		                setPeriodSince: '04-09-2024' until: '04-09-2024';
 		                over: Week.
 
-	"Given"
+	"When"
 	result := codeDeletion calculate.
 
 	"Then"
