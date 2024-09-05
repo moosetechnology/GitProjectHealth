@@ -152,8 +152,8 @@ GLHUserCatalogueV2Test >> testExportAndLoad [
 
 	catalogue addUser: user.
 	json := catalogue exportToJson.
-
 	res := GLHUserCatalogueV2 loadFromJson: json.
+	
 	self assert: res size equals: catalogue size.
 	self assert: ((res at: 'test user' at: #contributedProjects) includes: 11) equals: true.
 	self assert: ((res at: 'test user' at: #names) includes: 'test user') equals: true.
