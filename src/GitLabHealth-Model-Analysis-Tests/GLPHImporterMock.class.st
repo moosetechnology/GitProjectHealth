@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'commits',
 		'commitDiffs',
-		'mergeRequests'
+		'mergeRequests',
+		'glhModel'
 	],
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
@@ -32,10 +33,23 @@ GLPHImporterMock >> completeImportedCommit: commit [
 	^self
 ]
 
+{ #category : #accessing }
+GLPHImporterMock >> glhModel [
+
+	^ glhModel
+]
+
+{ #category : #accessing }
+GLPHImporterMock >> glhModel: anObject [
+
+	glhModel := anObject
+]
+
 { #category : #commit }
 GLPHImporterMock >> importCommitsOProject: project since: since until: until [
 
-	^commits
+	glhModel addAll: commits.
+	^ commits
 ]
 
 { #category : #'as yet unclassified' }
@@ -46,8 +60,9 @@ GLPHImporterMock >> importCreatorOfCommit: commit [
 
 { #category : #'import - merge request' }
 GLPHImporterMock >> importMergeRequests: project since: since until: until [
-	^mergeRequests
-	
+
+	glhModel addAll: mergeRequests.
+	^ mergeRequests
 ]
 
 { #category : #'import - merge request' }
@@ -65,6 +80,8 @@ GLPHImporterMock >> initialize [
 
 	commits := OrderedCollection new.
 	mergeRequests := OrderedCollection new.
+	
+glhModel := GLPHEModel new name: 'model'
 ]
 
 { #category : #accessing }

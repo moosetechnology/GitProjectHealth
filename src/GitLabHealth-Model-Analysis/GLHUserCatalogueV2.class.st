@@ -214,7 +214,7 @@ GLHUserCatalogueV2 >> exportToJson [
 			           (#id -> assoc key id) } asDictionary); yourself ]."
 	tempDic := Dictionary new.
 	self associationsDo: [ :assoc |
-		|entry user names|
+		| entry user names |
 		entry := assoc value.
 		user := entry at: #user.
 		names := entry at: #names.
