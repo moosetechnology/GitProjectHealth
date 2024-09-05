@@ -55,6 +55,11 @@ GLPHImporterMock >> importMergeResquestAuthor: mr [
 	^self
 ]
 
+{ #category : #'import - merge request' }
+GLPHImporterMock >> importMergeResquestMerger: mergeRequest [
+	^self
+]
+
 { #category : #initialization }
 GLPHImporterMock >> initialize [
 
