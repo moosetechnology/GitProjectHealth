@@ -259,7 +259,7 @@ GLHUserCatalogueV2 >> exportToJson [
 					(#id -> user id) } asDictionary;
 			yourself ].
 
-	^ STONJSON toString: tempDic
+	^ STONJSON toStringPretty: tempDic
 ]
 
 { #category : #fuse }
@@ -267,6 +267,7 @@ GLHUserCatalogueV2 >> fuse: mainUser with: subUser [
 	self at: mainUser ifPresent: [ :entry |
 		self at: subUser ifAbsent: [ ^ self ]. 
 		(entry at: #names) addAll: (self at: subUser at: #names ).
+		(entry at: #contributedProjects) addAll: (self at: subUser at: #contributedProjects ).
 		self removeKey: subUser.
 		 ].
 ]
