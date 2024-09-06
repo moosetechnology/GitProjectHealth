@@ -535,11 +535,11 @@ GLHModelImporter >> importContributedProjectsOfUser: aGLHUser [
 { #category : #'as yet unclassified' }
 GLHModelImporter >> importCreatorOfCommit: aCommit [
 
-	aCommit commitCreator ifNil: [
-				
+	aCommit commitCreator ifNil: [		
 		aCommit commitCreator:
-		
-			(self importUserByUsername: aCommit author_name) ]
+			(self importUserByUsername: aCommit author_name) ].
+	self userCatalogue addUser: aCommit commitCreator withProject: aCommit repository project id.
+	^ aCommit commitCreator
 ]
 
 { #category : #api }

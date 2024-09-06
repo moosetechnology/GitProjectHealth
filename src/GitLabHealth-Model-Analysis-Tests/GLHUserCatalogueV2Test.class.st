@@ -191,6 +191,31 @@ GLHUserCatalogueV2Test >> testExportToJson [
 	self assert: ((res at: 'test user2') at: #contributedProjects) size equals: 2.
 ]
 
+{ #category : #test }
+GLHUserCatalogueV2Test >> testExportToJsonApostrophe [
+
+	| user  json  res |
+	user := GLHUser new
+		        username: 'test User';
+		        name: 'tes''t user';
+				  contributedProjects: { GLHProject new id: 11  } ;
+		        id: 1;
+		        yourself.
+
+
+
+	catalogue
+		addUser: user.
+	json := catalogue exportToJson.
+
+	res := STONJSON fromString: json.
+	self assert: res size equals: catalogue size.
+
+	self assert: ((res at: 'tes''t user') at: #foundNames) size equals: 2.
+	self assert: ((res at: 'tes''t user') at: #contributedProjects) size equals: 1.
+
+]
+
 { #category : #'as yet unclassified' }
 GLHUserCatalogueV2Test >> testLevenshteinDistanceBetweenBenoitAndNicolas [
 	self assert: ('benoit' levenshteinDistanceWith: 'nicolas') equals: 6
