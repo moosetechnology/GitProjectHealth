@@ -44,7 +44,7 @@ TimeBetweenCommitMetricTest >> testCalculate [
 	result := timeBetweenCommit calculate.
 
 	"Then"
-	self assert: result equals: 23 hours
+	self assert: result equals: (23 hours asSeconds)
 ]
 
 { #category : #tests }

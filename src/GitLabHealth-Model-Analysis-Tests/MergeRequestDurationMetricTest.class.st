@@ -40,7 +40,7 @@ MergeRequestDurationMetricTest >> testCalculate [
 	result := mergeRequestDuration calculate.
 
 	"Then"
-	self assert: result equals: 10 hours
+	self assert: result equals: (10 * 60 * 60)
 ]
 
 { #category : #tests }
