@@ -8,7 +8,7 @@ Class {
 MergeRequestDurationMetric >> calculate [
 
 	| groupedByDate gitAnalyzer mergeRequestsValidation filterGroups |
-		userMergeRequests ifNil: [ self load ].
+	userMergeRequests ifNil: [ self load ].
 	groupedByDate := self setupGroupedDate.
 
 	userMergeRequests ifEmpty: [ ^ nil ].
@@ -47,13 +47,13 @@ MergeRequestDurationMetric >> calculate [
 
 		filterGroups at: assoc key put: sum / denominator ].
 
-	^ filterGroups average asDuration
+	^ filterGroups average asSeconds
 ]
 
 { #category : #accessing }
 MergeRequestDurationMetric >> description [
 
-	^ 'merge request duration'
+	^ 'merge request duration (in seconds)'
 ]
 
 { #category : #accessing }
