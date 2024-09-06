@@ -150,16 +150,32 @@ GitMetricExporter >> entities: aCollection [
 { #category : #exporting }
 GitMetricExporter >> exportFor: usersWithProjects [
 
-	self exportFor: usersWithProjects over: { Date. Week . Month . Year }.
+	self
+		deprecated: 'Use #exportInCSV instead'
+		on: '03 Sept 2024'
+		in:
+		'Pharo-11.0.0+build.726.sha.aece1b5473acf3830a0e082c1bc3a15d4ff3522b (64 Bit)'.
+
+	self exportFor: usersWithProjects over: {
+			Date.
+			Week.
+			Month.
+			Year }
 ]
 
 { #category : #exporting }
 GitMetricExporter >> exportFor: usersWithProjects over: aCollectionOfDateWeekMonthOrYear [
 
+	self
+		deprecated: 'Use #exportInCSV instead'
+		on: '03 Sept 2024'
+		in:
+		'Pharo-11.0.0+build.726.sha.aece1b5473acf3830a0e082c1bc3a15d4ff3522b (64 Bit)'.
+
 	entities ifNil: [
 		self addEntitiesFromUserNamesAndProjects: usersWithProjects ].
 
-	self exportFor: aCollectionOfDateWeekMonthOrYear. 
+	self exportFor: aCollectionOfDateWeekMonthOrYear
 ]
 
 { #category : #exporting }
