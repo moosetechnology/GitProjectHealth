@@ -8,7 +8,7 @@ Class {
 		'onProject',
 		'maxChildCommits'
 	],
-	#category : 'GitLabHealth-Model-Analysis'
+	#category : #'GitLabHealth-Model-Analysis'
 }
 
 { #category : #analyze }
@@ -46,6 +46,7 @@ GitAnalyzer >> analyseCommentContribution [
 	('GitAnalyzer, analyse comment contributions onProject: '
 	 , onProject printString) recordInfo.
 	numberOfComments := 0.
+	
 	fromCommit diffs do: [ :diff |
 		diff diffRanges do: [ :range |
 			range changes do: [ :change |

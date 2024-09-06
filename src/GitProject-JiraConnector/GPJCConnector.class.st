@@ -24,7 +24,6 @@ Class {
 
 { #category : #accessing }
 GPJCConnector >> connect [
-
 	(self gpModel allWithType: GLHCommit) do: [ :commit |
 		self connectCommit: commit ].
 	(self gpModel allWithType: GLPHEMergeRequest) do: [ :mergeRequest |
