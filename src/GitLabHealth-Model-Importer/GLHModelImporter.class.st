@@ -18,10 +18,14 @@ Class {
 	#category : #'GitLabHealth-Model-Importer'
 }
 
-{ #category : #accessing }
-GLHModelImporter class >> current [
+{ #category : #'as yet unclassified' }
+GLHModelImporter class >> importers [
+	^ currentImporter 
+]
 
-	^ currentImporter
+{ #category : #initialization }
+GLHModelImporter class >> reset [
+	currentImporter := nil.
 ]
 
 { #category : #'private - api' }
@@ -877,7 +881,15 @@ GLHModelImporter >> loadAllProjectsFromRepositorySoftware [
 
 { #category : #'as yet unclassified' }
 GLHModelImporter >> makeGlobal [
-	currentImporter := self
+	^ self makeGlobal: DateAndTime now printString.
+]
+
+{ #category : #'as yet unclassified' }
+GLHModelImporter >> makeGlobal: aLabel [ 
+
+	currentImporter := currentImporter ifNil: [ OrderedDictionary new ].
+	currentImporter at: aLabel put: self. 
+	^ self
 ]
 
 { #category : #private }

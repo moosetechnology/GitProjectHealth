@@ -290,7 +290,7 @@ GLHUserCatalogueV2 >> initACatalogueEntryForUser: aGLHUser [.
 { #category : #initialization }
 GLHUserCatalogueV2 >> initialize [
 
-	anImporter := GLHModelImporter current.
+	anImporter := GLHModelImporter new.
 ]
 
 { #category : #'as yet unclassified' }
