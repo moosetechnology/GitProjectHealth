@@ -457,7 +457,7 @@ GitMetricExporter >> initialize [
 		           OpenedMergeRequestMetric.
 		           ClosedMergeRequestMetric.
 		           MergedMergeRequestMetric.
-		           MergedMergeRequestWithoutReviewMetric.
+		           SelfMergedUnderAMinuteMergeRequestMetric.
 		           ClosedTicketsMetric}
 ]
 

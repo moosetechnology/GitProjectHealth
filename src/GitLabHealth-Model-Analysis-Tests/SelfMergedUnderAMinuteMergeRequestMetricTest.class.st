@@ -2,13 +2,13 @@
 A MergedMergeRequestWithoutReviewMetricTest is a test class for testing the behavior of MergedMergeRequestWithoutReviewMetric
 "
 Class {
-	#name : #MergedMergeRequestWithoutReviewMetricTest,
+	#name : #SelfMergedUnderAMinuteMergeRequestMetricTest,
 	#superclass : #TestCase,
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }
-MergedMergeRequestWithoutReviewMetricTest >> testCalculate [
+SelfMergedUnderAMinuteMergeRequestMetricTest >> testCalculate [
 
 	| result glhImporter user mergedMergeRequestWithoutReview |
 	"Given"
@@ -22,6 +22,7 @@ MergedMergeRequestWithoutReviewMetricTest >> testCalculate [
 			(GLPHEMergeRequest new
 				 author: user;
 				 merge_user: user;
+				 reviewers: { user };
 				 created_at: '09-05-2024:00-00-00' asDateAndTime;
 				 merged_at: '09-05-2024:00-00-01' asDateAndTime).
 			(GLPHEMergeRequest new
@@ -31,7 +32,7 @@ MergedMergeRequestWithoutReviewMetricTest >> testCalculate [
 				 merged_at: '09-05-2024:00-00-01' asDateAndTime) }.
 
 
-	mergedMergeRequestWithoutReview := MergedMergeRequestWithoutReviewMetric
+	mergedMergeRequestWithoutReview := SelfMergedUnderAMinuteMergeRequestMetric
 		                                   new
 		                                   user: user;
 		                                   glhImporter: glhImporter;
@@ -47,7 +48,7 @@ MergedMergeRequestWithoutReviewMetricTest >> testCalculate [
 ]
 
 { #category : #tests }
-MergedMergeRequestWithoutReviewMetricTest >> testCalculateNoMergeRequests [
+SelfMergedUnderAMinuteMergeRequestMetricTest >> testCalculateNoMergeRequests [
 
 	| result glhImporter user mergedMergeRequestWithoutReview |
 	"Given"
@@ -58,7 +59,7 @@ MergedMergeRequestWithoutReviewMetricTest >> testCalculateNoMergeRequests [
 
 	glhImporter := GLPHImporterMock new.
 
-	mergedMergeRequestWithoutReview := MergedMergeRequestWithoutReviewMetric
+	mergedMergeRequestWithoutReview := SelfMergedUnderAMinuteMergeRequestMetric
 		                                   new
 		                                   user: user;
 		                                   glhImporter: glhImporter;

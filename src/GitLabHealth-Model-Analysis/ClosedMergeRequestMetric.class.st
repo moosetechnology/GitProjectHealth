@@ -13,7 +13,7 @@ ClosedMergeRequestMetric >> calculate [
 
 	userClosedMergeRequests := userMergeRequests select: [
 		                           :userMergeRequest |
-		                           userMergeRequest merged_at isNil and:
+		                           "userMergeRequest merged_at isNil and:"
 			                           userMergeRequest state = 'closed' ].
 
 	userClosedMergeRequests do: [ :userMergeRequest |
@@ -26,14 +26,13 @@ ClosedMergeRequestMetric >> calculate [
 
 	groupedByDate := groupedByDate collect: [ :group | group size ].
 
-
 	^ groupedByDate average asFloat
 ]
 
 { #category : #accessing }
 ClosedMergeRequestMetric >> description [
 
-	^ 'number of merge requests closed and not merged'
+	^ 'number of merge requests closed'
 ]
 
 { #category : #accessing }

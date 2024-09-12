@@ -423,3 +423,12 @@ GLHUserCatalogueV2 >> users [
 
 	^ self collect: [ :entry | entry at: #user ].
 ]
+
+{ #category : #search }
+GLHUserCatalogueV2 >> weirdUsers [
+	"return user that have name containing weird caracter, making them suspicious"
+	^ self select: [ :entry |
+		((entry at:#user) name includesSubstring: '.') or: [ 
+			(entry at:#user) name includesSubstring: '@' ]
+		 ].
+]
