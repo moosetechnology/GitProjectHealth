@@ -32,6 +32,12 @@ PendingMergeRequestMetric >> description [
 	^ 'number of merge request opened during a period and left opened at the end of it'
 ]
 
+{ #category : #loading }
+PendingMergeRequestMetric >> load [
+	userMergeRequests := self loadMergeRequestsOfUser: user since: (period at: #since)
+		                     until: (period at: #until).
+]
+
 { #category : #accessing }
 PendingMergeRequestMetric >> name [ 
 	^'pendingMergeRequest'

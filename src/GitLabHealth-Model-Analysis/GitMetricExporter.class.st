@@ -255,9 +255,6 @@ GitMetricExporter >> exportProjectAnalysesInCSV [
 
 		file := self constructFilePath: groupOver.
 		file writeStreamDo: [ :aStream |
-			aStream
-				<< 'sep=,';
-				<< OSPlatform current lineEnding.
 			exportBrowserModel writeCSVOn: aStream ] ]
 ]
 
@@ -301,9 +298,6 @@ GitMetricExporter >> exportUserAnalysesInCSV [
 
 		file := self constructFilePath: groupOver.
 		file writeStreamDo: [ :aStream |
-			aStream
-				<< 'sep=,';
-				<< OSPlatform current lineEnding.
 			exportBrowserModel writeCSVOn: aStream ] ]
 ]
 

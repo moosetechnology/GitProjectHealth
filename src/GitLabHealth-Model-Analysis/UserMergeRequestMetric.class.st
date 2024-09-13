@@ -27,5 +27,5 @@ UserMergeRequestMetric >> load [
 { #category : #accessing }
 UserMergeRequestMetric >> name [
 
-	^ self subclassResponsibility
+	^ self class name asString
 ]

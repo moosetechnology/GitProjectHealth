@@ -9,11 +9,13 @@ MergedMergeRequestMetric >> calculate [
 
 	| groupedByDate userMergedMergeRequests dateOver |
 		userMergeRequests ifNil: [ self load ].
+
 	groupedByDate := self setupGroupedDate.
 
 	userMergedMergeRequests := userMergeRequests select: [
 		                           :userMergeRequest |
-		                           userMergeRequest merged_at isNotNil ].
+		                           userMergeRequest merge_user isNotNil 
+												and: [ userMergeRequest merge_user id = user id ] ].
 
 	userMergedMergeRequests do: [ :userMergeRequest |
 		"here we look at the specific date of its merged"
@@ -29,7 +31,15 @@ MergedMergeRequestMetric >> calculate [
 { #category : #accessing }
 MergedMergeRequestMetric >> description [
 
-	^ 'number of merged merge request'
+	^ 'number of merge request merged by this user'
+]
+
+{ #category : #loading }
+MergedMergeRequestMetric >> load [ 
+		userMergeRequests := self
+		                     loadMergeRequestsSince:
+		                     (period at: #since)
+		                     until: (period at: #until)
 ]
 
 { #category : #accessing }
