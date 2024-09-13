@@ -1,14 +1,15 @@
 Class {
-	#name : #RSCommitDiff,
-	#superclass : #Object,
+	#name : 'RSCommitDiff',
+	#superclass : 'Object',
 	#instVars : [
 		'aDiff',
 		'canvas'
 	],
-	#category : #'GitLabHealth-Visualization'
+	#category : 'GitLabHealth-Visualization',
+	#package : 'GitLabHealth-Visualization'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 RSCommitDiff class >> canvasFor: aGLHDiff [
 
 	^ self new
@@ -16,7 +17,7 @@ RSCommitDiff class >> canvasFor: aGLHDiff [
 		  buildCanvas
 ]
 
-{ #category : #hooks }
+{ #category : 'hooks' }
 RSCommitDiff class >> shapeFor: aCommitDiff [
 	^ self new
 		  diffCommit: aCommitDiff;
@@ -25,7 +26,7 @@ RSCommitDiff class >> shapeFor: aCommitDiff [
 	
 ]
 
-{ #category : #canvas }
+{ #category : 'canvas' }
 RSCommitDiff >> buildCanvas [
 
 	| shapes |
@@ -46,7 +47,7 @@ RSCommitDiff >> buildCanvas [
 	^ canvas
 ]
 
-{ #category : #shape }
+{ #category : 'shape' }
 RSCommitDiff >> buildCompositeLayer: shapes withName: name withColor: color [
 
 	| shapesCompo label boxGroup |
@@ -77,7 +78,7 @@ RSCommitDiff >> buildCompositeLayer: shapes withName: name withColor: color [
 		  yourself
 ]
 
-{ #category : #lines }
+{ #category : 'lines' }
 RSCommitDiff >> createLinesBetweenCommits: shapes [
 
 	(RSLineBuilder arrowedLine
@@ -89,12 +90,12 @@ RSCommitDiff >> createLinesBetweenCommits: shapes [
 		 connectToAll: [ :diff | diff childCommits ]) pushFront
 ]
 
-{ #category : #setter }
+{ #category : 'setter' }
 RSCommitDiff >> diffCommit: aGLHDiff [ 
 	aDiff := aGLHDiff
 ]
 
-{ #category : #shape }
+{ #category : 'shape' }
 RSCommitDiff >> shapeForDiff: aGLHDiff withColor: color [
 
 	| box group label |
@@ -121,7 +122,7 @@ RSCommitDiff >> shapeForDiff: aGLHDiff withColor: color [
 		  yourself
 ]
 
-{ #category : #shape }
+{ #category : 'shape' }
 RSCommitDiff >> shapeForDiffRange: aGLPHEDiffRange withColor: aColor [
 
 	| box group label |
@@ -146,7 +147,7 @@ RSCommitDiff >> shapeForDiffRange: aGLPHEDiffRange withColor: aColor [
 		  yourself
 ]
 
-{ #category : #shape }
+{ #category : 'shape' }
 RSCommitDiff >> shapeForRange: aGLHDiff withColor: color [
 
 	| box group label |

@@ -46,7 +46,12 @@ BaselineOfGitLabHealth >> defineGroups: spec [
 
 { #category : 'baselines' }
 BaselineOfGitLabHealth >> definePackages: spec [
+	"generic"
 
+	spec package: 'GitProjectHealth-Model-Importer'.
+
+
+	"gitlab"
 	spec
 		package: 'GitLabHealth-Model';
 		package: 'GitLabHealth-Model-Extension'
@@ -58,9 +63,9 @@ BaselineOfGitLabHealth >> definePackages: spec [
 		with: [ spec requires: #( 'GitLabHealth-Model-Visualization' ) ];
 		package: 'GitLabHealth-Model-Visualization';
 		package: 'GitLabHealth-Model-Importer'
-		with: [ spec requires: #( 'NeoJSON' 'MoreLogger' ) ];
+		with: [ spec requires: #( 'NeoJSON' 'MoreLogger' 'GitProjectHealth-Model-Importer' ) ];
 		package: 'GitHubHealth-Model-Importer'
-		with: [ spec requires: #( 'NeoJSON' 'MoreLogger' ) ];
+		with: [ spec requires: #( 'NeoJSON' 'MoreLogger' 'GitProjectHealth-Model-Importer' ) ];
 		package: 'GitLabHealth-Model-Importer-Tests' with: [
 			spec requires:
 					#( 'GitLabHealth-Model-Importer' 'GitHubHealth-Model-Importer' ) ].

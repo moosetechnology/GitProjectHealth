@@ -1,39 +1,40 @@
 Class {
-	#name : #GHModelImporter,
-	#superclass : #Object,
+	#name : 'GHModelImporter',
+	#superclass : 'GPModelImporter',
 	#instVars : [
 		'api',
 		'glhModel',
 		'withFiles'
 	],
-	#category : #'GitHubHealth-Model-Importer'
+	#category : 'GitHubHealth-Model-Importer',
+	#package : 'GitHubHealth-Model-Importer'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GHModelImporter >> api [
 
 	^ api
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GHModelImporter >> api: anObject [
 
 	api := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GHModelImporter >> beWithFiles [
 
 	withFiles := true
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GHModelImporter >> beWithoutFiles [
 
 	withFiles := false
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 GHModelImporter >> convertApiFileAsFile: aAPIFile [
 
 	aAPIFile type = 'dir' ifTrue: [ 
@@ -45,19 +46,19 @@ GHModelImporter >> convertApiFileAsFile: aAPIFile [
 		  yourself
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GHModelImporter >> glhModel [
 
 	^ glhModel
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GHModelImporter >> glhModel: anObject [
 
 	glhModel := anObject
 ]
 
-{ #category : #api }
+{ #category : 'api' }
 GHModelImporter >> importBranchesOf: project [
 
 	"add the pipeline (actions runs) in the project"
@@ -76,7 +77,7 @@ GHModelImporter >> importBranchesOf: project [
 		self withFiles ifTrue: [ self importFilesOfBranch: branch ] ]
 ]
 
-{ #category : #api }
+{ #category : 'api' }
 GHModelImporter >> importDirectoryFiles: aDirectoryFile OfBranch: aBranch [
 
 	| result files apiFiles |
@@ -98,7 +99,7 @@ GHModelImporter >> importDirectoryFiles: aDirectoryFile OfBranch: aBranch [
 		self importDirectoryFiles: file OfBranch: aBranch ]
 ]
 
-{ #category : #api }
+{ #category : 'api' }
 GHModelImporter >> importFilesOfBranch: aBranch [
 
 	| result files apiFiles |
@@ -119,7 +120,7 @@ GHModelImporter >> importFilesOfBranch: aBranch [
 		self importDirectoryFiles: file OfBranch: aBranch ]
 ]
 
-{ #category : #api }
+{ #category : 'api' }
 GHModelImporter >> importGroup: aGroupName [
 
 	| result groupResult |
@@ -130,7 +131,7 @@ GHModelImporter >> importGroup: aGroupName [
 	^ groupResult
 ]
 
-{ #category : #api }
+{ #category : 'api' }
 GHModelImporter >> importPipelinesOf: project [
 
 	"add the pipeline (actions runs) in the project"
@@ -144,7 +145,7 @@ GHModelImporter >> importPipelinesOf: project [
 		project addPipeline: pipeline ]
 ]
 
-{ #category : #api }
+{ #category : 'api' }
 GHModelImporter >> importRepositoriesOfGroup: groupResult [
 
 	| reposResult |
@@ -158,14 +159,14 @@ GHModelImporter >> importRepositoriesOfGroup: groupResult [
 	^ groupResult
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 GHModelImporter >> initialize [
 	super initialize.
 	self api: GHApi new.
 	withFiles := false
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 GHModelImporter >> parseArrayOfProject: arrayOfProjects [
 
 	| reader |
@@ -184,7 +185,7 @@ GHModelImporter >> parseArrayOfProject: arrayOfProjects [
 	^ reader nextAs: #ArrayOfProjects
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 GHModelImporter >> parseBranchesResult: arrayOfBranch [
 
 	| reader |
@@ -197,7 +198,7 @@ GHModelImporter >> parseBranchesResult: arrayOfBranch [
 	^ reader nextAs: #ArrayOfBranch
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 GHModelImporter >> parseFileTreeResult: aResult [
 
 	| reader |
@@ -210,7 +211,7 @@ GHModelImporter >> parseFileTreeResult: aResult [
 	^ reader nextAs: #ArrayOfFile
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 GHModelImporter >> parseGroupResult: aResult [
 
 	| reader |
@@ -223,7 +224,7 @@ GHModelImporter >> parseGroupResult: aResult [
 	^ reader nextAs: GLHGroup
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 GHModelImporter >> parsePipelinesResult: pipelineOverview [
 
 	| reader |
@@ -245,23 +246,23 @@ GHModelImporter >> parsePipelinesResult: pipelineOverview [
 	^ reader nextAs: GHAPIPipelineOverview
 ]
 
-{ #category : #api }
+{ #category : 'api' }
 GHModelImporter >> privateToken [
 	^ self api privateToken
 ]
 
-{ #category : #api }
+{ #category : 'api' }
 GHModelImporter >> privateToken: aTokenString [
 	^ self api privateToken: aTokenString
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GHModelImporter >> withFiles [
 
 	^ withFiles
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GHModelImporter >> withFiles: anObject [
 
 	withFiles := anObject
