@@ -29,7 +29,7 @@ PendingMergeRequestMetric >> calculate [
 { #category : #accessing }
 PendingMergeRequestMetric >> description [
 
-	^ 'number of merge request opened during the period and left opened at the end of it'
+	^ 'number of merge request opened during a period and left opened at the end of it'
 ]
 
 { #category : #accessing }

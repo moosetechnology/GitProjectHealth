@@ -32,7 +32,7 @@ ClosedMergeRequestMetric >> calculate [
 { #category : #accessing }
 ClosedMergeRequestMetric >> description [
 
-	^ 'number of merge requests closed'
+	^ 'number of closed merge requests'
 ]
 
 { #category : #accessing }

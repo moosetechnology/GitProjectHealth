@@ -27,5 +27,5 @@ UserCommitsMetric >> load [
 { #category : #accessing }
 UserCommitsMetric >> name [
 
-	^ self subclassResponsibility
+	^ self class name asString
 ]

@@ -10,6 +10,11 @@ Class {
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
+{ #category : #'as yet unclassified' }
+Metric >> accronym [
+	^ (self name first uppercase asString), (self name select: #isUppercase) 
+]
+
 { #category : #calculating }
 Metric >> calculate [
 

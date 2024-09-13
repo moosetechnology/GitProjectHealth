@@ -53,7 +53,7 @@ MergeRequestDurationMetric >> calculate [
 { #category : #accessing }
 MergeRequestDurationMetric >> description [
 
-	^ 'merge request duration (in seconds)'
+	^ 'average time to merge a merge request (in seconds)'
 ]
 
 { #category : #accessing }

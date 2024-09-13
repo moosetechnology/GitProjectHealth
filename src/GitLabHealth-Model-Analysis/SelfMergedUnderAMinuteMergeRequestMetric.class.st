@@ -46,7 +46,7 @@ SelfMergedUnderAMinuteMergeRequestMetric >> calculate [
 { #category : #accessing }
 SelfMergedUnderAMinuteMergeRequestMetric >> description [
 
-	^ 'number of merge requests merged without review'
+	^ 'number of merge requests merged by its author under a minute after creation'
 ]
 
 { #category : #loading }
@@ -61,5 +61,5 @@ SelfMergedUnderAMinuteMergeRequestMetric >> load [
 { #category : #accessing }
 SelfMergedUnderAMinuteMergeRequestMetric >> name [
 
-	^ 'mergeRequestMergedWithoutReview'
+	^ 'SelfMergedUnderAMinuteMergeRequest'
 ]

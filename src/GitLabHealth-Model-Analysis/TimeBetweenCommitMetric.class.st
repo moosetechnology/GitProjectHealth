@@ -49,9 +49,3 @@ TimeBetweenCommitMetric >> description [
 
 	^ 'average time between commits (in seconds)'
 ]
-
-{ #category : #accessing }
-TimeBetweenCommitMetric >> name [
-
-	^ 'timeBetweenCommit'
-]

@@ -81,9 +81,3 @@ DelayUntilFirstChurnMetric >> initialize [
 	super initialize.
 	maxCommitWindow := 3
 ]
-
-{ #category : #accessing }
-DelayUntilFirstChurnMetric >> name [
-
-	^'delayUntilFirstChurn'
-]

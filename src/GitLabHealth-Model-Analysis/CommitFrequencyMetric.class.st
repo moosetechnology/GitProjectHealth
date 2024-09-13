@@ -26,9 +26,3 @@ CommitFrequencyMetric >> description [
 
 	^'commits frequency (avg)'
 ]
-
-{ #category : #accessing }
-CommitFrequencyMetric >> name [
-
-	^ 'commitFrequency'
-]
