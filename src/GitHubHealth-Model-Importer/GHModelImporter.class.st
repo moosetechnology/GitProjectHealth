@@ -3,8 +3,7 @@ Class {
 	#superclass : 'GPModelImporter',
 	#instVars : [
 		'api',
-		'glhModel',
-		'withFiles'
+		'glhModel'
 	],
 	#category : 'GitHubHealth-Model-Importer',
 	#package : 'GitHubHealth-Model-Importer'
@@ -20,18 +19,6 @@ GHModelImporter >> api [
 GHModelImporter >> api: anObject [
 
 	api := anObject
-]
-
-{ #category : 'accessing' }
-GHModelImporter >> beWithFiles [
-
-	withFiles := true
-]
-
-{ #category : 'accessing' }
-GHModelImporter >> beWithoutFiles [
-
-	withFiles := false
 ]
 
 { #category : 'private' }
@@ -161,6 +148,7 @@ GHModelImporter >> importRepositoriesOfGroup: groupResult [
 
 { #category : 'initialization' }
 GHModelImporter >> initialize [
+
 	super initialize.
 	self api: GHApi new.
 	withFiles := false
@@ -254,16 +242,4 @@ GHModelImporter >> privateToken [
 { #category : 'api' }
 GHModelImporter >> privateToken: aTokenString [
 	^ self api privateToken: aTokenString
-]
-
-{ #category : 'accessing' }
-GHModelImporter >> withFiles [
-
-	^ withFiles
-]
-
-{ #category : 'accessing' }
-GHModelImporter >> withFiles: anObject [
-
-	withFiles := anObject
 ]

@@ -4,7 +4,6 @@ Class {
 	#instVars : [
 		'glhModel',
 		'glhApi',
-		'withFiles',
 		'withCommitDiffs',
 		'withInitialCommits',
 		'withInitialMergeRequest',
@@ -48,16 +47,6 @@ GLHModelImporter >> addGroupResultToModel: groupResult [
 		addAll: group projects
 		unless: self blockOnIdEquality.
 	^ group 
-]
-
-{ #category : 'accessing' }
-GLHModelImporter >> beWithFiles [
-	withFiles := true
-]
-
-{ #category : 'accessing' }
-GLHModelImporter >> beWithouFiles [
-	withFiles := false
 ]
 
 { #category : 'as yet unclassified' }
@@ -788,12 +777,12 @@ GLHModelImporter >> initReader [
 { #category : 'initialization' }
 GLHModelImporter >> initialize [
 
-	withFiles := false.
+	super initialize.
 	withCommitDiffs := false.
 	withInitialCommits := false.
 	withInitialMergeRequest := false.
 	self initReader.
-	currentImporter := self. 
+	currentImporter := self
 ]
 
 { #category : 'importer' }
@@ -1087,16 +1076,6 @@ GLHModelImporter >> withCommitDiffs [
 GLHModelImporter >> withCommitDiffs: anObject [
 
 	withCommitDiffs := anObject
-]
-
-{ #category : 'accessing' }
-GLHModelImporter >> withFiles [
-	^ withFiles
-]
-
-{ #category : 'accessing' }
-GLHModelImporter >> withFiles: aBoolean [
-	withFiles := aBoolean
 ]
 
 { #category : 'accessing' }
