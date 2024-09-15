@@ -206,3 +206,48 @@ GHModelImporterTest >> testParsePipelinesResult [
 		assert: project workflow_runs anyOne runDate
 		equals: (DateAndTime year: 2024 month: 01 day: 11)
 ]
+
+{ #category : 'tests' }
+GHModelImporterTest >> testParseUserResult [
+
+	| user |
+	user := importer parseUserResult: '{
+  "login": "ClotildeToullec",
+  "id": 39184695,
+  "node_id": "MDQ6VXNlcjM5MTg0Njk1",
+  "avatar_url": "https://avatars.githubusercontent.com/u/39184695?v=4",
+  "gravatar_id": "",
+  "url": "https://api.github.com/users/ClotildeToullec",
+  "html_url": "https://github.com/ClotildeToullec",
+  "followers_url": "https://api.github.com/users/ClotildeToullec/followers",
+  "following_url": "https://api.github.com/users/ClotildeToullec/following{/other_user}",
+  "gists_url": "https://api.github.com/users/ClotildeToullec/gists{/gist_id}",
+  "starred_url": "https://api.github.com/users/ClotildeToullec/starred{/owner}{/repo}",
+  "subscriptions_url": "https://api.github.com/users/ClotildeToullec/subscriptions",
+  "organizations_url": "https://api.github.com/users/ClotildeToullec/orgs",
+  "repos_url": "https://api.github.com/users/ClotildeToullec/repos",
+  "events_url": "https://api.github.com/users/ClotildeToullec/events{/privacy}",
+  "received_events_url": "https://api.github.com/users/ClotildeToullec/received_events",
+  "type": "User",
+  "site_admin": false,
+  "name": "Clotilde Toullec",
+  "company": "Inria",
+  "blog": "",
+  "location": "Villeneuve d''Ascq",
+  "email": null,
+  "hireable": null,
+  "bio": "Software engineer at Inria Lille, France\r\nMaintainer and developer of @moosetechnology ",
+  "twitter_username": null,
+  "public_repos": 35,
+  "public_gists": 0,
+  "followers": 11,
+  "following": 2,
+  "created_at": "2018-05-11T07:52:42Z",
+  "updated_at": "2024-08-26T08:29:32Z"
+}
+'.
+
+	self assert: user name equals: 'Clotilde Toullec'.
+
+	self assert: user id equals: 39184695
+]

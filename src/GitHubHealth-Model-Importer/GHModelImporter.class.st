@@ -337,6 +337,7 @@ GHModelImporter >> parseUserResult: result [
 		mapping mapInstVar: #followers to: #followers.
 		mapping mapInstVar: #following to: #following.
 		mapping mapInstVar: #web_url to: #html_url.
+		mapping mapInstVar: #name to: #name.
 		mapping mapInstVar: #avatar_url to: #avatar_url ].
 	^ reader nextAs: GLHUser
 ]
