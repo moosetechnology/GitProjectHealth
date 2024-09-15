@@ -72,12 +72,16 @@ GHModelImporter >> importCommitsOfProject: aGLHProject [
 	foundCommits := OrderedCollection new.
 	('Extract commits from ' , foundCommits size printString , ' to '
 	 , (foundCommits size + itemByPage) printString) recordInfo.
+	"also check that there is at least one commit with the error handling"
+	[
 	tmp := self parseCommitsResult: (self api
 			        commitsOfProject: aGLHProject name
 			        ofOrganization: aGLHProject group name
 			        since: self withCommitsSince
 			        perPage: itemByPage
-			        page: pageNumber).
+			        page: pageNumber) ]
+		on: GHRepositoryEmptyError
+		do: [ ^ {  } ].
 
 	foundCommits addAll: tmp.
 	[ tmp size = itemByPage ] whileTrue: [
@@ -263,6 +267,8 @@ GHModelImporter >> parseBranchesResult: arrayOfBranch [
 GHModelImporter >> parseCommitsResult: result [
 
 	| reader |
+	(result includesSubstring: '"status":"409"') ifTrue: [
+		GHRepositoryEmptyError signal: 'Git Repository is empty' ].
 	reader := NeoJSONReader on: result readStream.
 
 	reader for: GLHCommit do: [ :mapping |
