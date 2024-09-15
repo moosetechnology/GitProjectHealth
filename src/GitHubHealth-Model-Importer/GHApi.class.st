@@ -103,3 +103,9 @@ GHApi >> reposOfOrganization: anOrganizationName [
 
 	^ self client get: self baseAPIUrl , '/orgs/' , anOrganizationName, '/repos'
 ]
+
+{ #category : 'api - users' }
+GHApi >> user: aUserID [
+
+	^ self client get: self baseAPIUrl , '/user/' , aUserID asString
+]

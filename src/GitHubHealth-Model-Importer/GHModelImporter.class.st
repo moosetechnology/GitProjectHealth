@@ -171,6 +171,21 @@ GHModelImporter >> importRepositoriesOfGroup: groupResult [
 	^ groupResult
 ]
 
+{ #category : 'api' }
+GHModelImporter >> importUser: userID [
+
+	| result userResult |
+	(glhModel allWithType: GLHUser)
+		detect: [ :user | user id = userID ]
+		ifFound: [ :user | ^ user ].
+	('Import user: ' , userID printString) recordInfo.
+	result := self api user: userID.
+	userResult := self parseUserResult: result.
+	^ glhModel
+		  add: userResult
+		  unless: [ :current :new | current id = new id ]
+]
+
 { #category : 'initialization' }
 GHModelImporter >> initialize [
 
@@ -225,7 +240,25 @@ GHModelImporter >> parseCommitsResult: result [
 			getter: [ :object | #ignore ]
 			setter: [ :glhCommit :value |
 			glhCommit message: (value at: #message) ].
-		(mapping mapInstVar: #parent_ids) valueSchema: #ArrayOfIds ].
+
+		mapping
+			mapProperty: #author
+			getter: [ :object | #ignore ]
+			setter: [ :glhCommit :value |
+				glhCommit author_name: (value at: #login).
+				value
+					at: #id
+					ifPresent: [ :authorId |
+					glhCommit commitCreator: (self importUser: authorId) ] ].
+
+		mapping
+			mapProperty: #committer
+			getter: [ :object | #ignore ]
+			setter: [ :glhCommit :value |
+			glhCommit committer_name: (value at: #login) ].
+
+		(mapping mapInstVar: #parent_ids to: #parents) valueSchema:
+			#ArrayOfIds ].
 
 	reader for: DateAndTime customDo: [ :mapping |
 		mapping decoder: [ :string | DateAndTime fromString: string ] ].
@@ -288,6 +321,24 @@ GHModelImporter >> parsePipelinesResult: pipelineOverview [
 			setter: [ :object :value |
 				object runDate: (DateAndTime fromString: value) ] ].
 	^ reader nextAs: GHAPIPipelineOverview
+]
+
+{ #category : 'parsing' }
+GHModelImporter >> parseUserResult: result [
+
+	| reader |
+	reader := NeoJSONReader on: result readStream.
+	reader for: GLHUser do: [ :mapping |
+		mapping mapInstVar: #id to: #id.
+		mapping mapInstVar: #public_email to: #email.
+		mapping mapInstVar: #username to: #login.
+		mapping mapInstVar: #bio to: #bio.
+		mapping mapInstVar: #organization to: #company.
+		mapping mapInstVar: #followers to: #followers.
+		mapping mapInstVar: #following to: #following.
+		mapping mapInstVar: #web_url to: #html_url.
+		mapping mapInstVar: #avatar_url to: #avatar_url ].
+	^ reader nextAs: GLHUser
 ]
 
 { #category : 'api' }

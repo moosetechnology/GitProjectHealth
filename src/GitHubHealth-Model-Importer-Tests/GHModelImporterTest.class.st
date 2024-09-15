@@ -20,7 +20,7 @@ GHModelImporterTest >> setUp [
 
 { #category : 'tests' }
 GHModelImporterTest >> testParseCommitsResult [
-
+	"we remove the id of author entries to not trigger the call to import user"
 	| commits |
 	commits := importer parseCommitsResult: '[
   {
@@ -56,7 +56,6 @@ GHModelImporterTest >> testParseCommitsResult [
     "comments_url": "https://api.github.com/repos/moosetechnology/Moose/commits/f5ac58f4afe4632b0a26d1e968439c78962da289/comments",
     "author": {
       "login": "ClotildeToullec",
-      "id": 39184695,
       "node_id": "MDQ6VXNlcjM5MTg0Njk1",
       "avatar_url": "https://avatars.githubusercontent.com/u/39184695?v=4",
       "gravatar_id": "",
@@ -135,7 +134,6 @@ GHModelImporterTest >> testParseCommitsResult [
     "comments_url": "https://api.github.com/repos/moosetechnology/Moose/commits/eb31d04f01254d0caf7c7a5b03546e3f6a5c3d58/comments",
     "author": {
       "login": "ClotildeToullec",
-      "id": 39184695,
       "node_id": "MDQ6VXNlcjM5MTg0Njk1",
       "avatar_url": "https://avatars.githubusercontent.com/u/39184695?v=4",
       "gravatar_id": "",
