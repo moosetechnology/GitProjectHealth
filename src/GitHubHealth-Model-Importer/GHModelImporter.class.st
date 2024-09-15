@@ -2,8 +2,7 @@ Class {
 	#name : 'GHModelImporter',
 	#superclass : 'GPModelImporter',
 	#instVars : [
-		'api',
-		'glhModel'
+		'api'
 	],
 	#category : 'GitHubHealth-Model-Importer',
 	#package : 'GitHubHealth-Model-Importer'
@@ -245,17 +244,18 @@ GHModelImporter >> parseCommitsResult: result [
 			mapProperty: #author
 			getter: [ :object | #ignore ]
 			setter: [ :glhCommit :value |
-				glhCommit author_name: (value at: #login).
-				value
-					at: #id
-					ifPresent: [ :authorId |
-					glhCommit commitCreator: (self importUser: authorId) ] ].
+				value ifNotNil: [
+					glhCommit author_name: (value at: #login).
+					value
+						at: #id
+						ifPresent: [ :authorId |
+						glhCommit commitCreator: (self importUser: authorId) ] ] ].
 
 		mapping
 			mapProperty: #committer
 			getter: [ :object | #ignore ]
 			setter: [ :glhCommit :value |
-			glhCommit committer_name: (value at: #login) ].
+				value ifNotNil: [ glhCommit committer_name: (value at: #login) ] ].
 
 		(mapping mapInstVar: #parent_ids to: #parents) valueSchema:
 			#ArrayOfIds ].

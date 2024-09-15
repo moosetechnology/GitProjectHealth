@@ -186,6 +186,58 @@ GHModelImporterTest >> testParseCommitsResult [
 	self assert: commits second message equals: 'Update release.yml'.
 ]
 
+{ #category : 'tests' }
+GHModelImporterTest >> testParseCommitsResultWithSomeNullValue [
+	"we remove the id of author entries to not trigger the call to import user"
+
+	| commits |
+	commits := importer parseCommitsResult: '[
+{
+    "sha": "f566f11d4bb045e5ab762fb430655f3d218bd784",
+    "node_id": "C_kwDOCCsKwdoAKGY1NjZmMTFkNGJiMDQ1ZTVhYjc2MmZiNDMwNjU1ZjNkMjE4YmQ3ODQ",
+    "commit": {
+      "author": {
+        "name": "anquetil",
+        "email": "nicolas.anquetil@inria.fr",
+        "date": "2024-02-22T14:09:56Z"
+      },
+      "committer": {
+        "name": "anquetil",
+        "email": "nicolas.anquetil@inria.fr",
+        "date": "2024-02-22T14:09:56Z"
+      },
+      "message": "A generator for a copy visitor (ie. a visitor that creates a copy of an AST",
+      "tree": {
+        "sha": "29b55107b0378ae3668b984a688d1e1cbd6062d4",
+        "url": "https://api.github.com/repos/moosetechnology/FAST/git/trees/29b55107b0378ae3668b984a688d1e1cbd6062d4"
+      },
+      "url": "https://api.github.com/repos/moosetechnology/FAST/git/commits/f566f11d4bb045e5ab762fb430655f3d218bd784",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null
+      }
+    },
+    "url": "https://api.github.com/repos/moosetechnology/FAST/commits/f566f11d4bb045e5ab762fb430655f3d218bd784",
+    "html_url": "https://github.com/moosetechnology/FAST/commit/f566f11d4bb045e5ab762fb430655f3d218bd784",
+    "comments_url": "https://api.github.com/repos/moosetechnology/FAST/commits/f566f11d4bb045e5ab762fb430655f3d218bd784/comments",
+    "author": null,
+    "committer": null,
+    "parents": [
+      {
+        "sha": "bfd5bfcb6cafe10be0cf58ff5eb22d26df809eaa",
+        "url": "https://api.github.com/repos/moosetechnology/FAST/commits/bfd5bfcb6cafe10be0cf58ff5eb22d26df809eaa",
+        "html_url": "https://github.com/moosetechnology/FAST/commit/bfd5bfcb6cafe10be0cf58ff5eb22d26df809eaa"
+      }
+    ]
+  }
+]'.
+
+	self assert: commits size equals: 1
+]
+
 { #category : 'test' }
 GHModelImporterTest >> testParsePipelinesResult [
 
