@@ -6,7 +6,7 @@ GLHRepository >> rsCommitDistribution: aBuilder [
 	<inspectorPresentationOrder: 100 title: 'Commits distribution'>
 	^ SpRoassalInspectorPresenter new
 		  canvas:
-			  (GLHRepositoryCommitDistributionVisualization new forRepository:
-					   self);
+			  (GLHCommitDistributionVisualization new forCommits:
+					   self commits);
 		  yourself
 ]
