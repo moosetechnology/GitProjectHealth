@@ -65,18 +65,40 @@ GHModelImporter >> importBranchesOf: project [
 { #category : 'api' }
 GHModelImporter >> importCommitsOfProject: aGLHProject [
 
-	| commitsResult commits |
-	commitsResult := self api
-		                 commitsOfProject: aGLHProject name
-		                 ofOrganization: aGLHProject group name.
-	commits := self parseCommitsResult: commitsResult.
+	| itemByPage foundCommits tmp pageNumber |
+	itemByPage := 100.
+	pageNumber := 1.
+	('Extract all commits of ' , aGLHProject name) recordInfo.
+	foundCommits := OrderedCollection new.
+	('Extract commits from ' , foundCommits size printString , ' to '
+	 , (foundCommits size + itemByPage) printString) recordInfo.
+	tmp := self parseCommitsResult: (self api
+			        commitsOfProject: aGLHProject name
+			        ofOrganization: aGLHProject group name
+			        since: self withCommitsSince
+			        perPage: itemByPage
+			        page: pageNumber).
+
+	foundCommits addAll: tmp.
+	[ tmp size = itemByPage ] whileTrue: [
+		pageNumber := pageNumber + 1.
+		('Extract issues from ' , foundCommits size printString , ' to '
+		 , (foundCommits size + itemByPage) printString) recordInfo.
+		tmp := self parseCommitsResult: (self api
+				        commitsOfProject: aGLHProject name
+				        ofOrganization: aGLHProject group name
+				        since: self withCommitsSince
+				        perPage: itemByPage
+				        page: pageNumber).
+		foundCommits addAll: tmp ].
+
 	"add the imported commits (unless they are already added to this repository)"
 	aGLHProject repository commits
-		addAll: commits
+		addAll: foundCommits
 		unless: [ :existing :new | existing id = new id ].
 	"add the imported commits to the model unles they are already added to the model"
 	^ self glhModel
-		  addAll: commits
+		  addAll: foundCommits
 		  unless: [ :existing :new | existing id = new id ]
 ]
 
@@ -228,7 +250,11 @@ GHModelImporter >> parseCommitsResult: result [
 			mapProperty: #commit
 			getter: [ :object | #ignore ]
 			setter: [ :glhCommit :value |
-			glhCommit message: (value at: #message) ].
+				glhCommit message: (value at: #message).
+				glhCommit authored_date:
+					(DateAndTime fromString: (value at: #author at: #date)).
+				glhCommit committed_date:
+					(DateAndTime fromString: (value at: #committer at: #date)) ].
 
 		mapping
 			mapProperty: #author

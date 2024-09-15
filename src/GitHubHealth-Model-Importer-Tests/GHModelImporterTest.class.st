@@ -21,6 +21,7 @@ GHModelImporterTest >> setUp [
 { #category : 'tests' }
 GHModelImporterTest >> testParseCommitsResult [
 	"we remove the id of author entries to not trigger the call to import user"
+
 	| commits |
 	commits := importer parseCommitsResult: '[
   {
@@ -182,8 +183,12 @@ GHModelImporterTest >> testParseCommitsResult [
 ]'.
 
 	self assert: commits size equals: 2.
-	self assert: commits first message equals: 'Update test-and-release.yml'.
+	self
+		assert: commits first message
+		equals: 'Update test-and-release.yml'.
 	self assert: commits second message equals: 'Update release.yml'.
+	self assert: commits first authored_date isNotNil.
+	self assert: commits first committed_date isNotNil
 ]
 
 { #category : 'tests' }

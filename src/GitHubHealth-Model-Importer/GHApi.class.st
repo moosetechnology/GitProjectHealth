@@ -56,9 +56,25 @@ GHApi >> client: anObject [
 { #category : 'api - commits' }
 GHApi >> commitsOfProject: aProjectId ofOrganization: organisationName [
 
-	^ self client get:
-		  self baseAPIUrl , '/repos/' , organisationName , '/' , aProjectId
-		  , '/commits'
+	^ self
+		  commitsOfProject: aProjectId
+		  ofOrganization: organisationName
+		  since: nil
+		  perPage: nil
+		  page: nil
+]
+
+{ #category : 'api - commits' }
+GHApi >> commitsOfProject: aProjectId ofOrganization: organisationName since: aSinceDate perPage: itemPerPage page: pageNumber [
+
+	self client url:
+		self baseAPIUrl , '/repos/' , organisationName , '/' , aProjectId
+		, '/commits'.
+	aSinceDate ifNotNil: [ self client queryAt: #since put: aSinceDate ].
+	itemPerPage ifNotNil: [
+		self client queryAt: #per_page put: itemPerPage ].
+	pageNumber ifNotNil: [ self client queryAt: #page put: pageNumber ].
+	^ self client get
 ]
 
 { #category : 'api' }
