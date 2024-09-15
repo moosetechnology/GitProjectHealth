@@ -114,10 +114,21 @@ GHApi >> privateToken: anObject [
 	self client headerAt: #'Authorization' add: ('token ', anObject)
 ]
 
-{ #category : 'api' }
+{ #category : 'api - repositories' }
 GHApi >> reposOfOrganization: anOrganizationName [
 
-	^ self client get: self baseAPIUrl , '/orgs/' , anOrganizationName, '/repos'
+	^ self reposOfOrganization: anOrganizationName perPage: nil page: nil
+]
+
+{ #category : 'api - repositories' }
+GHApi >> reposOfOrganization: anOrganizationName perPage: itemPerPage page: pageNumber [
+
+	self client url:
+		self baseAPIUrl , '/orgs/' , anOrganizationName , '/repos'.
+	itemPerPage ifNotNil: [
+		self client queryAt: #per_page put: itemPerPage ].
+	pageNumber ifNotNil: [ self client queryAt: #page put: pageNumber ].
+	^ self client get
 ]
 
 { #category : 'api - users' }

@@ -173,9 +173,31 @@ GHModelImporter >> importPipelinesOf: project [
 { #category : 'api' }
 GHModelImporter >> importRepositoriesOfGroup: groupResult [
 
-	| reposResult |
+	| reposResult itemByPage pageNumber reposFound tmp |
+	itemByPage := 100.
+	pageNumber := 1.
+	('Extract all repository of ' , groupResult name) recordInfo.
+	reposFound := OrderedCollection new.
+	('Extract commits from ' , reposFound size printString , ' to '
+	 , (reposFound size + itemByPage) printString) recordInfo.
+	tmp := self parseArrayOfProject: (self api
+			        reposOfOrganization: groupResult name
+			        perPage: itemByPage
+			        page: pageNumber).
+
+	reposFound addAll: tmp.
+	[ tmp size = itemByPage ] whileTrue: [
+		pageNumber := pageNumber + 1.
+		('Extract issues from ' , reposFound size printString , ' to '
+		 , (reposFound size + itemByPage) printString) recordInfo.
+		tmp := self parseArrayOfProject: (self api
+				        reposOfOrganization: groupResult name
+				        perPage: itemByPage
+				        page: pageNumber).
+		reposFound addAll: tmp ].
+
 	reposResult := self api reposOfOrganization: groupResult name.
-	groupResult projects addAll: (self parseArrayOfProject: reposResult).
+	groupResult projects addAll: reposFound.
 	self glhModel addAll: groupResult projects.
 	groupResult projects do: [ :project |
 		self completeImportProject: project ].
