@@ -76,11 +76,11 @@ GHModelImporter >> importBranchesOf: project [
 { #category : 'api' }
 GHModelImporter >> importCommitsOfProject: aGLHProject [
 
-	| commits |
-	commits := self api
-		           commitsOfProject: aGLHProject name
-		           ofOrganization: aGLHProject group name.
-	self halt
+	| commitsResult commits |
+	commitsResult := self api
+		                 commitsOfProject: aGLHProject name
+		                 ofOrganization: aGLHProject group name.
+	commits := self parseCommitsResult: commitsResult
 ]
 
 { #category : 'api' }
@@ -201,6 +201,37 @@ GHModelImporter >> parseBranchesResult: arrayOfBranch [
 		customDo: [ :customMappting | 
 		customMappting listOfElementSchema: GLHBranch ].
 	^ reader nextAs: #ArrayOfBranch
+]
+
+{ #category : 'parsing' }
+GHModelImporter >> parseCommitsResult: result [
+
+	| reader |
+	reader := NeoJSONReader on: result readStream.
+
+	reader for: GLHCommit do: [ :mapping |
+		mapping mapInstVar: #id to: #sha.
+		mapping mapInstVar: #web_url to: #html_url.
+		mapping
+			mapProperty: #commit
+			getter: [ :object | #ignore ]
+			setter: [ :glhCommit :value |
+			glhCommit message: (value at: #message) ].
+		(mapping mapInstVar: #parent_ids) valueSchema: #ArrayOfIds ].
+
+	reader for: DateAndTime customDo: [ :mapping |
+		mapping decoder: [ :string | DateAndTime fromString: string ] ].
+
+	reader for: #ArrayOfIds customDo: [ :mapping |
+		mapping decoder: [ :parents |
+			parents collect: [ :parent | parent at: #sha ] ] ].
+
+	reader
+		for: #ArrayOfCommit
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHCommit ].
+
+	^ reader nextAs: #ArrayOfCommit
 ]
 
 { #category : 'private' }
