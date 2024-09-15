@@ -2,7 +2,6 @@ Class {
 	#name : 'GLHModelImporter',
 	#superclass : 'GPModelImporter',
 	#instVars : [
-		'glhModel',
 		'glhApi',
 		'withCommitDiffs',
 		'withInitialCommits',
@@ -219,18 +218,6 @@ GLHModelImporter >> glhApi [
 GLHModelImporter >> glhApi: anObject [
 
 	glhApi := anObject
-]
-
-{ #category : 'accessing' }
-GLHModelImporter >> glhModel [
-
-	^ glhModel
-]
-
-{ #category : 'accessing' }
-GLHModelImporter >> glhModel: anObject [
-
-	glhModel := anObject
 ]
 
 { #category : 'api' }

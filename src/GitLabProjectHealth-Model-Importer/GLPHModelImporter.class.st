@@ -15,28 +15,6 @@ GLPHModelImporter >> blockForDiffRangeEquality [
 ]
 
 { #category : 'commit' }
-GLPHModelImporter >> chainsCommitsFrom: commitsCollection [
-
-	| dic |
-	
-	('Chains ', commitsCollection size printString , ' commits') recordInfo.
-	
-	dic := ((self glhModel allWithType: GLHCommit) collect: [ :commit |
-		        commit id -> commit ]) asSet asDictionary.
-
-	commitsCollection do: [ :commit |
-		commit parent_ids do: [ :parentId | 
-			dic
-				at: parentId
-				ifPresent: [ :parentCommit |
-					parentCommit childCommits
-						add: commit
-						unless: self blockOnIdEquality ]
-				ifAbsent: [  ] ] ].
-	^ commitsCollection
-]
-
-{ #category : 'commit' }
 GLPHModelImporter >> commitsOfProject: aGLHProject forRefName: refName until: toDate [
 
 	| newlyFoundCommit page |

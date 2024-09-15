@@ -9,7 +9,8 @@ Class {
 	#superclass : 'Object',
 	#instVars : [
 		'withCommitsSince',
-		'withFiles'
+		'withFiles',
+		'glhModel'
 	],
 	#category : 'GitProjectHealth-Model-Importer',
 	#package : 'GitProjectHealth-Model-Importer'
@@ -25,6 +26,40 @@ GPModelImporter >> beWithFiles [
 GPModelImporter >> beWithoutFiles [
 
 	withFiles := false
+]
+
+{ #category : 'commit' }
+GPModelImporter >> chainsCommitsFrom: commitsCollection [
+
+	| dic |
+	('Chains ' , commitsCollection size printString , ' commits')
+		recordInfo.
+
+	dic := ((self glhModel allWithType: GLHCommit) collect: [ :commit |
+		        commit id -> commit ]) asSet asDictionary.
+
+	commitsCollection do: [ :commit |
+		commit parent_ids do: [ :parentId |
+			dic
+				at: parentId
+				ifPresent: [ :parentCommit |
+					parentCommit childCommits
+						add: commit
+						unless: [ :existing :new | existing id = new id ] ]
+				ifAbsent: [  ] ] ].
+	^ commitsCollection
+]
+
+{ #category : 'accessing' }
+GPModelImporter >> glhModel [
+
+	^ glhModel
+]
+
+{ #category : 'accessing' }
+GPModelImporter >> glhModel: anObject [
+
+	glhModel := anObject
 ]
 
 { #category : 'initialization' }

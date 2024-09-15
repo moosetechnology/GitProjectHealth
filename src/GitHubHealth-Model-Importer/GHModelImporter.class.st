@@ -26,7 +26,9 @@ GHModelImporter >> completeImportProject: aGLHProject [
 	self importPipelinesOf: aGLHProject.
 	self importBranchesOf: aGLHProject.
 	self withCommitsSince ifNotNil: [ :withCommitSince | "If not nil, it means we have to import commit"
-		self importCommitsOfProject: aGLHProject ]
+		| commits |
+		commits := self importCommitsOfProject: aGLHProject.
+		self chainsCommitsFrom: commits ]
 ]
 
 { #category : 'private' }
@@ -39,18 +41,6 @@ GHModelImporter >> convertApiFileAsFile: aAPIFile [
 	^ GLHFileBlob new
 		  name: aAPIFile name;
 		  yourself
-]
-
-{ #category : 'accessing' }
-GHModelImporter >> glhModel [
-
-	^ glhModel
-]
-
-{ #category : 'accessing' }
-GHModelImporter >> glhModel: anObject [
-
-	glhModel := anObject
 ]
 
 { #category : 'api' }
