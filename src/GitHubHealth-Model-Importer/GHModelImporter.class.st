@@ -21,6 +21,15 @@ GHModelImporter >> api: anObject [
 	api := anObject
 ]
 
+{ #category : 'api' }
+GHModelImporter >> completeImportProject: aGLHProject [
+
+	self importPipelinesOf: aGLHProject.
+	self importBranchesOf: aGLHProject.
+	self withCommitsSince ifNotNil: [ :withCommitSince | "If not nil, it means we have to import commit"
+		self importCommitsOfProject: aGLHProject ]
+]
+
 { #category : 'private' }
 GHModelImporter >> convertApiFileAsFile: aAPIFile [
 
@@ -62,6 +71,16 @@ GHModelImporter >> importBranchesOf: project [
 	branches do: [ :branch | 
 		repository addBranch: branch.
 		self withFiles ifTrue: [ self importFilesOfBranch: branch ] ]
+]
+
+{ #category : 'api' }
+GHModelImporter >> importCommitsOfProject: aGLHProject [
+
+	| commits |
+	commits := self api
+		           commitsOfProject: aGLHProject name
+		           ofOrganization: aGLHProject group name.
+	self halt
 ]
 
 { #category : 'api' }
@@ -138,11 +157,9 @@ GHModelImporter >> importRepositoriesOfGroup: groupResult [
 	| reposResult |
 	reposResult := self api reposOfOrganization: groupResult name.
 	groupResult projects addAll: (self parseArrayOfProject: reposResult).
-	self glhModel
-		addAll: groupResult projects.
+	self glhModel addAll: groupResult projects.
 	groupResult projects do: [ :project |
-		self importPipelinesOf: project.
-		self importBranchesOf: project ].
+		self completeImportProject: project ].
 	^ groupResult
 ]
 

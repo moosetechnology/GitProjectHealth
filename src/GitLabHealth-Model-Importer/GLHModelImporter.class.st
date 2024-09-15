@@ -77,10 +77,13 @@ GLHModelImporter >> blockOnNameEquality [
 
 { #category : 'private - api' }
 GLHModelImporter >> completeImportProject: aGLHProject [
-	|importedProject|
+
+	| importedProject |
 	('Complete import of project: ' , aGLHProject id printString)
 		recordInfo.
-	importedProject := self glhModel add: aGLHProject unless: (self blockOnIdEquality ).
+	importedProject := self glhModel
+		                   add: aGLHProject
+		                   unless: self blockOnIdEquality.
 
 	self importPipelinesOfProject: importedProject.
 

@@ -53,6 +53,14 @@ GHApi >> client: anObject [
 	client := anObject
 ]
 
+{ #category : 'api - commits' }
+GHApi >> commitsOfProject: aProjectId ofOrganization: organisationName [
+
+	^ self client get:
+		  self baseAPIUrl , '/repos/' , organisationName , '/' , aProjectId
+		  , '/commits'
+]
+
 { #category : 'api' }
 GHApi >> contentsOfRepo: aRepoName ofOrganization: anOrganizationName inBranch: aBranchRef withPath: aPath [
 
