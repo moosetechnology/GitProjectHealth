@@ -80,7 +80,15 @@ GHModelImporter >> importCommitsOfProject: aGLHProject [
 	commitsResult := self api
 		                 commitsOfProject: aGLHProject name
 		                 ofOrganization: aGLHProject group name.
-	commits := self parseCommitsResult: commitsResult
+	commits := self parseCommitsResult: commitsResult.
+	"add the imported commits (unless they are already added to this repository)"
+	aGLHProject repository commits
+		addAll: commits
+		unless: [ :existing :new | existing id = new id ].
+	"add the imported commits to the model unles they are already added to the model"
+	^ self glhModel
+		  addAll: commits
+		  unless: [ :existing :new | existing id = new id ]
 ]
 
 { #category : 'api' }

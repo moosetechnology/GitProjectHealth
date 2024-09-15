@@ -407,8 +407,10 @@ RSCommit >> shapeForCommit: aGLHCommit withColor: color [
 		              yourself.
 
 	labelCommiter := RSLabel new
-		                 text: 'by ',
-			                 (aGLHCommit author_name truncateWithElipsisTo: 50);
+		                 text: 'by ' , (aGLHCommit author_name
+					                  ifNil: [ 'unknown' ]
+					                  ifNotNil: [ :authorName |
+						                  authorName truncateWithElipsisTo: 50 ]);
 		                 yourself.
 
 	box := RSBox new
