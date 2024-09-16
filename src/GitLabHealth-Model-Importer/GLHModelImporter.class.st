@@ -605,7 +605,7 @@ GLHModelImporter >> importCreatorOfCommit: aCommit [
 ]
 
 { #category : #'as yet unclassified' }
-GLHModelImporter >> importCreatorOfCommit: aCommit [
+GLHModelImporter >> importCreatorOfCommit2: aCommit [
 
 	aCommit commitCreator ifNil: [		
 		aCommit commitCreator:
@@ -938,7 +938,7 @@ GLHModelImporter >> initialize [
 	userCatalogue := GLHUserCatalogueV2 new
 		                 anImporter: self;
 		                 yourself.
-	self initReader
+	self initReader.
 
 	currentImporter := self
 ]
