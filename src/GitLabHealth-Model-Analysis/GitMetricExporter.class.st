@@ -255,6 +255,9 @@ GitMetricExporter >> exportProjectAnalysesInCSV [
 
 		file := self constructFilePath: groupOver.
 		file writeStreamDo: [ :aStream |
+						aStream
+				<< 'sep=,';
+				<< OSPlatform current lineEnding.
 			exportBrowserModel writeCSVOn: aStream ] ]
 ]
 
@@ -443,7 +446,8 @@ GitMetricExporter >> initialize [
 		           ClosedMergeRequestMetric.
 		           MergedMergeRequestMetric.
 		           SelfMergedUnderAMinuteMergeRequestMetric.
-		           ClosedTicketsMetric. JiraTimeMRTimeDifferenceMetric }
+		           ClosedTicketsMetric .
+		           JiraTimeMRTimeDifferenceMetric }
 ]
 
 { #category : #accessing }

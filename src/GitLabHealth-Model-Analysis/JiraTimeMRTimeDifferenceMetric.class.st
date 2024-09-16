@@ -7,7 +7,7 @@ Class {
 { #category : #calculating }
 JiraTimeMRTimeDifferenceMetric >> calculate [
 
-	| groupedByDate dateOver |
+	| groupedByDate dateOver average |
 	userMergeRequests ifNil: [ self load ].
 	groupedByDate := self setupGroupedDate.
 
@@ -45,8 +45,12 @@ JiraTimeMRTimeDifferenceMetric >> calculate [
 					                             timeOriginalEstimate ].
 
 			                 jiraTime - mergeRequestTime ] ].
-
-	^groupedByDate average ifNil: [ nil ] ifNotNil: [ groupedByDate average ] 
+	
+	groupedByDate := groupedByDate select: [ :group | group isNotEmpty ].
+	average := groupedByDate ifEmpty: [ nil ] ifNotEmpty: [ groupedByDate average ].
+	
+	^average.
+	
 ]
 
 { #category : #accessing }
