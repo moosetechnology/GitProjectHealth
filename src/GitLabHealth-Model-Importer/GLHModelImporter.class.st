@@ -12,7 +12,7 @@ Class {
 	#classVars : [
 		'currentImporter'
 	],
-	#category : 'GitLabHealth-Model-Importer',
+	#category : 'GitLabHealth-Model-Importer'
 }
 
 { #category : #'as yet unclassified' }
@@ -592,6 +592,7 @@ GLHModelImporter >> importContributedProjectsOfUser: aGLHUser [
 			(self glhModel
 				 addAll: newlyFoundElmts
 				 unless: self blockOnIdEquality) ].
+]
 
 { #category : 'as yet unclassified' }
 GLHModelImporter >> importCreatorOfCommit: aCommit [
@@ -608,7 +609,7 @@ GLHModelImporter >> importCreatorOfCommit: aCommit [
 ]
 
 { #category : #'as yet unclassified' }
-GLHModelImporter >> importCreatorOfCommit: aCommit [
+GLHModelImporter >> importCreatorOfCommit2: aCommit [
 
 	aCommit commitCreator ifNil: [		
 		aCommit commitCreator:
@@ -941,7 +942,7 @@ GLHModelImporter >> initialize [
 	userCatalogue := GLHUserCatalogueV2 new
 		                 anImporter: self;
 		                 yourself.
-	self initReader
+	self initReader.
 
 	currentImporter := self
 ]
