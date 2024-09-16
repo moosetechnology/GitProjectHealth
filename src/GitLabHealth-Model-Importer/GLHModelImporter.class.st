@@ -12,7 +12,7 @@ Class {
 	#classVars : [
 		'currentImporter'
 	],
-	#category : 'GitLabHealth-Model-Importer',
+	#category : 'GitLabHealth-Model-Importer'
 }
 
 { #category : 'accessing' }
