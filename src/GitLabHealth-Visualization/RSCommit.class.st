@@ -5,7 +5,7 @@ Class {
 		'aCommit',
 		'canvas'
 	],
-	#category : #'GitLabHealth-Visualization'
+	#category : 'GitLabHealth-Visualization'
 }
 
 { #category : #'as yet unclassified' }
@@ -79,7 +79,9 @@ RSCommit >> buildCommitCompleteHierachyCanvas [
 	dic := Dictionary new.
 
 
-	churnAnalyzer := GitAnalyzer new fromCommit: aCommit; maxChildCommit: 50.
+	churnAnalyzer := GitAnalyzer new
+		                 fromCommit: aCommit;
+		                 maxChildCommit: 50.
 	files2Commits := churnAnalyzer impactedFilesInFollowUpCommitsOf:
 		                 aCommit.
 	files2Commits := files2Commits select: [ :entry |
@@ -404,8 +406,10 @@ RSCommit >> shapeForCommit: aGLHCommit withColor: color [
 		              yourself.
 
 	labelCommiter := RSLabel new
-		                 text: 'by ',
-			                 (aGLHCommit author_name truncateWithElipsisTo: 50);
+		                 text: 'by ' , (aGLHCommit author_name
+					                  ifNil: [ 'unknown' ]
+					                  ifNotNil: [ :authorName |
+						                  authorName truncateWithElipsisTo: 50 ]);
 		                 yourself.
 
 	box := RSBox new

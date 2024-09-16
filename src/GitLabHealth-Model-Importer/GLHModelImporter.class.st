@@ -1,12 +1,9 @@
 Class {
 	#name : #GLHModelImporter,
-	#superclass : #Object,
+	#superclass : #GPModelImporter,
 	#instVars : [
-		'glhModel',
 		'glhApi',
-		'withFiles',
 		'withCommitDiffs',
-		'withCommitsSince',
 		'withInitialCommits',
 		'withInitialMergeRequest',
 		'generalReader',
@@ -15,7 +12,7 @@ Class {
 	#classVars : [
 		'currentImporter'
 	],
-	#category : #'GitLabHealth-Model-Importer'
+	#category : 'GitLabHealth-Model-Importer'
 }
 
 { #category : #'as yet unclassified' }
@@ -55,16 +52,6 @@ GLHModelImporter >> addGroupResultToModel: groupResult [
 	^ group 
 ]
 
-{ #category : #accessing }
-GLHModelImporter >> beWithFiles [
-	withFiles := true
-]
-
-{ #category : #accessing }
-GLHModelImporter >> beWithouFiles [
-	withFiles := false
-]
-
 { #category : #'as yet unclassified' }
 GLHModelImporter >> blockEqualityOn: aSymbol [
 	^ [ :existing :new |
@@ -91,7 +78,7 @@ GLHModelImporter >> blockOnNameEquality [
 	^ self blockEqualityOn: #name
 ]
 
-{ #category : #commit }
+{ #category : #'as yet unclassified' }
 GLHModelImporter >> chainsCommitsFrom: commitsCollection [
 
 	| dic |
@@ -120,7 +107,7 @@ GLHModelImporter >> completeImportProject: aGLHProject [
 	('Complete import of project: ' , aGLHProject id printString)
 		recordInfo.
 	aGLHProject repository ifNotNil: [ ^ aGLHProject ].
-	
+
 	importedProject := self glhModel
 		                   add: aGLHProject
 		                   unless: self blockOnIdEquality.
@@ -378,6 +365,37 @@ GLHModelImporter >> importCommitOfProject: anProject withId: anID [
 	^ commit
 ]
 
+{ #category : #'private - api' }
+GLHModelImporter >> importCommits: aGLHProject [
+	"limited to the last 20 commits"
+
+	| results parsedResults |
+	results := self glhApi
+		           commitsOfProject: aGLHProject id
+		           forRefName: nil
+		           since: nil
+		           until: nil
+		           path: nil
+		           author: nil
+		           all: nil
+		           with_stats: true
+		           firstParent: nil
+		           order: nil
+		           trailers: nil
+		           perPage: nil
+		           page: nil.
+	parsedResults := self parseCommitsResult: results.
+	self glhModel addAll: parsedResults unless: self blockOnIdEquality.
+
+	parsedResults do: [ :commit |
+		commit repository: aGLHProject repository ].
+
+	self withCommitDiffs ifTrue: [
+		parsedResults do: [ :commit | self importDiffOfCommit: commit ] ].
+	
+	^ parsedResults. 
+]
+
 { #category : #'as yet unclassified' }
 GLHModelImporter >> importCommitsFollowing: aCommit upToDays: aNumberOfDay [
 	"import the 'n' commits of a project starting from an initial 'aCommit' commit. 
@@ -430,6 +448,51 @@ GLHModelImporter >> importCommitsOProject: aProject since: fromDate until: toDat
 
 
 	^ self glhModel addAll: foundCommit unless: self blockOnIdEquality
+]
+
+{ #category : #commit }
+GLHModelImporter >> importCommitsOf: aGLHProject withStats: aBoolean until: toDate [
+
+	| newlyFoundCommit page |
+	
+	self deprecated: [  ] .
+	
+	page := 0.
+	newlyFoundCommit := { true }.
+	[ newlyFoundCommit isNotEmpty ] whileTrue: [
+		| results parsedResults existingCommits |
+		page := page + 1.
+		('import commit page ' , page printString) recordInfo.
+		results := self glhApi
+			           commitsOfProject: aGLHProject id
+			           forRefName: nil
+			           since: nil
+			           until: nil
+			           path: nil
+			           author: nil
+			           all: nil
+			           with_stats: aBoolean
+			           firstParent: nil
+			           order: nil
+			           trailers: nil
+			           perPage: 100
+			           page: page.
+		parsedResults := self parseCommitsResult: results.
+		existingCommits := aGLHProject mooseModel allWithType: GLHCommit.
+
+		newlyFoundCommit := parsedResults reject: [ :commitParsed |
+			                    (toDate isNil or: [
+				                     commitParsed committed_date
+				                     < toDate asDateAndTime ]) or: [
+				                    existingCommits anySatisfy: [ :existingCommit |
+					                    existingCommit id = commitParsed id ] ] ].
+		aGLHProject mooseModel addAll: newlyFoundCommit.
+		aGLHProject repository commits addAll: newlyFoundCommit ].
+
+
+	self withCommitDiffs ifTrue: [
+		aGLHProject repository commits do: [ :commit |
+			self importDiffOfCommit: commit ] ]
 ]
 
 { #category : #commit }
@@ -523,7 +586,20 @@ GLHModelImporter >> importContributedProjectsOfUser: aGLHUser [
 			(self glhModel
 				 addAll: newlyFoundElmts
 				 unless: self blockOnIdEquality) ].
-	
+]
+
+{ #category : #'as yet unclassified' }
+GLHModelImporter >> importCreatorOfCommit2: aCommit [
+
+	aCommit commitCreator ifNil: [		
+		aCommit commitCreator:
+			(self importUserByUsername: aCommit author_name) ].
+	self userCatalogue addUser: aCommit commitCreator withProject: aCommit repository project id.
+	^ aCommit commitCreator
+]
+
+{ #category : #'as yet unclassified' }
+GLHModelImporter >> importCreatorOfCommit: aCommit [
 	
 	remaningProjects := self importProjects: ((foundElmts collect: #id) difference: ((self userCatalogue atId: aGLHUser id) at: #contributedProjects)).
 
@@ -534,16 +610,6 @@ GLHModelImporter >> importContributedProjectsOfUser: aGLHUser [
 	self userCatalogue addUser: aGLHUser withProjects: (aGLHUser contributedProjects collect: #id).
 
 	^ foundElmts
-]
-
-{ #category : #'as yet unclassified' }
-GLHModelImporter >> importCreatorOfCommit: aCommit [
-
-	aCommit commitCreator ifNil: [		
-		aCommit commitCreator:
-			(self importUserByUsername: aCommit author_name) ].
-	self userCatalogue addUser: aCommit commitCreator withProject: aCommit repository project id.
-	^ aCommit commitCreator
 ]
 
 { #category : #api }
@@ -860,15 +926,18 @@ GLHModelImporter >> initReader [
 { #category : #initialization }
 GLHModelImporter >> initialize [
 
-	withFiles := false.
+	super initialize.
 	withCommitDiffs := false.
 	withInitialCommits := false.
 	withInitialMergeRequest := false.
+
 	withCommitsSince := (Date today - 1 week) asDateAndTime.
 	userCatalogue := GLHUserCatalogueV2 new
 		                 anImporter: self;
 		                 yourself.
-	self initReader
+	self initReader.
+
+	currentImporter := self
 ]
 
 { #category : #importer }
@@ -1005,6 +1074,28 @@ GLHModelImporter >> parseCommitsResult: result [
 		customMappting listOfElementSchema: GLHCommit ].
 
 	^ reader nextAs: #ArrayOfCommit
+]
+
+{ #category : #private }
+GLHModelImporter >> parseDiffResult: result [
+
+	| reader |
+	self
+		deprecated: 'Use #newParseDiffResult: instead'
+		on: '28 June 2024'
+		in:
+		'Pharo-11.0.0+build.726.sha.aece1b5473acf3830a0e082c1bc3a15d4ff3522b (64 Bit)'.
+	reader := NeoJSONReader on: result readStream.
+	reader for: GLHDiff do: [ :mapping |
+		mapping mapInstVars:
+			#( deleted_file new_file new_path old_path renamed_file ).
+		mapping mapInstVar: #diffString to: #diff ].
+
+	reader
+		for: #ArrayOfDiffs
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHDiff ].
+	^ reader nextAs: #ArrayOfDiffs
 ]
 
 { #category : #private }
@@ -1148,6 +1239,13 @@ GLHModelImporter >> pipelinesOf: aProjectID [
 	^ self parsePipelinesResult: result .
 ]
 
+{ #category : #'as yet unclassified' }
+GLHModelImporter >> selectEntityType: aType overAttribut: aSelector equalTo: value [
+
+	^ (self glhModel allWithType: aType)
+		select: [ :entity | (entity perform: aSelector) = value ]
+]
+
 { #category : #'private - api' }
 GLHModelImporter >> subGroupsOf: aGroupID [
 
@@ -1188,16 +1286,6 @@ GLHModelImporter >> withCommitDiffs [
 GLHModelImporter >> withCommitDiffs: anObject [
 
 	withCommitDiffs := anObject
-]
-
-{ #category : #accessing }
-GLHModelImporter >> withFiles [
-	^ withFiles
-]
-
-{ #category : #accessing }
-GLHModelImporter >> withFiles: aBoolean [
-	withFiles := aBoolean
 ]
 
 { #category : #accessing }

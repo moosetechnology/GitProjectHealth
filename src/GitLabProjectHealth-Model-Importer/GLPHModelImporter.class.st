@@ -1,7 +1,7 @@
 Class {
 	#name : #GLPHModelImporter,
 	#superclass : #GLHModelImporter,
-	#category : #'GitLabProjectHealth-Model-Importer'
+	#category : 'GitLabProjectHealth-Model-Importer'
 }
 
 { #category : #'as yet unclassified' }
@@ -361,6 +361,18 @@ GLPHModelImporter >> importMergeResquestMerger: aGLPHEMergeRequest [
 ]
 
 { #category : #'private - api' }
+GLPHModelImporter >> importProject: aProjectID [
+
+	| result projectResult |
+	('Import project with id:  ' , aProjectID printString) recordInfo.
+
+	result := self glhApi project: aProjectID.
+	projectResult := self parseProjectResult: result.
+
+	^ self completeImportProject: projectResult
+]
+
+{ #category : #'private - api' }
 GLPHModelImporter >> importRepository: aGLHRepository [
 
 	super importRepository: aGLHRepository.
@@ -433,10 +445,27 @@ GLPHModelImporter >> parseMergeRequestResult: result [
 	^ generalReader nextAs: #ArrayOfMergeRequest
 ]
 
+{ #category : #parsing }
+GLPHModelImporter >> parseProjectResult: aResult [ 
+		| reader |
+	reader := NeoJSONReader on: aResult readStream.
+	reader for: GLHProject do: [ :mapping |
+		mapping mapInstVars. ].
+"	reader mapInstVarsFor: GLHProject."
+
+	^ reader nextAs: GLHProject
+]
+
 { #category : #accessing }
 GLPHModelImporter >> withCommitsSince: someDays [
 	"substract the current date with a given number of days. Use to retrieve the commits submit in the last giving days"
+
 	"(GLPHModelImporter new withCommitsSince: 1 week ) >>> (Date today - 1 week) asDateAndTime"
+
 	"(GLPHModelImporter new withCommitsSince: 30 day ) >>> (Date today - 30 day) asDateAndTime"
-	withCommitsSince := (Date today - someDays) asDateAndTime
+
+	(someDays isKindOf: DateAndTime)
+		ifTrue: [ withCommitsSince := someDays ]
+		ifFalse: [
+		withCommitsSince := (Date today - someDays) asDateAndTime ]
 ]
