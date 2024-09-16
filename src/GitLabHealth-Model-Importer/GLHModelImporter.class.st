@@ -12,7 +12,7 @@ Class {
 	#classVars : [
 		'currentImporter'
 	],
-	#category : 'GitLabHealth-Model-Importer'
+	#category : #'GitLabHealth-Model-Importer'
 }
 
 { #category : #'as yet unclassified' }
@@ -563,7 +563,7 @@ GLHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName until:
 { #category : #'as yet unclassified' }
 GLHModelImporter >> importContributedProjectsOfUser: aGLHUser [
 
-	| newlyFoundElmts page foundElmts remaningProjects|
+	| newlyFoundElmts page foundElmts remaningProjects |
 	page := 0.
 	foundElmts := OrderedCollection new.
 	newlyFoundElmts := { true }.
@@ -572,7 +572,7 @@ GLHModelImporter >> importContributedProjectsOfUser: aGLHUser [
 		page := page + 1.
 		('import contributed project of user ' , aGLHUser name , ' page '
 		 , page printString) recordInfo.
-		results := self glhApi 
+		results := self glhApi
 			           contributedProjectsOfUserId: aGLHUser id
 			           orderBy: 'last_activity_at'
 			           simple: true
@@ -586,30 +586,30 @@ GLHModelImporter >> importContributedProjectsOfUser: aGLHUser [
 			(self glhModel
 				 addAll: newlyFoundElmts
 				 unless: self blockOnIdEquality) ].
+	remaningProjects := self importProjects:
+		                    ((foundElmts collect: #id) difference:
+			                     ((self userCatalogue atId: aGLHUser id) at:
+				                      #contributedProjects)).
+
+	aGLHUser contributedProjects
+		addAll: foundElmts , remaningProjects
+		unless: self blockOnIdEquality.
+
+	self userCatalogue
+		addUser: aGLHUser
+		withProjects: (aGLHUser contributedProjects collect: #id).
+
+	^ foundElmts
 ]
 
 { #category : #'as yet unclassified' }
-GLHModelImporter >> importCreatorOfCommit2: aCommit [
+GLHModelImporter >> importCreatorOfCommit: aCommit [
 
 	aCommit commitCreator ifNil: [		
 		aCommit commitCreator:
 			(self importUserByUsername: aCommit author_name) ].
 	self userCatalogue addUser: aCommit commitCreator withProject: aCommit repository project id.
 	^ aCommit commitCreator
-]
-
-{ #category : #'as yet unclassified' }
-GLHModelImporter >> importCreatorOfCommit: aCommit [
-	
-	remaningProjects := self importProjects: ((foundElmts collect: #id) difference: ((self userCatalogue atId: aGLHUser id) at: #contributedProjects)).
-
-	aGLHUser contributedProjects
-		addAll: (foundElmts, remaningProjects)
-		unless: self blockOnIdEquality.
-		
-	self userCatalogue addUser: aGLHUser withProjects: (aGLHUser contributedProjects collect: #id).
-
-	^ foundElmts
 ]
 
 { #category : #api }
