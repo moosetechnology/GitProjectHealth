@@ -263,41 +263,32 @@ GitMetricExporter >> exportUserAnalysesInCSV [
 
 	| exportBrowserModel groupedByOver group groupOver groupByName periods csvMetrics file |
 	exportBrowserModel := MiExportModel new.
-
 	groupedByOver := self userAnalyses groupedBy: #over.
-	
-
 	groupedByOver associations do: [ :groupAssociation |
 		group := groupAssociation value.
 		groupOver := groupAssociation key.
-
-
 		groupByName := group groupedBy: #username.
 		exportBrowserModel entitiesList: groupByName.
-
 		exportBrowserModel removeColumnForQueryNamed: #Type.
 		exportBrowserModel removeColumnForQueryNamed: #Name.
-
 		exportBrowserModel
 			addColumnForQuery: [ :groupAnalyses |
 			(groupAnalyses at: 1) username ]
 			withName: #'User name'.
-
 		periods := (group groupedBy: #period) keys.
-
 		periods do: [ :period |
 			csvMetrics := self
 				              csvMetricsFor: self userMetrics
 				              at: (period at: #since).
-
-
 			csvMetrics associations do: [ :association |
 				exportBrowserModel
 					addColumnForQuery: association value
 					withName: association key ] ].
-
 		file := self constructFilePath: groupOver.
 		file writeStreamDo: [ :aStream |
+			aStream
+				<< 'sep=,';
+				<< OSPlatform current lineEnding.
 			exportBrowserModel writeCSVOn: aStream ] ]
 ]
 
