@@ -588,6 +588,7 @@ GLHModelImporter >> importContributedProjectsOfUser: aGLHUser [
 			(self glhModel
 				 addAll: newlyFoundElmts
 				 unless: self blockOnIdEquality) ].
+]
 
 { #category : 'as yet unclassified' }
 GLHModelImporter >> importCreatorOfCommit: aCommit [
