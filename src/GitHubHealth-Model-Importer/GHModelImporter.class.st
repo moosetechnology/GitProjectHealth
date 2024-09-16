@@ -1,26 +1,25 @@
 Class {
-	#name : 'GHModelImporter',
-	#superclass : 'GPModelImporter',
+	#name : #GHModelImporter,
+	#superclass : #GPModelImporter,
 	#instVars : [
 		'api'
 	],
-	#category : 'GitHubHealth-Model-Importer',
-	#package : 'GitHubHealth-Model-Importer'
+	#category : 'GitHubHealth-Model-Importer'
 }
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GHModelImporter >> api [
 
 	^ api
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GHModelImporter >> api: anObject [
 
 	api := anObject
 ]
 
-{ #category : 'api' }
+{ #category : #api }
 GHModelImporter >> completeImportProject: aGLHProject [
 
 	self importPipelinesOf: aGLHProject.
@@ -31,7 +30,7 @@ GHModelImporter >> completeImportProject: aGLHProject [
 		self chainsCommitsFrom: commits ]
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 GHModelImporter >> convertApiFileAsFile: aAPIFile [
 
 	aAPIFile type = 'dir' ifTrue: [ 
@@ -43,7 +42,7 @@ GHModelImporter >> convertApiFileAsFile: aAPIFile [
 		  yourself
 ]
 
-{ #category : 'api' }
+{ #category : #api }
 GHModelImporter >> importBranchesOf: project [
 
 	"add the pipeline (actions runs) in the project"
@@ -62,7 +61,7 @@ GHModelImporter >> importBranchesOf: project [
 		self withFiles ifTrue: [ self importFilesOfBranch: branch ] ]
 ]
 
-{ #category : 'api' }
+{ #category : #api }
 GHModelImporter >> importCommitsOfProject: aGLHProject [
 
 	| itemByPage foundCommits tmp pageNumber |
@@ -106,7 +105,7 @@ GHModelImporter >> importCommitsOfProject: aGLHProject [
 		  unless: [ :existing :new | existing id = new id ]
 ]
 
-{ #category : 'api' }
+{ #category : #api }
 GHModelImporter >> importDirectoryFiles: aDirectoryFile OfBranch: aBranch [
 
 	| result files apiFiles |
@@ -128,7 +127,7 @@ GHModelImporter >> importDirectoryFiles: aDirectoryFile OfBranch: aBranch [
 		self importDirectoryFiles: file OfBranch: aBranch ]
 ]
 
-{ #category : 'api' }
+{ #category : #api }
 GHModelImporter >> importFilesOfBranch: aBranch [
 
 	| result files apiFiles |
@@ -149,7 +148,7 @@ GHModelImporter >> importFilesOfBranch: aBranch [
 		self importDirectoryFiles: file OfBranch: aBranch ]
 ]
 
-{ #category : 'api' }
+{ #category : #api }
 GHModelImporter >> importGroup: aGroupName [
 
 	| result groupResult |
@@ -160,7 +159,7 @@ GHModelImporter >> importGroup: aGroupName [
 	^ groupResult
 ]
 
-{ #category : 'api' }
+{ #category : #api }
 GHModelImporter >> importPipelinesOf: project [
 
 	"add the pipeline (actions runs) in the project"
@@ -174,7 +173,7 @@ GHModelImporter >> importPipelinesOf: project [
 		project addPipeline: pipeline ]
 ]
 
-{ #category : 'api' }
+{ #category : #api }
 GHModelImporter >> importRepositoriesOfGroup: groupResult [
 
 	| reposResult itemByPage pageNumber reposFound tmp |
@@ -208,7 +207,7 @@ GHModelImporter >> importRepositoriesOfGroup: groupResult [
 	^ groupResult
 ]
 
-{ #category : 'api' }
+{ #category : #api }
 GHModelImporter >> importUser: userID [
 
 	| result userResult |
@@ -223,7 +222,7 @@ GHModelImporter >> importUser: userID [
 		  unless: [ :current :new | current id = new id ]
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 GHModelImporter >> initialize [
 
 	super initialize.
@@ -231,7 +230,7 @@ GHModelImporter >> initialize [
 	withFiles := false
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 GHModelImporter >> parseArrayOfProject: arrayOfProjects [
 
 	| reader |
@@ -250,7 +249,7 @@ GHModelImporter >> parseArrayOfProject: arrayOfProjects [
 	^ reader nextAs: #ArrayOfProjects
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 GHModelImporter >> parseBranchesResult: arrayOfBranch [
 
 	| reader |
@@ -263,7 +262,7 @@ GHModelImporter >> parseBranchesResult: arrayOfBranch [
 	^ reader nextAs: #ArrayOfBranch
 ]
 
-{ #category : 'parsing' }
+{ #category : #parsing }
 GHModelImporter >> parseCommitsResult: result [
 
 	| reader |
@@ -319,7 +318,7 @@ GHModelImporter >> parseCommitsResult: result [
 	^ reader nextAs: #ArrayOfCommit
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 GHModelImporter >> parseFileTreeResult: aResult [
 
 	| reader |
@@ -332,7 +331,7 @@ GHModelImporter >> parseFileTreeResult: aResult [
 	^ reader nextAs: #ArrayOfFile
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 GHModelImporter >> parseGroupResult: aResult [
 
 	| reader |
@@ -345,7 +344,7 @@ GHModelImporter >> parseGroupResult: aResult [
 	^ reader nextAs: GLHGroup
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 GHModelImporter >> parsePipelinesResult: pipelineOverview [
 
 	| reader |
@@ -367,7 +366,7 @@ GHModelImporter >> parsePipelinesResult: pipelineOverview [
 	^ reader nextAs: GHAPIPipelineOverview
 ]
 
-{ #category : 'parsing' }
+{ #category : #parsing }
 GHModelImporter >> parseUserResult: result [
 
 	| reader |
@@ -386,12 +385,12 @@ GHModelImporter >> parseUserResult: result [
 	^ reader nextAs: GLHUser
 ]
 
-{ #category : 'api' }
+{ #category : #api }
 GHModelImporter >> privateToken [
 	^ self api privateToken
 ]
 
-{ #category : 'api' }
+{ #category : #api }
 GHModelImporter >> privateToken: aTokenString [
 	^ self api privateToken: aTokenString
 ]

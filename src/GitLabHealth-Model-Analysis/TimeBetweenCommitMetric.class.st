@@ -39,19 +39,13 @@ TimeBetweenCommitMetric >> calculate [
 
 	average := groupedByDate
 		           ifEmpty: [ nil ]
-		           ifNotEmpty: [ groupedByDate average ].
+		           ifNotEmpty: [ groupedByDate average asFloat ].
 
-	^ average
+	^ average 
 ]
 
 { #category : #accessing }
 TimeBetweenCommitMetric >> description [
 
 	^ 'average time between commits (in seconds)'
-]
-
-{ #category : #accessing }
-TimeBetweenCommitMetric >> name [
-
-	^ 'timeBetweenCommit'
 ]

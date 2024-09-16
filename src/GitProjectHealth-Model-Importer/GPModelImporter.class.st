@@ -5,30 +5,29 @@ I am a try of normalization for the different importer.
 I also define some contract so it is easier to switch from one importer to another
 "
 Class {
-	#name : 'GPModelImporter',
-	#superclass : 'Object',
+	#name : #GPModelImporter,
+	#superclass : #Object,
 	#instVars : [
 		'withCommitsSince',
 		'withFiles',
 		'glhModel'
 	],
-	#category : 'GitProjectHealth-Model-Importer',
-	#package : 'GitProjectHealth-Model-Importer'
+	#category : 'GitProjectHealth-Model-Importer'
 }
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GPModelImporter >> beWithFiles [
 
 	withFiles := true
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GPModelImporter >> beWithoutFiles [
 
 	withFiles := false
 ]
 
-{ #category : 'commit' }
+{ #category : #commit }
 GPModelImporter >> chainsCommitsFrom: commitsCollection [
 
 	| dic |
@@ -50,44 +49,44 @@ GPModelImporter >> chainsCommitsFrom: commitsCollection [
 	^ commitsCollection
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GPModelImporter >> glhModel [
 
 	^ glhModel
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GPModelImporter >> glhModel: anObject [
 
 	glhModel := anObject
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 GPModelImporter >> initialize [
 
 	super initialize.
 	self withCommitsSince: (Date today - 1 week) asDateAndTime
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GPModelImporter >> withCommitsSince [
 
 	^ withCommitsSince
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GPModelImporter >> withCommitsSince: anObject [
 
 	withCommitsSince := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GPModelImporter >> withFiles [
 
 	^ withFiles
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GPModelImporter >> withFiles: anObject [
 
 	withFiles := anObject

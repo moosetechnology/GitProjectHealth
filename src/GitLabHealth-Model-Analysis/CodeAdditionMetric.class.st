@@ -41,9 +41,3 @@ CodeAdditionMetric >> description [
 
 	^ 'code addition (avg)'
 ]
-
-{ #category : #accessing }
-CodeAdditionMetric >> name [
-
-	^ 'codeContribution'
-]

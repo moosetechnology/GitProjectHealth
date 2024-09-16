@@ -122,6 +122,33 @@ UserMetric >> loadCompleteMergeRequestsSince: since until: until [
 ]
 
 { #category : #loading }
+UserMetric >> loadMergeRequestsOfUser: anUser since: since until: until [ 
+
+	| cacheSymbol mergeRequests |
+	glhImporter withCommitDiffs: false.
+	cacheSymbol := self
+		               cacheSymbolFor: GLPHEMergeRequest
+		               since: since
+		               until: until.
+
+	mergeRequests := anUser contributedProjects collect: [ :project |
+		                 | mr |
+		                 project cacheAt: cacheSymbol ifAbsentPut: [
+			                 mr := glhImporter
+				                       importMergeRequests: project
+				                       since: since
+				                       until: until.
+			                 mr ] ].
+
+	mergeRequests := mergeRequests flattened.
+	glhImporter withCommitDiffs: true.
+
+	mergeRequests do: [ :mr | glhImporter importMergeResquestAuthor: mr ].
+
+	^ mergeRequests select: [ :mergeRequest | mergeRequest author = anUser ]
+]
+
+{ #category : #loading }
 UserMetric >> loadMergeRequestsSince: since until: until [
 
 	| cacheSymbol mergeRequests |
@@ -145,7 +172,7 @@ UserMetric >> loadMergeRequestsSince: since until: until [
 
 	mergeRequests do: [ :mr | glhImporter importMergeResquestAuthor: mr ].
 
-	^ mergeRequests select: [ :mergeRequest | mergeRequest author = user ]
+	^ mergeRequests "select: [ :mergeRequest | mergeRequest author = user ]"
 ]
 
 { #category : #loading }

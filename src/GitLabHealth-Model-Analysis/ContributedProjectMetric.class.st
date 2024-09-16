@@ -30,9 +30,3 @@ ContributedProjectMetric >> description [
 
 	^ 'number of project with min 1 commit of user'
 ]
-
-{ #category : #accessing }
-ContributedProjectMetric >> name [
-
-	^ 'contributedProject'
-]

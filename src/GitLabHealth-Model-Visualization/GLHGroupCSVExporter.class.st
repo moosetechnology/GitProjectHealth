@@ -1,18 +1,17 @@
 Class {
-	#name : 'GLHGroupCSVExporter',
-	#superclass : 'MiAbstractVisualization',
-	#category : 'GitLabHealth-Model-Visualization',
-	#package : 'GitLabHealth-Model-Visualization'
+	#name : #GLHGroupCSVExporter,
+	#superclass : #MiAbstractVisualization,
+	#category : #'GitLabHealth-Model-Visualization'
 }
 
-{ #category : 'running' }
+{ #category : #running }
 GLHGroupCSVExporter >> forGroup: aGLHGroup [
 	^String streamContents: [ :output |
 		self headerLineOn: output.
 		self forGroup: aGLHGroup on: output ]
 ]
 
-{ #category : 'running' }
+{ #category : #running }
 GLHGroupCSVExporter >> forGroup: aGLHGroup on: outputStream [
 
 	(aGLHGroup allToScope: GLHGroup) do: [ :group |
@@ -21,7 +20,7 @@ GLHGroupCSVExporter >> forGroup: aGLHGroup on: outputStream [
 	]
 ]
 
-{ #category : 'running' }
+{ #category : #running }
 GLHGroupCSVExporter >> forProject: aGHLProject inGroup: aGLHGroup onStream: outputStream [
 
 	outputStream
@@ -36,7 +35,7 @@ GLHGroupCSVExporter >> forProject: aGHLProject inGroup: aGLHGroup onStream: outp
 		cr
 ]
 
-{ #category : 'running' }
+{ #category : #running }
 GLHGroupCSVExporter >> headerLineOn: outputStream [
 
 	outputStream
@@ -44,7 +43,7 @@ GLHGroupCSVExporter >> headerLineOn: outputStream [
 		cr
 ]
 
-{ #category : 'running' }
+{ #category : #running }
 GLHGroupCSVExporter >> pipelineResult: aGHLProject [
 
 	^aGHLProject lastPipeline

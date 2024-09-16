@@ -1,6 +1,6 @@
-Extension { #name : 'GLHProject' }
+Extension { #name : #GLHProject }
 
-{ #category : '*GitLabHealth-Model-Visualization' }
+{ #category : #'*GitLabHealth-Model-Visualization' }
 GLHProject >> lastPipeline [
 
 	^self
@@ -14,7 +14,7 @@ GLHProject >> lastPipeline [
 		]
 ]
 
-{ #category : '*GitLabHealth-Model-Visualization' }
+{ #category : #'*GitLabHealth-Model-Visualization' }
 GLHProject >> lastPipelineDate [
 
 	^self

@@ -26,7 +26,7 @@ ClosedTicketsMetric >> calculate [
 { #category : #accessing }
 ClosedTicketsMetric >> description [
 
-	^ 'number of merge request with jira ticket closed'
+	^ 'number of closed merge request associated with a jira ticket'
 ]
 
 { #category : #accessing }

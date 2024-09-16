@@ -1,6 +1,6 @@
-Extension { #name : 'GLHUser' }
+Extension { #name : #GLHUser }
 
-{ #category : '*GitLabHealth-Visualization' }
+{ #category : #'*GitLabHealth-Visualization' }
 GLHUser >> rsCommitDistribution: aBuilder [
 
 	<inspectorPresentationOrder: 100 title: 'Commits distribution'>

@@ -1,6 +1,6 @@
-Extension { #name : 'GLHRepository' }
+Extension { #name : #GLHRepository }
 
-{ #category : '*GitLabHealth-Model-Visualization' }
+{ #category : #'*GitLabHealth-Model-Visualization' }
 GLHRepository >> rsCommitDistribution: aBuilder [
 
 	<inspectorPresentationOrder: 100 title: 'Commits distribution'>

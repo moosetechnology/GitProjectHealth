@@ -1,16 +1,15 @@
 Class {
-	#name : 'GLHGroupVisualization',
-	#superclass : 'MiAbstractVisualization',
+	#name : #GLHGroupVisualization,
+	#superclass : #MiAbstractVisualization,
 	#instVars : [
 		'noPipelineColor',
 		'passingPipelineColor',
 		'failingPipelinecolor'
 	],
-	#category : 'GitLabHealth-Model-Visualization',
-	#package : 'GitLabHealth-Model-Visualization'
+	#category : #'GitLabHealth-Model-Visualization'
 }
 
-{ #category : 'running' }
+{ #category : #running }
 GLHGroupVisualization >> createLegend [
 
 	| legend |
@@ -35,7 +34,7 @@ GLHGroupVisualization >> createLegend [
 	^ legend
 ]
 
-{ #category : 'running' }
+{ #category : #running }
 GLHGroupVisualization >> createShapeFor: project [
 
 	| box inspect |
@@ -70,7 +69,7 @@ GLHGroupVisualization >> createShapeFor: project [
 	^ box
 ]
 
-{ #category : 'running' }
+{ #category : #running }
 GLHGroupVisualization >> createShapes: aGLHGroup [
 
 	^(aGLHGroup allToScope: GLHGroup) collect: [ :group || lbl projects composite |
@@ -99,19 +98,19 @@ GLHGroupVisualization >> createShapes: aGLHGroup [
 	]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHGroupVisualization >> failingPipelinecolor [
 
 	^ failingPipelinecolor
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHGroupVisualization >> failingPipelinecolor: anObject [
 
 	failingPipelinecolor := anObject
 ]
 
-{ #category : 'running' }
+{ #category : #running }
 GLHGroupVisualization >> forGroup: aGLHGroups [
 
 	| c shapes legend |
@@ -142,7 +141,7 @@ GLHGroupVisualization >> forGroup: aGLHGroups [
 	^ c
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 GLHGroupVisualization >> initialize [
 
 	super initialize.
@@ -152,25 +151,25 @@ GLHGroupVisualization >> initialize [
 	failingPipelinecolor := Color red
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHGroupVisualization >> noPipelineColor [
 
 	^ noPipelineColor
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHGroupVisualization >> noPipelineColor: anObject [
 
 	noPipelineColor := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHGroupVisualization >> passingPipelineColor [
 
 	^ passingPipelineColor
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHGroupVisualization >> passingPipelineColor: anObject [
 
 	passingPipelineColor := anObject

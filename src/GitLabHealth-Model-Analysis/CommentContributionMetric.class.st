@@ -52,9 +52,3 @@ CommentContributionMetric >> load [
 		               loadCompleteCommitsSince: (period at: #since)
 		               until: (period at: #until)
 ]
-
-{ #category : #accessing }
-CommentContributionMetric >> name [
-
-	^ 'commentContribution'
-]

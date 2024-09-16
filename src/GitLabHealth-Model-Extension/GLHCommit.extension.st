@@ -1,6 +1,6 @@
-Extension { #name : 'GLHCommit' }
+Extension { #name : #GLHCommit }
 
-{ #category : '*GitLabHealth-Model-Extension' }
+{ #category : #'*GitLabHealth-Model-Extension' }
 GLHCommit >> computeChurnForMaxCommits: aLimit [
 
 	^ GitAnalyzer new
@@ -9,7 +9,7 @@ GLHCommit >> computeChurnForMaxCommits: aLimit [
 		  analyseChurn
 ]
 
-{ #category : '*GitLabHealth-Model-Extension' }
+{ #category : #'*GitLabHealth-Model-Extension' }
 GLHCommit >> displayStringOn: aStream [
 
 	aStream
@@ -18,7 +18,7 @@ GLHCommit >> displayStringOn: aStream [
 		<< self message
 ]
 
-{ #category : '*GitLabHealth-Model-Extension' }
+{ #category : #'*GitLabHealth-Model-Extension' }
 GLHCommit >> inspectionGLHCommitChildren [
 
 	<inspectorPresentationOrder: 3 title: 'Commits Tree'>
@@ -28,7 +28,7 @@ GLHCommit >> inspectionGLHCommitChildren [
 	^ canvas asPresenter
 ]
 
-{ #category : '*GitLabHealth-Model-Extension' }
+{ #category : #'*GitLabHealth-Model-Extension' }
 GLHCommit >> inspectionGLHCommitFileImpacts [
 
 	<inspectorPresentationOrder: 3 title: 'File Impact'>
@@ -38,7 +38,6 @@ GLHCommit >> inspectionGLHCommitFileImpacts [
 	^ canvas asPresenter
 ]
 
-
 { #category : #'*GitLabHealth-Model-Extension' }
 GLHCommit >> mooseNameOn: stream [
 	message ifNotNil: [ :mess | stream nextPutAll: mess ] ifNil: [
@@ -47,7 +46,7 @@ GLHCommit >> mooseNameOn: stream [
 			nextPutAll: (short_id ifNil: [ 'unknow id' ]) ]
 ]
 
-{ #category : '*GitLabHealth-Model-Extension' }
+{ #category : #'*GitLabHealth-Model-Extension' }
 GLHCommit >> parent_ids [
 	
 	^ parent_ids

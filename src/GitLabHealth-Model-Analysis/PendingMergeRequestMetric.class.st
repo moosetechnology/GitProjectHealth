@@ -1,25 +1,23 @@
 Class {
-	#name : #MergedMergeRequestMetric,
+	#name : #PendingMergeRequestMetric,
 	#superclass : #UserMergeRequestMetric,
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
 { #category : #calculating }
-MergedMergeRequestMetric >> calculate [
+PendingMergeRequestMetric >> calculate [
 
 	| groupedByDate userMergedMergeRequests dateOver |
 		userMergeRequests ifNil: [ self load ].
-
 	groupedByDate := self setupGroupedDate.
 
 	userMergedMergeRequests := userMergeRequests select: [
 		                           :userMergeRequest |
-		                           userMergeRequest merge_user isNotNil 
-												and: [ userMergeRequest merge_user id = user id ] ].
+		                           userMergeRequest state = 'opened'  ].
 
 	userMergedMergeRequests do: [ :userMergeRequest |
 		"here we look at the specific date of its merged"
-		dateOver := self transformDate: userMergeRequest merged_at to: over.
+		dateOver := self transformDate: userMergeRequest created_at to: over.
 		groupedByDate
 			at: dateOver printString
 			ifPresent: [ :value | value add: userMergeRequest ] ].
@@ -29,21 +27,18 @@ MergedMergeRequestMetric >> calculate [
 ]
 
 { #category : #accessing }
-MergedMergeRequestMetric >> description [
+PendingMergeRequestMetric >> description [
 
-	^ 'number of merge request merged by this user'
+	^ 'number of merge request opened during a period and left opened at the end of it'
 ]
 
 { #category : #loading }
-MergedMergeRequestMetric >> load [ 
-		userMergeRequests := self
-		                     loadMergeRequestsSince:
-		                     (period at: #since)
-		                     until: (period at: #until)
+PendingMergeRequestMetric >> load [
+	userMergeRequests := self loadMergeRequestsOfUser: user since: (period at: #since)
+		                     until: (period at: #until).
 ]
 
 { #category : #accessing }
-MergedMergeRequestMetric >> name [
-
-	^ 'mergedMergeRequest'
+PendingMergeRequestMetric >> name [ 
+	^'pendingMergeRequest'
 ]

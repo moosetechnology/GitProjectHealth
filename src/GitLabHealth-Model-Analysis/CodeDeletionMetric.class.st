@@ -41,9 +41,3 @@ CodeDeletionMetric >> description [
 
 	^'code deletion (avg)'
 ]
-
-{ #category : #accessing }
-CodeDeletionMetric >> name [
-
-	^'codeDeletion'
-]

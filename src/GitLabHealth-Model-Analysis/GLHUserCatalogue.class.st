@@ -199,7 +199,7 @@ GLHUserCatalogue >> exportToJson [
 { #category : #initialization }
 GLHUserCatalogue >> initialize [
 
-	anImporter := GLHModelImporter current.
+	anImporter := GLHModelImporter importers anyOne.
 ]
 
 { #category : #'as yet unclassified' }

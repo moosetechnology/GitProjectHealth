@@ -2,23 +2,22 @@
 A GHModelImporterTest is a test class for testing the behavior of GHModelImporter
 "
 Class {
-	#name : 'GHModelImporterTest',
-	#superclass : 'TestCase',
+	#name : #GHModelImporterTest,
+	#superclass : #TestCase,
 	#instVars : [
 		'importer'
 	],
-	#category : 'GitHubHealth-Model-Importer-Tests',
-	#package : 'GitHubHealth-Model-Importer-Tests'
+	#category : 'GitHubHealth-Model-Importer-Tests'
 }
 
-{ #category : 'running' }
+{ #category : #running }
 GHModelImporterTest >> setUp [
 	super setUp.
 
 	importer := GHModelImporter new
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 GHModelImporterTest >> testParseCommitsResult [
 	"we remove the id of author entries to not trigger the call to import user"
 
@@ -191,7 +190,7 @@ GHModelImporterTest >> testParseCommitsResult [
 	self assert: commits first committed_date isNotNil
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 GHModelImporterTest >> testParseCommitsResultWithSomeNullValue [
 	"we remove the id of author entries to not trigger the call to import user"
 
@@ -243,7 +242,7 @@ GHModelImporterTest >> testParseCommitsResultWithSomeNullValue [
 	self assert: commits size equals: 1
 ]
 
-{ #category : 'test' }
+{ #category : #test }
 GHModelImporterTest >> testParsePipelinesResult [
 
 	| project |
@@ -264,7 +263,7 @@ GHModelImporterTest >> testParsePipelinesResult [
 		equals: (DateAndTime year: 2024 month: 01 day: 11)
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 GHModelImporterTest >> testParseUserResult [
 
 	| user |

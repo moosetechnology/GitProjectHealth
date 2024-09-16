@@ -75,9 +75,3 @@ CodeChurnMetric >> description [
 CodeChurnMetric >> initialize [ 
 	maxCommitWindow := 3
 ]
-
-{ #category : #accessing }
-CodeChurnMetric >> name [
-
-	^ 'codeChurn'
-]

@@ -1,14 +1,13 @@
 Class {
-	#name : 'GLHCommitDistributionVisualization',
-	#superclass : 'MiAbstractVisualization',
+	#name : #GLHCommitDistributionVisualization,
+	#superclass : #MiAbstractVisualization,
 	#instVars : [
 		'groupCommitBlock'
 	],
-	#category : 'GitLabHealth-Model-Visualization',
-	#package : 'GitLabHealth-Model-Visualization'
+	#category : 'GitLabHealth-Model-Visualization'
 }
 
-{ #category : 'instance creation' }
+{ #category : #'instance creation' }
 GLHCommitDistributionVisualization >> forCommits: commits [
 
 	| c lb oldestCommit horizontal commitGroups groupToCommitByDate alreadyAdded dates |
@@ -57,19 +56,19 @@ GLHCommitDistributionVisualization >> forCommits: commits [
 	^ c canvas
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommitDistributionVisualization >> groupCommitBlock [
 
 	^ groupCommitBlock
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommitDistributionVisualization >> groupCommitBlock: anObject [
 
 	groupCommitBlock := anObject
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 GLHCommitDistributionVisualization >> initialize [
 
 	super initialize.
