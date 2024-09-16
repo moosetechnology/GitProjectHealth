@@ -16,7 +16,7 @@ In the Moose image, in a playground (`Ctrl+O`, `Ctrl+W`), perform:
 Metacello new
   repository: 'github://moosetechnology/GitProjectHealth:main/src';
   baseline: 'GitLabHealth';
-  onConflict: [ :ex | ex useIncoming ];
+  onConflict: [ :ex | ex useLoaded ];
   onUpgrade: [ :ex | ex useIncoming ];
   onDowngrade: [ :ex | ex useLoaded ];
   load
@@ -103,16 +103,51 @@ Here is the metamodel used in this project
 
 ![GitProject meta-model png](https://raw.githubusercontent.com/moosetechnology/GitProjectHealth/v1/doc/gitproject.png)
 
+## Connectors
 
+This project comes with connectors to others metamodel to increase its powerfullness.
+
+### Jira Connector
+
+The Jira connector connect this project to the [Pharo Jira API project](https://github.com/Evref-BL/Jira-Pharo-API).
+It basically looks for commit and merge request links to Jira Issue.
+
+To install the connector, please perform:
+
+```st
+Metacello new
+  repository: 'github://moosetechnology/GitProjectHealth:main/src';
+  baseline: 'GitLabHealth';
+  onConflict: [ :ex | ex useIncoming ];
+  onUpgrade: [ :ex | ex useIncoming ];
+  onDowngrade: [ :ex | ex useLoaded ];
+  load: #( 'default' 'Jira' )
+```
+
+> loading default is optional if you already loaded it.
+
+Then, it is possible to connect two models using
+
+```st
+GPJCConnector new
+  gpModel: aGpModel; "or glh model"
+  jiraModel: aJiraModel;
+  connect
+```
+
+### Famix Connector
+
+> The project exists and some code already exists, but it is not released yet.
+> Raise an issue if you want us to investigate more on this
 
 ## Contributor
 
 This work has been first developed by the [research department of Berger-Levrault](https://www.research-bl.com/)
 
+## Running metrics with docker
 
-## Running metrics with docker 
+### Running locally
 
-### running locally
 ```smalltalk
 
 |glphModel glphApi glhImporter beforeExp duringExp usersWithProjects gme|
@@ -180,7 +215,6 @@ Smalltalk snapshot: true andQuit: true.
 ```
 
 ### deploying with docker
- 
 
 ```bash
 git clone https://github.com/moosetechnology/GitProjectHealth.git
@@ -190,13 +224,10 @@ git checkout GLPH-importer-new-changes
 sudo docker build -t code-churn-pharo .
 sudo docker run  code-churn-pharo &
 ```
-locate and retrieve csv output files: 
+
+Locate and retrieve csv output files:
+
 ```bash
 sudo docker ps
 sudo docker exec -it <container-id> find / -type f -name 'IA4Code*.csv' 2>/dev/null
 ```
-
-
-
-
-

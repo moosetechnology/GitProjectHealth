@@ -14,7 +14,7 @@ GLPHModelImporter >> blockForDiffRangeEquality [
 			  existing newLineRange = new newLineRange ] ] ]
 ]
 
-{ #category : 'commit' }
+{ #category : #commit }
 GLPHModelImporter >> commitsOfProject: aGLHProject forRefName: refName until: toDate [
 
 	| newlyFoundCommit page |
@@ -195,7 +195,7 @@ GLPHModelImporter >> importDiffOfMergeRequest: aMergeRequest [
 		          diffsMergeRequestOfProject: aMergeRequest project_id
 		          withId: aMergeRequest iid.
 
-	diffsResult := self parseDiffResult: result.
+	diffsResult := self newParseDiffResult: result.
 
 
 	aMergeRequest diffs
@@ -232,7 +232,7 @@ GLPHModelImporter >> importDiffRangesForDiff: aGLHDiff [
 { #category : 'import - merge request' }
 GLPHModelImporter >> importMergeRequests: aGLHProject [
 
-	| results parsedResults |
+	| results parsedResults mrs|
 	('Import merge request of Project: ' , aGLHProject id printString)
 		recordInfo.
 
@@ -243,7 +243,7 @@ GLPHModelImporter >> importMergeRequests: aGLHProject [
 		addAll: parsedResults
 		unless: self blockOnIdEquality.
 
-	self glhModel
+	mrs := self glhModel
 		addAll: aGLHProject mergeRequests
 		unless: self blockOnIdEquality.
 
@@ -255,7 +255,9 @@ GLPHModelImporter >> importMergeRequests: aGLHProject [
 
 	self withCommitDiffs ifTrue: [
 		aGLHProject mergeRequests do: [ :mr |
-			self importDiffOfMergeRequest: mr ] ]
+			self importDiffOfMergeRequest: mr ] ].
+	
+	^ mrs
 ]
 
 { #category : 'import - merge request' }
@@ -297,7 +299,7 @@ GLPHModelImporter >> importMergeRequests: aGLHProject since: fromDate until: toD
 	self withCommitDiffs ifTrue: [
 		aGLHProject mergeRequests do: [ :mr |
 			self importDiffOfMergeRequest: mr ] ].
-	
+
 	self glhModel addAll: foundMR unless: (self blockEqualityOn: #iid).
 
 	^ foundMR
@@ -359,7 +361,8 @@ GLPHModelImporter >> importMergeResquestMerger: aGLPHEMergeRequest [
 	aGLPHEMergeRequest merge_user: (self importUser: authorID)
 ]
 
-{ #category : 'as yet unclassified' }
+
+{ #category : #'private - api' }
 GLPHModelImporter >> importProject: aProjectID [
 
 	| result projectResult |
@@ -443,6 +446,7 @@ GLPHModelImporter >> parseMergeRequestResult: result [
 	generalReader on: result readStream.
 	^ generalReader nextAs: #ArrayOfMergeRequest
 ]
+
 
 { #category : 'parsing' }
 GLPHModelImporter >> parseProjectResult: aResult [ 

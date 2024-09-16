@@ -13,7 +13,7 @@ MooseAbstractGroup >> addAll: anElmtCollection ofType: aType unless: aConditionA
 	| originalCollection returnCollection |
 	originalCollection := (self allWithType: aType).
 	"Create same kind of collection"
-	returnCollection := self species new.
+	returnCollection := OrderedCollection new.
 	
 	anElmtCollection do: [ :anElmt |
 		originalCollection

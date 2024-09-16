@@ -11,8 +11,7 @@ Class {
 	#classVars : [
 		'currentAPI'
 	],
-	#category : 'GitLabHealth-Model-Importer',
-	#package : 'GitLabHealth-Model-Importer'
+	#category : #'GitLabHealth-Model-Importer'
 }
 
 { #category : 'accessing' }
@@ -267,7 +266,24 @@ GLHApi >> compareProject: aProjectID from: fromSha to: toSha fromProject: fromPr
 	^ self client get
 ]
 
-{ #category : 'api - branches' }
+
+{ #category : #'as yet unclassified' }
+GLHApi >> contributedProjectsOfUserId: anUserID orderBy: orderByAttribute simple: simpleBoolean sort: AscOrDesc perPage: perPageNumber page: pageIndex [ 
+	
+	self client path: self baseAPIUrl , '/users/', anUserID printString, '/contributed_projects'.
+
+	orderByAttribute ifNotNil: [
+		self client queryAt: #order_by put: orderByAttribute ].
+	simpleBoolean ifNotNil: [ self client queryAt: #simple put: simpleBoolean ].
+	AscOrDesc ifNotNil: [ self client queryAt: #sort put: AscOrDesc ].
+	perPageNumber ifNotNil: [ self client queryAt: #per_page put: perPageNumber ].
+	pageIndex ifNotNil: [ self client queryAt: #page put: pageIndex ].
+	
+	
+	^ self client get.
+]
+
+{ #category : #'api - branches' }
 GLHApi >> createBranch: newBranchName forProject: aProjectID fromBranch: refBranchName [
 
 	self client url:
@@ -378,7 +394,7 @@ GLHApi >> initialize [
 	self client: (ZnClient new
 			 accept: ZnMimeType applicationJson;
 			 yourself).
-	currentAPI:= self
+
 ]
 
 { #category : 'api - jobs' }
@@ -401,7 +417,13 @@ GLHApi >> listGroupsWithTopLevelOnly: topLevelOnly page: aPageNumber [
 	^ self client get
 ]
 
-{ #category : 'api' }
+
+{ #category : #'as yet unclassified' }
+GLHApi >> makeGlobal [ 
+		currentAPI := self
+]
+
+{ #category : #api }
 GLHApi >> pipelinesOfProject: aProjectID [
 	^ self client get: self baseAPIUrl , '/projects/' , aProjectID printString, '/pipelines'
 ]
@@ -515,4 +537,27 @@ GLHApi >> user: aUserID [
 GLHApi >> userWithUsername: anUsername [
 
 	^ self client get: self baseAPIUrl , '/users?username=' , anUsername
+]
+
+{ #category : #'as yet unclassified' }
+GLHApi >> usersHuman: humans active: active withoutProjectBots: withoutBot perPage: perPage page: page [
+
+	self client path: self baseAPIUrl , '/users/'.
+
+	withoutBot ifNotNil: [
+		self client queryAt: #without_project_bots put: withoutBot ].
+	active ifNotNil: [ self client queryAt: #active put: active ].
+	humans ifNotNil: [ self client queryAt: #humans put: humans ].
+	perPage ifNotNil: [ self client queryAt: #per_page put: perPage ].
+	page ifNotNil: [ self client queryAt: #page put: page ].
+	^ self client get
+]
+
+{ #category : #user }
+GLHApi >> usersPerPage: perPage page: page [
+
+	self client path: self baseAPIUrl , '/users/'.
+	perPage ifNotNil: [ self client queryAt: #per_page put: perPage ].
+	page ifNotNil: [ self client queryAt: #page put: page ].
+	^ self client get
 ]
