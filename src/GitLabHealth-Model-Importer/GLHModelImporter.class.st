@@ -15,12 +15,10 @@ Class {
 	#category : 'GitLabHealth-Model-Importer',
 }
 
-
 { #category : #'as yet unclassified' }
 GLHModelImporter class >> importers [
 	^ currentImporter 
 ]
-
 
 { #category : #initialization }
 GLHModelImporter class >> reset [
