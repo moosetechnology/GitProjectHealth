@@ -1,6 +1,6 @@
-Extension { #name : #GLHUser }
+Extension { #name : 'GLHUser' }
 
-{ #category : #'*GitLabHealth-Model-Extension' }
+{ #category : '*GitLabHealth-Model-Extension' }
 GLHUser >> computeCommitFrequencyOver: aDateWeekMonthOrYear [
 
 	| orderedCommits |
@@ -17,7 +17,7 @@ GLHUser >> computeCommitFrequencyOver: aDateWeekMonthOrYear [
 		  overA: aDateWeekMonthOrYear
 ]
 
-{ #category : #'*GitLabHealth-Model-Extension' }
+{ #category : '*GitLabHealth-Model-Extension' }
 GLHUser >> computeCommitFrequencySince: since until: until overA: aDateWeekMonthOrYear [
 
 	^ GitMetric4User new

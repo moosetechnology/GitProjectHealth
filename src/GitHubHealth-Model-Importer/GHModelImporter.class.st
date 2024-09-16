@@ -1,39 +1,37 @@
 Class {
-	#name : #GHModelImporter,
-	#superclass : #Object,
+	#name : 'GHModelImporter',
+	#superclass : 'GPModelImporter',
 	#instVars : [
-		'api',
-		'glhModel',
-		'withFiles'
+		'api'
 	],
-	#category : #'GitHubHealth-Model-Importer'
+	#category : 'GitHubHealth-Model-Importer',
+	#package : 'GitHubHealth-Model-Importer'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GHModelImporter >> api [
 
 	^ api
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GHModelImporter >> api: anObject [
 
 	api := anObject
 ]
 
-{ #category : #accessing }
-GHModelImporter >> beWithFiles [
+{ #category : 'api' }
+GHModelImporter >> completeImportProject: aGLHProject [
 
-	withFiles := true
+	self importPipelinesOf: aGLHProject.
+	self importBranchesOf: aGLHProject.
+	self withCommitsSince ifNotNil: [ :withCommitSince | "If not nil, it means we have to import commit"
+		| commits |
+		commits := self importCommitsOfProject: aGLHProject.
+		self chainsCommitsFrom: commits ]
 ]
 
-{ #category : #accessing }
-GHModelImporter >> beWithoutFiles [
-
-	withFiles := false
-]
-
-{ #category : #private }
+{ #category : 'private' }
 GHModelImporter >> convertApiFileAsFile: aAPIFile [
 
 	aAPIFile type = 'dir' ifTrue: [ 
@@ -45,19 +43,7 @@ GHModelImporter >> convertApiFileAsFile: aAPIFile [
 		  yourself
 ]
 
-{ #category : #accessing }
-GHModelImporter >> glhModel [
-
-	^ glhModel
-]
-
-{ #category : #accessing }
-GHModelImporter >> glhModel: anObject [
-
-	glhModel := anObject
-]
-
-{ #category : #api }
+{ #category : 'api' }
 GHModelImporter >> importBranchesOf: project [
 
 	"add the pipeline (actions runs) in the project"
@@ -76,7 +62,51 @@ GHModelImporter >> importBranchesOf: project [
 		self withFiles ifTrue: [ self importFilesOfBranch: branch ] ]
 ]
 
-{ #category : #api }
+{ #category : 'api' }
+GHModelImporter >> importCommitsOfProject: aGLHProject [
+
+	| itemByPage foundCommits tmp pageNumber |
+	itemByPage := 100.
+	pageNumber := 1.
+	('Extract all commits of ' , aGLHProject name) recordInfo.
+	foundCommits := OrderedCollection new.
+	('Extract commits from ' , foundCommits size printString , ' to '
+	 , (foundCommits size + itemByPage) printString) recordInfo.
+	"also check that there is at least one commit with the error handling"
+	[
+	tmp := self parseCommitsResult: (self api
+			        commitsOfProject: aGLHProject name
+			        ofOrganization: aGLHProject group name
+			        since: self withCommitsSince
+			        perPage: itemByPage
+			        page: pageNumber) ]
+		on: GHRepositoryEmptyError
+		do: [ ^ {  } ].
+
+	foundCommits addAll: tmp.
+	[ tmp size = itemByPage ] whileTrue: [
+		pageNumber := pageNumber + 1.
+		('Extract issues from ' , foundCommits size printString , ' to '
+		 , (foundCommits size + itemByPage) printString) recordInfo.
+		tmp := self parseCommitsResult: (self api
+				        commitsOfProject: aGLHProject name
+				        ofOrganization: aGLHProject group name
+				        since: self withCommitsSince
+				        perPage: itemByPage
+				        page: pageNumber).
+		foundCommits addAll: tmp ].
+
+	"add the imported commits (unless they are already added to this repository)"
+	aGLHProject repository commits
+		addAll: foundCommits
+		unless: [ :existing :new | existing id = new id ].
+	"add the imported commits to the model unles they are already added to the model"
+	^ self glhModel
+		  addAll: foundCommits
+		  unless: [ :existing :new | existing id = new id ]
+]
+
+{ #category : 'api' }
 GHModelImporter >> importDirectoryFiles: aDirectoryFile OfBranch: aBranch [
 
 	| result files apiFiles |
@@ -98,7 +128,7 @@ GHModelImporter >> importDirectoryFiles: aDirectoryFile OfBranch: aBranch [
 		self importDirectoryFiles: file OfBranch: aBranch ]
 ]
 
-{ #category : #api }
+{ #category : 'api' }
 GHModelImporter >> importFilesOfBranch: aBranch [
 
 	| result files apiFiles |
@@ -119,7 +149,7 @@ GHModelImporter >> importFilesOfBranch: aBranch [
 		self importDirectoryFiles: file OfBranch: aBranch ]
 ]
 
-{ #category : #api }
+{ #category : 'api' }
 GHModelImporter >> importGroup: aGroupName [
 
 	| result groupResult |
@@ -130,7 +160,7 @@ GHModelImporter >> importGroup: aGroupName [
 	^ groupResult
 ]
 
-{ #category : #api }
+{ #category : 'api' }
 GHModelImporter >> importPipelinesOf: project [
 
 	"add the pipeline (actions runs) in the project"
@@ -144,28 +174,64 @@ GHModelImporter >> importPipelinesOf: project [
 		project addPipeline: pipeline ]
 ]
 
-{ #category : #api }
+{ #category : 'api' }
 GHModelImporter >> importRepositoriesOfGroup: groupResult [
 
-	| reposResult |
+	| reposResult itemByPage pageNumber reposFound tmp |
+	itemByPage := 100.
+	pageNumber := 1.
+	('Extract all repository of ' , groupResult name) recordInfo.
+	reposFound := OrderedCollection new.
+	('Extract commits from ' , reposFound size printString , ' to '
+	 , (reposFound size + itemByPage) printString) recordInfo.
+	tmp := self parseArrayOfProject: (self api
+			        reposOfOrganization: groupResult name
+			        perPage: itemByPage
+			        page: pageNumber).
+
+	reposFound addAll: tmp.
+	[ tmp size = itemByPage ] whileTrue: [
+		pageNumber := pageNumber + 1.
+		('Extract issues from ' , reposFound size printString , ' to '
+		 , (reposFound size + itemByPage) printString) recordInfo.
+		tmp := self parseArrayOfProject: (self api
+				        reposOfOrganization: groupResult name
+				        perPage: itemByPage
+				        page: pageNumber).
+		reposFound addAll: tmp ].
+
 	reposResult := self api reposOfOrganization: groupResult name.
-	groupResult projects addAll: (self parseArrayOfProject: reposResult).
-	self glhModel
-		addAll: groupResult projects.
+	groupResult projects addAll: reposFound.
+	self glhModel addAll: groupResult projects.
 	groupResult projects do: [ :project |
-		self importPipelinesOf: project.
-		self importBranchesOf: project ].
+		self completeImportProject: project ].
 	^ groupResult
 ]
 
-{ #category : #initialization }
+{ #category : 'api' }
+GHModelImporter >> importUser: userID [
+
+	| result userResult |
+	(glhModel allWithType: GLHUser)
+		detect: [ :user | user id = userID ]
+		ifFound: [ :user | ^ user ].
+	('Import user: ' , userID printString) recordInfo.
+	result := self api user: userID.
+	userResult := self parseUserResult: result.
+	^ glhModel
+		  add: userResult
+		  unless: [ :current :new | current id = new id ]
+]
+
+{ #category : 'initialization' }
 GHModelImporter >> initialize [
+
 	super initialize.
 	self api: GHApi new.
 	withFiles := false
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 GHModelImporter >> parseArrayOfProject: arrayOfProjects [
 
 	| reader |
@@ -184,7 +250,7 @@ GHModelImporter >> parseArrayOfProject: arrayOfProjects [
 	^ reader nextAs: #ArrayOfProjects
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 GHModelImporter >> parseBranchesResult: arrayOfBranch [
 
 	| reader |
@@ -197,7 +263,63 @@ GHModelImporter >> parseBranchesResult: arrayOfBranch [
 	^ reader nextAs: #ArrayOfBranch
 ]
 
-{ #category : #private }
+{ #category : 'parsing' }
+GHModelImporter >> parseCommitsResult: result [
+
+	| reader |
+	(result includesSubstring: '"status":"409"') ifTrue: [
+		GHRepositoryEmptyError signal: 'Git Repository is empty' ].
+	reader := NeoJSONReader on: result readStream.
+
+	reader for: GLHCommit do: [ :mapping |
+		mapping mapInstVar: #id to: #sha.
+		mapping mapInstVar: #web_url to: #html_url.
+		mapping
+			mapProperty: #commit
+			getter: [ :object | #ignore ]
+			setter: [ :glhCommit :value |
+				glhCommit message: (value at: #message).
+				glhCommit authored_date:
+					(DateAndTime fromString: (value at: #author at: #date)).
+				glhCommit committed_date:
+					(DateAndTime fromString: (value at: #committer at: #date)) ].
+
+		mapping
+			mapProperty: #author
+			getter: [ :object | #ignore ]
+			setter: [ :glhCommit :value |
+				value ifNotNil: [
+					glhCommit author_name: (value at: #login).
+					value
+						at: #id
+						ifPresent: [ :authorId |
+						glhCommit commitCreator: (self importUser: authorId) ] ] ].
+
+		mapping
+			mapProperty: #committer
+			getter: [ :object | #ignore ]
+			setter: [ :glhCommit :value |
+				value ifNotNil: [ glhCommit committer_name: (value at: #login) ] ].
+
+		(mapping mapInstVar: #parent_ids to: #parents) valueSchema:
+			#ArrayOfIds ].
+
+	reader for: DateAndTime customDo: [ :mapping |
+		mapping decoder: [ :string | DateAndTime fromString: string ] ].
+
+	reader for: #ArrayOfIds customDo: [ :mapping |
+		mapping decoder: [ :parents |
+			parents collect: [ :parent | parent at: #sha ] ] ].
+
+	reader
+		for: #ArrayOfCommit
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHCommit ].
+
+	^ reader nextAs: #ArrayOfCommit
+]
+
+{ #category : 'private' }
 GHModelImporter >> parseFileTreeResult: aResult [
 
 	| reader |
@@ -210,7 +332,7 @@ GHModelImporter >> parseFileTreeResult: aResult [
 	^ reader nextAs: #ArrayOfFile
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 GHModelImporter >> parseGroupResult: aResult [
 
 	| reader |
@@ -223,7 +345,7 @@ GHModelImporter >> parseGroupResult: aResult [
 	^ reader nextAs: GLHGroup
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 GHModelImporter >> parsePipelinesResult: pipelineOverview [
 
 	| reader |
@@ -245,24 +367,31 @@ GHModelImporter >> parsePipelinesResult: pipelineOverview [
 	^ reader nextAs: GHAPIPipelineOverview
 ]
 
-{ #category : #api }
+{ #category : 'parsing' }
+GHModelImporter >> parseUserResult: result [
+
+	| reader |
+	reader := NeoJSONReader on: result readStream.
+	reader for: GLHUser do: [ :mapping |
+		mapping mapInstVar: #id to: #id.
+		mapping mapInstVar: #public_email to: #email.
+		mapping mapInstVar: #username to: #login.
+		mapping mapInstVar: #bio to: #bio.
+		mapping mapInstVar: #organization to: #company.
+		mapping mapInstVar: #followers to: #followers.
+		mapping mapInstVar: #following to: #following.
+		mapping mapInstVar: #web_url to: #html_url.
+		mapping mapInstVar: #name to: #name.
+		mapping mapInstVar: #avatar_url to: #avatar_url ].
+	^ reader nextAs: GLHUser
+]
+
+{ #category : 'api' }
 GHModelImporter >> privateToken [
 	^ self api privateToken
 ]
 
-{ #category : #api }
+{ #category : 'api' }
 GHModelImporter >> privateToken: aTokenString [
 	^ self api privateToken: aTokenString
-]
-
-{ #category : #accessing }
-GHModelImporter >> withFiles [
-
-	^ withFiles
-]
-
-{ #category : #accessing }
-GHModelImporter >> withFiles: anObject [
-
-	withFiles := anObject
 ]
