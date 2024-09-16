@@ -1,14 +1,15 @@
 Class {
-	#name : #RSCommit,
-	#superclass : #Object,
+	#name : 'RSCommit',
+	#superclass : 'Object',
 	#instVars : [
 		'aCommit',
 		'canvas'
 	],
-	#category : #'GitLabHealth-Visualization'
+	#category : 'GitLabHealth-Visualization',
+	#package : 'GitLabHealth-Visualization'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 RSCommit class >> canvasCompleteHierachyFor: aGLHCommit [
 
 	^ self new
@@ -16,7 +17,7 @@ RSCommit class >> canvasCompleteHierachyFor: aGLHCommit [
 		  buildCommitCompleteHierachyCanvas 
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 RSCommit class >> canvasDiffImpactFor: aGLHCommit [
 
 	^ self new
@@ -24,7 +25,7 @@ RSCommit class >> canvasDiffImpactFor: aGLHCommit [
 		  buildCommitDiffFileImpact
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 RSCommit class >> canvasHierarchyFor: aGLHCommit [
 
 	^ self new
@@ -32,7 +33,7 @@ RSCommit class >> canvasHierarchyFor: aGLHCommit [
 		  buildCommitHierachyCanvas
 ]
 
-{ #category : #shape }
+{ #category : 'shape' }
 RSCommit >> allChildrenShapesFrom: aGLHCommit [
 
 	| children sum |
@@ -53,7 +54,7 @@ RSCommit >> allChildrenShapesFrom: aGLHCommit [
 	^ children, sum . 
 ]
 
-{ #category : #shape }
+{ #category : 'shape' }
 RSCommit >> allChildrenShapesFrom: aGLHCommit into: dic [
 
 	| children sum |
@@ -67,7 +68,7 @@ RSCommit >> allChildrenShapesFrom: aGLHCommit into: dic [
 		 self allChildrenShapesFrom: commit model into: dic ]) flattened
 ]
 
-{ #category : #canvas }
+{ #category : 'canvas' }
 RSCommit >> buildCommitCompleteHierachyCanvas [
 
 	| shapes parents children commitShape dic churnAnalyzer files2Commits shape2change allCommitShps |
@@ -79,7 +80,9 @@ RSCommit >> buildCommitCompleteHierachyCanvas [
 	dic := Dictionary new.
 
 
-	churnAnalyzer := GitAnalyzer new fromCommit: aCommit; maxChildCommit: 50.
+	churnAnalyzer := GitAnalyzer new
+		                 fromCommit: aCommit;
+		                 maxChildCommit: 50.
 	files2Commits := churnAnalyzer impactedFilesInFollowUpCommitsOf:
 		                 aCommit.
 	files2Commits := files2Commits select: [ :entry |
@@ -130,7 +133,7 @@ RSCommit >> buildCommitCompleteHierachyCanvas [
 	^ canvas
 ]
 
-{ #category : #canvas }
+{ #category : 'canvas' }
 RSCommit >> buildCommitDiffFileImpact [
 
 	| shapes |
@@ -157,7 +160,7 @@ RSCommit >> buildCommitDiffFileImpact [
 	^ canvas
 ]
 
-{ #category : #canvas }
+{ #category : 'canvas' }
 RSCommit >> buildCommitHierachyCanvas [
 	"build the commit graph from a starting root commit toward all of the descendants (children commit). Regardless of branches. Also display in red border the following commits that touch on the same files commited by the root commit. "
 
@@ -214,7 +217,7 @@ RSCommit >> buildCommitHierachyCanvas [
 	^ canvas
 ]
 
-{ #category : #shape }
+{ #category : 'shape' }
 RSCommit >> buildCompositeLayer: shapes withName: name withColor: color [
 
 	| shapesCompo label boxGroup |
@@ -246,7 +249,7 @@ RSCommit >> buildCompositeLayer: shapes withName: name withColor: color [
 		  yourself
 ]
 
-{ #category : #canvas }
+{ #category : 'canvas' }
 RSCommit >> buildDiffCanvas [
 
 	| shapes parents children commitShape group |
@@ -302,25 +305,25 @@ RSCommit >> buildDiffCanvas [
 	^ canvas
 ]
 
-{ #category : #color }
+{ #category : 'color' }
 RSCommit >> childColor [
 
 	^ Color lightGreen
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RSCommit >> commit: aGLHCommit [
 	aCommit := aGLHCommit 
 
 ]
 
-{ #category : #color }
+{ #category : 'color' }
 RSCommit >> commitColor [
 
 	^ Color blue
 ]
 
-{ #category : #shape }
+{ #category : 'shape' }
 RSCommit >> createChildrenGroupFor: aGLHCommit [ 
 	|group|
 	group := RSGroup new. 
@@ -345,7 +348,7 @@ RSCommit >> createChildrenGroupFor: aGLHCommit [
 	^ group 
 ]
 
-{ #category : #lines }
+{ #category : 'lines' }
 RSCommit >> createLinesBetweenCommits [
 
 	(RSLineBuilder arrowedLine
@@ -357,7 +360,7 @@ RSCommit >> createLinesBetweenCommits [
 		 connectToAll: [ :commit | commit childCommits ]) pushBack
 ]
 
-{ #category : #lines }
+{ #category : 'lines' }
 RSCommit >> createLinesBetweenCommits: shapes [
 
 	(RSLineBuilder arrowedLine
@@ -369,31 +372,31 @@ RSCommit >> createLinesBetweenCommits: shapes [
 		connectToAll: [ :commit | commit childCommits ]) pushFront 
 ]
 
-{ #category : #color }
+{ #category : 'color' }
 RSCommit >> defaultColor [
 
 	^ Color lightOrange 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 RSCommit >> initialize [ 
 	canvas := RSCanvas new.
 	aCommit := GLHCommit new. 
 ]
 
-{ #category : #color }
+{ #category : 'color' }
 RSCommit >> parentColor [
 
 	^ Color gray
 ]
 
-{ #category : #shape }
+{ #category : 'shape' }
 RSCommit >> shapeForCommit: aGLHCommit [
 
 	^ self shapeForCommit: aGLHCommit withColor: self defaultColor.
 ]
 
-{ #category : #shape }
+{ #category : 'shape' }
 RSCommit >> shapeForCommit: aGLHCommit withColor: color [
 
 	| box group labelTitle labelCommiter impactedFiles |
@@ -404,8 +407,10 @@ RSCommit >> shapeForCommit: aGLHCommit withColor: color [
 		              yourself.
 
 	labelCommiter := RSLabel new
-		                 text: 'by ',
-			                 (aGLHCommit author_name truncateWithElipsisTo: 50);
+		                 text: 'by ' , (aGLHCommit author_name
+					                  ifNil: [ 'unknown' ]
+					                  ifNotNil: [ :authorName |
+						                  authorName truncateWithElipsisTo: 50 ]);
 		                 yourself.
 
 	box := RSBox new

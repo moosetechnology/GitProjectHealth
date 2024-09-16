@@ -1,6 +1,6 @@
-Extension { #name : #GLHDiff }
+Extension { #name : 'GLHDiff' }
 
-{ #category : #'*GitLabHealth-Model-Extension' }
+{ #category : '*GitLabHealth-Model-Extension' }
 GLHDiff >> name [
 
 	<FMProperty: #name type: #String>
