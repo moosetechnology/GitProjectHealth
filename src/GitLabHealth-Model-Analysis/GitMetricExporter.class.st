@@ -452,7 +452,7 @@ GitMetricExporter >> initialize [
 		           ClosedMergeRequestMetric.
 		           MergedMergeRequestMetric.
 		           SelfMergedUnderAMinuteMergeRequestMetric.
-		           ClosedTicketsMetric}
+		           ClosedTicketsMetric. JiraTimeMRTimeDifferenceMetric }
 ]
 
 { #category : #accessing }

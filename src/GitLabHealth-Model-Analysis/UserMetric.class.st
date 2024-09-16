@@ -116,7 +116,10 @@ UserMetric >> loadCompleteMergeRequestsSince: since until: until [
 	mergeRequests := self loadMergeRequestsSince: since until: until.
 
 	mergeRequests do: [ :mergeRequest |
-		glhImporter importMergeResquestMerger: mergeRequest ].
+		glhImporter importMergeResquestMerger: mergeRequest.
+		glhImporter importMergeRequestCommits: mergeRequest ].
+
+	Halt now.
 
 	^ mergeRequests
 ]
@@ -173,6 +176,28 @@ UserMetric >> loadMergeRequestsSince: since until: until [
 	mergeRequests do: [ :mr | glhImporter importMergeResquestAuthor: mr ].
 
 	^ mergeRequests "select: [ :mergeRequest | mergeRequest author = user ]"
+]
+
+{ #category : #loading }
+UserMetric >> loadMergeRequestsWithJiraIssueOfUser: anUser since: since until: until [
+
+	| email mergeRequests |
+	mergeRequests := self
+		                 loadMergeRequestsOfUser: anUser
+		                 since: since
+		                 until: until.
+
+	email := self userEmail.
+
+	jiraImporter importAllCurrentAndPastIssuesOf: email.
+
+	GPJCConnector new
+		gpModel: glhImporter glhModel;
+		jiraModel: jiraImporter model;
+		connect.
+
+	^ mergeRequests select: [ :mergeRequest |
+		  mergeRequest jiraIssue isNotNil ]
 ]
 
 { #category : #loading }

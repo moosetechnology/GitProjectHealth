@@ -1,7 +1,7 @@
 Class {
 	#name : #GLPHModelImporter,
 	#superclass : #GLHModelImporter,
-	#category : 'GitLabProjectHealth-Model-Importer'
+	#category : #'GitLabProjectHealth-Model-Importer'
 }
 
 { #category : #'as yet unclassified' }
@@ -226,6 +226,36 @@ GLPHModelImporter >> importDiffRangesForDiff: aGLHDiff [
 	^ aGLHDiff diffRanges
 		  addAll: diffRanges
 		  unless: self blockForDiffRangeEquality
+]
+
+{ #category : #'import - merge request' }
+GLPHModelImporter >> importMergeRequestCommits: aGLPHEMergeRequest [
+
+	| results page commits parseResult |
+	aGLPHEMergeRequest commits ifNotNil: [ ^ aGLPHEMergeRequest commits ].
+	page := 1.
+
+	parseResult := { nil }.
+	commits := OrderedCollection new.
+
+	[
+	results := glhApi
+		           commitsOfMergeRequest: aGLPHEMergeRequest iid
+		           ofProject: aGLPHEMergeRequest project id
+		           page: page
+		           perPage: 100.
+	parseResult := self parseCommitsResult: results.
+
+	commits addAll: parseResult.
+	page := page + 1 ] doWhileTrue: [ parseResult isNotEmpty ].
+
+
+	aGLPHEMergeRequest commits: commits.
+
+	self glhModel
+		addAll: aGLPHEMergeRequest commits
+		unless: self blockOnIdEquality.
+	^ commits
 ]
 
 { #category : #'import - merge request' }
