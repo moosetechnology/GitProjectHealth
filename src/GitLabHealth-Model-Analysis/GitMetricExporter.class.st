@@ -267,17 +267,21 @@ GitMetricExporter >> exportUserAnalysesInCSV [
 	| exportBrowserModel groupedByOver group groupOver groupByName periods csvMetrics file |
 	exportBrowserModel := MiExportModel new.
 	groupedByOver := self userAnalyses groupedBy: #over.
+	
 	groupedByOver associations do: [ :groupAssociation |
 		group := groupAssociation value.
 		groupOver := groupAssociation key.
+		
 		groupByName := group groupedBy: #username.
 		exportBrowserModel entitiesList: groupByName.
 		exportBrowserModel removeColumnForQueryNamed: #Type.
 		exportBrowserModel removeColumnForQueryNamed: #Name.
+		
 		exportBrowserModel
 			addColumnForQuery: [ :groupAnalyses |
 			(groupAnalyses at: 1) username ]
 			withName: #'User name'.
+			
 		periods := (group groupedBy: #period) keys.
 		periods do: [ :period |
 			csvMetrics := self
@@ -287,7 +291,10 @@ GitMetricExporter >> exportUserAnalysesInCSV [
 				exportBrowserModel
 					addColumnForQuery: association value
 					withName: association key ] ].
+			
+			
 		file := self constructFilePath: groupOver.
+		
 		file writeStreamDo: [ :aStream |
 			aStream
 				<< 'sep=,';
@@ -333,16 +340,17 @@ GitMetricExporter >> findProjectsOfUser: aCollection [
 { #category : #analysis }
 GitMetricExporter >> generateAnalysesOver: aDateWeekMonthOrYear [
 
-	| userAnalyses projectAnalyses |
+	analyses := OrderedCollection new.
 	runningPeriods do: [ :period |
-		userAnalyses := self
-			                generateUsersAnalysesDuringPeriod: period
-			                over: aDateWeekMonthOrYear.
-		projectAnalyses := self
-			                   generateProjectsAnalysesDuringPeriod: period
-			                   over: aDateWeekMonthOrYear ].
+		analyses addAll: (self
+				 generateUsersAnalysesDuringPeriod: period
+				 over: aDateWeekMonthOrYear).
 
-	^ analyses := userAnalyses, projectAnalyses.
+		analyses addAll: (self
+				 generateProjectsAnalysesDuringPeriod: period
+				 over: aDateWeekMonthOrYear) ].
+
+	^ analyses
 ]
 
 { #category : #analysis }
@@ -446,8 +454,7 @@ GitMetricExporter >> initialize [
 		           ClosedMergeRequestMetric.
 		           MergedMergeRequestMetric.
 		           SelfMergedUnderAMinuteMergeRequestMetric.
-		           ClosedTicketsMetric .
-		           JiraTimeMRTimeDifferenceMetric }
+		           ClosedTicketsMetric. JiraTimeMRTimeDifferenceMetric }
 ]
 
 { #category : #accessing }
