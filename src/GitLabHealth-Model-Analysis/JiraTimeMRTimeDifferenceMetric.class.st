@@ -61,9 +61,8 @@ JiraTimeMRTimeDifferenceMetric >> load [
 		                     user
 		                     since: (period at: #since)
 		                     until: (period at: #until).
-		
-		
-	"Take only the mergeRequest who are merged and got a time estimated"	
+
+	"Take only the merge requests that have been merged and given a time estimate"
 	userMergeRequests := userMergeRequests select: [ :mergeRequest |
 		                     | issueIsEstimated |
 		                     issueIsEstimated := mergeRequest jiraIssue
@@ -73,4 +72,5 @@ JiraTimeMRTimeDifferenceMetric >> load [
 				                                         isNotNil.
 		                     mergeRequest merged_at isNotNil and:
 			                     issueIsEstimated ].
+
 ]
