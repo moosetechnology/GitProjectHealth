@@ -7,19 +7,10 @@ Class {
 { #category : #calculating }
 JiraTimeMRTimeDifferenceMetric >> calculate [
 
-	| groupedByDate dateOver average |
+	| groupedByDate dateOver |
 	userMergeRequests ifNil: [ self load ].
+	userMergeRequests ifEmpty: [ ^nil ].
 	groupedByDate := self setupGroupedDate.
-
-	userMergeRequests := userMergeRequests select: [ :mergeRequest |
-		                     | issueIsEstimated |
-		                     issueIsEstimated := mergeRequest jiraIssue
-			                                         timeEstimate isNotNil or:
-			                                         mergeRequest jiraIssue
-				                                         timeOriginalEstimate
-				                                         isNotNil.
-		                     mergeRequest merged_at isNotNil and:
-			                     issueIsEstimated ].
 
 	userMergeRequests do: [ :userMergeRequest |
 		dateOver := self transformDate: userMergeRequest created_at to: over.
@@ -28,29 +19,32 @@ JiraTimeMRTimeDifferenceMetric >> calculate [
 			ifPresent: [ :value | value add: userMergeRequest ] ].
 
 	groupedByDate := groupedByDate collect: [ :group |
-		                 group collect: [ :mergeRequest |
-			                 | firstCommitDate mergeRequestTime jiraTime |
-			                 firstCommitDate := mergeRequest commits last
-				                                    created_at.
+		                 | differences |
+		                 differences := group collect: [ :mergeRequest |
+			                                | firstCommitDate mergeRequestTime jiraTime |
+			                                firstCommitDate := mergeRequest
+				                                                   commits last
+				                                                   created_at.
 
-			                 mergeRequestTime := mergeRequest merged_at
-			                                     - firstCommitDate.
+			                                mergeRequestTime := mergeRequest
+				                                                    merged_at
+			                                                    -
+			                                                    firstCommitDate.
 
-			                 jiraTime := mergeRequest jiraIssue
-				                             timeOriginalEstimate
-				                             ifNil: [
-				                             mergeRequest jiraIssue timeEstimate ]
-				                             ifNotNil: [
-				                             mergeRequest jiraIssue
-					                             timeOriginalEstimate ].
+			                                jiraTime := mergeRequest jiraIssue
+				                                            timeOriginalEstimate
+				                                            ifNil: [
+				                                            mergeRequest jiraIssue
+					                                            timeEstimate ]
+				                                            ifNotNil: [
+				                                            mergeRequest jiraIssue
+					                                            timeOriginalEstimate ].
 
-			                 jiraTime - mergeRequestTime ] ].
-	
-	groupedByDate := groupedByDate select: [ :group | group isNotEmpty ].
-	average := groupedByDate ifEmpty: [ nil ] ifNotEmpty: [ groupedByDate average ].
-	
-	^average.
-	
+			                                (jiraTime - mergeRequestTime)
+				                                asSeconds ].
+		                 differences average ].
+
+	^ groupedByDate average
 ]
 
 { #category : #accessing }
@@ -63,7 +57,20 @@ JiraTimeMRTimeDifferenceMetric >> description [
 JiraTimeMRTimeDifferenceMetric >> load [
 
 	userMergeRequests := self
-		                     loadCompleteMergeRequestsWithJiraIssueOfUser: user
+		                     loadCompleteMergeRequestsWithJiraIssueOfUser:
+		                     user
 		                     since: (period at: #since)
-		                     until: (period at: #until)
+		                     until: (period at: #until).
+		
+		
+	"Take only the mergeRequest who are merged and got a time estimated"	
+	userMergeRequests := userMergeRequests select: [ :mergeRequest |
+		                     | issueIsEstimated |
+		                     issueIsEstimated := mergeRequest jiraIssue
+			                                         timeEstimate isNotNil or:
+			                                         mergeRequest jiraIssue
+				                                         timeOriginalEstimate
+				                                         isNotNil.
+		                     mergeRequest merged_at isNotNil and:
+			                     issueIsEstimated ].
 ]
