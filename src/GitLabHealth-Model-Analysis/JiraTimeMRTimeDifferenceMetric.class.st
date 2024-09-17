@@ -50,7 +50,7 @@ JiraTimeMRTimeDifferenceMetric >> calculate [
 { #category : #accessing }
 JiraTimeMRTimeDifferenceMetric >> description [
 
-	^ 'average difference between jira estimate time and associated merge resquest time'
+	^ 'average difference between jira estimate time and associated merge request time (time between first commit and merge date)'
 ]
 
 { #category : #loading }
