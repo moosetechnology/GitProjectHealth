@@ -56,7 +56,8 @@ BaselineOfGitLabHealth >> defineGroups: spec [
 	spec
 		group: 'Jira'
 		with:
-		#( 'GitProject-JiraConnector' 'GitProject-JiraConnector-Generator' 'GitProject-JiraConnector-Tests' ).
+			#( 'GitProject-JiraConnector' 'GitProject-JiraConnector-Generator'
+			   'GitProject-JiraConnector-Tests' ).
 	spec
 		group: 'Core'
 		with: #( 'GitLabHealth-Model' 'GitLabHealth-Model-Extension'
@@ -66,7 +67,7 @@ BaselineOfGitLabHealth >> defineGroups: spec [
 			   'GitLabHealth-Model-Importer' 'GitLabHealth-Model-Importer-Tests'
 			   'GitHubHealth-Model-Importer-Tests'
 			   'GLPHExtended-Model' 'GLPHExtended-Model-Tests'
-			   'GLPHExtended-Model-Extension' 'GitLabHealth-Model-Analysis'
+			   'GLPHExtended-Model-Extension' 'GitLabHealth-Model-Analysis' 'GitLabHealth-Model-Analysis-Tests'
 			   'GitLabHealth-Visualization' 'GitLabProjectHealth-ExtendModel-Generator'
 			   'GitLabProjectHealth-Model-Importer'
 			   'GitLabProjectHealth-Model-Importer-Tests' ).
