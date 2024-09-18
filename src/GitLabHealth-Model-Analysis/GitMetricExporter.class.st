@@ -454,7 +454,8 @@ GitMetricExporter >> initialize [
 		           ClosedMergeRequestMetric.
 		           MergedMergeRequestMetric.
 		           SelfMergedUnderAMinuteMergeRequestMetric.
-		           ClosedTicketsMetric. JiraTimeMRTimeDifferenceMetric }
+		           ClosedTicketsMetric.
+		           JiraTimeMRTimeDifferenceMetric. CommitsNumberByJiraTicketsMetric }
 ]
 
 { #category : #accessing }
@@ -471,6 +472,12 @@ GitMetricExporter >> label: aString [
 { #category : #accessing }
 GitMetricExporter >> maxCommitWindow: anInteger [
 	maxCommitWindow := anInteger abs
+]
+
+{ #category : #accessing }
+GitMetricExporter >> metrics: anObject [
+
+	metrics := anObject
 ]
 
 { #category : #adding }
