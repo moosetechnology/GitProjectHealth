@@ -20,8 +20,7 @@ UserJiraMetric >> description [
 UserJiraMetric >> load [
 
 	userMergeRequests := self
-		                     loadMergeRequestsWithJiraIssueOfUser: user since: 
-		                     (period at: #since)
+		                     loadUserMergeRequestsWithJiraIssueSince: (period at: #since)
 		                     until: (period at: #until)
 ]
 

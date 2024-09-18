@@ -69,7 +69,69 @@ UserMetric >> load [
 ]
 
 { #category : #loading }
-UserMetric >> loadCommitsSince: since until: until [
+UserMetric >> loadCompleteMergeRequestsSince: since until: until [
+
+	| mergeRequests |
+	mergeRequests := self
+		                 loadMergeRequestsSince: since until: until.
+
+	mergeRequests do: [ :mergeRequest |
+		glhImporter importMergeResquestMerger: mergeRequest.
+		glhImporter importMergeRequestCommits: mergeRequest ].
+
+	^ mergeRequests
+]
+
+{ #category : #loading }
+UserMetric >> loadMergeRequestsSince: since until: until [
+
+	| cacheSymbol mergeRequests |
+	glhImporter withCommitDiffs: false.
+	cacheSymbol := self
+		               cacheSymbolFor: GLPHEMergeRequest
+		               since: since
+		               until: until.
+
+	mergeRequests := user contributedProjects collect: [ :project |
+		                 | mr |
+		                 project cacheAt: cacheSymbol ifAbsentPut: [
+			                 mr := glhImporter
+				                       importMergeRequests: project
+				                       since: since
+				                       until: until.
+			                 mr ] ].
+
+	mergeRequests := mergeRequests flattened.
+	glhImporter withCommitDiffs: true.
+
+	mergeRequests do: [ :mr | glhImporter importMergeResquestAuthor: mr ].
+
+	^ mergeRequests "mergeRequests select: [ :mergeRequest |
+		  mergeRequest author = user ]"
+]
+
+{ #category : #loading }
+UserMetric >> loadMergeRequestsWithJiraIssueSince: since until: until [
+
+	| email mergeRequests |
+	mergeRequests := self
+		                 loadMergeRequestsSince: since until:  until.
+
+	email := self userEmail.
+
+	jiraImporter importAllCurrentAndPastIssuesOf: email.
+
+	GPJCConnector new
+		gpModel: glhImporter glhModel;
+		jiraModel: jiraImporter model;
+		connect.
+
+	^ mergeRequests select: [ :mergeRequest |
+		  mergeRequest jiraIssue isNotNil ]
+]
+
+{ #category : #loading }
+UserMetric >> loadUserCommitsSince: since until: until [
 
 	| cacheSymbol allCommits |
 	glhImporter withCommitDiffs: false.
@@ -101,22 +163,19 @@ UserMetric >> loadCommitsSince: since until: until [
 ]
 
 { #category : #loading }
-UserMetric >> loadCompleteCommitsSince: since until: until [
+UserMetric >> loadUserCompleteCommitsSince: since until: until [
 
 	| commits |
-	commits := self loadCommitsSince: since until: until.
+	commits := self loadUserCommitsSince: since until: until.
 	commits do: [ :commit | glhImporter completeImportedCommit: commit ].
 	^ commits
 ]
 
 { #category : #loading }
-UserMetric >> loadCompleteMergeRequestsOfUser: anUser since: since until: until [
+UserMetric >> loadUserCompleteMergeRequestsSince: since until: until [
 
 	| mergeRequests |
-	mergeRequests := self
-		                 loadMergeRequestsOfUser: anUser
-		                 since: since
-		                 until: until.
+	mergeRequests := self loadUserMergeRequestsSince: since until: until.
 
 	mergeRequests do: [ :mergeRequest |
 		glhImporter importMergeResquestMerger: mergeRequest.
@@ -126,13 +185,10 @@ UserMetric >> loadCompleteMergeRequestsOfUser: anUser since: since until: until 
 ]
 
 { #category : #loading }
-UserMetric >> loadCompleteMergeRequestsWithJiraIssueOfUser: anUser since: since until: until [
+UserMetric >> loadUserCompleteMergeRequestsWithJiraIssueSince: since until: until [
 
 	| email mergeRequests |
-	mergeRequests := self
-		                 loadCompleteMergeRequestsOfUser:  anUser
-		                 since: since
-		                 until: until.
+	mergeRequests := self loadUserCompleteMergeRequestsSince: since until: until.
 
 	email := self userEmail.
 
@@ -148,40 +204,19 @@ UserMetric >> loadCompleteMergeRequestsWithJiraIssueOfUser: anUser since: since 
 ]
 
 { #category : #loading }
-UserMetric >> loadMergeRequestsOfUser: anUser since: since until: until [ 
+UserMetric >> loadUserMergeRequestsSince: since until: until [
 
-	| cacheSymbol mergeRequests |
-	glhImporter withCommitDiffs: false.
-	cacheSymbol := self
-		               cacheSymbolFor: GLPHEMergeRequest
-		               since: since
-		               until: until.
+	| mergeRequests |
+	mergeRequests := self loadMergeRequestsSince: since until: until.
 
-	mergeRequests := anUser contributedProjects collect: [ :project |
-		                 | mr |
-		                 project cacheAt: cacheSymbol ifAbsentPut: [
-			                 mr := glhImporter
-				                       importMergeRequests: project
-				                       since: since
-				                       until: until.
-			                 mr ] ].
-
-	mergeRequests := mergeRequests flattened.
-	glhImporter withCommitDiffs: true.
-
-	mergeRequests do: [ :mr | glhImporter importMergeResquestAuthor: mr ].
-
-	^ mergeRequests select: [ :mergeRequest | mergeRequest author = anUser ]
+	^ mergeRequests select: [ :mergeRequest | mergeRequest author = user ]
 ]
 
 { #category : #loading }
-UserMetric >> loadMergeRequestsWithJiraIssueOfUser: anUser since: since until: until [
+UserMetric >> loadUserMergeRequestsWithJiraIssueSince: since until: until [
 
 	| email mergeRequests |
-	mergeRequests := self
-		                 loadMergeRequestsOfUser: anUser
-		                 since: since
-		                 until: until.
+	mergeRequests := self loadUserMergeRequestsSince: since until: until.
 
 	email := self userEmail.
 
