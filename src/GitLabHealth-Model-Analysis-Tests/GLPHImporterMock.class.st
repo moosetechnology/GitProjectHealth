@@ -59,6 +59,12 @@ GLPHImporterMock >> importCreatorOfCommit: commit [
 ]
 
 { #category : #'import - merge request' }
+GLPHImporterMock >> importMergeRequestCommits: mergeRequest [
+
+	mergeRequest commits: self commits
+]
+
+{ #category : #'import - merge request' }
 GLPHImporterMock >> importMergeRequests: project since: since until: until [
 
 	glhModel addAll: mergeRequests.

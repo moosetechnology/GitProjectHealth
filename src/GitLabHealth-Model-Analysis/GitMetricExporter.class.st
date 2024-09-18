@@ -255,6 +255,9 @@ GitMetricExporter >> exportProjectAnalysesInCSV [
 
 		file := self constructFilePath: groupOver.
 		file writeStreamDo: [ :aStream |
+						aStream
+				<< 'sep=,';
+				<< OSPlatform current lineEnding.
 			exportBrowserModel writeCSVOn: aStream ] ]
 ]
 
@@ -263,41 +266,39 @@ GitMetricExporter >> exportUserAnalysesInCSV [
 
 	| exportBrowserModel groupedByOver group groupOver groupByName periods csvMetrics file |
 	exportBrowserModel := MiExportModel new.
-
 	groupedByOver := self userAnalyses groupedBy: #over.
 	
-
 	groupedByOver associations do: [ :groupAssociation |
 		group := groupAssociation value.
 		groupOver := groupAssociation key.
-
-
+		
 		groupByName := group groupedBy: #username.
 		exportBrowserModel entitiesList: groupByName.
-
 		exportBrowserModel removeColumnForQueryNamed: #Type.
 		exportBrowserModel removeColumnForQueryNamed: #Name.
-
+		
 		exportBrowserModel
 			addColumnForQuery: [ :groupAnalyses |
 			(groupAnalyses at: 1) username ]
 			withName: #'User name'.
-
+			
 		periods := (group groupedBy: #period) keys.
-
 		periods do: [ :period |
 			csvMetrics := self
 				              csvMetricsFor: self userMetrics
 				              at: (period at: #since).
-
-
 			csvMetrics associations do: [ :association |
 				exportBrowserModel
 					addColumnForQuery: association value
 					withName: association key ] ].
-
+			
+			
 		file := self constructFilePath: groupOver.
+		
 		file writeStreamDo: [ :aStream |
+			aStream
+				<< 'sep=,';
+				<< OSPlatform current lineEnding.
 			exportBrowserModel writeCSVOn: aStream ] ]
 ]
 
@@ -339,16 +340,17 @@ GitMetricExporter >> findProjectsOfUser: aCollection [
 { #category : #analysis }
 GitMetricExporter >> generateAnalysesOver: aDateWeekMonthOrYear [
 
-	| userAnalyses projectAnalyses |
+	analyses := OrderedCollection new.
 	runningPeriods do: [ :period |
-		userAnalyses := self
-			                generateUsersAnalysesDuringPeriod: period
-			                over: aDateWeekMonthOrYear.
-		projectAnalyses := self
-			                   generateProjectsAnalysesDuringPeriod: period
-			                   over: aDateWeekMonthOrYear ].
+		analyses addAll: (self
+				 generateUsersAnalysesDuringPeriod: period
+				 over: aDateWeekMonthOrYear).
 
-	^ analyses := userAnalyses, projectAnalyses.
+		analyses addAll: (self
+				 generateProjectsAnalysesDuringPeriod: period
+				 over: aDateWeekMonthOrYear) ].
+
+	^ analyses
 ]
 
 { #category : #analysis }
@@ -452,7 +454,7 @@ GitMetricExporter >> initialize [
 		           ClosedMergeRequestMetric.
 		           MergedMergeRequestMetric.
 		           SelfMergedUnderAMinuteMergeRequestMetric.
-		           ClosedTicketsMetric}
+		           ClosedTicketsMetric. JiraTimeMRTimeDifferenceMetric }
 ]
 
 { #category : #accessing }

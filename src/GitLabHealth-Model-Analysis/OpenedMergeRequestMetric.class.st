@@ -30,12 +30,6 @@ OpenedMergeRequestMetric >> description [
 	^'number of opened merge request'
 ]
 
-{ #category : #loading }
-OpenedMergeRequestMetric >> load [
-	userMergeRequests := self loadMergeRequestsOfUser: user since: (period at: #since)
-		                     until: (period at: #until).
-]
-
 { #category : #accessing }
 OpenedMergeRequestMetric >> name [
 
