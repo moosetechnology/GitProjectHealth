@@ -57,9 +57,7 @@ JiraTimeMRTimeDifferenceMetric >> description [
 JiraTimeMRTimeDifferenceMetric >> load [
 
 	userMergeRequests := self
-		                     loadCompleteMergeRequestsWithJiraIssueOfUser:
-		                     user
-		                     since: (period at: #since)
+		                     loadUserCompleteMergeRequestsWithJiraIssueSince: (period at: #since)
 		                     until: (period at: #until).
 
 	"Take only the merge requests that have been merged and given a time estimate"
@@ -71,6 +69,5 @@ JiraTimeMRTimeDifferenceMetric >> load [
 				                                         timeOriginalEstimate
 				                                         isNotNil.
 		                     mergeRequest merged_at isNotNil and:
-			                     issueIsEstimated ].
-
+			                     issueIsEstimated ]
 ]

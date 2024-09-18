@@ -20,7 +20,7 @@ UserCommitsMetric >> description [
 UserCommitsMetric >> load [
 
 	userCommits := self
-		               loadCommitsSince: (period at: #since)
+		               loadUserCommitsSince: (period at: #since)
 		               until: (period at: #until)
 ]
 

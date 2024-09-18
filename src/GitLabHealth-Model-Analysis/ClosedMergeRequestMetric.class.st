@@ -7,16 +7,14 @@ Class {
 { #category : #calculating }
 ClosedMergeRequestMetric >> calculate [
 
-	| groupedByDate userClosedMergeRequests dateOver |
+	| groupedByDate dateOver |
 	userMergeRequests ifNil: [ self load ].
 	groupedByDate := self setupGroupedDate.
+	
+		userMergeRequests := userMergeRequests select: [ :userMergeRequest |
+		                     userMergeRequest state = 'closed'  ].
 
-	userClosedMergeRequests := userMergeRequests select: [
-		                           :userMergeRequest |
-		                           "userMergeRequest merged_at isNil and:"
-			                           userMergeRequest state = 'closed' ].
-
-	userClosedMergeRequests do: [ :userMergeRequest |
+	userMergeRequests do: [ :userMergeRequest |
 		dateOver := self transformDate: userMergeRequest created_at to: over.
 
 		groupedByDate

@@ -46,8 +46,7 @@ ReviewedByUserMergeRequestMetric >> description [
 ReviewedByUserMergeRequestMetric >> load [
 
 	userMergeRequests := self
-		                     loadCompleteMergeRequestsOfUser: user since:   
-		                     (period at: #since)
+		                     loadCompleteMergeRequestsSince: (period at: #since)
 		                     until: (period at: #until)
 ]
 

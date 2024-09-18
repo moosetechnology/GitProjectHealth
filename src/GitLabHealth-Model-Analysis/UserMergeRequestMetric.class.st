@@ -20,8 +20,9 @@ UserMergeRequestMetric >> description [
 UserMergeRequestMetric >> load [
 
 	userMergeRequests := self
-		                     loadMergeRequestsOfUser: user since:  (period at: #since)
+		                     loadUserMergeRequestsSince: (period at: #since)
 		                     until: (period at: #until)
+
 ]
 
 { #category : #accessing }
