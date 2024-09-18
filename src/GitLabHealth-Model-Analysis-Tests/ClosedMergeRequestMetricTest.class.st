@@ -67,18 +67,18 @@ ClosedMergeRequestMetricTest >> testCalculate1MRinPeriod2Outside [
 				 created_at: '09-05-2024';
 				 merged_at: nil;
 				 state: 'closed').
-				(GLPHEMergeRequest new
+			(GLPHEMergeRequest new
 				 author: user;
 				 created_at: '08-01-2024';
 				 merged_at: nil;
-				 state: 'closed')}.
+				 state: 'closed') }.
 
 
 	closedMergeRequestMetric := ClosedMergeRequestMetric new
 		                            user: user;
 		                            glhImporter: glhImporter;
-		                            setPeriodSince: '08-01-2024'
-		                            until: '08-05-2024';
+		                            setPeriodSince: '07-28-2024'
+		                            until: '08-03-2024';
 		                            over: Week.
 
 	"When"
