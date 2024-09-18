@@ -49,6 +49,6 @@ CommentContributionMetric >> description [
 CommentContributionMetric >> load [
 
 	userCommits := self
-		               loadCompleteCommitsSince: (period at: #since)
+		               loadUserCompleteCommitsSince: (period at: #since)
 		               until: (period at: #until)
 ]

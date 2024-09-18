@@ -53,8 +53,7 @@ SelfMergedUnderAMinuteMergeRequestMetric >> description [
 SelfMergedUnderAMinuteMergeRequestMetric >> load [
 
 	userMergeRequests := self
-		                     loadCompleteMergeRequestsSince:
-		                     (period at: #since)
+		                     loadCompleteMergeRequestsSince: (period at: #since)
 		                     until: (period at: #until)
 ]
 

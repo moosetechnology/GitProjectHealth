@@ -20,13 +20,12 @@ UserJiraMetric >> description [
 UserJiraMetric >> load [
 
 	userMergeRequests := self
-		                     loadMergeRequestsWithJiraIssueSince:
-		                     (period at: #since)
+		                     loadUserMergeRequestsWithJiraIssueSince: (period at: #since)
 		                     until: (period at: #until)
 ]
 
 { #category : #accessing }
 UserJiraMetric >> name [
 
-	^ self subclassResponsibility
+	^ self class name asString
 ]

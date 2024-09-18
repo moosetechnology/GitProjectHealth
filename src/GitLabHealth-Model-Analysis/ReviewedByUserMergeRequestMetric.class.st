@@ -43,10 +43,10 @@ ReviewedByUserMergeRequestMetric >> description [
 ]
 
 { #category : #loading }
-ReviewedByUserMergeRequestMetric >> load [ 
-		userMergeRequests := self
-		                     loadCompleteMergeRequestsSince:
-		                     (period at: #since)
+ReviewedByUserMergeRequestMetric >> load [
+
+	userMergeRequests := self
+		                     loadCompleteMergeRequestsSince: (period at: #since)
 		                     until: (period at: #until)
 ]
 

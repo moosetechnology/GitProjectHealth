@@ -330,7 +330,7 @@ GLHModelImporter >> importCommit: aCommitID ofProject: aGLHProject [
 	result := self glhApi
 		          commit: aCommitID
 		          ofProject: aGLHProject id
-		          withStat: false.
+		          withStat: true.
 	parsedResult := self parseCommitResult: result.
 	self
 		addCommits: { parsedResult }
