@@ -473,6 +473,12 @@ GitMetricExporter >> maxCommitWindow: anInteger [
 	maxCommitWindow := anInteger abs
 ]
 
+{ #category : #accessing }
+GitMetricExporter >> metrics: anObject [
+
+	metrics := anObject
+]
+
 { #category : #adding }
 GitMetricExporter >> onlyImportProjectsOfGroup: groupId [
 
