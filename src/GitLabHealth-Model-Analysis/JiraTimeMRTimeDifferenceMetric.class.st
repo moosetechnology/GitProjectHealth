@@ -9,7 +9,7 @@ JiraTimeMRTimeDifferenceMetric >> calculate [
 
 	| groupedByDate dateOver |
 	userMergeRequests ifNil: [ self load ].
-	userMergeRequests ifEmpty: [ ^nil ].
+	userMergeRequests ifEmpty: [ ^ nil ].
 	groupedByDate := self setupGroupedDate.
 
 	userMergeRequests do: [ :userMergeRequest |
@@ -19,7 +19,7 @@ JiraTimeMRTimeDifferenceMetric >> calculate [
 			ifPresent: [ :value | value add: userMergeRequest ] ].
 
 	groupedByDate := groupedByDate collect: [ :group |
-		                 | differences |
+		                 | differences average |
 		                 differences := group collect: [ :mergeRequest |
 			                                | firstCommitDate mergeRequestTime jiraTime |
 			                                firstCommitDate := mergeRequest
@@ -42,9 +42,13 @@ JiraTimeMRTimeDifferenceMetric >> calculate [
 
 			                                (jiraTime - mergeRequestTime)
 				                                asSeconds ].
-		                 differences average ].
+			
+				average := group ifEmpty: [ 0 ] ifNotEmpty: [ differences average ].
+				average 
+		                  ].
 
-	^ groupedByDate average
+
+	 ^ groupedByDate average
 ]
 
 { #category : #accessing }
