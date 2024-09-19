@@ -7,14 +7,13 @@ on:
   push:
     branches: 
       - main
-      - develop
 
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        smalltalk: [ Moose64-11]
+        smalltalk: [ Moose64-11 ]
     name: ${{ matrix.smalltalk }}
     steps:
       - uses: actions/checkout@v2
