@@ -13,6 +13,7 @@ BaselineOfGitLabHealth >> baseline: spec [
 		self definePackages: spec.
 		self defineGroups: spec.
 		self defineJiraConnector: spec.
+		self defineFamixConnector: spec.
 
 		spec for: #( #WithoutFamix ) do: [
 			spec
@@ -51,6 +52,19 @@ BaselineOfGitLabHealth >> defineDependencies: spec [
 ]
 
 { #category : #baselines }
+BaselineOfGitLabHealth >> defineFamixConnector: spec [
+
+	spec
+		package: 'GitProject-FamixConnector'
+		with: [ spec requires: #( 'GitProject-FamixConnector-Model' ) ];
+		package: 'GitProject-FamixConnector-Model';
+		package: 'GitProject-FamixConnector-Generator'
+		with: [ spec requires: #( 'GitProject-FamixConnector-Model' ) ];
+		package: 'GitProject-FamixConnector-Tests'
+		with: [ spec requires: #( 'GitProject-FamixConnector' ) ]
+]
+
+{ #category : #baselines }
 BaselineOfGitLabHealth >> defineGroups: spec [
 
 	spec
@@ -58,6 +72,12 @@ BaselineOfGitLabHealth >> defineGroups: spec [
 		with:
 			#( 'GitProject-JiraConnector' 'GitProject-JiraConnector-Generator'
 			   'GitProject-JiraConnector-Tests' ).
+
+	spec
+		group: 'Famix'
+		with:
+			#( 'GitProject-FamixConnector' 'GitProject-FamixConnector-Generator'
+			   'GitProject-FamixConnector-Tests' ).
 	spec
 		group: 'Core'
 		with: #( 'GitLabHealth-Model' 'GitLabHealth-Model-Extension'
@@ -67,7 +87,8 @@ BaselineOfGitLabHealth >> defineGroups: spec [
 			   'GitLabHealth-Model-Importer' 'GitLabHealth-Model-Importer-Tests'
 			   'GitHubHealth-Model-Importer-Tests'
 			   'GLPHExtended-Model' 'GLPHExtended-Model-Tests'
-			   'GLPHExtended-Model-Extension' 'GitLabHealth-Model-Analysis' 'GitLabHealth-Model-Analysis-Tests'
+			   'GLPHExtended-Model-Extension' 'GitLabHealth-Model-Analysis'
+			   'GitLabHealth-Model-Analysis-Tests'
 			   'GitLabHealth-Visualization' 'GitLabProjectHealth-ExtendModel-Generator'
 			   'GitLabProjectHealth-Model-Importer'
 			   'GitLabProjectHealth-Model-Importer-Tests' ).
