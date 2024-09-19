@@ -106,39 +106,7 @@ Here is the metamodel used in this project
 ## Connectors
 
 This project comes with connectors to others metamodel to increase its powerfullness.
-
-### Jira Connector
-
-The Jira connector connect this project to the [Pharo Jira API project](https://github.com/Evref-BL/Jira-Pharo-API).
-It basically looks for commit and merge request links to Jira Issue.
-
-To install the connector, please perform:
-
-```st
-Metacello new
-  repository: 'github://moosetechnology/GitProjectHealth:main/src';
-  baseline: 'GitLabHealth';
-  onConflict: [ :ex | ex useIncoming ];
-  onUpgrade: [ :ex | ex useIncoming ];
-  onDowngrade: [ :ex | ex useLoaded ];
-  load: #( 'default' 'Jira' )
-```
-
-> loading default is optional if you already loaded it.
-
-Then, it is possible to connect two models using
-
-```st
-GPJCConnector new
-  gpModel: aGpModel; "or glh model"
-  jiraModel: aJiraModel;
-  connect
-```
-
-### Famix Connector
-
-> The project exists and some code already exists, but it is not released yet.
-> Raise an issue if you want us to investigate more on this
+Explore this part of the [documentation on the main website](https://modularmoose.org/moose-wiki/Users/gitproject-health).
 
 ## Contributor
 
