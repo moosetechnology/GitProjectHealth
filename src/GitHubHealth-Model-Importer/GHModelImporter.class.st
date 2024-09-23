@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'api'
 	],
-	#category : 'GitHubHealth-Model-Importer'
+	#category : #'GitHubHealth-Model-Importer'
 }
 
 { #category : #accessing }
@@ -40,6 +40,15 @@ GHModelImporter >> convertApiFileAsFile: aAPIFile [
 	^ GLHFileBlob new
 		  name: aAPIFile name;
 		  yourself
+]
+
+{ #category : #api }
+GHModelImporter >> ensureGroupNamed: aGroupName [
+
+	^ self glhModel
+		  detect: [ :a |
+		  (a isKindOf: GLHGroup) and: [ a name = aGroupName ] ]
+		  ifNone: [ self glhModel newGroupNamed: aGroupName ]
 ]
 
 { #category : #api }
@@ -174,6 +183,19 @@ GHModelImporter >> importPipelinesOf: project [
 ]
 
 { #category : #api }
+GHModelImporter >> importProject: aProjectName ofGroup: aGroupName [
+
+	| result projectResult group |
+	group := self ensureGroupNamed: aGroupName.
+	result := self api organization: aGroupName repo: aProjectName.
+	projectResult := self parseProjectResult: result.
+	projectResult group: group.
+	self glhModel add: projectResult.
+	self completeImportProject: projectResult.
+	^ projectResult
+]
+
+{ #category : #api }
 GHModelImporter >> importRepositoriesOfGroup: groupResult [
 
 	| reposResult itemByPage pageNumber reposFound tmp |
@@ -230,7 +252,7 @@ GHModelImporter >> initialize [
 	withFiles := false
 ]
 
-{ #category : #private }
+{ #category : #parsing }
 GHModelImporter >> parseArrayOfProject: arrayOfProjects [
 
 	| reader |
@@ -249,7 +271,7 @@ GHModelImporter >> parseArrayOfProject: arrayOfProjects [
 	^ reader nextAs: #ArrayOfProjects
 ]
 
-{ #category : #private }
+{ #category : #parsing }
 GHModelImporter >> parseBranchesResult: arrayOfBranch [
 
 	| reader |
@@ -318,7 +340,7 @@ GHModelImporter >> parseCommitsResult: result [
 	^ reader nextAs: #ArrayOfCommit
 ]
 
-{ #category : #private }
+{ #category : #parsing }
 GHModelImporter >> parseFileTreeResult: aResult [
 
 	| reader |
@@ -331,7 +353,7 @@ GHModelImporter >> parseFileTreeResult: aResult [
 	^ reader nextAs: #ArrayOfFile
 ]
 
-{ #category : #private }
+{ #category : #parsing }
 GHModelImporter >> parseGroupResult: aResult [
 
 	| reader |
@@ -344,7 +366,7 @@ GHModelImporter >> parseGroupResult: aResult [
 	^ reader nextAs: GLHGroup
 ]
 
-{ #category : #private }
+{ #category : #parsing }
 GHModelImporter >> parsePipelinesResult: pipelineOverview [
 
 	| reader |
@@ -364,6 +386,21 @@ GHModelImporter >> parsePipelinesResult: pipelineOverview [
 			setter: [ :object :value |
 				object runDate: (DateAndTime fromString: value) ] ].
 	^ reader nextAs: GHAPIPipelineOverview
+]
+
+{ #category : #parsing }
+GHModelImporter >> parseProjectResult: aResult [
+
+	| reader |
+	reader := NeoJSONReader on: aResult readStream.
+	reader for: GLHProject do: [ :mapping |
+		mapping mapInstVar: #name to: #name.
+		mapping mapInstVar: #description to: #description.
+		mapping mapInstVar: #id to: #id.
+		mapping mapInstVar: #archived to: #archived.
+		mapping mapInstVar: #web_url to: #html_url.
+		mapping mapInstVar: #topics to: #topics ].
+	^ reader nextAs: GLHProject
 ]
 
 { #category : #parsing }
