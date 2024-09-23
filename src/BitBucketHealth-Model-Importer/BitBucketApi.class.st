@@ -6,7 +6,7 @@ Class {
 		'client',
 		'bearerToken',
 		'apiToken',
-		'user'
+		'username'
 	],
 	#category : #'BitBucketHealth-Model-Importer'
 }
@@ -69,8 +69,9 @@ BitBucketApi >> initialize [
 { #category : #'private - building' }
 BitBucketApi >> prepareZnClient [
 
-	client := ZnClient new.
-	client host: self baseAPIUrl.
+	client := ZnClient new
+		          accept: ZnMimeType applicationJson;
+		          yourself.
 
 	self bearerToken ifNotNil: [ :anApiKey |
 		client headerAt: #Authorization put: 'Bearer ' , anApiKey ].
@@ -79,17 +80,26 @@ BitBucketApi >> prepareZnClient [
 			headerAt: #Authorization
 			put:
 			'Basic '
-			, (self user , ':' , self apiToken) utf8Encoded base64Encoded ]
+			, (self username , ':' , self apiToken) utf8Encoded base64Encoded ]
+]
+
+{ #category : #'api - user' }
+BitBucketApi >> user: accountId [
+	"https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/#api-user-get"
+
+	self prepareZnClient.
+
+	^ self client get: self baseAPIUrl , '/user/' , accountId printString
 ]
 
 { #category : #accessing }
-BitBucketApi >> user [
+BitBucketApi >> username [
 
-	^ user
+	^ username
 ]
 
 { #category : #accessing }
-BitBucketApi >> user: anObject [
+BitBucketApi >> username: anObject [
 
-	user := anObject
+	username := anObject
 ]
