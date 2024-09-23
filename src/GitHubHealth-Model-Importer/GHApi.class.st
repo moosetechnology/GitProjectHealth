@@ -8,7 +8,7 @@ Class {
 		'baseAPIUrl',
 		'client'
 	],
-	#category : 'GitHubHealth-Model-Importer'
+	#category : #'GitHubHealth-Model-Importer'
 }
 
 { #category : #api }
@@ -99,6 +99,13 @@ GHApi >> initialize [
 GHApi >> organization: anOrganizationName [
 
 	^ self client get: self baseAPIUrl , '/orgs/' , anOrganizationName
+]
+
+{ #category : #api }
+GHApi >> organization: aGroupName repo: aRepoName [
+
+	^ self client get:
+		  self baseAPIUrl , '/repos/' , aGroupName , '/' , aRepoName
 ]
 
 { #category : #accessing }
