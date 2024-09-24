@@ -80,6 +80,40 @@ BitBucketApi >> client: anObject [
 	client := anObject
 ]
 
+{ #category : #'api - projects' }
+BitBucketApi >> commitsOfRepo: repositorySlug inProject: projectKey since: since until: until [
+	"/rest/api/1.0/projects/{projectKey}/repos/{repositorySlug}/commits"
+
+	| results lastDate lastCommitterTimestamp commits |
+	self prepareZnClient.
+	self client path:
+		self basePath , '/projects/' , projectKey , '/repos/'
+		, repositorySlug , '/commits'.
+
+	commits := OrderedCollection new.
+
+	[
+	results := self client get.
+	results := (NeoJSONReader on: results readStream) next.
+	commits addAll: (results at: #values).
+	results
+		at: #nextPageStart
+		ifPresent: [
+		client queryAt: #start put: (results at: #nextPageStart) ].
+
+	lastCommitterTimestamp := commits last at: #committerTimestamp.
+	lastDate := DateAndTime fromUnixTime: lastCommitterTimestamp / 1000.
+
+	(results at: #isLastPage) not and: since asDate <= lastDate ]
+		whileTrue.
+		
+		^ commits select: [ :commit |
+		| commitDate |
+		commitDate := DateAndTime fromUnixTime:
+			              (commit at: #committerTimestamp) / 1000.
+		commitDate >= since asDate and: commitDate <= until asDate ]
+]
+
 { #category : #accessing }
 BitBucketApi >> endpoint [
 
