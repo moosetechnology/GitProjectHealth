@@ -12,6 +12,27 @@ Class {
 	#category : #'BitBucketHealth-Model-Importer'
 }
 
+{ #category : #'private - building' }
+BitBucketApi >> allValuesOfPath: path [
+
+	| results values |
+	self prepareZnClient.
+	self client path: path.
+	values := OrderedCollection new.
+
+	[
+	results := self client get.
+	results := (NeoJSONReader on: results readStream) next.
+	values addAll: (results at: #values).
+	results
+		at: #nextPageStart
+		ifPresent: [
+		client queryAt: #start put: (results at: #nextPageStart) ].
+	results at: #isLastPage ] whileFalse.
+
+	^ values
+]
+
 { #category : #accessing }
 BitBucketApi >> apiToken [
 
@@ -102,22 +123,12 @@ BitBucketApi >> prepareZnClient [
 BitBucketApi >> projects [
 	"/rest/api/1.0/projects"
 
-	| results projects |
-	self prepareZnClient.
-	self client path: self basePath , '/projects'.
-	client queryAt: #limit put: 5.
-	projects := OrderedCollection new.
-	[
-	results := self client get.
-	results := (NeoJSONReader on: results readStream) next.
-	projects addAll: (results at: #values).
-	results
-		at: #nextPageStart
-		ifPresent: [
-		client queryAt: #start put: (results at: #nextPageStart) ].
-	results at: #isLastPage ] whileFalse.
+	^ self allValuesOfPath: self basePath , '/projects'.
+]
 
-	^ projects
+{ #category : #'api - projects' }
+BitBucketApi >> repositoriesOfProject: projectKey [
+	^self allValuesOfPath: self basePath, '/projects/', projectKey, '/repos'.
 ]
 
 { #category : #'api - user' }

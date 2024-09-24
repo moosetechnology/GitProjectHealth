@@ -19,6 +19,20 @@ BitBucketModelImporter >> bitBucketApi: anObject [
 	bitBucketApi := anObject
 ]
 
+{ #category : #'as yet unclassified' }
+BitBucketModelImporter >> importContributedProjectsOfUser: aGLHUser [
+	| projects |
+	"get all projects"
+	projects := self bitBucketApi projects
+
+	"get all repos of projects"
+	
+
+	"get all commits of repo"
+
+	"look if user is author of min one commit"
+]
+
 { #category : #api }
 BitBucketModelImporter >> importUser: accountId [
 
