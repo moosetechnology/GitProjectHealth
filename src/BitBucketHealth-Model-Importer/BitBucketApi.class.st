@@ -2,7 +2,8 @@ Class {
 	#name : #BitBucketApi,
 	#superclass : #Object,
 	#instVars : [
-		'baseAPIUrl',
+		'endpoint',
+		'basePath',
 		'client',
 		'bearerToken',
 		'apiToken',
@@ -24,15 +25,15 @@ BitBucketApi >> apiToken: anObject [
 ]
 
 { #category : #accessing }
-BitBucketApi >> baseAPIUrl [
+BitBucketApi >> basePath [
 
-	^ baseAPIUrl
+	^ basePath
 ]
 
 { #category : #accessing }
-BitBucketApi >> baseAPIUrl: anObject [
+BitBucketApi >> basePath: anObject [
 
-	baseAPIUrl := anObject
+	basePath := anObject
 ]
 
 { #category : #accessing }
@@ -58,12 +59,26 @@ BitBucketApi >> client: anObject [
 	client := anObject
 ]
 
+{ #category : #accessing }
+BitBucketApi >> endpoint [
+
+	^ endpoint
+]
+
+{ #category : #accessing }
+BitBucketApi >> endpoint: anObject [
+
+	endpoint := anObject
+]
+
 { #category : #initialization }
 BitBucketApi >> initialize [
 
-		self client: (ZnClient new
+	self client: (ZnClient new
 			 accept: ZnMimeType applicationJson;
-			 yourself)
+			 yourself).
+			
+	self basePath: 'rest/api/1.0'
 ]
 
 { #category : #'private - building' }
@@ -73,14 +88,36 @@ BitBucketApi >> prepareZnClient [
 		          accept: ZnMimeType applicationJson;
 		          yourself.
 
+	client host: self endpoint.
+	client http.
+
 	self bearerToken ifNotNil: [ :anApiKey |
 		client headerAt: #Authorization put: 'Bearer ' , anApiKey ].
 	self apiToken ifNotNil: [ :anApiKey |
-		client
-			headerAt: #Authorization
-			put:
-			'Basic '
+		client headerAt: #Authorization put: 'Basic '
 			, (self username , ':' , self apiToken) utf8Encoded base64Encoded ]
+]
+
+{ #category : #'api - projects' }
+BitBucketApi >> projects [
+	"/rest/api/1.0/projects"
+
+	| results projects |
+	self prepareZnClient.
+	self client path: self basePath , '/projects'.
+	client queryAt: #limit put: 5.
+	projects := OrderedCollection new.
+	[
+	results := self client get.
+	results := (NeoJSONReader on: results readStream) next.
+	projects addAll: (results at: #values).
+	results
+		at: #nextPageStart
+		ifPresent: [
+		client queryAt: #start put: (results at: #nextPageStart) ].
+	results at: #isLastPage ] whileFalse.
+
+	^ projects
 ]
 
 { #category : #'api - user' }
@@ -88,8 +125,9 @@ BitBucketApi >> user: accountId [
 	"https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/#api-user-get"
 
 	self prepareZnClient.
-
-	^ self client get: self baseAPIUrl , '/user/' , accountId printString
+	
+	self client path: self basePath, '/user/' , accountId printString.
+	^ self client get
 ]
 
 { #category : #accessing }
