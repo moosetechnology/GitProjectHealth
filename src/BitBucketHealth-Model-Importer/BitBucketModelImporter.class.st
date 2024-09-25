@@ -19,18 +19,74 @@ BitBucketModelImporter >> bitBucketApi: anObject [
 	bitBucketApi := anObject
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #api }
 BitBucketModelImporter >> importContributedProjectsOfUser: aGLHUser [
-	| projects |
+
+	| projects repositories repositoriesCommits userRepositories userProjects |
 	"get all projects"
-	projects := self bitBucketApi projects
+	projects := self bitBucketApi projects.
 
 	"get all repos of projects"
-	
+	repositories := projects flatCollect: [ :project |
+		                self bitBucketApi repositoriesOfProject:
+			                (project at: #key) ].
+
 
 	"get all commits of repo"
+	repositoriesCommits := repositories collect: [ :repository |
+		                       repository -> (self bitBucketApi
+			                        commitsOfRepo: (repository at: #slug)
+			                        inProject:
+			                        ((repository at: #project) at: #key)
+			                        since: Date today - 7 days
+			                        until: Date today) ].
 
 	"look if user is author of min one commit"
+	userRepositories := repositoriesCommits select: [ :repository |
+		                    | repos |
+		                    repos := repository value
+			                             ifEmpty: [ false ]
+			                             ifNotEmpty: [
+				                             repository value
+					                             detect: [ :commit |
+					                             ((commit at: #author) at: #name)
+					                             = aGLHUser name ]
+					                             ifNone: [ false ] ].
+
+		                    repos isNotEmpty ].
+
+	"Transform user repositories in GLHProject"
+	userProjects := userRepositories collect: [ :repoCommits |
+		                | repo project group glhProject |
+		                repo := repoCommits key.
+		                project := repo at: #project.
+
+		                group := (self glhModel allWithType: GLHGroup)
+			                         detect: [ :glhGroup |
+			                         glhGroup id = project at: #key ]
+			                         ifFound: [ :glhGroup | glhGroup ]
+			                         ifNone: [
+				                         | newGroup |
+				                         newGroup := GLHGroup new
+					                                     name: (project at: #name);
+					                                     id: (project at: #key);
+					                                     description:
+						                                     (project at: #description).
+				                         glhModel add: newGroup.
+				                         newGroup ].
+
+
+		                glhProject :=GLHProject new
+			                name: (repo at: #name);
+			                id: (repo at: #slug);
+			                group: group.
+			
+							group addProject: glhProject.
+							glhProject
+			
+			 ].
+
+	^userProjects
 ]
 
 { #category : #api }
