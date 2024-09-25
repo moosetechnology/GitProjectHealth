@@ -19,6 +19,16 @@ BitBucketModelImporter >> bitBucketApi: anObject [
 	bitBucketApi := anObject
 ]
 
+{ #category : #'private - api' }
+BitBucketModelImporter >> completeImportProject: aGLHProject [
+	aGLHProject repository ifNotNil: [ ^aGLHProject ].
+	
+	aGLHProject repository: GLHRepository new.
+	self glhModel add: aGLHProject repository.
+	"TODO: import repository"
+	^aGLHProject  
+]
+
 { #category : #api }
 BitBucketModelImporter >> importContributedProjectsOfUser: aGLHUser [
 

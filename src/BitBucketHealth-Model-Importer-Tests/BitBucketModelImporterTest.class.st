@@ -8,6 +8,32 @@ Class {
 }
 
 { #category : #tests }
+BitBucketModelImporterTest >> testCompleteImportProject [
+	"Given"
+
+	| glphModel project bitBucketApi bitBucketImporter |
+		bitBucketApi := BitBucketApiMock new.
+	glphModel := GLPHEModel new name: 'test'.
+
+	project := GLHProject new.
+
+	glphModel add: project.
+
+	bitBucketImporter := BitBucketModelImporter new
+		                     bitBucketApi: bitBucketApi;
+		                     glhModel: glphModel.
+
+	"When"
+	project := bitBucketImporter completeImportProject: project.
+
+	"Then"
+	self deny: project repository equals: nil.
+	self
+		assert: (bitBucketImporter glhModel allWithType: GLHRepository) size
+		equals: 1
+]
+
+{ #category : #tests }
 BitBucketModelImporterTest >> testImportContributedProjectsOfUser [
 
 	| bitBucketApi glphModel bitBucketImporter user projects |
