@@ -34,6 +34,7 @@ BitBucketApiMock >> commitsOfRepo: repositorySlug inProject: projectKey since: s
 
 	commits := (NeoJSONReader on: commits readStream) next.
 
+
 	^ commits select: [ :commit |
 		  | commitDate |
 		  commitDate := DateAndTime fromUnixTime:

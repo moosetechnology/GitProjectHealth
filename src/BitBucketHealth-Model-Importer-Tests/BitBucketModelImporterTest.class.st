@@ -34,6 +34,39 @@ BitBucketModelImporterTest >> testCompleteImportProject [
 ]
 
 { #category : #tests }
+BitBucketModelImporterTest >> testImportCommitsOfProjectSinceUntil [
+
+	| bitBucketApi glphModel bitBucketImporter project commits group repo |
+	"Given"
+	bitBucketApi := BitBucketApiMock new.
+
+	glphModel := GLPHEModel new name: 'test'.
+
+	bitBucketImporter := BitBucketModelImporter new
+		                     bitBucketApi: bitBucketApi;
+		                     glhModel: glphModel.
+
+	group := GLHGroup new id: 1.
+	repo := GLHRepository new.
+	project := GLHProject new
+		           group: group;
+		           repository: repo.
+
+	"When"
+	commits := bitBucketImporter
+		           importCommitsOfProject: project
+		           since: '09-23-2024'
+		           until: '09-25-2024'.
+
+	"Then"
+	self
+		assert: (bitBucketImporter glhModel allWithType: GLHCommit) size
+		equals: 1.
+		
+  self assert: project repository commits size equals: 1. 
+]
+
+{ #category : #tests }
 BitBucketModelImporterTest >> testImportContributedProjectsOfUser [
 
 	| bitBucketApi glphModel bitBucketImporter user projects |

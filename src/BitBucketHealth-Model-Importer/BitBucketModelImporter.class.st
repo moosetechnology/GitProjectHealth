@@ -19,6 +19,12 @@ BitBucketModelImporter >> bitBucketApi: anObject [
 	bitBucketApi := anObject
 ]
 
+{ #category : #equality }
+BitBucketModelImporter >> blockOnIdEquality [
+
+	^ [ :existing :new | existing id = new id ]
+]
+
 { #category : #'private - api' }
 BitBucketModelImporter >> completeImportProject: aGLHProject [
 	aGLHProject repository ifNotNil: [ ^aGLHProject ].
@@ -27,6 +33,27 @@ BitBucketModelImporter >> completeImportProject: aGLHProject [
 	self glhModel add: aGLHProject repository.
 	"TODO: import repository"
 	^aGLHProject  
+]
+
+{ #category : #'as yet unclassified' }
+BitBucketModelImporter >> importCommitsOfProject: aGLHProject since: since until: until [
+
+	| commits |
+	commits := bitBucketApi
+		           commitsOfRepo: aGLHProject id
+		           inProject: aGLHProject group id
+		           since: since
+		           until: until.
+
+	commits := commits collect: [ :commit |
+		           self parseCommitIntoGLHCommit: commit ].
+
+	aGLHProject repository commits
+		addAll: commits
+		unless: self blockOnIdEquality.
+	self glhModel addAll: commits unless: self blockOnIdEquality.
+
+	^commits 
 ]
 
 { #category : #api }
@@ -105,6 +132,25 @@ BitBucketModelImporter >> importUser: accountId [
 	glhModel add: glhUser.
 		
 	^glhUser
+]
+
+{ #category : #parsing }
+BitBucketModelImporter >> parseCommitIntoGLHCommit: commitDictionary [
+
+	| author committer |
+	author := commitDictionary at: #author.
+	committer := commitDictionary at: #committer.
+
+	^ GLHCommit new
+		  id: (commitDictionary at: #id);
+		  author_email: (author at: #emailAddress);
+		  author_name: (author at: #name);
+		  authored_date: (DateAndTime fromUnixTime:
+					   ((commitDictionary at: #authorTimestamp) / 1000));
+		  committed_date: (DateAndTime fromUnixTime:
+					   ((commitDictionary at: #committerTimestamp) / 1000));
+		  committer_email: (committer at: #emailAddress);
+		  committer_name: (committer at: #name)
 ]
 
 { #category : #parsing }
