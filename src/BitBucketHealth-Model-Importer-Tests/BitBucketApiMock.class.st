@@ -11,6 +11,7 @@ BitBucketApiMock >> commitsOfRepo: repositorySlug inProject: projectKey since: s
 	commits := '[
     {
       "id": "abcdef0123abcdef4567abcdef8987abcdef6543",
+		"message": "message test",
       "displayId": "abcdef0123a",
       "author": {
         "name": "charlie",

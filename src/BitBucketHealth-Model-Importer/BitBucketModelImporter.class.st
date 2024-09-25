@@ -35,7 +35,7 @@ BitBucketModelImporter >> completeImportProject: aGLHProject [
 	^aGLHProject  
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #api }
 BitBucketModelImporter >> importCommitsOfProject: aGLHProject since: since until: until [
 
 	| commits |
@@ -48,9 +48,7 @@ BitBucketModelImporter >> importCommitsOfProject: aGLHProject since: since until
 	commits := commits collect: [ :commit |
 		           self parseCommitIntoGLHCommit: commit ].
 
-	aGLHProject repository commits
-		addAll: commits
-		unless: self blockOnIdEquality.
+	aGLHProject repository commits: commits.
 	self glhModel addAll: commits unless: self blockOnIdEquality.
 
 	^commits 
@@ -113,6 +111,21 @@ BitBucketModelImporter >> importContributedProjectsOfUser: aGLHUser [
 ]
 
 { #category : #api }
+BitBucketModelImporter >> importCreatorOfCommit: aGLHCommit [
+
+	| creator |
+	(self glhModel allWithType: GLHUser)
+		detect: [ :user | user username = aGLHCommit author_name ]
+		ifFound: [ :user |
+			aGLHCommit commitCreator: user.
+			^ user ].
+
+	creator := self importUser: aGLHCommit author_name.
+	aGLHCommit commitCreator: creator.
+	^creator.
+]
+
+{ #category : #api }
 BitBucketModelImporter >> importUser: accountId [
 
 	| result reader glhUser |
@@ -138,17 +151,19 @@ BitBucketModelImporter >> importUser: accountId [
 BitBucketModelImporter >> parseCommitIntoGLHCommit: commitDictionary [
 
 	| author committer |
+
 	author := commitDictionary at: #author.
 	committer := commitDictionary at: #committer.
 
 	^ GLHCommit new
 		  id: (commitDictionary at: #id);
+		  message: (commitDictionary at: #message);
 		  author_email: (author at: #emailAddress);
 		  author_name: (author at: #name);
 		  authored_date: (DateAndTime fromUnixTime:
-					   ((commitDictionary at: #authorTimestamp) / 1000));
+					   (commitDictionary at: #authorTimestamp) / 1000);
 		  committed_date: (DateAndTime fromUnixTime:
-					   ((commitDictionary at: #committerTimestamp) / 1000));
+					   (commitDictionary at: #committerTimestamp) / 1000);
 		  committer_email: (committer at: #emailAddress);
 		  committer_name: (committer at: #name)
 ]

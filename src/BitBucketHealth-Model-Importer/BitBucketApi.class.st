@@ -106,12 +106,12 @@ BitBucketApi >> commitsOfRepo: repositorySlug inProject: projectKey since: since
 
 	(results at: #isLastPage) not and: since asDate <= lastDate ]
 		whileTrue.
-		
-		^ commits select: [ :commit |
-		| commitDate |
-		commitDate := DateAndTime fromUnixTime:
-			              (commit at: #committerTimestamp) / 1000.
-		commitDate >= since asDate and: commitDate <= until asDate ]
+
+	^ commits select: [ :commit |
+		  | commitDate |
+		  commitDate := DateAndTime fromUnixTime:
+			                (commit at: #committerTimestamp) / 1000.
+		  commitDate >= since asDate and: commitDate <= until asDate ]
 ]
 
 { #category : #accessing }
