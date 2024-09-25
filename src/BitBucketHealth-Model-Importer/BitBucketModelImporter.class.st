@@ -57,36 +57,22 @@ BitBucketModelImporter >> importContributedProjectsOfUser: aGLHUser [
 
 	"Transform user repositories in GLHProject"
 	userProjects := userRepositories collect: [ :repoCommits |
-		                | repo project group glhProject |
+		                | repo project |
 		                repo := repoCommits key.
 		                project := repo at: #project.
 
-		                group := (self glhModel allWithType: GLHGroup)
-			                         detect: [ :glhGroup |
-			                         glhGroup id = project at: #key ]
-			                         ifFound: [ :glhGroup | glhGroup ]
-			                         ifNone: [
-				                         | newGroup |
-				                         newGroup := GLHGroup new
-					                                     name: (project at: #name);
-					                                     id: (project at: #key);
-					                                     description:
-						                                     (project at: #description).
-				                         glhModel add: newGroup.
-				                         newGroup ].
+		                (self glhModel allWithType: GLHProject)
+			                detect: [ :glhProject |
+			                glhProject id = project at: #key ]
+			                ifFound: [ :glhProject | glhProject ]
+			                ifNone: [
+				                | glhProject |
+				                glhProject := self parseRepoIntoGLHProject: repo.
+									glhModel add: glhProject.
+									glhProject 
+				 ] ].
 
-
-		                glhProject :=GLHProject new
-			                name: (repo at: #name);
-			                id: (repo at: #slug);
-			                group: group.
-			
-							group addProject: glhProject.
-							glhProject
-			
-			 ].
-
-	^userProjects
+	^ userProjects
 ]
 
 { #category : #api }
@@ -109,4 +95,39 @@ BitBucketModelImporter >> importUser: accountId [
 	glhModel add: glhUser.
 		
 	^glhUser
+]
+
+{ #category : #parsing }
+BitBucketModelImporter >> parseProjectIntoGLHGroup: projectRepository [
+
+	^GLHGroup new
+				                     name: (projectRepository at: #name);
+				                     id: (projectRepository at: #key);
+				                     description: (projectRepository at: #description).
+]
+
+{ #category : #parsing }
+BitBucketModelImporter >> parseRepoIntoGLHProject: repositoryDictionary [
+
+	| project group glhProject |
+	project := repositoryDictionary at: #project.
+
+	group := (self glhModel allWithType: GLHGroup)
+		         detect: [ :glhGroup | glhGroup id = project at: #key ]
+		         ifFound: [ :glhGroup | glhGroup ]
+		         ifNone: [
+			         | newGroup |
+			         newGroup := self parseProjectIntoGLHGroup: project.
+			         glhModel add: newGroup.
+			         newGroup ].
+
+
+	glhProject := GLHProject new
+		              name: (repositoryDictionary at: #name);
+		              id: (repositoryDictionary at: #slug);
+		              group: group.
+		
+	group addProject: glhProject.
+	
+	^glhProject.
 ]
