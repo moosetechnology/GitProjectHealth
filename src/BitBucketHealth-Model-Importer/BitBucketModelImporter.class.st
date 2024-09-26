@@ -35,6 +35,41 @@ BitBucketModelImporter >> completeImportProject: aGLHProject [
 	^ aGLHProject
 ]
 
+{ #category : #'private - api' }
+BitBucketModelImporter >> getContributionFromDiffs: diffs [
+
+	| contribution |
+	contribution := {
+		                ('additions' -> 0).
+		                ('deletions' -> 0) } asDictionary.
+
+	diffs do: [ :diff |
+		| hunks segments |
+		hunks := diff at: #hunks.
+
+		hunks do: [ :hunk |
+			| addedSegment removedSegment |
+			segments := hunk at: #segments.
+
+			addedSegment := segments detect: [ :segment |
+				                (segment at: #type) = 'ADDED' ] ifNone: [nil ].
+			removedSegment := segments detect: [ :segment |
+				                  (segment at: #type) = 'REMOVED' ] ifNone: [nil ].
+
+			addedSegment ifNotNil: [
+				contribution
+					at: #additions
+					put:
+					(contribution at: #additions) + (addedSegment at: #lines) size ].
+			removedSegment ifNotNil: [
+				contribution
+					at: #deletions
+					put:
+					(contribution at: #deletions) + (removedSegment at: #lines) size ] ] ].
+
+	^ contribution
+]
+
 { #category : #api }
 BitBucketModelImporter >> importCommitsOfProject: aGLHProject since: since until: until [
 

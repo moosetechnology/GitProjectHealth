@@ -3,7 +3,8 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'commits',
-		'commits1'
+		'commits1',
+		'diffs'
 	],
 	#category : #'BitBucketHealth-Model-Importer-Tests'
 }
@@ -36,8 +37,21 @@ BitBucketApiMock >> commitsOfRepo: repositorySlug inProject: projectKey since: s
 		  commitDate >= since asDate and: commitDate <= until asDate ]
 ]
 
+{ #category : #accessing }
+BitBucketApiMock >> diffs [
+
+	^ diffs
+]
+
 { #category : #initialization }
 BitBucketApiMock >> initialize [
+
+	self initializeCommits.
+	self initializeDiffs.
+]
+
+{ #category : #initialization }
+BitBucketApiMock >> initializeCommits [
 
 	commits1 := '[
     {
@@ -65,10 +79,170 @@ BitBucketApiMock >> initialize [
   ]'.
 
 	commits1 := (NeoJSONReader on: commits1 readStream) next.
-	
-	commits := commits1.
-	
-	
+
+	commits := commits1
+]
+
+{ #category : #initialization }
+BitBucketApiMock >> initializeDiffs [
+
+	diffs := '{
+  "fromHash": null,
+  "toHash": "f041798be8404b4dae231b042346e58412145ea0",
+  "contextLines": 10,
+  "whitespace": "SHOW",
+  "diffs": [
+    {
+      "source": {
+        "components": [
+          "build.gradle"
+        ],
+        "parent": "",
+        "name": "build.gradle",
+        "extension": "gradle",
+        "toString": "build.gradle"
+      },
+      "destination": {
+        "components": [
+          "build.gradle"
+        ],
+        "parent": "",
+        "name": "build.gradle",
+        "extension": "gradle",
+        "toString": "build.gradle"
+      },
+      "hunks": [
+        {
+          "sourceLine": 1,
+          "sourceSpan": 14,
+          "destinationLine": 1,
+          "destinationSpan": 14,
+          "segments": [
+            {
+              "type": "CONTEXT",
+              "lines": [
+                {
+                  "source": 1,
+                  "destination": 1,
+                  "line": "// Chargement des plugins",
+                  "truncated": false
+                },
+                {
+                  "source": 2,
+                  "destination": 2,
+                  "line": "plugins {",
+                  "truncated": false
+                },
+                {
+                  "source": 3,
+                  "destination": 3,
+                  "line": " line",
+                  "truncated": false
+                }
+              ],
+              "truncated": false
+            },
+            {
+              "type": "REMOVED",
+              "lines": [
+                {
+                  "source": 4,
+                  "destination": 4,
+                  "line": "    id ''com.carl.gradle.build-utils'' version ''1.1.1''",
+                  "truncated": false
+                }
+              ],
+              "truncated": false
+            },
+            {
+              "type": "ADDED",
+              "lines": [
+                {
+                  "source": 5,
+                  "destination": 4,
+                  "line": "    test2",
+                  "truncated": false
+                }
+              ],
+              "truncated": false
+            },
+            {
+              "type": "CONTEXT",
+              "lines": [
+                {
+                  "source": 5,
+                  "destination": 5,
+                  "line": "    // la partie sbom",
+                  "truncated": false
+                },
+                {
+                  "source": 6,
+                  "destination": 6,
+                  "line": "    test3",
+                  "truncated": false
+                },
+                {
+                  "source": 7,
+                  "destination": 7,
+                  "line": "    // la partie release",
+                  "truncated": false
+                },
+                {
+                  "source": 8,
+                  "destination": 8,
+                  "line": "    test4",
+                  "truncated": false
+                },
+                {
+                  "source": 9,
+                  "destination": 9,
+                  "line": "}",
+                  "truncated": false
+                },
+                {
+                  "source": 10,
+                  "destination": 10,
+                  "line": "",
+                  "truncated": false
+                },
+                {
+                  "source": 11,
+                  "destination": 11,
+                  "line": "line",
+                  "truncated": false
+                },
+                {
+                  "source": 12,
+                  "destination": 12,
+                  "line": "version = \"${artifactVersion}\"",
+                  "truncated": false
+                },
+                {
+                  "source": 13,
+                  "destination": 13,
+                  "line": "",
+                  "truncated": false
+                },
+                {
+                  "source": 14,
+                  "destination": 14,
+                  "line": "",
+                  "truncated": false
+                }
+              ],
+              "truncated": false
+            }
+          ],
+          "truncated": false
+        }
+      ],
+      "truncated": false
+    }
+  ],
+  "truncated": false
+}'.
+
+	diffs := (NeoJSONReader on: diffs readStream) next
 ]
 
 { #category : #accessing }

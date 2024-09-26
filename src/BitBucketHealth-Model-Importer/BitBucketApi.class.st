@@ -80,7 +80,7 @@ BitBucketApi >> client: anObject [
 	client := anObject
 ]
 
-{ #category : #'api - projects' }
+{ #category : #'api - commits' }
 BitBucketApi >> commitsOfRepo: repositorySlug inProject: projectKey since: since until: until [
 	"/rest/api/1.0/projects/{projectKey}/repos/{repositorySlug}/commits"
 
@@ -113,6 +113,21 @@ BitBucketApi >> commitsOfRepo: repositorySlug inProject: projectKey since: since
 		  commitDate := DateAndTime fromUnixTime:
 			                (commit at: #committerTimestamp) / 1000.
 		  commitDate >= since asDate and: commitDate <= until asDate ]
+]
+
+{ #category : #'api - commits' }
+BitBucketApi >> diffsOfCommit: commitID inRepo: repositorySlug inProject: projectKey [
+
+	| results |
+	self prepareZnClient.
+
+	self client path:
+		self basePath , '/projects/' , projectKey , '/repos/'
+		, repositorySlug , '/commits/' , commitID , '/diff'.
+
+	results := self client get.
+
+	^ (NeoJSONReader on: results readStream) next
 ]
 
 { #category : #accessing }

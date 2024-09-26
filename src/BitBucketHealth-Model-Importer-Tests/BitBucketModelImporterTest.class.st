@@ -34,6 +34,29 @@ BitBucketModelImporterTest >> testCompleteImportProject [
 ]
 
 { #category : #tests }
+BitBucketModelImporterTest >> testGetContributionFromDiffs [
+	"Given"
+
+	| bitBucketApi glphModel bitBucketImporter diffs contribution |
+	bitBucketApi := BitBucketApiMock new.
+
+	glphModel := GLPHEModel new name: 'test'.
+
+	bitBucketImporter := BitBucketModelImporter new
+		                     bitBucketApi: bitBucketApi;
+		                     glhModel: glphModel.
+
+	diffs := bitBucketApi diffs.
+
+	"When"
+	contribution := bitBucketImporter getContributionFromDiffs: (diffs at: #diffs).
+
+	"Then"
+	self assert: (contribution at: #additions) equals: 1.
+	self assert: (contribution at: #deletions) equals: 1
+]
+
+{ #category : #tests }
 BitBucketModelImporterTest >> testImportCommitsOfProjectSinceUntil [
 
 	| bitBucketApi glphModel bitBucketImporter project commits group repo |
