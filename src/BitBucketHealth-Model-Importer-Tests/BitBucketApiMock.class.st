@@ -1,14 +1,45 @@
 Class {
 	#name : #BitBucketApiMock,
 	#superclass : #Object,
+	#instVars : [
+		'commits',
+		'commits1'
+	],
 	#category : #'BitBucketHealth-Model-Importer-Tests'
 }
+
+{ #category : #accessing }
+BitBucketApiMock >> commits [
+
+	^ commits
+]
+
+{ #category : #accessing }
+BitBucketApiMock >> commits1 [
+
+	^ commits1
+]
+
+{ #category : #accessing }
+BitBucketApiMock >> commits: anObject [
+
+	commits := anObject
+]
 
 { #category : #'api - projects' }
 BitBucketApiMock >> commitsOfRepo: repositorySlug inProject: projectKey since: since until: until [
 
-	| commits |
-	commits := '[
+	^ self commits select: [ :commit |
+		  | commitDate |
+		  commitDate := DateAndTime fromUnixTime:
+			                (commit at: #committerTimestamp) / 1000.
+		  commitDate >= since asDate and: commitDate <= until asDate ]
+]
+
+{ #category : #initialization }
+BitBucketApiMock >> initialize [
+
+	commits1 := '[
     {
       "id": "abcdef0123abcdef4567abcdef8987abcdef6543",
 		"message": "message test",
@@ -33,14 +64,11 @@ BitBucketApiMock >> commitsOfRepo: repositorySlug inProject: projectKey since: s
     }
   ]'.
 
-	commits := (NeoJSONReader on: commits readStream) next.
-
-
-	^ commits select: [ :commit |
-		  | commitDate |
-		  commitDate := DateAndTime fromUnixTime:
-			                (commit at: #committerTimestamp) / 1000.
-		  commitDate >= since asDate and: commitDate <= until asDate ]
+	commits1 := (NeoJSONReader on: commits1 readStream) next.
+	
+	commits := commits1.
+	
+	
 ]
 
 { #category : #accessing }

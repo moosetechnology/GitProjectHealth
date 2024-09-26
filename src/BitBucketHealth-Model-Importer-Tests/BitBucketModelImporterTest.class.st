@@ -69,7 +69,7 @@ BitBucketModelImporterTest >> testImportCommitsOfProjectSinceUntil [
 { #category : #tests }
 BitBucketModelImporterTest >> testImportContributedProjectsOfUser [
 
-	| bitBucketApi glphModel bitBucketImporter user projects |
+	| bitBucketApi glphModel bitBucketImporter user projects commits yesterdayAsTimestamp |
 	bitBucketApi := BitBucketApiMock new.
 
 	glphModel := GLPHEModel new name: 'test'.
@@ -82,6 +82,12 @@ BitBucketModelImporterTest >> testImportContributedProjectsOfUser [
 		        id: 1;
 		        name: 'charlie'.
 
+	commits := bitBucketApi commits1.
+	yesterdayAsTimestamp := (Date today - 1 days) asDateAndTime
+		                        asUnixTime * 1000.
+	commits first at: #committerTimestamp put: yesterdayAsTimestamp.
+	bitBucketApi commits: commits.
+
 	"When"
 	projects := bitBucketImporter importContributedProjectsOfUser: user.
 
@@ -93,7 +99,9 @@ BitBucketModelImporterTest >> testImportContributedProjectsOfUser [
 	self
 		assert: (bitBucketImporter glhModel allWithType: GLHProject) first
 		equals: projects first.
-	self assertCollection: user contributedProjects hasSameElements:  projects
+	self
+		assertCollection: user contributedProjects
+		hasSameElements: projects
 ]
 
 { #category : #tests }
