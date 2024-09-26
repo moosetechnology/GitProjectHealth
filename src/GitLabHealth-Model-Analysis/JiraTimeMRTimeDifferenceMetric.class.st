@@ -48,7 +48,7 @@ JiraTimeMRTimeDifferenceMetric >> calculate [
 		                  ].
 
 
-	 ^ groupedByDate average
+	 ^ groupedByDate average asFloat
 ]
 
 { #category : #accessing }
