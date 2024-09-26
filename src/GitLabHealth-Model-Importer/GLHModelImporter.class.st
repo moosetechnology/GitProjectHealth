@@ -924,7 +924,6 @@ GLHModelImporter >> initialize [
 		                 yourself.
 	self initReader.
 
-	currentImporter := self
 ]
 
 { #category : #importer }
@@ -933,19 +932,6 @@ GLHModelImporter >> loadAllProjectsFromRepositorySoftware [
 	|projects|
 	
 	projects := self glhApi projects. 
-]
-
-{ #category : #'as yet unclassified' }
-GLHModelImporter >> makeGlobal [
-	^ self makeGlobal: DateAndTime now printString.
-]
-
-{ #category : #'as yet unclassified' }
-GLHModelImporter >> makeGlobal: aLabel [ 
-
-	currentImporter := currentImporter ifNil: [ OrderedDictionary new ].
-	currentImporter at: aLabel put: self. 
-	^ self
 ]
 
 { #category : #private }
