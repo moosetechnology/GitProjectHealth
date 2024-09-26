@@ -89,6 +89,7 @@ BitBucketApi >> commitsOfRepo: repositorySlug inProject: projectKey since: since
 	self client path:
 		self basePath , '/projects/' , projectKey , '/repos/'
 		, repositorySlug , '/commits'.
+	self client queryAt: 'merges' put: 'exclude'.
 
 	commits := OrderedCollection new.
 
