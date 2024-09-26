@@ -9,21 +9,8 @@ Class {
 		'generalReader',
 		'userCatalogue'
 	],
-	#classVars : [
-		'currentImporter'
-	],
 	#category : #'GitLabHealth-Model-Importer'
 }
-
-{ #category : #'as yet unclassified' }
-GLHModelImporter class >> importers [
-	^ currentImporter 
-]
-
-{ #category : #initialization }
-GLHModelImporter class >> reset [
-	currentImporter := nil.
-]
 
 { #category : #'private - api' }
 GLHModelImporter >> addCommits: commitsList toRepository: aProjectRepository [
