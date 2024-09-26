@@ -45,16 +45,20 @@ BitBucketModelImporter >> getContributionFromDiffs: diffs [
 
 	diffs do: [ :diff |
 		| hunks segments |
-		hunks := diff at: #hunks.
+		hunks := diff at: #hunks ifAbsent: Array new.
 
 		hunks do: [ :hunk |
 			| addedSegment removedSegment |
 			segments := hunk at: #segments.
 
-			addedSegment := segments detect: [ :segment |
-				                (segment at: #type) = 'ADDED' ] ifNone: [nil ].
-			removedSegment := segments detect: [ :segment |
-				                  (segment at: #type) = 'REMOVED' ] ifNone: [nil ].
+			addedSegment := segments
+				                detect: [ :segment |
+				                (segment at: #type) = 'ADDED' ]
+				                ifNone: [ nil ].
+			removedSegment := segments
+				                  detect: [ :segment |
+				                  (segment at: #type) = 'REMOVED' ]
+				                  ifNone: [ nil ].
 
 			addedSegment ifNotNil: [
 				contribution
@@ -81,7 +85,15 @@ BitBucketModelImporter >> importCommitsOfProject: aGLHProject since: since until
 		           until: until.
 
 	commits := commits collect: [ :commit |
-		           self parseCommitIntoGLHCommit: commit ].
+		           | glhCommit commitDiffs contribution |
+		           glhCommit := self parseCommitIntoGLHCommit: commit.
+		commitDiffs :=  self bitBucketApi diffsOfCommit: glhCommit id inRepo: aGLHProject id inProject: aGLHProject group id.
+		          
+		           contribution := self getContributionFromDiffs:
+			                           (commitDiffs at: #diffs).
+		           glhCommit additions: (contribution at: #additions).
+		           glhCommit deletions: (contribution at: #deletions).
+		           glhCommit ].
 
 	aGLHProject repository commits: commits.
 	self glhModel addAll: commits unless: self blockOnIdEquality.

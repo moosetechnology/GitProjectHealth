@@ -4,7 +4,11 @@ Class {
 	#instVars : [
 		'commits',
 		'commits1',
-		'diffs'
+		'diffs',
+		'diffs1',
+		'diffsWithoutHunks',
+		'diffsWithoutAdded',
+		'diffsWithoutRemoved'
 	],
 	#category : #'BitBucketHealth-Model-Importer-Tests'
 }
@@ -41,6 +45,35 @@ BitBucketApiMock >> commitsOfRepo: repositorySlug inProject: projectKey since: s
 BitBucketApiMock >> diffs [
 
 	^ diffs
+]
+
+{ #category : #accessing }
+BitBucketApiMock >> diffs: anObject [
+
+	diffs := anObject
+]
+
+{ #category : #'api - commits' }
+BitBucketApiMock >> diffsOfCommit: commitID inRepo: repositorySlug inProject: projectKey [
+	^diffs 
+]
+
+{ #category : #accessing }
+BitBucketApiMock >> diffsWithoutAdded [
+
+	^ diffsWithoutAdded
+]
+
+{ #category : #accessing }
+BitBucketApiMock >> diffsWithoutHunks [
+
+	^ diffsWithoutHunks
+]
+
+{ #category : #accessing }
+BitBucketApiMock >> diffsWithoutRemoved [
+
+	^ diffsWithoutRemoved
 ]
 
 { #category : #initialization }
@@ -86,9 +119,136 @@ BitBucketApiMock >> initializeCommits [
 { #category : #initialization }
 BitBucketApiMock >> initializeDiffs [
 
-	diffs := '{
+	diffs1 := '{
   "fromHash": null,
-  "toHash": "f041798be8404b4dae231b042346e58412145ea0",
+  "toHash": "123",
+  "contextLines": 10,
+  "whitespace": "SHOW",
+  "diffs": [
+    {
+      "source": {
+        "components": [
+          "build.gradle"
+        ],
+        "parent": "",
+        "name": "build.gradle",
+        "extension": "gradle",
+        "toString": "build.gradle"
+      },
+      "destination": {
+        "components": [
+          "build.gradle"
+        ],
+        "parent": "",
+        "name": "build.gradle",
+        "extension": "gradle",
+        "toString": "build.gradle"
+      },
+      "hunks": [
+        {
+          "sourceLine": 1,
+          "sourceSpan": 14,
+          "destinationLine": 1,
+          "destinationSpan": 14,
+          "segments": [
+            {
+              "type": "CONTEXT",
+              "lines": [
+                {
+                  "source": 3,
+                  "destination": 3,
+                  "line": " line",
+                  "truncated": false
+                }
+              ],
+              "truncated": false
+            },
+            {
+              "type": "REMOVED",
+              "lines": [
+                {
+                  "source": 4,
+                  "destination": 4,
+                  "line": "line4",
+                  "truncated": false
+                }
+              ],
+              "truncated": false
+            },
+            {
+              "type": "ADDED",
+              "lines": [
+                {
+                  "source": 5,
+                  "destination": 4,
+                  "line": "line5",
+                  "truncated": false
+                }
+              ],
+              "truncated": false
+            },
+            {
+              "type": "CONTEXT",
+              "lines": [
+                {
+                  "source": 14,
+                  "destination": 14,
+                  "line": "",
+                  "truncated": false
+                }
+              ],
+              "truncated": false
+            }
+          ],
+          "truncated": false
+        }
+      ],
+      "truncated": false
+    }
+  ],
+  "truncated": false
+}'.
+
+	diffs1 := (NeoJSONReader on: diffs1 readStream) next.
+
+	diffsWithoutHunks := '{
+  "fromHash": null,
+  "toHash": "2",
+  "contextLines": 10,
+  "whitespace": "SHOW",
+  "diffs": [
+    {
+      "source": {
+        "components": [
+          "build.gradle"
+        ],
+        "parent": "",
+        "name": "build.gradle",
+        "extension": "gradle",
+        "toString": "build.gradle"
+      },
+      "destination": {
+        "components": [
+          "build.gradle"
+        ],
+        "parent": "",
+        "name": "build.gradle",
+        "extension": "gradle",
+        "toString": "build.gradle"
+      },
+          
+      "truncated": false
+    }
+  ],
+  "truncated": false
+}'.
+
+	diffsWithoutHunks := (NeoJSONReader on: diffsWithoutHunks readStream)
+		                     next.
+
+	diffsWithoutAdded := '{
+  "fromHash": null,
+  "toHash": "3",
   "contextLines": 10,
   "whitespace": "SHOW",
   "diffs": [
@@ -124,19 +284,19 @@ BitBucketApiMock >> initializeDiffs [
                 {
                   "source": 1,
                   "destination": 1,
-                  "line": "// Chargement des plugins",
+                  "line": "line1",
                   "truncated": false
                 },
                 {
                   "source": 2,
                   "destination": 2,
-                  "line": "plugins {",
+                  "line": "line2",
                   "truncated": false
                 },
                 {
                   "source": 3,
                   "destination": 3,
-                  "line": " line",
+                  "line": "line3",
                   "truncated": false
                 }
               ],
@@ -148,7 +308,77 @@ BitBucketApiMock >> initializeDiffs [
                 {
                   "source": 4,
                   "destination": 4,
-                  "line": "    id ''com.carl.gradle.build-utils'' version ''1.1.1''",
+                  "line": "line4",
+                  "truncated": false
+                }
+              ],
+              "truncated": false
+            },
+            {
+              "type": "CONTEXT",
+              "lines": [
+                {
+                  "source": 5,
+                  "destination": 5,
+                  "line": "",
+                  "truncated": false
+                }
+              ],
+              "truncated": false
+            }
+          ],
+          "truncated": false
+        }
+      ],
+      "truncated": false
+    }
+  ],
+  "truncated": false
+}'.
+
+	diffsWithoutAdded := (NeoJSONReader on: diffsWithoutAdded readStream)
+		                     next.
+
+
+	diffsWithoutRemoved := '{
+  "fromHash": null,
+  "toHash": "1",
+  "contextLines": 10,
+  "whitespace": "SHOW",
+  "diffs": [
+    {
+      "source": {
+        "components": [
+          "build.gradle"
+        ],
+        "parent": "",
+        "name": "build.gradle",
+        "extension": "gradle",
+        "toString": "build.gradle"
+      },
+      "destination": {
+        "components": [
+          "build.gradle"
+        ],
+        "parent": "",
+        "name": "build.gradle",
+        "extension": "gradle",
+        "toString": "build.gradle"
+      },
+      "hunks": [
+        {
+          "sourceLine": 1,
+          "sourceSpan": 14,
+          "destinationLine": 1,
+          "destinationSpan": 14,
+          "segments": [
+            {
+              "type": "CONTEXT",
+              "lines": [
+                {
+                  "source": 3,
+                  "destination": 3,
+                  "line": " line",
                   "truncated": false
                 }
               ],
@@ -170,62 +400,8 @@ BitBucketApiMock >> initializeDiffs [
               "type": "CONTEXT",
               "lines": [
                 {
-                  "source": 5,
-                  "destination": 5,
-                  "line": "    // la partie sbom",
-                  "truncated": false
-                },
-                {
                   "source": 6,
                   "destination": 6,
-                  "line": "    test3",
-                  "truncated": false
-                },
-                {
-                  "source": 7,
-                  "destination": 7,
-                  "line": "    // la partie release",
-                  "truncated": false
-                },
-                {
-                  "source": 8,
-                  "destination": 8,
-                  "line": "    test4",
-                  "truncated": false
-                },
-                {
-                  "source": 9,
-                  "destination": 9,
-                  "line": "}",
-                  "truncated": false
-                },
-                {
-                  "source": 10,
-                  "destination": 10,
-                  "line": "",
-                  "truncated": false
-                },
-                {
-                  "source": 11,
-                  "destination": 11,
-                  "line": "line",
-                  "truncated": false
-                },
-                {
-                  "source": 12,
-                  "destination": 12,
-                  "line": "version = \"${artifactVersion}\"",
-                  "truncated": false
-                },
-                {
-                  "source": 13,
-                  "destination": 13,
-                  "line": "",
-                  "truncated": false
-                },
-                {
-                  "source": 14,
-                  "destination": 14,
                   "line": "",
                   "truncated": false
                 }
@@ -242,7 +418,10 @@ BitBucketApiMock >> initializeDiffs [
   "truncated": false
 }'.
 
-	diffs := (NeoJSONReader on: diffs readStream) next
+	diffsWithoutRemoved := (NeoJSONReader on:
+		                        diffsWithoutRemoved readStream) next.
+
+	diffs := diffs1
 ]
 
 { #category : #accessing }

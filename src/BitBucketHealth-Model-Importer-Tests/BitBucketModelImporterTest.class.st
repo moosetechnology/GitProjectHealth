@@ -57,6 +57,81 @@ BitBucketModelImporterTest >> testGetContributionFromDiffs [
 ]
 
 { #category : #tests }
+BitBucketModelImporterTest >> testGetContributionFromDiffsWithoutAdded [
+	"Given"
+
+	| bitBucketApi glphModel bitBucketImporter diffs contribution |
+	bitBucketApi := BitBucketApiMock new.
+
+	glphModel := GLPHEModel new name: 'test'.
+
+	bitBucketImporter := BitBucketModelImporter new
+		                     bitBucketApi: bitBucketApi;
+		                     glhModel: glphModel.
+
+	diffs := bitBucketApi diffsWithoutAdded.
+	bitBucketApi diffs: diffs.
+
+	"When"
+	contribution := bitBucketImporter getContributionFromDiffs:
+		                (diffs at: #diffs).
+
+	"Then"
+	self assert: (contribution at: #additions) equals: 0.
+	self assert: (contribution at: #deletions) equals: 1
+]
+
+{ #category : #tests }
+BitBucketModelImporterTest >> testGetContributionFromDiffsWithoutHunks [
+	"Given"
+
+	| bitBucketApi glphModel bitBucketImporter diffs contribution |
+	bitBucketApi := BitBucketApiMock new.
+
+	glphModel := GLPHEModel new name: 'test'.
+
+	bitBucketImporter := BitBucketModelImporter new
+		                     bitBucketApi: bitBucketApi;
+		                     glhModel: glphModel.
+
+	diffs := bitBucketApi diffsWithoutHunks.
+	bitBucketApi diffs: diffs.
+
+	"When"
+	contribution := bitBucketImporter getContributionFromDiffs:
+		                (diffs at: #diffs).
+
+	"Then"
+	self assert: (contribution at: #additions) equals: 0.
+	self assert: (contribution at: #deletions) equals: 0
+]
+
+{ #category : #tests }
+BitBucketModelImporterTest >> testGetContributionFromDiffsWithoutRemoved [
+	"Given"
+
+	| bitBucketApi glphModel bitBucketImporter diffs contribution |
+	bitBucketApi := BitBucketApiMock new.
+
+	glphModel := GLPHEModel new name: 'test'.
+
+	bitBucketImporter := BitBucketModelImporter new
+		                     bitBucketApi: bitBucketApi;
+		                     glhModel: glphModel.
+
+	diffs := bitBucketApi diffsWithoutRemoved.
+	bitBucketApi diffs: diffs.
+
+	"When"
+	contribution := bitBucketImporter getContributionFromDiffs:
+		                (diffs at: #diffs).
+
+	"Then"
+	self assert: (contribution at: #additions) equals: 1.
+	self assert: (contribution at: #deletions) equals: 0
+]
+
+{ #category : #tests }
 BitBucketModelImporterTest >> testImportCommitsOfProjectSinceUntil [
 
 	| bitBucketApi glphModel bitBucketImporter project commits group repo |
