@@ -20,7 +20,7 @@ CommitsNumberByJiraTicketsMetric >> calculate [
 		                 | average |
 		                 average := (group collect: [ :mergeRequest |
 			                             mergeRequest commits size ]) average ].
-	^ groupedByDate average
+	^ groupedByDate average asFloat
 ]
 
 { #category : #accessing }
