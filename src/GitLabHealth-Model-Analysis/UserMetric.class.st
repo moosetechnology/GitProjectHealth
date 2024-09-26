@@ -141,6 +141,9 @@ UserMetric >> loadUserCommitsSince: since until: until [
 		               since: since
 		               until: until.
 
+	user contributedProjects ifEmpty: [
+		glhImporter importContributedProjectsOfUser: user ].
+
 	"download commits unless project cache is not empty"
 	allCommits := user contributedProjects collect: [ :project |
 		              project repository
@@ -148,7 +151,7 @@ UserMetric >> loadUserCommitsSince: since until: until [
 			              ifAbsentPut: [
 				              | foundCommits |
 				              foundCommits := glhImporter
-					                              importCommitsOProject: project
+					                              importCommitsOfProject: project
 					                              since: since
 					                              until: until.
 				              foundCommits ] ].
@@ -158,8 +161,7 @@ UserMetric >> loadUserCommitsSince: since until: until [
 	glhImporter chainsCommitsFrom: allCommits.
 	glhImporter withCommitDiffs: true.
 
-	^allCommits reject: [ :commit |
-		                 commit commitCreator ~= user ]
+	^ allCommits reject: [ :commit | commit commitCreator ~= user ]
 ]
 
 { #category : #loading }

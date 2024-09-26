@@ -87,8 +87,13 @@ BitBucketModelImporterTest >> testImportContributedProjectsOfUser [
 
 	"Then"
 	self assert: projects size equals: 1.
-	self assert: (bitBucketImporter glhModel allWithType: GLHProject) size equals: 1.
-	self assert: (bitBucketImporter glhModel allWithType: GLHProject) first equals: projects first
+	self
+		assert: (bitBucketImporter glhModel allWithType: GLHProject) size
+		equals: 1.
+	self
+		assert: (bitBucketImporter glhModel allWithType: GLHProject) first
+		equals: projects first.
+	self assertCollection: user contributedProjects hasSameElements:  projects
 ]
 
 { #category : #tests }

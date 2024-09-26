@@ -2,7 +2,8 @@ Class {
 	#name : #BitBucketModelImporter,
 	#superclass : #GPModelImporter,
 	#instVars : [
-		'bitBucketApi'
+		'bitBucketApi',
+		'withCommitDiffs'
 	],
 	#category : #'BitBucketHealth-Model-Importer'
 }
@@ -27,12 +28,11 @@ BitBucketModelImporter >> blockOnIdEquality [
 
 { #category : #'private - api' }
 BitBucketModelImporter >> completeImportProject: aGLHProject [
-	aGLHProject repository ifNotNil: [ ^aGLHProject ].
-	
+
 	aGLHProject repository: GLHRepository new.
 	self glhModel add: aGLHProject repository.
 	"TODO: import repository"
-	^aGLHProject  
+	^ aGLHProject
 ]
 
 { #category : #api }
@@ -51,7 +51,7 @@ BitBucketModelImporter >> importCommitsOfProject: aGLHProject since: since until
 	aGLHProject repository commits: commits.
 	self glhModel addAll: commits unless: self blockOnIdEquality.
 
-	^commits 
+	^ commits
 ]
 
 { #category : #api }
@@ -73,7 +73,7 @@ BitBucketModelImporter >> importContributedProjectsOfUser: aGLHUser [
 			                        commitsOfRepo: (repository at: #slug)
 			                        inProject:
 			                        ((repository at: #project) at: #key)
-			                        since: Date today - 7 days
+			                        since: Date today - 31 days
 			                        until: Date today) ].
 
 	"look if user is author of min one commit"
@@ -86,9 +86,8 @@ BitBucketModelImporter >> importContributedProjectsOfUser: aGLHUser [
 					                             detect: [ :commit |
 					                             ((commit at: #author) at: #name)
 					                             = aGLHUser name ]
-					                             ifNone: [ false ] ].
-
-		                    repos isNotEmpty ].
+					                             ifFound: [ true ]
+					                             ifNone: [ false ] ] ].
 
 	"Transform user repositories in GLHProject"
 	userProjects := userRepositories collect: [ :repoCommits |
@@ -103,9 +102,10 @@ BitBucketModelImporter >> importContributedProjectsOfUser: aGLHUser [
 			                ifNone: [
 				                | glhProject |
 				                glhProject := self parseRepoIntoGLHProject: repo.
-									glhModel add: glhProject.
-									glhProject 
-				 ] ].
+				                glhModel add: glhProject.
+				                glhProject ] ].
+
+	aGLHUser contributedProjects: userProjects.
 
 	^ userProjects
 ]
@@ -196,9 +196,22 @@ BitBucketModelImporter >> parseRepoIntoGLHProject: repositoryDictionary [
 	glhProject := GLHProject new
 		              name: (repositoryDictionary at: #name);
 		              id: (repositoryDictionary at: #slug);
+						  repository: GLHRepository new;
 		              group: group.
-		
+
 	group addProject: glhProject.
-	
-	^glhProject.
+
+	^ glhProject
+]
+
+{ #category : #accessing }
+BitBucketModelImporter >> withCommitDiffs [
+
+	^ withCommitDiffs
+]
+
+{ #category : #accessing }
+BitBucketModelImporter >> withCommitDiffs: anObject [
+
+	withCommitDiffs := anObject
 ]

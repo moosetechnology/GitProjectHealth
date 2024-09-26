@@ -46,7 +46,7 @@ GLPHImporterMock >> glhModel: anObject [
 ]
 
 { #category : #commit }
-GLPHImporterMock >> importCommitsOProject: project since: since until: until [
+GLPHImporterMock >> importCommitsOfProject: project since: since until: until [
 
 	glhModel addAll: commits.
 	^ commits

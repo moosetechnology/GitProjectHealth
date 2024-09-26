@@ -412,45 +412,6 @@ GLHModelImporter >> importCommitsFollowing: aCommit upToDays: aNumberOfDay [
 ]
 
 { #category : #commit }
-GLHModelImporter >> importCommitsOProject: aProject since: fromDate until: toDate [
-
-	| newlyFoundCommit page foundCommit |
-	page := 0.
-	foundCommit := OrderedCollection new.
-	newlyFoundCommit := { true }.
-	[ newlyFoundCommit isNotEmpty ] whileTrue: [
-		| results |
-		page := page + 1.
-		('import commit page ' , page printString) recordInfo.
-		results := self glhApi
-			           commitsOfProject: aProject id
-			           forRefName: nil
-			           since:
-			           (fromDate ifNotNil: [ fromDate asDateAndTime asString ])
-			           until:
-			           (toDate ifNotNil: [ toDate asDateAndTime asString ])
-			           path: nil
-			           author: nil
-			           all: true
-			           with_stats: true
-			           firstParent: nil
-			           order: nil
-			           trailers: nil
-			           perPage: 100
-			           page: page.
-
-		newlyFoundCommit := self parseCommitsResult: results.
-		"newlyFoundCommit do: [ :c | c repository: aProject repository ]."
-
-		foundCommit addAll: (aProject repository commits
-			addAll: newlyFoundCommit
-			unless: self blockOnIdEquality). ].
-
-
-	^ self glhModel addAll: foundCommit unless: self blockOnIdEquality
-]
-
-{ #category : #commit }
 GLHModelImporter >> importCommitsOf: aGLHProject withStats: aBoolean until: toDate [
 
 	| newlyFoundCommit page |
@@ -558,6 +519,45 @@ GLHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName until:
 		  forRefName: aGLHBranch name
 		  since: nil
 		  until: toDate
+]
+
+{ #category : #commit }
+GLHModelImporter >> importCommitsOfProject: aProject since: fromDate until: toDate [
+
+	| newlyFoundCommit page foundCommit |
+	page := 0.
+	foundCommit := OrderedCollection new.
+	newlyFoundCommit := { true }.
+	[ newlyFoundCommit isNotEmpty ] whileTrue: [
+		| results |
+		page := page + 1.
+		('import commit page ' , page printString) recordInfo.
+		results := self glhApi
+			           commitsOfProject: aProject id
+			           forRefName: nil
+			           since:
+			           (fromDate ifNotNil: [ fromDate asDateAndTime asString ])
+			           until:
+			           (toDate ifNotNil: [ toDate asDateAndTime asString ])
+			           path: nil
+			           author: nil
+			           all: true
+			           with_stats: true
+			           firstParent: nil
+			           order: nil
+			           trailers: nil
+			           perPage: 100
+			           page: page.
+
+		newlyFoundCommit := self parseCommitsResult: results.
+		"newlyFoundCommit do: [ :c | c repository: aProject repository ]."
+
+		foundCommit addAll: (aProject repository commits
+			addAll: newlyFoundCommit
+			unless: self blockOnIdEquality). ].
+
+
+	^ self glhModel addAll: foundCommit unless: self blockOnIdEquality
 ]
 
 { #category : #'as yet unclassified' }
