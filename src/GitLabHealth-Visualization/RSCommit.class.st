@@ -5,7 +5,7 @@ Class {
 		'aCommit',
 		'canvas'
 	],
-	#category : 'GitLabHealth-Visualization'
+	#category : #'GitLabHealth-Visualization'
 }
 
 { #category : #'as yet unclassified' }
@@ -402,7 +402,7 @@ RSCommit >> shapeForCommit: aGLHCommit withColor: color [
 	group := RSGroup new.
 	impactedFiles := RSGroup new.
 	labelTitle := RSLabel new
-		              text: (aGLHCommit name truncateWithElipsisTo: 40);
+		              text: (aGLHCommit message ifNil: [ (aGLHCommit id truncateWithElipsisTo: 7) printString ] ifNotNil: [ aGLHCommit message truncateWithElipsisTo: 40] );
 		              yourself.
 
 	labelCommiter := RSLabel new

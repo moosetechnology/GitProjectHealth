@@ -12,8 +12,21 @@ Class {
 		'withFiles',
 		'glhModel'
 	],
-	#category : 'GitProjectHealth-Model-Importer'
+	#classVars : [
+		'currentImporter'
+	],
+	#category : #'GitProjectHealth-Model-Importer'
 }
+
+{ #category : #'accessing - global variables' }
+GPModelImporter class >> importers [
+	^ currentImporter 
+]
+
+{ #category : #initialization }
+GPModelImporter class >> reset [
+	currentImporter := nil.
+]
 
 { #category : #accessing }
 GPModelImporter >> beWithFiles [
