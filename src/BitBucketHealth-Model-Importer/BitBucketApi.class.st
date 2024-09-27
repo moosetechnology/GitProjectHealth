@@ -103,11 +103,12 @@ BitBucketApi >> commitsOfRepo: repositorySlug inProject: projectKey since: since
 		ifPresent: [
 		client queryAt: #start put: (results at: #nextPageStart) ].
 
-	lastCommitterTimestamp := commits last at: #committerTimestamp.
-	lastDate := DateAndTime fromUnixTime: lastCommitterTimestamp / 1000.
-
-	(results at: #isLastPage) not and: since asDate <= lastDate ]
-		whileTrue.
+	(results at: #isLastPage)
+		ifTrue: [ false ]
+		ifFalse: [
+			lastCommitterTimestamp := commits last at: #committerTimestamp.
+			lastDate := DateAndTime fromUnixTime: lastCommitterTimestamp / 1000.
+			since asDate <= lastDate ] ] whileTrue.
 
 	^ commits select: [ :commit |
 		  | commitDate |

@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'bitBucketApi',
 		'withCommitDiffs',
-		'withInitialCommits'
+		'withInitialCommits',
+		'userCatalogue'
 	],
 	#category : #'BitBucketHealth-Model-Importer'
 }
@@ -133,7 +134,7 @@ BitBucketModelImporter >> importContributedProjectsOfUser: aGLHUser [
 				                             repository value
 					                             detect: [ :commit |
 					                             ((commit at: #author) at: #name)
-					                             = aGLHUser name ]
+					                             = aGLHUser username ]
 					                             ifFound: [ true ]
 					                             ifNone: [ false ] ] ].
 
@@ -275,6 +276,18 @@ BitBucketModelImporter >> parseUserIntoGLHUser: userDictionnary [
 		public_email: (userDictionnary at: #emailAddress);
 		id: (userDictionnary at: #id);
 		username: (userDictionnary at: #name).
+]
+
+{ #category : #accessing }
+BitBucketModelImporter >> userCatalogue [
+
+	^ userCatalogue
+]
+
+{ #category : #accessing }
+BitBucketModelImporter >> userCatalogue: anObject [
+
+	userCatalogue := anObject
 ]
 
 { #category : #accessing }
