@@ -64,8 +64,9 @@ BitBucketApi >> bearerToken [
 ]
 
 { #category : #accessing }
-BitBucketApi >> bearerToken: token [
-	self client headerAt: #Authorization put: 'Bearer ' , token.
+BitBucketApi >> bearerToken: anObject [
+
+	bearerToken := anObject
 ]
 
 { #category : #accessing }
@@ -162,11 +163,11 @@ BitBucketApi >> prepareZnClient [
 	client host: self endpoint.
 	client http.
 
-	self bearerToken ifNotNil: [ :anApiKey |
-		client headerAt: #Authorization put: 'Bearer ' , anApiKey ].
+	self bearerToken ifNotNil: [ :token |
+		client headerAt: #Authorization put: 'Bearer ' , token ].
 	self apiToken ifNotNil: [ :anApiKey |
 		client headerAt: #Authorization put: 'Basic '
-			, (self username , ':' , self apiToken) utf8Encoded base64Encoded ]
+			, (self username , ':' , self apiToken) utf8Encoded base64Encoded ].
 ]
 
 { #category : #'api - projects' }
@@ -201,4 +202,18 @@ BitBucketApi >> username [
 BitBucketApi >> username: anObject [
 
 	username := anObject
+]
+
+{ #category : #'api - user' }
+BitBucketApi >> usersByUserName: usernameString [
+
+	| users |
+	self prepareZnClient.
+	self client path: self basePath , '/admin/users'.
+	self client queryAt: 'filter' put: usernameString.
+	
+	users := self client get.
+   users := (NeoJSONReader on: users readStream) next.
+
+^users
 ]
