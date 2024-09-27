@@ -195,6 +195,22 @@ BitBucketModelImporter >> importUser: accountId [
 	^glhUser
 ]
 
+{ #category : #api }
+BitBucketModelImporter >> importUserByUsername: username [
+
+	| users user glhUser |
+	users := self bitBucketApi usersByUsername: username.
+	
+	users ifEmpty: [ ^nil ].
+
+	user := users first.
+
+	glhUser := self parseUserIntoGLHUser: user.
+
+	self glhModel add: glhUser unless: [ :nu :ou | nu id = ou id ].
+	^ glhUser
+]
+
 { #category : #parsing }
 BitBucketModelImporter >> parseCommitIntoGLHCommit: commitDictionary [
 
@@ -250,6 +266,15 @@ BitBucketModelImporter >> parseRepoIntoGLHProject: repositoryDictionary [
 	group addProject: glhProject.
 
 	^ glhProject
+]
+
+{ #category : #parsing }
+BitBucketModelImporter >> parseUserIntoGLHUser: userDictionnary [
+
+	^ GLHUser new name: (userDictionnary at: #displayName);
+		public_email: (userDictionnary at: #emailAddress);
+		id: (userDictionnary at: #id);
+		username: (userDictionnary at: #name).
 ]
 
 { #category : #accessing }

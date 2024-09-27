@@ -226,3 +226,49 @@ BitBucketModelImporterTest >> testImportUser [
 	modelUser := (bitBucketImporter glhModel allWithType: GLHUser) first.
 	self assert: user equals: modelUser
 ]
+
+{ #category : #tests }
+BitBucketModelImporterTest >> testImportUserByUsername [
+	"Given"
+
+	| bitBucketApi glphModel bitBucketImporter user |
+	bitBucketApi := BitBucketApiMock new.
+
+	glphModel := GLPHEModel new name: 'test'.
+
+	bitBucketImporter := BitBucketModelImporter new
+		                     bitBucketApi: bitBucketApi;
+		                     glhModel: glphModel.
+		
+	"When"
+	user := bitBucketImporter importUserByUsername: 'test'.
+	
+   "Then"
+	self assert: (glphModel allWithType: GLHUser) size equals: 1.
+	self
+		assertCollection: (glphModel allWithType: GLHUser)
+		hasSameElements: {user}.
+]
+
+{ #category : #tests }
+BitBucketModelImporterTest >> testImportUserByUsernameWithoutUsers [
+	"Given"
+
+	| bitBucketApi glphModel bitBucketImporter user |
+	bitBucketApi := BitBucketApiMock new.
+
+	glphModel := GLPHEModel new name: 'test'.
+
+	bitBucketImporter := BitBucketModelImporter new
+		                     bitBucketApi: bitBucketApi;
+		                     glhModel: glphModel.
+		
+	bitBucketApi userMock: nil.
+
+	"When"
+	user := bitBucketImporter importUserByUsername: 'test'.
+
+	"Then"
+	self assert: (glphModel allWithType: GLHUser) size equals: 0.
+	self assert: user equals: nil
+]

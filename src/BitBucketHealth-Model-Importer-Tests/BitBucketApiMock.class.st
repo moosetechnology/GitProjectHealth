@@ -2,6 +2,8 @@ Class {
 	#name : #BitBucketApiMock,
 	#superclass : #Object,
 	#instVars : [
+		'user1',
+		'userMock',
 		'commits',
 		'commits1',
 		'diffs',
@@ -81,6 +83,7 @@ BitBucketApiMock >> initialize [
 
 	self initializeCommits.
 	self initializeDiffs.
+	self initializeUsers.
 ]
 
 { #category : #initialization }
@@ -424,6 +427,39 @@ BitBucketApiMock >> initializeDiffs [
 	diffs := diffs1
 ]
 
+{ #category : #initialization }
+BitBucketApiMock >> initializeUsers [
+
+	user1 := '
+    {
+      "name": "test",
+      "emailAddress": "test@test.com",
+      "id": 1,
+      "displayName": "test test",
+      "active": true,
+      "slug": "test",
+      "type": "NORMAL",
+      "directoryName": "directory",
+      "deletable": false,
+      "lastAuthenticationTimestamp": 1727444943000,
+      "mutableDetails": false,
+      "mutableGroups": true,
+      "links": {
+        "self": [
+          {
+            "href": "test.com"
+          }
+        ]
+      }
+    }
+  '.
+
+
+	user1 := (NeoJSONReader on: user1 readStream) next.
+
+	userMock := user1
+]
+
 { #category : #accessing }
 BitBucketApiMock >> projects [
 
@@ -489,6 +525,12 @@ repos := (NeoJSONReader on: repos readStream) next.
 ]
 
 { #category : #accessing }
+BitBucketApiMock >> user1 [
+
+	^ user1
+]
+
+{ #category : #accessing }
 BitBucketApiMock >> user: accountId [
 
 	| user |
@@ -501,4 +543,22 @@ BitBucketApiMock >> user: accountId [
    }'.
 
 	^ user
+]
+
+{ #category : #accessing }
+BitBucketApiMock >> userMock [
+
+	^ userMock
+]
+
+{ #category : #accessing }
+BitBucketApiMock >> userMock: anObject [
+
+	userMock := anObject
+]
+
+{ #category : #'api - user' }
+BitBucketApiMock >> usersByUsername: username [
+
+	userMock ifNil: [ ^Array new ] ifNotNil: [ ^{ userMock }]
 ]
