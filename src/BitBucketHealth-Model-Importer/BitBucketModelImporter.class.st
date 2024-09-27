@@ -3,7 +3,8 @@ Class {
 	#superclass : #GPModelImporter,
 	#instVars : [
 		'bitBucketApi',
-		'withCommitDiffs'
+		'withCommitDiffs',
+		'withInitialCommits'
 	],
 	#category : #'BitBucketHealth-Model-Importer'
 }
@@ -261,4 +262,16 @@ BitBucketModelImporter >> withCommitDiffs [
 BitBucketModelImporter >> withCommitDiffs: anObject [
 
 	withCommitDiffs := anObject
+]
+
+{ #category : #accessing }
+BitBucketModelImporter >> withInitialCommits [
+
+	^ withInitialCommits
+]
+
+{ #category : #accessing }
+BitBucketModelImporter >> withInitialCommits: anObject [
+
+	withInitialCommits := anObject
 ]
