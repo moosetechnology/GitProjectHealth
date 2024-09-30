@@ -178,7 +178,7 @@ BitBucketModelImporterTest >> testImportContributedProjectsOfUser [
 
 	user := GLHUser new
 		        id: 1;
-		        name: 'charlie'.
+		        username: 'charlie'.
 
 	commits := bitBucketApi commits1.
 	yesterdayAsTimestamp := (Date today - 1 days) asDateAndTime
