@@ -122,7 +122,7 @@ BitBucketModelImporter >> importContributedProjectsOfUser: aGLHUser [
 			                        commitsOfRepo: (repository at: #slug)
 			                        inProject:
 			                        ((repository at: #project) at: #key)
-			                        since: Date today - 31 days
+			                        since: Date today - 10 days
 			                        until: Date today) ].
 
 	"look if user is author of min one commit"
@@ -146,7 +146,7 @@ BitBucketModelImporter >> importContributedProjectsOfUser: aGLHUser [
 
 		                (self glhModel allWithType: GLHProject)
 			                detect: [ :glhProject |
-			                glhProject id = project at: #key ]
+			                glhProject id = (project at: #key) ]
 			                ifFound: [ :glhProject | glhProject ]
 			                ifNone: [
 				                | glhProject |
@@ -249,7 +249,7 @@ BitBucketModelImporter >> parseRepoIntoGLHProject: repositoryDictionary [
 	project := repositoryDictionary at: #project.
 
 	group := (self glhModel allWithType: GLHGroup)
-		         detect: [ :glhGroup | glhGroup id = project at: #key ]
+		         detect: [ :glhGroup | glhGroup id = (project at: #key) ]
 		         ifFound: [ :glhGroup | glhGroup ]
 		         ifNone: [
 			         | newGroup |

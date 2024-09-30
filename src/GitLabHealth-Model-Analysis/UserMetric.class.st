@@ -141,9 +141,6 @@ UserMetric >> loadUserCommitsSince: since until: until [
 		               since: since
 		               until: until.
 
-	user contributedProjects ifEmpty: [
-		glhImporter importContributedProjectsOfUser: user ].
-
 	"download commits unless project cache is not empty"
 	allCommits := user contributedProjects collect: [ :project |
 		              project repository

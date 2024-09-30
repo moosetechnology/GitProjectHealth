@@ -523,15 +523,15 @@ GitMetricExporter >> setupAnalysisForUsersWithNames: userNames [
 	users := userNames collect: [ :username |
 		         glhImporter importUserByUsername: username ].
 
-	glhImporter userCatalogue scrapeAuthorNamesForUsers: users.
-	
+	glhImporter userCatalogue ifNotNil: [
+		glhImporter userCatalogue scrapeAuthorNamesForUsers: users ].
+
 	users do: [ :user |
-		|projects |
+		| projects |
 		projects := glhImporter importContributedProjectsOfUser: user.
-				projects do: [ :project |
-				glhImporter completeImportProject: project ].	 
-		
-	].
+
+		projects do: [ :project |
+			glhImporter completeImportProject: project ] ].
 
 	entities addAll: users.
 
