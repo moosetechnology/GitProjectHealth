@@ -215,10 +215,12 @@ BitBucketModelImporter >> importUserByUsername: username [
 { #category : #parsing }
 BitBucketModelImporter >> parseCommitIntoGLHCommit: commitDictionary [
 
-	| author committer |
-
+	| author committer parentIds |
 	author := commitDictionary at: #author.
 	committer := commitDictionary at: #committer.
+
+	parentIds := (commitDictionary at: #parents) collect: [ :parent |
+		             parent at: #id ].
 
 	^ GLHCommit new
 		  id: (commitDictionary at: #id);
@@ -227,10 +229,13 @@ BitBucketModelImporter >> parseCommitIntoGLHCommit: commitDictionary [
 		  author_name: (author at: #name);
 		  authored_date: (DateAndTime fromUnixTime:
 					   (commitDictionary at: #authorTimestamp) / 1000);
+		  created_at: (DateAndTime fromUnixTime:
+					   (commitDictionary at: #authorTimestamp) / 1000);
 		  committed_date: (DateAndTime fromUnixTime:
 					   (commitDictionary at: #committerTimestamp) / 1000);
 		  committer_email: (committer at: #emailAddress);
-		  committer_name: (committer at: #name)
+		  committer_name: (committer at: #name);
+		  parent_ids: parentIds
 ]
 
 { #category : #parsing }
