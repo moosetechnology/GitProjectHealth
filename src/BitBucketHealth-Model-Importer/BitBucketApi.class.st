@@ -178,6 +178,42 @@ BitBucketApi >> projects [
 	^ self allValuesOfPath: self basePath , '/projects'.
 ]
 
+{ #category : #'api - commits' }
+BitBucketApi >> pullRequestsOfRepo: repositorySlug inProject: projectKey since: since until: until [
+
+	| pullRequests results lastCommitterTimestamp lastDate |
+	self prepareZnClient.
+	self client path:
+		self basePath , '/projects/' , projectKey , '/repos/'
+		, repositorySlug , '/pull-requests'.
+
+	self client queryAt: 'state' put: 'all'.
+
+	pullRequests := OrderedCollection new.
+
+	[
+	results := self client get.
+	results := (NeoJSONReader on: results readStream) next.
+	pullRequests addAll: (results at: #values).
+	results
+		at: #nextPageStart
+		ifPresent: [
+		client queryAt: #start put: (results at: #nextPageStart) ].
+
+	(results at: #isLastPage)
+		ifTrue: [ false ]
+		ifFalse: [
+			lastCommitterTimestamp := pullRequests last at: #createdDate.
+			lastDate := DateAndTime fromUnixTime: lastCommitterTimestamp / 1000.
+			since asDate <= lastDate ] ] whileTrue.
+
+	^ pullRequests select: [ :commit |
+		  | commitDate |
+		  commitDate := DateAndTime fromUnixTime:
+			                (commit at: #createdDate) / 1000.
+		  commitDate >= since asDate and: commitDate <= until asDate ]
+]
+
 { #category : #'api - projects' }
 BitBucketApi >> repositoriesOfProject: projectKey [
 	^self allValuesOfPath: self basePath, '/projects/', projectKey, '/repos'.

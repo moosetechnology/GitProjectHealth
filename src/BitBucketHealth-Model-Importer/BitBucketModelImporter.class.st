@@ -175,6 +175,11 @@ BitBucketModelImporter >> importCreatorOfCommit: aGLHCommit [
 ]
 
 { #category : #api }
+BitBucketModelImporter >> importMergeRequests: aGLHProject since: fromDate until: toDate [
+	
+]
+
+{ #category : #api }
 BitBucketModelImporter >> importUser: accountId [
 
 	| result reader glhUser |
