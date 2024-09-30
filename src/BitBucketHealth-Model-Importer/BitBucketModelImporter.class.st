@@ -169,9 +169,9 @@ BitBucketModelImporter >> importCreatorOfCommit: aGLHCommit [
 			aGLHCommit commitCreator: user.
 			^ user ].
 
-	creator := self importUser: aGLHCommit author_name.
+	creator := self importUserByUsername: aGLHCommit author_name.
 	aGLHCommit commitCreator: creator.
-	^creator.
+	^ creator
 ]
 
 { #category : #api }

@@ -203,6 +203,63 @@ BitBucketModelImporterTest >> testImportContributedProjectsOfUser [
 ]
 
 { #category : #tests }
+BitBucketModelImporterTest >> testImportCreatorOfCommit [
+
+	| bitBucketApi glphModel bitBucketImporter creator commit |
+	
+	"Given"
+	bitBucketApi := BitBucketApiMock new.
+
+	glphModel := GLPHEModel new name: 'test'.
+
+	bitBucketImporter := BitBucketModelImporter new
+		                     bitBucketApi: bitBucketApi;
+		                     glhModel: glphModel.
+
+	commit := GLHCommit new author_name: 'test'.
+
+
+	"When"
+	creator := bitBucketImporter importCreatorOfCommit: commit.
+
+	"Then"
+	self
+		assert: creator id
+		equals:
+		(bitBucketImporter parseUserIntoGLHUser: bitBucketApi userMock) id.
+	self assert: commit commitCreator equals: creator
+]
+
+{ #category : #tests }
+BitBucketModelImporterTest >> testImportCreatorOfCommitIfAlreadyExist [
+
+	| bitBucketApi glphModel bitBucketImporter creator commit |
+	"Given"
+	bitBucketApi := BitBucketApiMock new.
+
+	glphModel := GLPHEModel new name: 'test'.
+
+	bitBucketImporter := BitBucketModelImporter new
+		                     bitBucketApi: bitBucketApi;
+		                     glhModel: glphModel.
+		
+	glphModel add: (bitBucketImporter parseUserIntoGLHUser: bitBucketApi userMock).
+
+	commit := GLHCommit new author_name: 'test'.
+
+
+	"When"
+	creator := bitBucketImporter importCreatorOfCommit: commit.
+
+	"Then"
+	self
+		assert: creator id
+		equals:
+		(bitBucketImporter parseUserIntoGLHUser: bitBucketApi userMock) id.
+	self assert: commit commitCreator equals: creator
+]
+
+{ #category : #tests }
 BitBucketModelImporterTest >> testImportUser [
 	"Given"
 
