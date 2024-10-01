@@ -276,9 +276,22 @@ BitBucketModelImporter >> parseProjectIntoGLHGroup: projectRepository [
 { #category : #parsing }
 BitBucketModelImporter >> parsePullRequestIntoGLPHEMergeRequest: pullRequestDictionary [
 
-	| repository project toRef fromRef glpheMergeRequest author state |
+	| repository project toRef fromRef glpheMergeRequest author state reviewers |
 	toRef := pullRequestDictionary at: #toRef.
 	fromRef := pullRequestDictionary at: #fromRef.
+	
+	reviewers := pullRequestDictionary at: #reviewers.
+	reviewers := reviewers collect: [ :reviewer | 
+		|reviewerUser|
+		reviewerUser := reviewer at: #user.
+		(self glhModel allWithType: GLHUser) detect: [ :user | user id = (reviewerUser at: #id) ]	 ifFound: [ :user | user ] ifNone: [ 
+			|glhUser|
+			glhUser := self parseUserIntoGLHUser: reviewerUser.
+			glhModel  add: glhUser.
+			glhUser.		
+		]
+		
+	].
 
 	repository := toRef at: #repository.
 	project := (self glhModel allWithType: GLHProject)
