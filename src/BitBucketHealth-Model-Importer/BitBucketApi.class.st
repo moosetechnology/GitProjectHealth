@@ -114,7 +114,8 @@ BitBucketApi >> commitsOfRepo: repositorySlug inProject: projectKey since: since
 		  | commitDate |
 		  commitDate := DateAndTime fromUnixTime:
 			                (commit at: #committerTimestamp) / 1000.
-		  commitDate >= since asDate and: commitDate <= until asDate ]
+		  commitDate >= since asDateAndTime and:
+			  commitDate <= until asDateAndTime ]
 ]
 
 { #category : #'api - commits' }

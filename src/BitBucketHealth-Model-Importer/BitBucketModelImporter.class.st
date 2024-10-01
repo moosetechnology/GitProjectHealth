@@ -122,8 +122,9 @@ BitBucketModelImporter >> importContributedProjectsOfUser: aGLHUser [
 			                        commitsOfRepo: (repository at: #slug)
 			                        inProject:
 			                        ((repository at: #project) at: #key)
-			                        since: Date today - 10 days
-			                        until: Date today) ].
+			                        since: DateAndTime now - 10 days
+			                        until: DateAndTime now) ].
+
 
 	"look if user is author of min one commit"
 	userRepositories := repositoriesCommits select: [ :repository |
@@ -137,6 +138,7 @@ BitBucketModelImporter >> importContributedProjectsOfUser: aGLHUser [
 					                             = aGLHUser username ]
 					                             ifFound: [ true ]
 					                             ifNone: [ false ] ] ].
+
 
 	"Transform user repositories in GLHProject"
 	userProjects := userRepositories collect: [ :repoCommits |
@@ -183,14 +185,19 @@ BitBucketModelImporter >> importMergeRequests: aGLHProject since: fromDate until
 		                inProject: aGLHProject group id
 		                since: fromDate
 		                until: toDate.
-		
+
 	pullRequests := pullRequests collect: [ :pullRequest |
 		                self parsePullRequestIntoGLPHEMergeRequest:
 			                pullRequest ].
-		
+
 	self glhModel addAll: pullRequests unless: self blockOnIdEquality.
-	
+
 	^ pullRequests
+]
+
+{ #category : #api }
+BitBucketModelImporter >> importMergeResquestAuthor: mergeRequest [
+	mergeRequest author ifNotNil: [ ^mergeRequest ]
 ]
 
 { #category : #api }

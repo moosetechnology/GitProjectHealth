@@ -9,6 +9,7 @@ MergeRequestDurationMetric >> calculate [
 
 	| groupedByDate gitAnalyzer mergeRequestsValidation filterGroups |
 	userMergeRequests ifNil: [ self load ].
+	
 	groupedByDate := self setupGroupedDate.
 
 	userMergeRequests ifEmpty: [ ^ nil ].
