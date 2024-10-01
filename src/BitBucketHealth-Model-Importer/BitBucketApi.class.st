@@ -12,6 +12,15 @@ Class {
 	#category : #'BitBucketHealth-Model-Importer'
 }
 
+{ #category : #'api - pull-requests' }
+BitBucketApi >> activitiesOfPullRequest: pullRequestId inRepo: repositorySlug ofProject: projectKey [
+
+	^ self allValuesOfPath:
+		  self basePath , '/projects/' , projectKey , '/repos/'
+		  , repositorySlug , '/pull-requests/' , pullRequestId printString
+		  , '/activities'
+]
+
 { #category : #'private - building' }
 BitBucketApi >> allValuesOfPath: path [
 
@@ -179,7 +188,7 @@ BitBucketApi >> projects [
 	^ self allValuesOfPath: self basePath , '/projects'.
 ]
 
-{ #category : #'api - commits' }
+{ #category : #'api - pull-requests' }
 BitBucketApi >> pullRequestsOfRepo: repositorySlug inProject: projectKey since: since until: until [
 
 	| pullRequests results lastCommitterTimestamp lastDate |
