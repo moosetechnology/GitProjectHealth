@@ -10,7 +10,8 @@ Class {
 		'diffs1',
 		'diffsWithoutHunks',
 		'diffsWithoutAdded',
-		'diffsWithoutRemoved'
+		'diffsWithoutRemoved',
+		'mergeRequests'
 	],
 	#category : #'BitBucketHealth-Model-Importer-Tests'
 }
@@ -41,6 +42,202 @@ BitBucketApiMock >> commitsOfRepo: repositorySlug inProject: projectKey since: s
 		  commitDate := DateAndTime fromUnixTime:
 			                (commit at: #committerTimestamp) / 1000.
 		  commitDate >= since asDate and: commitDate <= until asDate ]
+]
+
+{ #category : #accessing }
+BitBucketApiMock >> declinedMergeRequest [
+
+	| pullRequest |
+	pullRequest := '{
+      "id": 539,
+      "version": 10,
+      "title": "title",
+      "state": "DECLINED",
+      "open": false,
+      "closed": true,
+  		"createdDate": 1721396425473,
+  		"updatedDate": 1721457513310,
+  		"closedDate": 1721457513310,
+      "fromRef": {
+        "id": "refs/heads/wip/1",
+        "displayId": "wip/1",
+        "latestCommit": "2",
+        "repository": {
+          "slug": "repoSlug",
+          "id": 242,
+          "name": "repo-name",
+          "scmId": "git",
+          "state": "AVAILABLE",
+          "statusMessage": "Available",
+          "forkable": true,
+          "project": {
+            "key": "project-key",
+            "id": 242,
+            "name": "project-name",
+            "description": "project description",
+            "public": true,
+            "type": "NORMAL",
+            "links": {
+              "self": [
+                {
+                  "href": "link"
+                }
+              ]
+            }
+          },
+          "public": false,
+          "links": {
+            "clone": [
+              {
+                "href": "clone",
+                "name": "ssh"
+              },
+              {
+                "href": "clone",
+                "name": "http"
+              }
+            ],
+            "self": [
+              {
+                "href": "link"
+              }
+            ]
+          }
+        }
+      },
+      "toRef": {
+        "id": "refs/heads/develop/trunk",
+        "displayId": "develop/trunk",
+        "latestCommit": "3",
+        "repository": {
+          "slug": "repo-slug",
+          "id": 242,
+          "name": "repo-name",
+          "scmId": "git",
+          "state": "AVAILABLE",
+          "statusMessage": "Available",
+          "forkable": true,
+          "project": {
+            "key": "project-key",
+            "id": 242,
+            "name": "project-name",
+            "description": "description",
+            "public": true,
+            "type": "NORMAL",
+            "links": {
+              "self": [
+                {
+                  "href": "link"
+                }
+              ]
+            }
+          },
+          "public": false,
+          "links": {
+            "clone": [
+              {
+                "href": "link",
+                "name": "ssh"
+              },
+              {
+                "href": "link-http",
+                "name": "http"
+              }
+            ],
+            "self": [
+              {
+                "href": "link-self"
+              }
+            ]
+          }
+        }
+      },
+      "locked": false,
+      "author": {
+        "user": {
+          "name": "user-name",
+          "id": 1,
+          "displayName": "user-display-name",
+          "active": false,
+          "slug": "user-slug",
+          "type": "NORMAL",
+          "links": {
+            "self": [
+              {
+                "href": "link-self"
+              }
+            ]
+          }
+        },
+        "role": "AUTHOR",
+        "approved": false,
+        "status": "UNAPPROVED"
+      },
+      "reviewers": [
+        {
+          "user": {
+            "name": "reviewer-name",
+            "emailAddress": "reviewer@email.com",
+            "id": 1713,
+            "displayName": "reviewer-display-name",
+            "active": true,
+            "slug": "reviewer-slug",
+            "type": "NORMAL",
+            "links": {
+              "self": [
+                {
+                  "href": "link-self"
+                }
+              ]
+            }
+          },
+          "lastReviewedCommit": "2",
+          "role": "REVIEWER",
+          "approved": true,
+          "status": "APPROVED"
+        },
+        {
+          "user": {
+            "name": "reveiwer2-name",
+            "emailAddress": "reviewer2@email.com",
+            "id": 49,
+            "displayName": "reviewer2 display name",
+            "active": true,
+            "slug": "reviewer2-slug",
+            "type": "NORMAL",
+            "links": {
+              "self": [
+                {
+                  "href": "link-self"
+                }
+              ]
+            }
+          },
+          "role": "REVIEWER",
+          "approved": false,
+          "status": "UNAPPROVED"
+        }
+      ],
+      "participants": [],
+      "properties": {
+        "mergeResult": {
+          "outcome": "CONFLICTED",
+          "current": true
+        },
+        "resolvedTaskCount": 0,
+        "commentCount": 4,
+        "openTaskCount": 0
+      },
+      "links": {
+        "self": [
+          {
+            "href": "link"
+          }
+        ]
+      }
+    }'.
+
+	^ pullRequest := (NeoJSONReader on: pullRequest readStream) next
 ]
 
 { #category : #accessing }
@@ -84,6 +281,8 @@ BitBucketApiMock >> initialize [
 	self initializeCommits.
 	self initializeDiffs.
 	self initializeUsers.
+
+	mergeRequests := { self openedMergeRequest }
 ]
 
 { #category : #initialization }
@@ -461,6 +660,409 @@ BitBucketApiMock >> initializeUsers [
 ]
 
 { #category : #accessing }
+BitBucketApiMock >> mergeRequests [
+
+	^ mergeRequests
+]
+
+{ #category : #accessing }
+BitBucketApiMock >> mergeRequests: anObject [
+
+	mergeRequests := anObject
+]
+
+{ #category : #accessing }
+BitBucketApiMock >> mergedMergeRequest [
+
+	| pullRequest |
+	pullRequest := '{
+      "id": 539,
+      "version": 10,
+      "title": "title",
+      "state": "MERGED",
+      "open": false,
+      "closed": true,
+  		"createdDate": 1721396425473,
+  		"updatedDate": 1721457513310,
+  		"closedDate": 1721457513310,
+      "fromRef": {
+        "id": "refs/heads/wip/1",
+        "displayId": "wip/1",
+        "latestCommit": "2",
+        "repository": {
+          "slug": "repoSlug",
+          "id": 242,
+          "name": "repo-name",
+          "scmId": "git",
+          "state": "AVAILABLE",
+          "statusMessage": "Available",
+          "forkable": true,
+          "project": {
+            "key": "project-key",
+            "id": 242,
+            "name": "project-name",
+            "description": "project description",
+            "public": true,
+            "type": "NORMAL",
+            "links": {
+              "self": [
+                {
+                  "href": "link"
+                }
+              ]
+            }
+          },
+          "public": false,
+          "links": {
+            "clone": [
+              {
+                "href": "clone",
+                "name": "ssh"
+              },
+              {
+                "href": "clone",
+                "name": "http"
+              }
+            ],
+            "self": [
+              {
+                "href": "link"
+              }
+            ]
+          }
+        }
+      },
+      "toRef": {
+        "id": "refs/heads/develop/trunk",
+        "displayId": "develop/trunk",
+        "latestCommit": "3",
+        "repository": {
+          "slug": "repo-slug",
+          "id": 242,
+          "name": "repo-name",
+          "scmId": "git",
+          "state": "AVAILABLE",
+          "statusMessage": "Available",
+          "forkable": true,
+          "project": {
+            "key": "project-key",
+            "id": 242,
+            "name": "project-name",
+            "description": "description",
+            "public": true,
+            "type": "NORMAL",
+            "links": {
+              "self": [
+                {
+                  "href": "link"
+                }
+              ]
+            }
+          },
+          "public": false,
+          "links": {
+            "clone": [
+              {
+                "href": "link",
+                "name": "ssh"
+              },
+              {
+                "href": "link-http",
+                "name": "http"
+              }
+            ],
+            "self": [
+              {
+                "href": "link-self"
+              }
+            ]
+          }
+        }
+      },
+      "locked": false,
+      "author": {
+        "user": {
+          "name": "user-name",
+          "id": 1,
+          "displayName": "user-display-name",
+          "active": false,
+          "slug": "user-slug",
+          "type": "NORMAL",
+          "links": {
+            "self": [
+              {
+                "href": "link-self"
+              }
+            ]
+          }
+        },
+        "role": "AUTHOR",
+        "approved": false,
+        "status": "UNAPPROVED"
+      },
+      "reviewers": [
+        {
+          "user": {
+            "name": "reviewer-name",
+            "emailAddress": "reviewer@email.com",
+            "id": 1713,
+            "displayName": "reviewer-display-name",
+            "active": true,
+            "slug": "reviewer-slug",
+            "type": "NORMAL",
+            "links": {
+              "self": [
+                {
+                  "href": "link-self"
+                }
+              ]
+            }
+          },
+          "lastReviewedCommit": "2",
+          "role": "REVIEWER",
+          "approved": true,
+          "status": "APPROVED"
+        },
+        {
+          "user": {
+            "name": "reveiwer2-name",
+            "emailAddress": "reviewer2@email.com",
+            "id": 49,
+            "displayName": "reviewer2 display name",
+            "active": true,
+            "slug": "reviewer2-slug",
+            "type": "NORMAL",
+            "links": {
+              "self": [
+                {
+                  "href": "link-self"
+                }
+              ]
+            }
+          },
+          "role": "REVIEWER",
+          "approved": false,
+          "status": "UNAPPROVED"
+        }
+      ],
+      "participants": [],
+      "properties": {
+        "mergeResult": {
+          "outcome": "CONFLICTED",
+          "current": true
+        },
+        "resolvedTaskCount": 0,
+        "commentCount": 4,
+        "openTaskCount": 0
+      },
+      "links": {
+        "self": [
+          {
+            "href": "link"
+          }
+        ]
+      }
+    }'.
+
+	^ pullRequest := (NeoJSONReader on: pullRequest readStream) next
+]
+
+{ #category : #accessing }
+BitBucketApiMock >> openedMergeRequest [
+
+	| pullRequest |
+	pullRequest := '{
+      "id": 539,
+      "version": 10,
+      "title": "title",
+      "state": "OPEN",
+      "open": true,
+      "closed": false,
+      "createdDate": 1709726344893,
+      "updatedDate": 1709728944248,
+      "fromRef": {
+        "id": "refs/heads/wip/1",
+        "displayId": "wip/1",
+        "latestCommit": "2",
+        "repository": {
+          "slug": "repoSlug",
+          "id": 242,
+          "name": "repo-name",
+          "scmId": "git",
+          "state": "AVAILABLE",
+          "statusMessage": "Available",
+          "forkable": true,
+          "project": {
+            "key": "project-key",
+            "id": 242,
+            "name": "project-name",
+            "description": "project description",
+            "public": true,
+            "type": "NORMAL",
+            "links": {
+              "self": [
+                {
+                  "href": "link"
+                }
+              ]
+            }
+          },
+          "public": false,
+          "links": {
+            "clone": [
+              {
+                "href": "clone",
+                "name": "ssh"
+              },
+              {
+                "href": "clone",
+                "name": "http"
+              }
+            ],
+            "self": [
+              {
+                "href": "link"
+              }
+            ]
+          }
+        }
+      },
+      "toRef": {
+        "id": "refs/heads/develop/trunk",
+        "displayId": "develop/trunk",
+        "latestCommit": "3",
+        "repository": {
+          "slug": "repo-slug",
+          "id": 242,
+          "name": "repo-name",
+          "scmId": "git",
+          "state": "AVAILABLE",
+          "statusMessage": "Available",
+          "forkable": true,
+          "project": {
+            "key": "project-key",
+            "id": 242,
+            "name": "project-name",
+            "description": "description",
+            "public": true,
+            "type": "NORMAL",
+            "links": {
+              "self": [
+                {
+                  "href": "link"
+                }
+              ]
+            }
+          },
+          "public": false,
+          "links": {
+            "clone": [
+              {
+                "href": "link",
+                "name": "ssh"
+              },
+              {
+                "href": "link-http",
+                "name": "http"
+              }
+            ],
+            "self": [
+              {
+                "href": "link-self"
+              }
+            ]
+          }
+        }
+      },
+      "locked": false,
+      "author": {
+        "user": {
+          "name": "user-name",
+          "id": 1,
+          "displayName": "user-display-name",
+          "active": false,
+          "slug": "user-slug",
+          "type": "NORMAL",
+          "links": {
+            "self": [
+              {
+                "href": "link-self"
+              }
+            ]
+          }
+        },
+        "role": "AUTHOR",
+        "approved": false,
+        "status": "UNAPPROVED"
+      },
+      "reviewers": [
+        {
+          "user": {
+            "name": "reviewer-name",
+            "emailAddress": "reviewer@email.com",
+            "id": 1713,
+            "displayName": "reviewer-display-name",
+            "active": true,
+            "slug": "reviewer-slug",
+            "type": "NORMAL",
+            "links": {
+              "self": [
+                {
+                  "href": "link-self"
+                }
+              ]
+            }
+          },
+          "lastReviewedCommit": "2",
+          "role": "REVIEWER",
+          "approved": true,
+          "status": "APPROVED"
+        },
+        {
+          "user": {
+            "name": "reveiwer2-name",
+            "emailAddress": "reviewer2@email.com",
+            "id": 49,
+            "displayName": "reviewer2 display name",
+            "active": true,
+            "slug": "reviewer2-slug",
+            "type": "NORMAL",
+            "links": {
+              "self": [
+                {
+                  "href": "link-self"
+                }
+              ]
+            }
+          },
+          "role": "REVIEWER",
+          "approved": false,
+          "status": "UNAPPROVED"
+        }
+      ],
+      "participants": [],
+      "properties": {
+        "mergeResult": {
+          "outcome": "CONFLICTED",
+          "current": true
+        },
+        "resolvedTaskCount": 0,
+        "commentCount": 4,
+        "openTaskCount": 0
+      },
+      "links": {
+        "self": [
+          {
+            "href": "link"
+          }
+        ]
+      }
+    }'.
+
+	^pullRequest := (NeoJSONReader on: pullRequest readStream) next.
+]
+
+{ #category : #accessing }
 BitBucketApiMock >> projects [
 
 	| projects |
@@ -482,6 +1084,12 @@ BitBucketApiMock >> projects [
 	projects := (NeoJSONReader on: projects readStream) next.
 
 	^ projects
+]
+
+{ #category : #'api - pull-requests' }
+BitBucketApiMock >> pullRequestsOfRepo: repoSlug inProject: projectKey since: since until: until [
+	
+	^ mergeRequests
 ]
 
 { #category : #'api - projects' }

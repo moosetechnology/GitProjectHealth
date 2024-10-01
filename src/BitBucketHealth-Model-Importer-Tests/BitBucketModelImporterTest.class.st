@@ -260,6 +260,126 @@ BitBucketModelImporterTest >> testImportCreatorOfCommitIfAlreadyExist [
 ]
 
 { #category : #tests }
+BitBucketModelImporterTest >> testImportMergeRequestsSinceUntil [
+
+	| bitBucketApi glphModel bitBucketImporter group repo project mergeRequests mergeRequest |
+	"Given"
+	bitBucketApi := BitBucketApiMock new.
+
+	glphModel := GLPHEModel new name: 'test'.
+
+	bitBucketImporter := BitBucketModelImporter new
+		                     bitBucketApi: bitBucketApi;
+		                     glhModel: glphModel.
+
+	group := GLHGroup new id: 1.
+	repo := GLHRepository new.
+	project := GLHProject new
+		           group: group;
+		           repository: repo.
+
+	"When"
+	mergeRequests := bitBucketImporter
+		                 importMergeRequests: project
+		                 since: '09-23-2024'
+		                 until: '09-25-2024'.
+
+	"Then"
+	self
+		assert:
+		(bitBucketImporter glhModel allWithType: GLPHEMergeRequest) size
+		equals: 1.
+
+	self assert: mergeRequests size equals: 1.
+	
+	mergeRequest := mergeRequests first.
+	self assert: mergeRequest state equals: 'opened'.
+	self assert: mergeRequest closed_at equals: nil.
+]
+
+{ #category : #tests }
+BitBucketModelImporterTest >> testImportMergeRequestsSinceUntilClosedMR [
+
+	| bitBucketApi glphModel bitBucketImporter group repo project mergeRequests mergeRequest |
+	"Given"
+	bitBucketApi := BitBucketApiMock new.
+
+	glphModel := GLPHEModel new name: 'test'.
+
+	bitBucketImporter := BitBucketModelImporter new
+		                     bitBucketApi: bitBucketApi;
+		                     glhModel: glphModel.
+
+	bitBucketApi mergeRequests: { bitBucketApi mergedMergeRequest }.
+
+	group := GLHGroup new id: 1.
+	repo := GLHRepository new.
+	project := GLHProject new
+		           group: group;
+		           repository: repo.
+
+	"When"
+	mergeRequests := bitBucketImporter
+		                 importMergeRequests: project
+		                 since: '09-23-2024'
+		                 until: '09-25-2024'.
+
+	"Then"
+	self
+		assert:
+		(bitBucketImporter glhModel allWithType: GLPHEMergeRequest) size
+		equals: 1.
+
+	self assert: mergeRequests size equals: 1.
+
+	mergeRequest := mergeRequests first.
+	self assert: mergeRequest state equals: 'merged'.
+	self assert: mergeRequest closed_at equals: nil.
+	self deny: mergeRequest merged_at equals: nil.
+]
+
+{ #category : #tests }
+BitBucketModelImporterTest >> testImportMergeRequestsSinceUntilDeclinedMR [
+
+	| bitBucketApi glphModel bitBucketImporter group repo project mergeRequests mergeRequest |
+	"Given"
+	bitBucketApi := BitBucketApiMock new.
+
+	glphModel := GLPHEModel new name: 'test'.
+
+	bitBucketImporter := BitBucketModelImporter new
+		                     bitBucketApi: bitBucketApi;
+		                     glhModel: glphModel.
+
+	bitBucketApi mergeRequests: { bitBucketApi declinedMergeRequest }.
+
+	group := GLHGroup new id: 1.
+	repo := GLHRepository new.
+	project := GLHProject new
+		           group: group;
+		           repository: repo.
+
+	"When"
+	mergeRequests := bitBucketImporter
+		                 importMergeRequests: project
+		                 since: '09-23-2024'
+		                 until: '09-25-2024'.
+
+	"Then"
+	self
+		assert:
+		(bitBucketImporter glhModel allWithType: GLPHEMergeRequest) size
+		equals: 1.
+
+	self assert: mergeRequests size equals: 1.
+
+	mergeRequest := mergeRequests first.
+	self assert: mergeRequest state equals: 'closed'.
+	self deny: mergeRequest closed_at equals: nil.
+	self assert: mergeRequest merged_at equals: nil
+]
+
+{ #category : #tests }
 BitBucketModelImporterTest >> testImportUser [
 	"Given"
 

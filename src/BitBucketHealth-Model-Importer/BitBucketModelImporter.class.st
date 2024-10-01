@@ -176,7 +176,21 @@ BitBucketModelImporter >> importCreatorOfCommit: aGLHCommit [
 
 { #category : #api }
 BitBucketModelImporter >> importMergeRequests: aGLHProject since: fromDate until: toDate [
+
+	| pullRequests |
+	pullRequests := bitBucketApi
+		                pullRequestsOfRepo: aGLHProject id
+		                inProject: aGLHProject group id
+		                since: fromDate
+		                until: toDate.
+		
+	pullRequests := pullRequests collect: [ :pullRequest |
+		                self parsePullRequestIntoGLPHEMergeRequest:
+			                pullRequest ].
+		
+	self glhModel addAll: pullRequests unless: self blockOnIdEquality.
 	
+	^ pullRequests
 ]
 
 { #category : #api }
@@ -250,6 +264,69 @@ BitBucketModelImporter >> parseProjectIntoGLHGroup: projectRepository [
 				                     name: (projectRepository at: #name);
 				                     id: (projectRepository at: #key);
 				                     description: (projectRepository at: #description).
+]
+
+{ #category : #parsing }
+BitBucketModelImporter >> parsePullRequestIntoGLPHEMergeRequest: pullRequestDictionary [
+
+	| repository project toRef fromRef glpheMergeRequest author state |
+	toRef := pullRequestDictionary at: #toRef.
+	fromRef := pullRequestDictionary at: #fromRef.
+
+	repository := toRef at: #repository.
+	project := (self glhModel allWithType: GLHProject)
+		           detect: [ :glhProject |
+		           glhProject id = (repository at: #id) ]
+		           ifFound: [ :glhProject | glhProject ]
+		           ifNone: [
+			           project := self parseRepoIntoGLHProject: repository.
+			           self glhModel add: project.
+			           project ].
+
+
+	author := pullRequestDictionary at: #author.
+	author := (self glhModel allWithType: GLHUser)
+		          detect: [ :user | user id = ((author at: #user) at: #id) ]
+		          ifFound: [ :user | user ]
+		          ifNone: [
+		          self importUserByUsername:
+			          ((author at: #user) at: #displayName) ].
+
+
+	glpheMergeRequest := GLPHEMergeRequest new
+		                     name: (pullRequestDictionary at: #title);
+		                     title: (pullRequestDictionary at: #title);
+		                     id: (pullRequestDictionary at: #id);
+		                     project: project;
+		                     project_id: project id;
+		                     target_branch: (toRef at: #id);
+		                     target_project_id:
+			                     ((toRef at: #repository) at: #id);
+		                     source_branch: (fromRef at: #id);
+		                     target_project_id:
+			                     ((fromRef at: #repository) at: #id);
+		                     updated_at: (DateAndTime fromUnixTime:
+					                      (pullRequestDictionary at: #updatedDate)
+					                      / 1000);
+		                     created_at: (DateAndTime fromUnixTime:
+					                      (pullRequestDictionary at: #createdDate)
+					                      / 1000);
+		                     author: author.
+
+	"STATE"
+	state := pullRequestDictionary at: #state.
+	state = 'OPEN' ifTrue: [ glpheMergeRequest state: 'opened' ].
+	state = 'MERGED' ifTrue: [
+		glpheMergeRequest state: 'merged'.
+		glpheMergeRequest merged_at: (DateAndTime fromUnixTime:
+				 (pullRequestDictionary at: #closedDate) / 1000) ].
+
+	state = 'DECLINED' ifTrue: [
+		glpheMergeRequest state: 'closed'.
+		glpheMergeRequest closed_at: (DateAndTime fromUnixTime:
+				 (pullRequestDictionary at: #closedDate) / 1000) ].
+
+	^ glpheMergeRequest
 ]
 
 { #category : #parsing }
