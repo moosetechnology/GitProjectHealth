@@ -90,6 +90,12 @@ BitBucketApi >> client: anObject [
 	client := anObject
 ]
 
+{ #category : #'api - pull-requests' }
+BitBucketApi >> commitsOfPullRequest: pullRequestId ofRepo: repoSlug inProject: projectKey [
+	^ self allValuesOfPath: self basePath, '/projects/', projectKey, '/repos/', repoSlug, '/pull-requests/', pullRequestId printString, '/commits'.
+	
+]
+
 { #category : #'api - commits' }
 BitBucketApi >> commitsOfRepo: repositorySlug inProject: projectKey since: since until: until [
 	"/rest/api/1.0/projects/{projectKey}/repos/{repositorySlug}/commits"
