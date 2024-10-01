@@ -201,6 +201,36 @@ BitBucketModelImporter >> importMergeResquestAuthor: mergeRequest [
 ]
 
 { #category : #api }
+BitBucketModelImporter >> importMergeResquestMerger: mergeRequest [
+
+	| activities mergeActivity mergeUser |
+	mergeRequest merge_user ifNotNil: [ ^ mergeRequest merge_user ].
+	mergeRequest state = 'merged' ifFalse: [ ^ nil ].
+
+	activities := self bitBucketApi
+		              activitiesOfPullRequest: mergeRequest id
+		              inRepo: mergeRequest project id
+		              ofProject: mergeRequest project group id.
+
+	mergeActivity := activities detect: [ :activity |
+		                 (activity at: #action) = 'MERGED' ].
+
+	mergeUser := mergeActivity at: #user.
+
+	mergeUser := (glhModel allWithType: GLHUser)
+		             detect: [ :user | user id = (mergeUser at: #id) ]
+		             ifFound: [ :user | user ]
+		             ifNone: [
+			             | glhUser |
+			             glhUser := self parseUserIntoGLHUser: mergeUser.
+			             glhModel add: glhUser.
+			             glhUser ].
+
+	mergeRequest merge_user: mergeUser.
+	^ mergeUser
+]
+
+{ #category : #api }
 BitBucketModelImporter >> importUser: accountId [
 
 	| result reader glhUser |

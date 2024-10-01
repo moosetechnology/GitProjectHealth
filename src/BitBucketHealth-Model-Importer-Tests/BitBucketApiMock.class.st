@@ -16,6 +16,12 @@ Class {
 	#category : #'BitBucketHealth-Model-Importer-Tests'
 }
 
+{ #category : #'api - pull-requests' }
+BitBucketApiMock >> activitiesOfPullRequest: pullRequestId inRepo: repoSlug ofProject: projectKey [
+
+	^self pullRequestActivities
+]
+
 { #category : #accessing }
 BitBucketApiMock >> commits [
 
@@ -1084,6 +1090,37 @@ BitBucketApiMock >> projects [
 	projects := (NeoJSONReader on: projects readStream) next.
 
 	^ projects
+]
+
+{ #category : #accessing }
+BitBucketApiMock >> pullRequestActivities [
+
+	| pullRequestActivities |
+	pullRequestActivities := '
+    [{
+      "id": 1,
+      "createdDate": 1720510446734,
+      "user": {
+        "name": "user-name",
+        "emailAddress": "user-name@email.com",
+        "id": 24,
+        "displayName": "user name",
+        "active": true,
+        "slug": "un",
+        "type": "NORMAL",
+        "links": {
+          "self": [
+            {
+              "href": "link"
+            }
+          ]
+        }
+      },
+      "action": "MERGED"
+}]'.
+
+	^ pullRequestActivities := (NeoJSONReader on:
+		                            pullRequestActivities readStream) next
 ]
 
 { #category : #'api - pull-requests' }

@@ -380,6 +380,33 @@ BitBucketModelImporterTest >> testImportMergeRequestsSinceUntilDeclinedMR [
 ]
 
 { #category : #tests }
+BitBucketModelImporterTest >> testImportMergeResquestMerger [
+
+	| bitBucketApi glphModel bitBucketImporter mergeRequest mergeUser |
+	"Given"
+	bitBucketApi := BitBucketApiMock new.
+
+	glphModel := GLPHEModel new name: 'test'.
+
+	bitBucketImporter := BitBucketModelImporter new
+		                     bitBucketApi: bitBucketApi;
+		                     glhModel: glphModel.
+
+	mergeRequest := bitBucketImporter
+		                parsePullRequestIntoGLPHEMergeRequest:
+		                bitBucketApi mergedMergeRequest.
+
+
+	"When"
+	mergeUser := bitBucketImporter importMergeResquestMerger:
+		             mergeRequest.
+
+	"Then"
+	self deny: mergeRequest merge_user equals: nil.
+	self assert: mergeRequest merge_user equals: mergeUser
+]
+
+{ #category : #tests }
 BitBucketModelImporterTest >> testImportUser [
 	"Given"
 
