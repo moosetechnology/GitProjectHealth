@@ -177,6 +177,23 @@ BitBucketModelImporter >> importCreatorOfCommit: aGLHCommit [
 ]
 
 { #category : #api }
+BitBucketModelImporter >> importMergeRequestCommits: mergeRequest [
+
+	| commits |
+	commits := self bitBucketApi
+		           commitsOfPullRequest: mergeRequest id
+		           ofRepo: mergeRequest project id
+		           inProject: mergeRequest project group id.
+
+	commits := commits collect: [ :commit |
+		           self parseCommitIntoGLHCommit: commit ].
+
+	mergeRequest commits: commits.
+
+	^ commits
+]
+
+{ #category : #api }
 BitBucketModelImporter >> importMergeRequests: aGLHProject since: fromDate until: toDate [
 
 	| pullRequests |

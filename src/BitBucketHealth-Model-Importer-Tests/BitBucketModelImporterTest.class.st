@@ -260,6 +260,32 @@ BitBucketModelImporterTest >> testImportCreatorOfCommitIfAlreadyExist [
 ]
 
 { #category : #tests }
+BitBucketModelImporterTest >> testImportMergeRequestCommits [
+
+	| bitBucketApi glphModel bitBucketImporter mergeRequest commits |
+	"Given"
+	bitBucketApi := BitBucketApiMock new.
+
+	glphModel := GLPHEModel new name: 'test'.
+
+	bitBucketImporter := BitBucketModelImporter new
+		                     bitBucketApi: bitBucketApi;
+		                     glhModel: glphModel.
+
+	mergeRequest := bitBucketImporter
+		                parsePullRequestIntoGLPHEMergeRequest:
+		                bitBucketApi mergedMergeRequest.
+
+
+	"When"
+	commits := bitBucketImporter importMergeRequestCommits: mergeRequest.
+
+	"Then"
+	self deny: mergeRequest commits equals: nil.
+	self assert: mergeRequest commits equals: commits
+]
+
+{ #category : #tests }
 BitBucketModelImporterTest >> testImportMergeRequestsSinceUntil [
 
 	| bitBucketApi glphModel bitBucketImporter group repo project mergeRequests mergeRequest |

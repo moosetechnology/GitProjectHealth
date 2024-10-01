@@ -40,6 +40,12 @@ BitBucketApiMock >> commits: anObject [
 	commits := anObject
 ]
 
+{ #category : #'api - pull-requests' }
+BitBucketApiMock >> commitsOfPullRequest: mergeRequestId ofRepo: repoSlug inProject: projectKey [
+
+	^commits
+]
+
 { #category : #'api - projects' }
 BitBucketApiMock >> commitsOfRepo: repositorySlug inProject: projectKey since: since until: until [
 
