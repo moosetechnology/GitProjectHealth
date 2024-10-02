@@ -91,7 +91,8 @@ BaselineOfGitLabHealth >> defineGroups: spec [
 			   'GitLabHealth-Model-Analysis-Tests'
 			   'GitLabHealth-Visualization' 'GitLabProjectHealth-ExtendModel-Generator'
 			   'GitLabProjectHealth-Model-Importer'
-			   'GitLabProjectHealth-Model-Importer-Tests' 'BitBucketHealth-Model-Importer' ).
+			   'GitLabProjectHealth-Model-Importer-Tests'
+			   'BitBucketHealth-Model-Importer' 'BitBucketHealth-Model-Importer-Tests' ).
 	spec group: 'default' with: #( 'Core' )
 ]
 
@@ -119,6 +120,7 @@ BaselineOfGitLabHealth >> defineJiraConnector: spec [
 { #category : #baselines }
 BaselineOfGitLabHealth >> definePackages: spec [
 	"generic"
+
 	spec package: 'GitProjectHealth-Model-Importer'.
 
 	"gitlab"
@@ -146,7 +148,8 @@ BaselineOfGitLabHealth >> definePackages: spec [
 		with: [ spec requires: #( 'GitHubHealth-Model-Importer' ) ].
 
 	"bitBucket"
-	spec package: 'BitBucketHealth-Model-Importer'.
+	spec package: 'BitBucketHealth-Model-Importer';
+		package: 'BitBucketHealth-Model-Importer-Tests' with: [ spec requires: #( 'BitBucketHealth-Model-Importer' ) ].
 
 	"model extension"
 	spec
