@@ -89,8 +89,11 @@ BitBucketModelImporter >> importCommitsOfProject: aGLHProject since: since until
 	commits := commits collect: [ :commit |
 		           | glhCommit commitDiffs contribution |
 		           glhCommit := self parseCommitIntoGLHCommit: commit.
-		commitDiffs :=  self bitBucketApi diffsOfCommit: glhCommit id inRepo: aGLHProject id inProject: aGLHProject group id.
-		          
+		           commitDiffs := self bitBucketApi
+			                          diffsOfCommit: glhCommit id
+			                          inRepo: aGLHProject id
+			                          inProject: aGLHProject group id.
+
 		           contribution := self getContributionFromDiffs:
 			                           (commitDiffs at: #diffs).
 		           glhCommit additions: (contribution at: #additions).
