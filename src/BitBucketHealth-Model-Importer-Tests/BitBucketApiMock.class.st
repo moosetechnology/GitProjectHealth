@@ -2,15 +2,9 @@ Class {
 	#name : #BitBucketApiMock,
 	#superclass : #Object,
 	#instVars : [
-		'user1',
 		'userMock',
 		'commits',
-		'commits1',
 		'diffs',
-		'diffs1',
-		'diffsWithoutHunks',
-		'diffsWithoutAdded',
-		'diffsWithoutRemoved',
 		'mergeRequests'
 	],
 	#category : #'BitBucketHealth-Model-Importer-Tests'
@@ -31,7 +25,33 @@ BitBucketApiMock >> commits [
 { #category : #accessing }
 BitBucketApiMock >> commits1 [
 
-	^ commits1
+	| commits1 |
+	commits1 := '[
+    {
+      "id": "abcdef0123abcdef4567abcdef8987abcdef6543",
+		"message": "message test",
+      "displayId": "abcdef0123a",
+      "author": {
+        "name": "charlie",
+        "emailAddress": "charlie@example.com"
+      },
+      "authorTimestamp": 1727168151000,
+      "committer": {
+        "name": "charlie",
+        "emailAddress": "charlie@example.com"
+      },
+      "committerTimestamp": 1727168151000,
+      "message": "WIP on feature 1",
+      "parents": [
+        {
+          "id": "abcdef0123abcdef4567abcdef8987abcdef6543",
+          "displayId": "abcdef0"
+        }
+      ]
+    }
+  ]'.
+
+	^ commits1 := (NeoJSONReader on: commits1 readStream) next
 ]
 
 { #category : #accessing }
@@ -259,80 +279,9 @@ BitBucketApiMock >> diffs [
 ]
 
 { #category : #accessing }
-BitBucketApiMock >> diffs: anObject [
+BitBucketApiMock >> diffs1 [
 
-	diffs := anObject
-]
-
-{ #category : #'api - commits' }
-BitBucketApiMock >> diffsOfCommit: commitID inRepo: repositorySlug inProject: projectKey [
-	^diffs 
-]
-
-{ #category : #accessing }
-BitBucketApiMock >> diffsWithoutAdded [
-
-	^ diffsWithoutAdded
-]
-
-{ #category : #accessing }
-BitBucketApiMock >> diffsWithoutHunks [
-
-	^ diffsWithoutHunks
-]
-
-{ #category : #accessing }
-BitBucketApiMock >> diffsWithoutRemoved [
-
-	^ diffsWithoutRemoved
-]
-
-{ #category : #initialization }
-BitBucketApiMock >> initialize [
-
-	self initializeCommits.
-	self initializeDiffs.
-	self initializeUsers.
-
-	mergeRequests := { self openedMergeRequest }
-]
-
-{ #category : #initialization }
-BitBucketApiMock >> initializeCommits [
-
-	commits1 := '[
-    {
-      "id": "abcdef0123abcdef4567abcdef8987abcdef6543",
-		"message": "message test",
-      "displayId": "abcdef0123a",
-      "author": {
-        "name": "charlie",
-        "emailAddress": "charlie@example.com"
-      },
-      "authorTimestamp": 1727168151000,
-      "committer": {
-        "name": "charlie",
-        "emailAddress": "charlie@example.com"
-      },
-      "committerTimestamp": 1727168151000,
-      "message": "WIP on feature 1",
-      "parents": [
-        {
-          "id": "abcdef0123abcdef4567abcdef8987abcdef6543",
-          "displayId": "abcdef0"
-        }
-      ]
-    }
-  ]'.
-
-	commits1 := (NeoJSONReader on: commits1 readStream) next.
-
-	commits := commits1
-]
-
-{ #category : #initialization }
-BitBucketApiMock >> initializeDiffs [
-
+	| diffs1 |
 	diffs1 := '{
   "fromHash": null,
   "toHash": "123",
@@ -423,43 +372,24 @@ BitBucketApiMock >> initializeDiffs [
   "truncated": false
 }'.
 
-	diffs1 := (NeoJSONReader on: diffs1 readStream) next.
+	^ diffs1 := (NeoJSONReader on: diffs1 readStream) next
+]
 
-	diffsWithoutHunks := '{
-  "fromHash": null,
-  "toHash": "2",
-  "contextLines": 10,
-  "whitespace": "SHOW",
-  "diffs": [
-    {
-      "source": {
-        "components": [
-          "build.gradle"
-        ],
-        "parent": "",
-        "name": "build.gradle",
-        "extension": "gradle",
-        "toString": "build.gradle"
-      },
-      "destination": {
-        "components": [
-          "build.gradle"
-        ],
-        "parent": "",
-        "name": "build.gradle",
-        "extension": "gradle",
-        "toString": "build.gradle"
-      },
-          
-      "truncated": false
-    }
-  ],
-  "truncated": false
-}'.
+{ #category : #accessing }
+BitBucketApiMock >> diffs: anObject [
 
-	diffsWithoutHunks := (NeoJSONReader on: diffsWithoutHunks readStream)
-		                     next.
+	diffs := anObject
+]
 
+{ #category : #'api - commits' }
+BitBucketApiMock >> diffsOfCommit: commitID inRepo: repositorySlug inProject: projectKey [
+	^diffs 
+]
+
+{ #category : #accessing }
+BitBucketApiMock >> diffsWithoutAdded [
+
+	| diffsWithoutAdded |
 	diffsWithoutAdded := '{
   "fromHash": null,
   "toHash": "3",
@@ -550,10 +480,54 @@ BitBucketApiMock >> initializeDiffs [
   "truncated": false
 }'.
 
-	diffsWithoutAdded := (NeoJSONReader on: diffsWithoutAdded readStream)
-		                     next.
+	^ diffsWithoutAdded := (NeoJSONReader on:
+		                        diffsWithoutAdded readStream) next
+]
 
+{ #category : #accessing }
+BitBucketApiMock >> diffsWithoutHunks [
 
+	| diffsWithoutHunks |
+	diffsWithoutHunks := '{
+  "fromHash": null,
+  "toHash": "2",
+  "contextLines": 10,
+  "whitespace": "SHOW",
+  "diffs": [
+    {
+      "source": {
+        "components": [
+          "build.gradle"
+        ],
+        "parent": "",
+        "name": "build.gradle",
+        "extension": "gradle",
+        "toString": "build.gradle"
+      },
+      "destination": {
+        "components": [
+          "build.gradle"
+        ],
+        "parent": "",
+        "name": "build.gradle",
+        "extension": "gradle",
+        "toString": "build.gradle"
+      },
+          
+      "truncated": false
+    }
+  ],
+  "truncated": false
+}'.
+
+	^ diffsWithoutHunks := (NeoJSONReader on:
+		                        diffsWithoutHunks readStream) next
+]
+
+{ #category : #accessing }
+BitBucketApiMock >> diffsWithoutRemoved [
+
+	| diffsWithoutRemoved |
 	diffsWithoutRemoved := '{
   "fromHash": null,
   "toHash": "1",
@@ -632,43 +606,17 @@ BitBucketApiMock >> initializeDiffs [
   "truncated": false
 }'.
 
-	diffsWithoutRemoved := (NeoJSONReader on:
-		                        diffsWithoutRemoved readStream) next.
-
-	diffs := diffs1
+	^ diffsWithoutRemoved := (NeoJSONReader on:
+		                          diffsWithoutRemoved readStream) next
 ]
 
 { #category : #initialization }
-BitBucketApiMock >> initializeUsers [
+BitBucketApiMock >> initialize [
 
-	user1 := '
-    {
-      "name": "test",
-      "emailAddress": "test@test.com",
-      "id": 1,
-      "displayName": "test test",
-      "active": true,
-      "slug": "test",
-      "type": "NORMAL",
-      "directoryName": "directory",
-      "deletable": false,
-      "lastAuthenticationTimestamp": 1727444943000,
-      "mutableDetails": false,
-      "mutableGroups": true,
-      "links": {
-        "self": [
-          {
-            "href": "test.com"
-          }
-        ]
-      }
-    }
-  '.
-
-
-	user1 := (NeoJSONReader on: user1 readStream) next.
-
-	userMock := user1
+	commits := self commits1.
+	diffs := self diffs1.
+	userMock := self user1.
+	mergeRequests := { self openedMergeRequest }
 ]
 
 { #category : #accessing }
@@ -1178,7 +1126,33 @@ repos := (NeoJSONReader on: repos readStream) next.
 { #category : #accessing }
 BitBucketApiMock >> user1 [
 
-	^ user1
+	| user1 |
+	user1 := '
+    {
+      "name": "test",
+      "emailAddress": "test@test.com",
+      "id": 1,
+      "displayName": "test test",
+      "active": true,
+      "slug": "test",
+      "type": "NORMAL",
+      "directoryName": "directory",
+      "deletable": false,
+      "lastAuthenticationTimestamp": 1727444943000,
+      "mutableDetails": false,
+      "mutableGroups": true,
+      "links": {
+        "self": [
+          {
+            "href": "test.com"
+          }
+        ]
+      }
+    }
+  '.
+
+
+	^ user1 := (NeoJSONReader on: user1 readStream) next
 ]
 
 { #category : #accessing }
