@@ -433,31 +433,6 @@ BitBucketModelImporterTest >> testImportMergeResquestMerger [
 ]
 
 { #category : #tests }
-BitBucketModelImporterTest >> testImportUser [
-	"Given"
-
-	| bitBucketApi glphModel bitBucketImporter user modelUser |
-	bitBucketApi := BitBucketApiMock new.
-
-	glphModel := GLPHEModel new name: 'test'.
-
-	bitBucketImporter := BitBucketModelImporter new
-		                     bitBucketApi: bitBucketApi;
-		                     glhModel: glphModel.
-
-	"When"
-	user := bitBucketImporter importUser: 1.
-
-	"Then"
-	self
-		assert: (bitBucketImporter glhModel allWithType: GLHUser) size
-		equals: 1.
-
-	modelUser := (bitBucketImporter glhModel allWithType: GLHUser) first.
-	self assert: user equals: modelUser
-]
-
-{ #category : #tests }
 BitBucketModelImporterTest >> testImportUserByUsername [
 	"Given"
 

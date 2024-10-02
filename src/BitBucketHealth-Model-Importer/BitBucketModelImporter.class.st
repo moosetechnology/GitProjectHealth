@@ -76,7 +76,7 @@ BitBucketModelImporter >> getContributionFromDiffs: diffs [
 	^ contribution
 ]
 
-{ #category : #api }
+{ #category : #'import - commits' }
 BitBucketModelImporter >> importCommitsOfProject: aGLHProject since: since until: until [
 
 	| commits |
@@ -106,7 +106,7 @@ BitBucketModelImporter >> importCommitsOfProject: aGLHProject since: since until
 	^ commits
 ]
 
-{ #category : #api }
+{ #category : #'import - projects' }
 BitBucketModelImporter >> importContributedProjectsOfUser: aGLHUser [
 
 	| projects repositories repositoriesCommits userRepositories userProjects |
@@ -164,7 +164,7 @@ BitBucketModelImporter >> importContributedProjectsOfUser: aGLHUser [
 	^ userProjects
 ]
 
-{ #category : #api }
+{ #category : #'import - commits' }
 BitBucketModelImporter >> importCreatorOfCommit: aGLHCommit [
 
 	| creator |
@@ -179,7 +179,7 @@ BitBucketModelImporter >> importCreatorOfCommit: aGLHCommit [
 	^ creator
 ]
 
-{ #category : #api }
+{ #category : #'import - merge-requests' }
 BitBucketModelImporter >> importMergeRequestCommits: mergeRequest [
 
 	| commits |
@@ -196,7 +196,7 @@ BitBucketModelImporter >> importMergeRequestCommits: mergeRequest [
 	^ commits
 ]
 
-{ #category : #api }
+{ #category : #'import - merge-requests' }
 BitBucketModelImporter >> importMergeRequests: aGLHProject since: fromDate until: toDate [
 
 	| pullRequests |
@@ -215,12 +215,12 @@ BitBucketModelImporter >> importMergeRequests: aGLHProject since: fromDate until
 	^ pullRequests
 ]
 
-{ #category : #api }
+{ #category : #'import - merge-requests' }
 BitBucketModelImporter >> importMergeResquestAuthor: mergeRequest [
 	mergeRequest author ifNotNil: [ ^mergeRequest ]
 ]
 
-{ #category : #api }
+{ #category : #'import - merge-requests' }
 BitBucketModelImporter >> importMergeResquestMerger: mergeRequest [
 
 	| activities mergeActivity mergeUser |
@@ -250,29 +250,7 @@ BitBucketModelImporter >> importMergeResquestMerger: mergeRequest [
 	^ mergeUser
 ]
 
-{ #category : #api }
-BitBucketModelImporter >> importUser: accountId [
-
-	| result reader glhUser |
-	(self glhModel allWithType: GLHUser)
-		detect: [ :user | user id = accountId ]
-		ifFound: [ :user | ^ user ].
-
-	result := self bitBucketApi user: accountId.
-	reader := (NeoJSONReader on: result readStream) next.
-	
-	glhUser := GLHUser new
-		id: accountId;
-		created_at: ((reader at: #created_on) asDate); 
-		username: (reader at:#display_name);
-		name: (reader at:#display_name).
-		
-	glhModel add: glhUser.
-		
-	^glhUser
-]
-
-{ #category : #api }
+{ #category : #'import - users' }
 BitBucketModelImporter >> importUserByUsername: username [
 
 	| users user glhUser |
