@@ -11,9 +11,9 @@ SmalltalkCISpec {
     }
   ],
   #testing: {
-    #packages : [ 'GitLab.*', 'GLPH.*', 'GitHub.*', 'GitProject.*' ],
+    #packages : [ 'GitLab.*', 'GLPH.*', 'GitHub.*', 'GitProject.*', 'BitBucket.*' ],
     #coverage : {
-      #packages : [ 'GitLab.*', 'GLPH.*', 'GitHub.*', 'GitProject.*' ],
+      #packages : [ 'GitLab.*', 'GLPH.*', 'GitHub.*', 'GitProject.*', 'BitBucket.*' ],
       #format : #lcov
     }
   }
