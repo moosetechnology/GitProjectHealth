@@ -100,7 +100,7 @@ GitAnalyzer >> analyseCommitFrequencySince: since until: until [
 		            (#frequency -> nil) } asDictionary.
 
 	commits := glhImporter
-		           importCommitsOProject: onProject
+		           importCommitsOfProject: onProject
 		           since: since
 		           until: until.
 

@@ -92,7 +92,8 @@ BaselineOfGitLabHealth >> defineGroups: spec [
 			   'GitLabHealth-Model-Analysis-Tests'
 			   'GitLabHealth-Visualization' 'GitLabProjectHealth-ExtendModel-Generator'
 			   'GitLabProjectHealth-Model-Importer'
-			   'GitLabProjectHealth-Model-Importer-Tests' ).
+			   'GitLabProjectHealth-Model-Importer-Tests'
+			   'BitBucketHealth-Model-Importer' 'BitBucketHealth-Model-Importer-Tests' ).
 	spec group: 'default' with: #( 'Core' )
 ]
 
@@ -123,7 +124,6 @@ BaselineOfGitLabHealth >> definePackages: spec [
 
 	spec package: 'GitProjectHealth-Model-Importer'.
 
-
 	"gitlab"
 	spec
 		package: 'GitLabHealth-Model';
@@ -135,16 +135,22 @@ BaselineOfGitLabHealth >> definePackages: spec [
 		package: 'GitLabHealth-Model-Inspector'
 		with: [ spec requires: #( 'GitLabHealth-Model-Visualization' ) ];
 		package: 'GitLabHealth-Model-Visualization';
-		package: 'GitLabHealth-Model-Importer'
-		with: [ spec requires: #( 'NeoJSON' 'MoreLogger' 'GitProjectHealth-Model-Importer' ) ];
-		package: 'GitHubHealth-Model-Importer'
-		with: [ spec requires: #( 'NeoJSON' 'MoreLogger' 'GitProjectHealth-Model-Importer' ) ];
+		package: 'GitLabHealth-Model-Importer' with: [
+			spec requires:
+					#( 'NeoJSON' 'MoreLogger' 'GitProjectHealth-Model-Importer' ) ];
+		package: 'GitHubHealth-Model-Importer' with: [
+			spec requires:
+					#( 'NeoJSON' 'MoreLogger' 'GitProjectHealth-Model-Importer' ) ];
 		package: 'GitLabHealth-Model-Importer-Tests' with: [
 			spec requires:
 					#( 'GitLabHealth-Model-Importer' 'GitHubHealth-Model-Importer' ) ].
 	spec
 		package: 'GitHubHealth-Model-Importer-Tests'
 		with: [ spec requires: #( 'GitHubHealth-Model-Importer' ) ].
+
+	"bitBucket"
+	spec package: 'BitBucketHealth-Model-Importer';
+		package: 'BitBucketHealth-Model-Importer-Tests' with: [ spec requires: #( 'BitBucketHealth-Model-Importer' ) ].
 
 	"model extension"
 	spec
@@ -156,7 +162,8 @@ BaselineOfGitLabHealth >> definePackages: spec [
 		package: 'GLPHExtended-Model-Extension' with: [
 			spec requires:
 					#( 'GLPHExtended-Model' 'GitLabHealth-Model' 'GitLabHealth-Model-Extension' ) ];
-		package: 'GitLabHealth-Model-Analysis' with: [ spec requires: #( 'Voyage' 'AWS' ) ];
+		package: 'GitLabHealth-Model-Analysis'
+		with: [ spec requires: #( 'Voyage' 'AWS' ) ];
 		package: 'GitLabHealth-Model-Analysis-Tests'
 		with: [ spec requires: #( 'GitLabHealth-Model-Analysis' ) ];
 		package: 'GitLabHealth-Visualization';

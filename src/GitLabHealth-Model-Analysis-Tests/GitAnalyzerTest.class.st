@@ -42,7 +42,7 @@ GitAnalyzerTest >> setUp [
 
 
 	glhImporter
-		importCommitsOProject: projects first
+		importCommitsOfProject: projects first
 		since: since asDate
 		until: nil.
 
