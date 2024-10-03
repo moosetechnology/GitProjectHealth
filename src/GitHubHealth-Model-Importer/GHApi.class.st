@@ -1,5 +1,5 @@
 "
-You can use me to extract query GitHub
+You can use me to extract query [GitHub REST Api](https://docs.github.com/en/rest)
 "
 Class {
 	#name : #GHApi,
@@ -52,6 +52,30 @@ GHApi >> client: anObject [
 	client := anObject
 ]
 
+{ #category : #'api - commits' }
+GHApi >> commitsOfProject: aProjectId ofOrganization: organisationName [
+
+	^ self
+		  commitsOfProject: aProjectId
+		  ofOrganization: organisationName
+		  since: nil
+		  perPage: nil
+		  page: nil
+]
+
+{ #category : #'api - commits' }
+GHApi >> commitsOfProject: aProjectId ofOrganization: organisationName since: aSinceDate perPage: itemPerPage page: pageNumber [
+
+	self client url:
+		self baseAPIUrl , '/repos/' , organisationName , '/' , aProjectId
+		, '/commits'.
+	aSinceDate ifNotNil: [ self client queryAt: #since put: aSinceDate ].
+	itemPerPage ifNotNil: [
+		self client queryAt: #per_page put: itemPerPage ].
+	pageNumber ifNotNil: [ self client queryAt: #page put: pageNumber ].
+	^ self client get
+]
+
 { #category : #api }
 GHApi >> contentsOfRepo: aRepoName ofOrganization: anOrganizationName inBranch: aBranchRef withPath: aPath [
 
@@ -77,6 +101,13 @@ GHApi >> organization: anOrganizationName [
 	^ self client get: self baseAPIUrl , '/orgs/' , anOrganizationName
 ]
 
+{ #category : #api }
+GHApi >> organization: aGroupName repo: aRepoName [
+
+	^ self client get:
+		  self baseAPIUrl , '/repos/' , aGroupName , '/' , aRepoName
+]
+
 { #category : #accessing }
 GHApi >> privateToken [
 
@@ -89,8 +120,25 @@ GHApi >> privateToken: anObject [
 	self client headerAt: #'Authorization' add: ('token ', anObject)
 ]
 
-{ #category : #api }
+{ #category : #'api - repositories' }
 GHApi >> reposOfOrganization: anOrganizationName [
 
-	^ self client get: self baseAPIUrl , '/orgs/' , anOrganizationName, '/repos'
+	^ self reposOfOrganization: anOrganizationName perPage: nil page: nil
+]
+
+{ #category : #'api - repositories' }
+GHApi >> reposOfOrganization: anOrganizationName perPage: itemPerPage page: pageNumber [
+
+	self client url:
+		self baseAPIUrl , '/orgs/' , anOrganizationName , '/repos'.
+	itemPerPage ifNotNil: [
+		self client queryAt: #per_page put: itemPerPage ].
+	pageNumber ifNotNil: [ self client queryAt: #page put: pageNumber ].
+	^ self client get
+]
+
+{ #category : #'api - users' }
+GHApi >> user: aUserID [
+
+	^ self client get: self baseAPIUrl , '/user/' , aUserID asString
 ]

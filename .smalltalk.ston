@@ -4,15 +4,16 @@ SmalltalkCISpec {
     SCIMetacelloLoadSpec {
       #baseline : 'GitLabHealth',
       #directory : 'src',
+      #load : [ 'default', 'Jira' ],
       #platforms : [ #pharo ],
-      #onConflict : #useIncoming,
+      #onConflict : #useLoaded,
       #onUpgrade : #useIncoming
     }
   ],
   #testing: {
-    #packages : [ 'GitLab*', 'GLPH.*', 'GitHub.*' ],
+    #packages : [ 'GitLab.*', 'GLPH.*', 'GitHub.*', 'GitProject.*', 'BitBucket.*' ],
     #coverage : {
-      #packages : [ 'GitLab.*', 'GLPH.*', 'GitHub.*' ],
+      #packages : [ 'GitLab.*', 'GLPH.*', 'GitHub.*', 'GitProject.*', 'BitBucket.*' ],
       #format : #lcov
     }
   }

@@ -3,13 +3,17 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'glhImporter',
+		'jiraImporter',
 		'label',
 		'entities',
 		'projectCache',
 		'sinceTimeLimit',
 		'runningPeriods',
 		'maxCommitWindow',
-		'over'
+		'over',
+		'emailDomain',
+		'metrics',
+		'analyses'
 	],
 	#category : #'GitLabHealth-Model-Analysis'
 }
@@ -33,73 +37,15 @@ GitMetricExporter >> addAPeriodFrom: since to: until [
 	^runningPeriods 
 ]
 
-{ #category : #'as yet unclassified' }
-GitMetricExporter >> addCodeChurnExporter: exportBrowserModel [
-
-	| columnName |
-	maxCommitWindow := 3.
-	runningPeriods do: [ :period |
-		columnName := ('churn % (W=' , maxCommitWindow printString , ') '
-		               , period printString) asSymbol.
-
-		exportBrowserModel
-			addColumnForQuery: (self blockCodeChurnSince: period)
-			withName: columnName.
-
-	 ].
-]
-
-{ #category : #'as yet unclassified' }
-GitMetricExporter >> addCommentContributionExporter: exportBrowserModel [
-
-	| columnName |
-	Smalltalk snapshot: true andQuit: false.
-
-	runningPeriods do: [ :period |
-		columnName := ('comment contribution (avg) ' , period printString)
-			              asSymbol.
-
-		exportBrowserModel
-			addColumnForQuery: (self blockCommentsContributionSince: period)
-			withName: columnName ]
-]
-
-{ #category : #'as yet unclassified' }
-GitMetricExporter >> addContributionExporter: exportBrowserModel [
-
-	| columnName |
-	"Code Contribution "
-	runningPeriods do: [ :period |
-		columnName := ('code addition (avg) ' , period printString) asSymbol.
-
-		exportBrowserModel
-			addColumnForQuery: (self blockCodeAdditionSince: period)
-			withName: columnName.
-
-		columnName := ('code deletion (avg) ' , period printString) asSymbol.
-		exportBrowserModel
-			addColumnForQuery: (self blockCodeDeletionSince: period)
-			withName: columnName.
-
-	 ]
-]
-
-{ #category : #'as yet unclassified' }
-GitMetricExporter >> addDelayUntilFirstChurnExporter: exportBrowserModel [
-
-	| columnName |
-	runningPeriods do: [ :period |
-		columnName := ('delay Until First Churn (W=' , maxCommitWindow printString , ') '
-		               , period printString) asSymbol.
-
-		exportBrowserModel
-			addColumnForQuery: (self blockDelayUntilFirstChurnSince: period)
-			withName: columnName ]
-]
-
-{ #category : #'as yet unclassified' }
+{ #category : #adding }
 GitMetricExporter >> addEntitiesFromUserNames: userNames [
 	"import all the project since a certain time"
+	
+	self
+		deprecated: 'Use #setupAnalysesForUsersWithNames instead'
+		on: '03 Sept 2024'
+		in:
+		'Pharo-11.0.0+build.726.sha.aece1b5473acf3830a0e082c1bc3a15d4ff3522b (64 Bit)'.
 
 	'Import all projects from the Git repository' recordInfo.
 	projectCache := projectCache ifNil: [
@@ -107,13 +53,16 @@ GitMetricExporter >> addEntitiesFromUserNames: userNames [
 
 	"then collect the project in which the user has be seen commited"
 	entities addAll: (userNames collect: [ :username |
-			 | projects metrics i size |
-			 projects := self findParticipationOfCommitAuthorNamed: username amongProjects: projectCache.
+			 | projects  i size |
+			 projects := self
+				             findParticipationOfCommitAuthorNamed: username
+				             amongProjects: projectCache.
 
-			 metrics := GitMetric4User new.
+			"metrics := GitMetric4User new.
 			 metrics
 				 glhImporter: glhImporter;
-				 findUserNamed: username.
+				 jiraImporter: jiraImporter;
+				 findUserNamed: username."
 
 
 
@@ -136,131 +85,33 @@ GitMetricExporter >> addEntitiesFromUserNames: userNames [
 	^ self
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #adding }
 GitMetricExporter >> addEntitiesFromUserNamesAndProjects: usersWithProjects [
 
+	self
+		deprecated: 'Use #setupAnalysesForUsersWithNames instead'
+		on: '03 Sept 2024'
+		in:
+		'Pharo-11.0.0+build.726.sha.aece1b5473acf3830a0e082c1bc3a15d4ff3522b (64 Bit)'.
+
 	entities addAll: (usersWithProjects associations collect: [ :assoc |
-		            | username projects metrics |
-		            username := assoc key.
-		            projects := assoc value.
+			 | username projects  |
+			 username := assoc key.
+			 projects := assoc value.
 
-		            metrics := GitMetric4User new.
-		            metrics
-			            glhImporter: glhImporter;
-			            findUserNamed: username.
-		            metrics loadProjectsFromIds: projects.
+			" metrics := GitMetric4User new.
+			 metrics
+				 glhImporter: glhImporter;
+				 jiraImporter: jiraImporter;
+				 findUserNamed: username.
+			 metrics loadProjectsFromIds: projects."
 
-		            metrics ]).
+			 username ]).
 
-	^ self
+	^ self 
 ]
 
-{ #category : #'as yet unclassified' }
-GitMetricExporter >> addFrequencyCommitExporter: exportBrowserModel [
-
-	| columnName |
-	runningPeriods do: [ :period |
-		columnName := ('commits frequency (avg) ' , period printString)
-			              asSymbol.
-
-		exportBrowserModel
-			addColumnForQuery: (self blockCommitFrequencySince: period)
-			withName: columnName ]
-]
-
-{ #category : #'as yet unclassified' }
-GitMetricExporter >> addMergeRequestDurationExporter: exportBrowserModel [
-
-	| columnName |
-	runningPeriods do: [ :period |
-		columnName := ('merge Request Duration ' , period printString)
-			              asSymbol.
-
-		exportBrowserModel
-			addColumnForQuery: (self blockMergeRequestDurationSince: period)
-			withName: columnName ]
-]
-
-{ #category : #'as yet unclassified' }
-GitMetricExporter >> blockCodeAdditionSince: period [
-
-	^ [ :metrics |
-	  ((metrics
-		    codeContributionsSince: (period at: #since)
-		    until: (period at: #until)
-		    overA: over) at: #avgAddition) printString ]
-]
-
-{ #category : #'as yet unclassified' }
-GitMetricExporter >> blockCodeChurnSince: period [
-	"comment stating purpose of instance-side method"
-
-	"scope: class-variables  &  instance-variables"
-
-	^ [ :metrics |
-	  ((metrics
-		    codeChurnSince: (period at: #since)
-		    until: (period at: #until)
-		    onACommitWindowOf: maxCommitWindow
-		    overA: over) at: #churn) printString ]
-]
-
-{ #category : #'as yet unclassified' }
-GitMetricExporter >> blockCodeDeletionSince: period [
-
-	^ [ :metrics |
-	  ((metrics
-		    codeContributionsSince: (period at: #since)
-		    until: (period at: #until)
-		    overA: over) at: #avgDeletion) printString ]
-]
-
-{ #category : #'as yet unclassified' }
-GitMetricExporter >> blockCommentsContributionSince: period [
-
-	^ [ :metrics |
-	  ((metrics
-		    commentsContributionsSince: (period at: #since)
-		    until: (period at: #until)
-		    overA: over) at: #avgComments) printString ]
-]
-
-{ #category : #'as yet unclassified' }
-GitMetricExporter >> blockCommitFrequencySince: period [
-
-	^ [ :metrics |
-	  ((metrics
-		    commitFrequencySince: (period at: #since)
-		    until: (period at: #until)
-		    overA: over) at: #averageFloat) printString ]
-]
-
-{ #category : #'as yet unclassified' }
-GitMetricExporter >> blockDelayUntilFirstChurnSince: period [
-	"comment stating purpose of instance-side method"
-
-	"scope: class-variables  &  instance-variables"
-
-	^ [ :metrics |
-	  ((metrics
-		    delayUntilFirstChurnSince: (period at: #since)
-		    until: (period at: #until)
-			 onACommitWindowOf: maxCommitWindow
-		    overA: over) at: #avgDelay) printString ]
-]
-
-{ #category : #'as yet unclassified' }
-GitMetricExporter >> blockMergeRequestDurationSince: period [
-
-	^ [ :metrics |
-	  
-	  ((metrics
-		    mergeRequestDurationSince: (period at: #since)
-		    until: (period at: #until)
-		    overA: over) at: #avgDuration) printString ]
-]
-
-{ #category : #'as yet unclassified' }
+{ #category : #utilities }
 GitMetricExporter >> constructFilePath: runningOver [
 
 	| file |
@@ -273,42 +124,22 @@ GitMetricExporter >> constructFilePath: runningOver [
 	^ file
 ]
 
-{ #category : #'as yet unclassified' }
-GitMetricExporter >> debugExportOver: aCollectionOfDateWeekMonthOrYear [
+{ #category : #exporting }
+GitMetricExporter >> csvMetricsFor: metricCollection at: date [
 
-	| period |
-	over := Date.
+	| csvMetrics |
+	csvMetrics := metricCollection collect: [ :metric |
+		              metric new description , ' - ' , date asString
+		              -> [ :groupAnalyses |
+			              | analysis |
+			              analysis := self
+				                          getAnalysisWithDate: date
+				                          from: groupAnalyses.
+			              analysis
+				              ifNil: [ nil ]
+				              ifNotNil: [ analysis metrics at: metric new name ] ] ].
 
-	period := runningPeriods first.
-
-
-	1 halt.
-	"Code Contribution "
-
-	(entities collect: (self blockCodeAdditionSince: period)) recordInfo.
-	(entities collect: (self blockCodeDeletionSince: period)) recordInfo.
-
-	"Commit frequencies "
-	(entities collect: (self blockCommitFrequencySince: period))
-		recordInfo.
-
-	"comment contribution "
-	(entities collect: (self blockCommentsContributionSince: period))
-		recordInfo.
-
-	"merge Request Duration "
-	(entities collect: (self blockMergeRequestDurationSince: period))
-		recordInfo.
-
-	"code churn"
-	(entities collect: (self blockCodeChurnSince: period)) recordInfo.
-
-	"delay Until First Churn"
-	(entities collect: (self blockDelayUntilFirstChurnSince: period))
-		recordInfo.
-
-
-	'Done computing debug' recordInfo
+	^ csvMetrics asOrderedDictionary
 ]
 
 { #category : #accessing }
@@ -316,65 +147,153 @@ GitMetricExporter >> entities: aCollection [
 	entities := aCollection
 ]
 
-{ #category : #'as yet unclassified' }
-GitMetricExporter >> exportAverageOver: aCollectionOfDateWeekMonthOrYear [
-
-	| file exportBrowserModel |
-	exportBrowserModel := MiExportModel new.
-	exportBrowserModel entitiesList: entities.
-	exportBrowserModel removeColumnForQueryNamed: #Type.
-	exportBrowserModel removeColumnForQueryNamed: #Name.
-
-	exportBrowserModel
-		addColumnForQuery: [ :metrics | metrics user name printString ]
-		withName: #'User name'.
-
-	"Code Contribution "
-	self addContributionExporter: exportBrowserModel.
-
-	"Commit frequencies "
-	self addFrequencyCommitExporter: exportBrowserModel.
-
-	"comment contribution "
-	self addCommentContributionExporter: exportBrowserModel.
-
-	"merge Request Duration "
-	self addMergeRequestDurationExporter: exportBrowserModel.
-
-	"code churn"
-	self addCodeChurnExporter: exportBrowserModel.
-
-	"delay Until First Churn"
-	self addDelayUntilFirstChurnExporter: exportBrowserModel.
-	
-	self addMergeRequestDurationExporter: exportBrowserModel.
-
-	aCollectionOfDateWeekMonthOrYear do: [ :aDateWeekMonthOrYear |
-		over := aDateWeekMonthOrYear.
-		file := self constructFilePath: over.
-
-		file writeStreamDo: [ :aStream |
-			aStream
-				<< 'sep=,';
-				<< OSPlatform current lineEnding.
-			exportBrowserModel writeCSVOn: aStream ] ].
-
-	'Done computing' recordInfo
-]
-
-{ #category : #'as yet unclassified' }
+{ #category : #exporting }
 GitMetricExporter >> exportFor: usersWithProjects [
 
-	self exportFor: usersWithProjects over: { Date. Week . Month . Year }.
+	self
+		deprecated: 'Use #exportInCSV instead'
+		on: '03 Sept 2024'
+		in:
+		'Pharo-11.0.0+build.726.sha.aece1b5473acf3830a0e082c1bc3a15d4ff3522b (64 Bit)'.
+
+	self exportFor: usersWithProjects over: {
+			Date.
+			Week.
+			Month.
+			Year }
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #exporting }
 GitMetricExporter >> exportFor: usersWithProjects over: aCollectionOfDateWeekMonthOrYear [
+
+	self
+		deprecated: 'Use #exportInCSV instead'
+		on: '03 Sept 2024'
+		in:
+		'Pharo-11.0.0+build.726.sha.aece1b5473acf3830a0e082c1bc3a15d4ff3522b (64 Bit)'.
 
 	entities ifNil: [
 		self addEntitiesFromUserNamesAndProjects: usersWithProjects ].
 
-	self exportFor: aCollectionOfDateWeekMonthOrYear. 
+	self exportFor: aCollectionOfDateWeekMonthOrYear
+]
+
+{ #category : #exporting }
+GitMetricExporter >> exportInCSV [
+
+	self exportUserAnalysesInCSV.
+	self exportProjectAnalysesInCSV.
+]
+
+{ #category : #exporting }
+GitMetricExporter >> exportInDB: repository [
+
+	repository enableSingleton.
+	analyses do: [ :analysis | analysis save ]
+]
+
+{ #category : #exporting }
+GitMetricExporter >> exportInS3: bucketName accessKey: accessKey secretKey: secretKey region: region [
+
+	| s3 bucket ston date fileName |
+	AWSS3Config default
+		accessKeyId: accessKey;
+		secretKey: secretKey;
+		regionName: region.
+
+	s3 := AWSS3 new.
+	bucket := s3 bucketNamed: bucketName.
+
+	ston := STON toString: analyses.
+
+	date := Date today asString copyReplaceAll: ' ' asString with: '-'.
+	fileName := ('-' join: {
+			             'analyse'.
+			             label.
+			             over asString.
+			             date }) , '.ston'.
+
+	bucket atKey: fileName putObject: ston
+]
+
+{ #category : #exporting }
+GitMetricExporter >> exportProjectAnalysesInCSV [
+
+	| exportBrowserModel groupedByOver group groupOver groupByName periods csvMetrics file |
+	exportBrowserModel := MiExportModel new.
+
+	groupedByOver := self projectAnalyses groupedBy: #over.
+
+	groupedByOver associations do: [ :groupAssociation |
+		group := groupAssociation value.
+		groupOver := groupAssociation key.
+
+
+		groupByName := group groupedBy: #projectName.
+		exportBrowserModel entitiesList: groupByName.
+
+		exportBrowserModel removeColumnForQueryNamed: #Type.
+		exportBrowserModel removeColumnForQueryNamed: #Name.
+
+		exportBrowserModel
+			addColumnForQuery: [ :groupAnalyses |
+			(groupAnalyses at: 1) projectName ]
+			withName: #'Project name'.
+
+		periods := (group groupedBy: #period) keys.
+
+		periods do: [ :period |
+			csvMetrics := self
+				              csvMetricsFor: self projectMetrics
+				              at: (period at: #since).
+
+
+			csvMetrics associations do: [ :association |
+				exportBrowserModel
+					addColumnForQuery: association value
+					withName: association key ] ].
+
+		file := self constructFilePath: groupOver.
+		file writeStreamDo: [ :aStream |
+			exportBrowserModel writeCSVOn: aStream ] ]
+]
+
+{ #category : #exporting }
+GitMetricExporter >> exportUserAnalysesInCSV [
+
+	| exportBrowserModel groupedByOver group groupOver groupByName periods csvMetrics file |
+	exportBrowserModel := MiExportModel new.
+	groupedByOver := self userAnalyses groupedBy: #over.
+	
+	groupedByOver associations do: [ :groupAssociation |
+		group := groupAssociation value.
+		groupOver := groupAssociation key.
+		
+		groupByName := group groupedBy: #username.
+		exportBrowserModel entitiesList: groupByName.
+		exportBrowserModel removeColumnForQueryNamed: #Type.
+		exportBrowserModel removeColumnForQueryNamed: #Name.
+		
+		exportBrowserModel
+			addColumnForQuery: [ :groupAnalyses |
+			(groupAnalyses at: 1) username ]
+			withName: #'User name'.
+			
+		periods := (group groupedBy: #period) keys.
+		periods do: [ :period |
+			csvMetrics := self
+				              csvMetricsFor: self userMetrics
+				              at: (period at: #since).
+			csvMetrics associations do: [ :association |
+				exportBrowserModel
+					addColumnForQuery: association value
+					withName: association key ] ].
+			
+			
+		file := self constructFilePath: groupOver.
+		
+		file writeStreamDo: [ :aStream |
+			exportBrowserModel writeCSVOn: aStream ] ]
 ]
 
 { #category : #projects }
@@ -407,9 +326,70 @@ GitMetricExporter >> findParticipationOfCommitAuthorNamed: username amongProject
 	^ itsProjects
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #projects }
 GitMetricExporter >> findProjectsOfUser: aCollection [ 
 	self shouldBeImplemented.
+]
+
+{ #category : #analysis }
+GitMetricExporter >> generateAnalysesOver: aDateWeekMonthOrYear [
+
+	analyses := OrderedCollection new.
+	runningPeriods do: [ :period |
+		analyses addAll: (self
+				 generateUsersAnalysesDuringPeriod: period
+				 over: aDateWeekMonthOrYear).
+
+		analyses addAll: (self
+				 generateProjectsAnalysesDuringPeriod: period
+				 over: aDateWeekMonthOrYear) ].
+
+	^ analyses
+]
+
+{ #category : #analysis }
+GitMetricExporter >> generateProjectsAnalysesDuringPeriod: period over: aDateWeekMonthOrYear [
+
+	^self projectEntities collect: [ :project |
+		ProjectAnalysisReport new
+			projectName: project name;
+			period: period;
+			over: aDateWeekMonthOrYear ]
+]
+
+{ #category : #analysis }
+GitMetricExporter >> generateUsersAnalysesDuringPeriod: period over: aDateWeekMonthOrYear [
+
+	| userAnalysisReport newMetric result |
+	^ self userEntities collect: [ :user |
+		  userAnalysisReport := UserAnalysisReport new
+			                        username: user name;
+			                        period: period;
+			                        over: aDateWeekMonthOrYear.
+
+		  metrics do: [ :metric |
+			  newMetric := metric new
+				               glhImporter: glhImporter;
+				               jiraImporter: jiraImporter;
+				               setPeriodSince: (period at: #since)
+				               until: (period at: #until);
+				               over: aDateWeekMonthOrYear;
+				               user: user;
+									emailDomain: emailDomain.
+
+
+			  result := newMetric calculate.
+			  userAnalysisReport metrics at: newMetric name put: result ].
+
+		  userAnalysisReport ]
+]
+
+{ #category : #utilities }
+GitMetricExporter >> getAnalysisWithDate: date from: analysisCollection [
+
+	^analysisCollection
+		detect: [ :groupAnalysis | (groupAnalysis period at: #since) = date ]
+		ifNone: [ nil ]
 ]
 
 { #category : #accessing }
@@ -418,15 +398,64 @@ GitMetricExporter >> glhImporter: anImporter [
 	glhImporter := anImporter withInitialCommits: false; yourself. 
 ]
 
+{ #category : #adding }
+GitMetricExporter >> importAnalysesFromS3: bucketName accessKey: accessKey secretKey: secretKey region: region [
+
+	| s3 bucket xmlObjects contentElements filesContent |
+	AWSS3Config default
+		accessKeyId: accessKey;
+		secretKey: secretKey;
+		regionName: region.
+
+	s3 := AWSS3 new.
+	bucket := s3 bucketNamed: bucketName.
+	xmlObjects := bucket listObjects.
+	contentElements := xmlObjects root elementsSelect: [ :element |
+		                   element isNamed: 'Contents' ].
+
+	filesContent := contentElements collect: [ :contentElement |
+		                | keyValue |
+		                keyValue := contentElement contentStringAt: 'Key'.
+		                bucket getObject: keyValue ].
+
+	^ analyses := (filesContent collect: [ :file | STON fromString: file ])
+		              flattened
+]
+
 { #category : #initialization }
 GitMetricExporter >> initialize [
 
 	entities := OrderedCollection new.
 	"set up the minimal date from which we are looking for the commits a particular user in projects"
-	sinceTimeLimit := '2024-01-01' asDateAndTime..
+	sinceTimeLimit := '2024-01-01' asDateAndTime.
 	runningPeriods := OrderedCollection new.
 	maxCommitWindow := 3.
-	over := Date
+	over := Date.
+
+	analyses := OrderedCollection new.
+
+	metrics := {
+		           CodeAdditionMetric.
+		           CodeDeletionMetric.
+		           CommentContributionMetric.
+		           CommitFrequencyMetric.
+		           CodeChurnMetric.
+		           DelayUntilFirstChurnMetric.
+		           TimeBetweenCommitMetric.
+		           ContributedProjectMetric.
+		           MergeRequestDurationMetric.
+		           OpenedMergeRequestMetric.
+		           ClosedMergeRequestMetric.
+		           MergedMergeRequestMetric.
+		           SelfMergedUnderAMinuteMergeRequestMetric.
+		           ClosedTicketsMetric.
+		           JiraTimeMRTimeDifferenceMetric. CommitsNumberByJiraTicketsMetric }
+]
+
+{ #category : #accessing }
+GitMetricExporter >> jiraImporter: anObject [
+
+	jiraImporter := anObject
 ]
 
 { #category : #accessing }
@@ -439,10 +468,91 @@ GitMetricExporter >> maxCommitWindow: anInteger [
 	maxCommitWindow := anInteger abs
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
+GitMetricExporter >> metrics: anObject [
+
+	metrics := anObject
+]
+
+{ #category : #adding }
 GitMetricExporter >> onlyImportProjectsOfGroup: groupId [
 
 	| group |
-	group := GLHModelImporter current importGroup: groupId.
-	projectCache := (group toScope: GLHProject)
+	group := glhImporter importGroup: groupId.
+	projectCache := group toScope: GLHProject
+]
+
+{ #category : #accessing }
+GitMetricExporter >> projectAnalyses [
+
+	^ analyses select: [ :analysis | analysis class = ProjectAnalysisReport ]
+]
+
+{ #category : #accessing }
+GitMetricExporter >> projectEntities [
+
+	^ entities select: [ :entity | entity class = GLHProject ]
+]
+
+{ #category : #accessing }
+GitMetricExporter >> projectMetrics [
+
+	^ metrics select: [ :metric | metric inheritsFrom: ProjectMetric ]
+]
+
+{ #category : #setup }
+GitMetricExporter >> setupAnalysisForProjectsWithIds: projectIds [
+
+	| projects |
+	projects := glhImporter importProjects: projectIds.
+
+	entities addAll: projects
+]
+
+{ #category : #setup }
+GitMetricExporter >> setupAnalysisForUsersWithNames: userNames [
+	"import all the project since a certain time"
+
+	| users |
+	users := userNames collect: [ :username |
+		         glhImporter importUserByUsername: username ].
+
+	glhImporter userCatalogue ifNotNil: [
+		glhImporter userCatalogue scrapeAuthorNamesForUsers: users ].
+
+	users do: [ :user |
+		| projects |
+		projects := glhImporter importContributedProjectsOfUser: user.
+
+		projects do: [ :project |
+			glhImporter completeImportProject: project ] ].
+
+	entities addAll: users.
+
+	^ self
+]
+
+{ #category : #accessing }
+GitMetricExporter >> userAnalyses [
+
+	^ analyses select: [ :analysis | analysis class = UserAnalysisReport ]
+]
+
+{ #category : #accessing }
+GitMetricExporter >> userEntities [
+
+	^ entities select: [ :entity | entity class = GLHUser ]
+]
+
+{ #category : #accessing }
+GitMetricExporter >> userMetrics [
+
+	^ metrics select: [ :metric | metric inheritsFrom: UserMetric ]
+]
+
+{ #category : #setup }
+GitMetricExporter >> withEmailDomain: anEmailDomain [
+
+	"define the email domain of your Git user. Usefull to link them between service (i.e. Jira)"
+	emailDomain := anEmailDomain
 ]

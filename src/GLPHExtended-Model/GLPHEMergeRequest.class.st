@@ -97,6 +97,7 @@ Class {
 		'#changes_count => FMProperty',
 		'#closed_at => FMProperty',
 		'#created_at => FMProperty',
+		'#commits => FMProperty',
 		'#description => FMProperty',
 		'#detailed_merge_status => FMProperty',
 		'#discussion_locked => FMProperty',
@@ -316,6 +317,18 @@ GLPHEMergeRequest >> closed_by: anObject [
 
 	<generated>
 	self attributeAt: #closed_by put: (FMMultivalueLink on: self update: #closedMergeRequests from: self closed_by to: anObject).
+]
+
+{ #category : #accessing }
+GLPHEMergeRequest >> commits [
+
+	^ commits
+]
+
+{ #category : #accessing }
+GLPHEMergeRequest >> commits: anObject [
+
+	commits := anObject
 ]
 
 { #category : #accessing }

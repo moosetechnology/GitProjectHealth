@@ -18,6 +18,7 @@ A GitLab Project
 ### Other
 | Relation | Origin | Opposite | Type | Comment |
 |---|
+| `contributors` | `GLHProject` | `contributedProjects` | `GLHUser` | |
 | `creator` | `GLHProject` | `createdProjects` | `GLHUser` | |
 
 
@@ -44,18 +45,19 @@ Class {
 	#traits : 'FamixTNamedEntity',
 	#classTraits : 'FamixTNamedEntity classTrait',
 	#instVars : [
-		'#id => FMProperty',
-		'#topics => FMProperty',
 		'#archived => FMProperty',
-		'#description => FMProperty',
-		'#readme_url => FMProperty',
 		'#avatar_url => FMProperty',
-		'#web_url => FMProperty',
-		'#creator_id => FMProperty',
-		'#group => FMOne type: #GLHGroup opposite: #projects',
-		'#pipelines => FMMany type: #GLHPipeline opposite: #project',
+		'#contributors => FMMany type: #GLHUser opposite: #contributedProjects',
 		'#creator => FMOne type: #GLHUser opposite: #createdProjects',
-		'#repository => FMOne type: #GLHRepository opposite: #project'
+		'#creator_id => FMProperty',
+		'#description => FMProperty',
+		'#group => FMOne type: #GLHGroup opposite: #projects',
+		'#id => FMProperty',
+		'#pipelines => FMMany type: #GLHPipeline opposite: #project',
+		'#readme_url => FMProperty',
+		'#repository => FMOne type: #GLHRepository opposite: #project',
+		'#topics => FMProperty',
+		'#web_url => FMProperty'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }
@@ -67,6 +69,12 @@ GLHProject class >> annotation [
 	<package: #'GitLabHealth-Model'>
 	<generated>
 	^ self
+]
+
+{ #category : #adding }
+GLHProject >> addContributor: anObject [
+	<generated>
+	^ self contributors add: anObject
 ]
 
 { #category : #adding }
@@ -101,6 +109,22 @@ GLHProject >> avatar_url [
 GLHProject >> avatar_url: anObject [
 	<generated>
 	avatar_url := anObject
+]
+
+{ #category : #accessing }
+GLHProject >> contributors [
+	"Relation named: #contributors type: #GLHUser opposite: #contributedProjects"
+
+	<generated>
+	<derived>
+	^ contributors
+]
+
+{ #category : #accessing }
+GLHProject >> contributors: anObject [
+
+	<generated>
+	contributors value: anObject
 ]
 
 { #category : #accessing }

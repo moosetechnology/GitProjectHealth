@@ -13,7 +13,7 @@ GLHCommit >> computeChurnForMaxCommits: aLimit [
 GLHCommit >> displayStringOn: aStream [
 
 	aStream
-		<< self short_id;
+		<< (self short_id ifNil: [ self id first: 7 ]);
 		<< ' ';
 		<< self message
 ]
@@ -39,8 +39,11 @@ GLHCommit >> inspectionGLHCommitFileImpacts [
 ]
 
 { #category : #'*GitLabHealth-Model-Extension' }
-GLHCommit >> name [
-	^ message ifNil: [ 'Commit#' , short_id ]
+GLHCommit >> mooseNameOn: stream [
+	message ifNotNil: [ :mess | stream nextPutAll: mess ] ifNil: [
+		stream
+			nextPutAll: 'Commit#';
+			nextPutAll: (short_id ifNil: [ 'unknow id' ]) ]
 ]
 
 { #category : #'*GitLabHealth-Model-Extension' }

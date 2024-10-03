@@ -13,6 +13,7 @@ A GitLab User
 ### Other
 | Relation | Origin | Opposite | Type | Comment |
 |---|
+| `contributedProjects` | `GLHUser` | `contributors` | `GLHProject` | |
 | `createdProjects` | `GLHUser` | `creator` | `GLHProject` | |
 
 
@@ -55,12 +56,14 @@ Class {
 		'#bio => FMProperty',
 		'#bot => FMProperty',
 		'#commits => FMMany type: #GLHCommit opposite: #commitCreator',
+		'#contributedProjects => FMMany type: #GLHProject opposite: #contributors',
 		'#createdProjects => FMMany type: #GLHProject opposite: #creator',
 		'#created_at => FMProperty',
 		'#followers => FMProperty',
 		'#following => FMProperty',
 		'#id => FMProperty',
 		'#job_title => FMProperty',
+		'#jobs => FMMany type: #GLHJob opposite: #user',
 		'#linkedin => FMProperty',
 		'#location => FMProperty',
 		'#name => FMProperty',
@@ -73,8 +76,7 @@ Class {
 		'#username => FMProperty',
 		'#web_url => FMProperty',
 		'#website_url => FMProperty',
-		'#work_information => FMProperty',
-		'#jobs => FMMany type: #GLHJob opposite: #user'
+		'#work_information => FMProperty'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }
@@ -92,6 +94,12 @@ GLHUser class >> annotation [
 GLHUser >> addCommit: anObject [
 	<generated>
 	^ self commits add: anObject
+]
+
+{ #category : #adding }
+GLHUser >> addContributedProject: anObject [
+	<generated>
+	^ self contributedProjects add: anObject
 ]
 
 { #category : #adding }
@@ -169,6 +177,21 @@ GLHUser >> commitsGroup [
 	<generated>
 	<navigation: 'Commits'>
 	^ MooseSpecializedGroup withAll: self commits asSet
+]
+
+{ #category : #accessing }
+GLHUser >> contributedProjects [
+	"Relation named: #contributedProjects type: #GLHProject opposite: #contributors"
+
+	<generated>
+	^ contributedProjects
+]
+
+{ #category : #accessing }
+GLHUser >> contributedProjects: anObject [
+
+	<generated>
+	contributedProjects value: anObject
 ]
 
 { #category : #accessing }
@@ -313,7 +336,7 @@ GLHUser >> name [
 
 	<FMProperty: #name type: #String>
 	<generated>
-	^ name
+	^ name 
 ]
 
 { #category : #accessing }

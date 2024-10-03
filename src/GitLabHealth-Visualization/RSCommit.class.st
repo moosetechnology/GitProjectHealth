@@ -79,7 +79,9 @@ RSCommit >> buildCommitCompleteHierachyCanvas [
 	dic := Dictionary new.
 
 
-	churnAnalyzer := GitAnalyzer new fromCommit: aCommit; maxChildCommit: 50.
+	churnAnalyzer := GitAnalyzer new
+		                 fromCommit: aCommit;
+		                 maxChildCommit: 50.
 	files2Commits := churnAnalyzer impactedFilesInFollowUpCommitsOf:
 		                 aCommit.
 	files2Commits := files2Commits select: [ :entry |
@@ -400,12 +402,14 @@ RSCommit >> shapeForCommit: aGLHCommit withColor: color [
 	group := RSGroup new.
 	impactedFiles := RSGroup new.
 	labelTitle := RSLabel new
-		              text: (aGLHCommit name truncateWithElipsisTo: 40);
+		              text: (aGLHCommit message ifNil: [ (aGLHCommit id truncateWithElipsisTo: 7) printString ] ifNotNil: [ aGLHCommit message truncateWithElipsisTo: 40] );
 		              yourself.
 
 	labelCommiter := RSLabel new
-		                 text: 'by ',
-			                 (aGLHCommit author_name truncateWithElipsisTo: 50);
+		                 text: 'by ' , (aGLHCommit author_name
+					                  ifNil: [ 'unknown' ]
+					                  ifNotNil: [ :authorName |
+						                  authorName truncateWithElipsisTo: 50 ]);
 		                 yourself.
 
 	box := RSBox new

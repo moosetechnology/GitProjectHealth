@@ -14,28 +14,6 @@ GLPHModelImporter >> blockForDiffRangeEquality [
 ]
 
 { #category : #commit }
-GLPHModelImporter >> chainsCommitsFrom: commitsCollection [
-
-	| dic |
-	
-	('Chains ', commitsCollection size printString , ' commits') recordInfo.
-	
-	dic := ((self glhModel allWithType: GLHCommit) collect: [ :commit |
-		        commit id -> commit ]) asSet asDictionary.
-
-	commitsCollection do: [ :commit |
-		commit parent_ids do: [ :parentId | 
-			dic
-				at: parentId
-				ifPresent: [ :parentCommit |
-					parentCommit childCommits
-						add: commit
-						unless: self blockOnIdEquality ]
-				ifAbsent: [  ] ] ].
-	^ commitsCollection
-]
-
-{ #category : #commit }
 GLPHModelImporter >> commitsOfProject: aGLHProject forRefName: refName until: toDate [
 
 	| newlyFoundCommit page |
@@ -158,39 +136,6 @@ GLPHModelImporter >> importCommitsOfBranch: aGLHBranch [
 		 ]
 ]
 
-{ #category : #import }
-GLPHModelImporter >> importCommitsOfMergeResquest: aGLPHEMergeRequest [
-
-	| foundCommits |
-	foundCommits := OrderedCollection new.
-
-	('Import commit sha of MR:  ' , aGLPHEMergeRequest iid printString)
-		recordInfo.
-	"the founds commits are added to the model during their respective import"
-	aGLPHEMergeRequest mergeRequestCommit: ((self
-			  importCommitOfProject: aGLPHEMergeRequest project
-			  withId: aGLPHEMergeRequest sha) ifNotNil: [ :commit |
-			 foundCommits add: commit ]).
-
-	('Import commit merge_commit_sha of MR:  '
-	 , aGLPHEMergeRequest iid printString) recordInfo.
-	aGLPHEMergeRequest mergedCommit: ((self
-			  importCommitOfProject: aGLPHEMergeRequest project
-			  withId: aGLPHEMergeRequest merge_commit_sha) ifNotNil: [ :commit |
-			 foundCommits add: commit ]).
-
-	('Import commit squash_commit_sha of MR:  '
-	 , aGLPHEMergeRequest iid printString) recordInfo.
-	aGLPHEMergeRequest squashCommit: ((self
-			  importCommitOfProject: aGLPHEMergeRequest project
-			  withId: aGLPHEMergeRequest squash_commit_sha) ifNotNil: [ :commit |
-			 foundCommits add: commit ]).
-
-
-	self chainsCommitsFrom: foundCommits.
-	^ foundCommits
-]
-
 { #category : #api }
 GLPHModelImporter >> importDiffOfCommit: aCommit [
 
@@ -216,7 +161,7 @@ GLPHModelImporter >> importDiffOfMergeRequest: aMergeRequest [
 		          diffsMergeRequestOfProject: aMergeRequest project_id
 		          withId: aMergeRequest iid.
 
-	diffsResult := self parseDiffResult: result.
+	diffsResult := self newParseDiffResult: result.
 
 
 	aMergeRequest diffs
@@ -251,9 +196,71 @@ GLPHModelImporter >> importDiffRangesForDiff: aGLHDiff [
 ]
 
 { #category : #'import - merge request' }
+GLPHModelImporter >> importMergeRequestCommits: aGLPHEMergeRequest [
+
+	| results page commits parseResult |
+	aGLPHEMergeRequest commits ifNotNil: [ ^ aGLPHEMergeRequest commits ].
+	page := 1.
+
+	parseResult := { nil }.
+	commits := OrderedCollection new.
+
+	[
+	results := glhApi
+		           commitsOfMergeRequest: aGLPHEMergeRequest iid
+		           ofProject: aGLPHEMergeRequest project id
+		           page: page
+		           perPage: 100.
+	parseResult := self parseCommitsResult: results.
+
+	commits addAll: parseResult.
+	page := page + 1 ] doWhileTrue: [ parseResult isNotEmpty ].
+
+
+	commits := commits collect: [ :commit | self importCommit: commit id ofProject: aGLPHEMergeRequest project ].
+	aGLPHEMergeRequest commits: commits.
+
+
+	^ commits
+]
+
+{ #category : #import }
+GLPHModelImporter >> importMergeRequestMergeCommits: aGLPHEMergeRequest [
+
+	| foundCommits |
+	foundCommits := OrderedCollection new.
+
+	('Import commit sha of MR:  ' , aGLPHEMergeRequest iid printString)
+		recordInfo.
+	"the founds commits are added to the model during their respective import"
+	aGLPHEMergeRequest mergeRequestCommit: ((self
+			  importCommitOfProject: aGLPHEMergeRequest project
+			  withId: aGLPHEMergeRequest sha) ifNotNil: [ :commit |
+			 foundCommits add: commit ]).
+
+	('Import commit merge_commit_sha of MR:  '
+	 , aGLPHEMergeRequest iid printString) recordInfo.
+	aGLPHEMergeRequest mergedCommit: ((self
+			  importCommitOfProject: aGLPHEMergeRequest project
+			  withId: aGLPHEMergeRequest merge_commit_sha) ifNotNil: [ :commit |
+			 foundCommits add: commit ]).
+
+	('Import commit squash_commit_sha of MR:  '
+	 , aGLPHEMergeRequest iid printString) recordInfo.
+	aGLPHEMergeRequest squashCommit: ((self
+			  importCommitOfProject: aGLPHEMergeRequest project
+			  withId: aGLPHEMergeRequest squash_commit_sha) ifNotNil: [ :commit |
+			 foundCommits add: commit ]).
+
+
+	self chainsCommitsFrom: foundCommits.
+	^ foundCommits
+]
+
+{ #category : #'import - merge request' }
 GLPHModelImporter >> importMergeRequests: aGLHProject [
 
-	| results parsedResults |
+	| results parsedResults mrs|
 	('Import merge request of Project: ' , aGLHProject id printString)
 		recordInfo.
 
@@ -264,19 +271,21 @@ GLPHModelImporter >> importMergeRequests: aGLHProject [
 		addAll: parsedResults
 		unless: self blockOnIdEquality.
 
-	self glhModel
+	mrs := self glhModel
 		addAll: aGLHProject mergeRequests
 		unless: self blockOnIdEquality.
 
 
 	"gets it related commits"
 	aGLHProject mergeRequests do: [ :mr |
-		self importCommitsOfMergeResquest: mr ].
+		self importMergeRequestMergeCommits: mr ].
 
 
 	self withCommitDiffs ifTrue: [
 		aGLHProject mergeRequests do: [ :mr |
-			self importDiffOfMergeRequest: mr ] ]
+			self importDiffOfMergeRequest: mr ] ].
+	
+	^ mrs
 ]
 
 { #category : #'import - merge request' }
@@ -313,12 +322,12 @@ GLPHModelImporter >> importMergeRequests: aGLHProject since: fromDate until: toD
 
 	"gets it related commits"
 	aGLHProject mergeRequests do: [ :mr |
-		self importCommitsOfMergeResquest: mr ].
+		self importMergeRequestMergeCommits: mr ].
 
 	self withCommitDiffs ifTrue: [
 		aGLHProject mergeRequests do: [ :mr |
 			self importDiffOfMergeRequest: mr ] ].
-	
+
 	self glhModel addAll: foundMR unless: (self blockEqualityOn: #iid).
 
 	^ foundMR
@@ -380,7 +389,7 @@ GLPHModelImporter >> importMergeResquestMerger: aGLPHEMergeRequest [
 	aGLPHEMergeRequest merge_user: (self importUser: authorID)
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'private - api' }
 GLPHModelImporter >> importProject: aProjectID [
 
 	| result projectResult |
@@ -479,7 +488,13 @@ GLPHModelImporter >> parseProjectResult: aResult [
 { #category : #accessing }
 GLPHModelImporter >> withCommitsSince: someDays [
 	"substract the current date with a given number of days. Use to retrieve the commits submit in the last giving days"
+
 	"(GLPHModelImporter new withCommitsSince: 1 week ) >>> (Date today - 1 week) asDateAndTime"
+
 	"(GLPHModelImporter new withCommitsSince: 30 day ) >>> (Date today - 30 day) asDateAndTime"
-	withCommitsSince := (Date today - someDays) asDateAndTime
+
+	(someDays isKindOf: DateAndTime)
+		ifTrue: [ withCommitsSince := someDays ]
+		ifFalse: [
+		withCommitsSince := (Date today - someDays) asDateAndTime ]
 ]
