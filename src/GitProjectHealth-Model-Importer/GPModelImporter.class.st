@@ -25,7 +25,7 @@ GPModelImporter class >> importers [
 
 { #category : #initialization }
 GPModelImporter class >> reset [
-	currentImporter := nil.
+	currentImporter := OrderedDictionary new.
 ]
 
 { #category : #accessing }
@@ -79,6 +79,19 @@ GPModelImporter >> initialize [
 
 	super initialize.
 	self withCommitsSince: (Date today - 1 week) asDateAndTime
+]
+
+{ #category : #'as yet unclassified' }
+GPModelImporter >> makeGlobal [
+	^ self makeGlobal: DateAndTime now printString.
+]
+
+{ #category : #'as yet unclassified' }
+GPModelImporter >> makeGlobal: aLabel [ 
+
+	currentImporter := GHModelImporter importers ifNil: [ OrderedDictionary new ].
+	currentImporter at: aLabel put: self. 
+	^ currentImporter 
 ]
 
 { #category : #accessing }
