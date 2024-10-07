@@ -22,12 +22,6 @@ BitBucketModelImporter >> bitBucketApi: anObject [
 	bitBucketApi := anObject
 ]
 
-{ #category : #equality }
-BitBucketModelImporter >> blockOnIdEquality [
-
-	^ [ :existing :new | existing id = new id ]
-]
-
 { #category : #'private - api' }
 BitBucketModelImporter >> completeImportProject: aGLHProject [
 
@@ -35,6 +29,68 @@ BitBucketModelImporter >> completeImportProject: aGLHProject [
 	self glhModel add: aGLHProject repository.
 	"TODO: import repository"
 	^ aGLHProject
+]
+
+{ #category : #commit }
+BitBucketModelImporter >> completeImportedCommit: aCommit [ 
+	
+	('completing commit: ' , aCommit short_id printString) recordInfo.
+	self importCreatorOfCommit: aCommit.
+
+	self withCommitDiffs ifTrue: [
+		| diffs |
+		aCommit diffs ifEmpty: [
+			diffs := self importDiffOfCommit: aCommit.
+			self glhModel addAll: diffs unless: self blockForDiffEquality ] ].
+
+	^ aCommit
+]
+
+{ #category : #convert }
+BitBucketModelImporter >> convertBitBucketDiffToGitDiff: response [ 
+	| bitbucketDiff gitDiff filePath fromHash toHash sourceLine sourceSpan destinationLine destinationSpan result|
+	
+	 fromHash := (response at: 'fromHash') ifNil: '' .
+    toHash := (response at: 'toHash') ifNil: ''.
+	
+gitDiff := ''.
+"Iterate over each diff in 'diffs'"
+result := (response at: #diffs) collect: [:diff |
+
+    "Extract file path, hashes"
+    filePath := (diff at: 'source') at: 'toString'.
+
+    "Build the diff header"
+   " gitDiff := gitDiff , 'diff --git a/', filePath, ' b/', filePath, String cr."
+   " gitDiff := gitDiff , 'index ', fromHash, '..', toHash, ' 100644', String cr."
+    gitDiff := gitDiff , '--- a/', filePath, String cr.
+    gitDiff := gitDiff , '+++ b/', filePath, String cr.
+
+    "Iterate over hunks"
+    (diff at: 'hunks') do: [:hunk |
+        sourceLine := hunk at: 'sourceLine'.
+        sourceSpan := hunk at: 'sourceSpan'.
+        destinationLine := hunk at: 'destinationLine'.
+        destinationSpan := hunk at: 'destinationSpan'.
+
+        "Hunk header"
+        gitDiff := gitDiff , ('@@ -{1},{2} +{3},{4} @@' format: { sourceLine. sourceSpan. destinationLine. destinationSpan }), String cr.
+
+        "Iterate over segments"
+        (hunk at: 'segments') do: [:segment |
+            (segment at: 'lines') do: [:line |
+                (segment at: 'type') = 'REMOVED'
+                    ifTrue: [ gitDiff := gitDiff , '-', (line at: 'line'), String cr ].
+                (segment at: 'type') = 'ADDED'
+                    ifTrue: [ gitDiff := gitDiff , '+', (line at: 'line'), String cr ].
+            ].
+        ].
+    ].
+	GLHDiff new diffString: gitDiff; new_path: filePath; old_path: 'filePath'.
+].
+
+ ^ result
+
 ]
 
 { #category : #'private - api' }
@@ -177,6 +233,30 @@ BitBucketModelImporter >> importCreatorOfCommit: aGLHCommit [
 	creator := self importUserByUsername: aGLHCommit author_name.
 	aGLHCommit commitCreator: creator.
 	^ creator
+]
+
+{ #category : #api }
+BitBucketModelImporter >> importDiffOfCommit: aCommit [
+
+		| result diffsResult |
+	aCommit diffs ifNotEmpty: [
+		'Diff already importer: ' , aCommit short_id printString recordInfo.
+		^ aCommit diffs ].
+	('Import diff of commit: ' , aCommit short_id printString) recordInfo.
+	result := self bitBucketApi 
+		          diffsOfCommit: aCommit id
+					 inRepo: aCommit repository project id
+		          inProject: aCommit repository project group id.
+		         
+	diffsResult := self convertBitBucketDiffToGitDiff: result.
+
+
+	aCommit diffs addAll: diffsResult unless: self blockForDiffEquality.
+	
+	"changes are added into the model during the import"
+	aCommit diffs do: [ :diff | self importDiffRangesForDiff: diff ].
+
+	^ aCommit diffs
 ]
 
 { #category : #'import - merge-requests' }

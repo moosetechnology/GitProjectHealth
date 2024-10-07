@@ -40,32 +40,6 @@ GLHModelImporter >> addGroupResultToModel: groupResult [
 ]
 
 { #category : #'as yet unclassified' }
-GLHModelImporter >> blockEqualityOn: aSymbol [
-	^ [ :existing :new |
-	  (existing perform: aSymbol) = (new perform: aSymbol) ]
-]
-
-{ #category : #equality }
-GLHModelImporter >> blockForDiffEquality [
-	^ [ :existing :new |
-			existing diffString size = new diffString size and: [
-				existing diffString = new diffString ] ]
-]
-
-{ #category : #equality }
-GLHModelImporter >> blockOnIdEquality [
-
-	^ [ :existing :new |
-	  existing id = new id ]
-]
-
-{ #category : #equality }
-GLHModelImporter >> blockOnNameEquality [
-
-	^ self blockEqualityOn: #name
-]
-
-{ #category : #'as yet unclassified' }
 GLHModelImporter >> chainsCommitsFrom: commitsCollection [
 
 	| dic |
@@ -210,17 +184,6 @@ GLHModelImporter >> detectEntityType: aType overAttribut: aSelector equalTo: val
 
 	^ (self glhModel allWithType: aType) detect: [ :entity |
 		  (entity perform: aSelector) = value ] ifNone: [ nil ]. 
-]
-
-{ #category : #'as yet unclassified' }
-GLHModelImporter >> filterCommitChanges: aCollection [
-
-	^ aCollection reject: [ :line |
-		  | trimmedLine |
-		  trimmedLine := line trimLeft.
-		  (trimmedLine beginsWith: '---') or: [
-			  (trimmedLine beginsWith: '+++') or: [
-				  trimmedLine beginsWith: '\ No newline at end of file' ] ] ]
 ]
 
 { #category : #accessing }
