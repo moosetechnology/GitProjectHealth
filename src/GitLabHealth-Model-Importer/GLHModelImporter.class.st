@@ -611,6 +611,7 @@ GLHModelImporter >> importDiffOfCommit: aCommit [
 		          commitDiff: aCommit id
 		          ofProject: aCommit repository project id
 		          unidiff: true.
+	(self isServerError: result) ifTrue: [ ^ {  } ].
 	diffsResult := self newParseDiffResult: result.
 
 	^ aCommit diffs addAll: diffsResult unless: self blockForDiffEquality.
@@ -924,6 +925,11 @@ GLHModelImporter >> initialize [
 		                 yourself.
 	self initReader.
 
+]
+
+{ #category : #api }
+GLHModelImporter >> isServerError: aString [
+	^ aString = '{"message":"500 Internal Server Error"}'
 ]
 
 { #category : #importer }
