@@ -349,8 +349,11 @@ BitBucketModelImporter >> importMergeResquestMerger: mergeRequest [
 { #category : #'import - users' }
 BitBucketModelImporter >> importUserByUsername: username [
 
-	^ self userCatalogue at: username ifAbsent: [
+	 
+
+	^ self userCatalogue collectUsernames at: username ifAbsent: [
 		|users glhUser user|
+		
 		users := self repoApi usersByUsername: username.
 		users ifEmpty: [ ^ nil ].
 		user := users first.
