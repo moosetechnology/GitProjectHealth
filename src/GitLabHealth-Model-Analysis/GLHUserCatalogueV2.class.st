@@ -198,14 +198,15 @@ GLHUserCatalogueV2 >> atId: anId [
 GLHUserCatalogueV2 >> collectUsernames [
 
 	| username2User |
-	self ifEmpty: [ ^ {  } ].
+	self ifEmpty: [ ^ OrderedDictionary new ].
 
 	username2User := OrderedDictionary new.
 
 	self associationsDo: [ :assoc |
 		| user |
-		user := assoc value at: #user .
-		(assoc value at: #names) do: [ :username | username2User at: username put: user ] ].
+		user := assoc value at: #user.
+		(assoc value at: #names) do: [ :username |
+			username2User at: username put: user ] ].
 
 	^ username2User
 ]
