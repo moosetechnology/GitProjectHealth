@@ -10,7 +10,9 @@ Class {
 	#instVars : [
 		'withCommitsSince',
 		'withFiles',
-		'glhModel'
+		'glhModel',
+		'userCatalogue',
+		'repoApi'
 	],
 	#classVars : [
 		'currentImporter'
@@ -143,7 +145,10 @@ GPModelImporter >> importDiffRangesForDiff: aGLHDiff [
 GPModelImporter >> initialize [
 
 	super initialize.
-	self withCommitsSince: (Date today - 1 week) asDateAndTime
+	self withCommitsSince: (Date today - 1 week) asDateAndTime.
+		userCatalogue := GLHUserCatalogueV2 new
+		                 anImporter: self;
+		                 yourself.
 ]
 
 { #category : #'as yet unclassified' }
@@ -199,6 +204,30 @@ GPModelImporter >> parseDiffString: aDiff [
 					existing index = new index ] ] ] ].
 
 	^ aDiff diffRanges
+]
+
+{ #category : #accessing }
+GPModelImporter >> repoApi [
+
+	^ repoApi
+]
+
+{ #category : #accessing }
+GPModelImporter >> repoApi: anObject [
+
+	repoApi := anObject
+]
+
+{ #category : #accessing }
+GPModelImporter >> userCatalogue [
+	^ userCatalogue 
+]
+
+{ #category : #accessing }
+GPModelImporter >> userCatalogue: aGLHUserCatalogue [
+
+	userCatalogue := aGLHUserCatalogue.
+	aGLHUserCatalogue anImporter: self. 
 ]
 
 { #category : #accessing }

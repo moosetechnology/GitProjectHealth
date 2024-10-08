@@ -1,22 +1,31 @@
 Class {
 	#name : #GHModelImporter,
 	#superclass : #GPModelImporter,
-	#instVars : [
-		'api'
-	],
 	#category : #'GitHubHealth-Model-Importer'
 }
 
 { #category : #accessing }
 GHModelImporter >> api [
 
-	^ api
+	self
+		deprecated: 'Use #repoApi instead'
+		on: '7 October 2024'
+		in:
+		'Pharo-11.0.0+build.726.sha.aece1b5473acf3830a0e082c1bc3a15d4ff3522b (64 Bit)'.
+
+	^ repoApi
 ]
 
 { #category : #accessing }
 GHModelImporter >> api: anObject [
 
-	api := anObject
+	self
+		deprecated: 'Use #repoApi: instead'
+		on: '7 October 2024'
+		in:
+		'Pharo-11.0.0+build.726.sha.aece1b5473acf3830a0e082c1bc3a15d4ff3522b (64 Bit)'.
+
+	repoApi := anObject
 ]
 
 { #category : #api }

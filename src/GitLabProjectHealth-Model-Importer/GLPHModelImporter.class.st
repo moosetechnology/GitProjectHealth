@@ -178,7 +178,7 @@ GLPHModelImporter >> importMergeRequestCommits: aGLPHEMergeRequest [
 	commits := OrderedCollection new.
 
 	[
-	results := glhApi
+	results := repoApi
 		           commitsOfMergeRequest: aGLPHEMergeRequest iid
 		           ofProject: aGLPHEMergeRequest project id
 		           page: page

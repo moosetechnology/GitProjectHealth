@@ -2,12 +2,10 @@ Class {
 	#name : #GLHModelImporter,
 	#superclass : #GPModelImporter,
 	#instVars : [
-		'glhApi',
 		'withCommitDiffs',
 		'withInitialCommits',
 		'withInitialMergeRequest',
-		'generalReader',
-		'userCatalogue'
+		'generalReader'
 	],
 	#category : #'GitLabHealth-Model-Importer'
 }
@@ -189,13 +187,25 @@ GLHModelImporter >> detectEntityType: aType overAttribut: aSelector equalTo: val
 { #category : #accessing }
 GLHModelImporter >> glhApi [
 
-	^ glhApi
+	self
+		deprecated: 'Use #repoApi instead'
+		on: '7 October 2024'
+		in:
+		'Pharo-11.0.0+build.726.sha.aece1b5473acf3830a0e082c1bc3a15d4ff3522b (64 Bit)'.
+
+	^ repoApi
 ]
 
 { #category : #accessing }
 GLHModelImporter >> glhApi: anObject [
 
-	glhApi := anObject
+	self
+		deprecated: 'Use #repoApi: instead'
+		on: '7 October 2024'
+		in:
+		'Pharo-11.0.0+build.726.sha.aece1b5473acf3830a0e082c1bc3a15d4ff3522b (64 Bit)'.
+
+	repoApi := anObject
 ]
 
 { #category : #accessing }
@@ -882,9 +892,7 @@ GLHModelImporter >> initialize [
 	withInitialMergeRequest := false.
 
 	withCommitsSince := (Date today - 1 week) asDateAndTime.
-	userCatalogue := GLHUserCatalogueV2 new
-		                 anImporter: self;
-		                 yourself.
+
 	self initReader.
 
 ]
@@ -1198,18 +1206,6 @@ GLHModelImporter >> subGroupsOf: aGroupID [
 				page := page + 1. ].
 	
 	^ results
-]
-
-{ #category : #accessing }
-GLHModelImporter >> userCatalogue [
-	^ userCatalogue 
-]
-
-{ #category : #accessing }
-GLHModelImporter >> userCatalogue: aGLHUserCatalogue [
-
-	userCatalogue := aGLHUserCatalogue.
-	aGLHUserCatalogue anImporter: self. 
 ]
 
 { #category : #accessing }

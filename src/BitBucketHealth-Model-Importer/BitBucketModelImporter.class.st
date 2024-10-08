@@ -2,10 +2,8 @@ Class {
 	#name : #BitBucketModelImporter,
 	#superclass : #GPModelImporter,
 	#instVars : [
-		'bitBucketApi',
 		'withCommitDiffs',
-		'withInitialCommits',
-		'userCatalogue'
+		'withInitialCommits'
 	],
 	#category : #'BitBucketHealth-Model-Importer'
 }
@@ -13,13 +11,25 @@ Class {
 { #category : #accessing }
 BitBucketModelImporter >> bitBucketApi [
 
-	^ bitBucketApi
+	self
+		deprecated: 'Use #repoApi instead'
+		on: '7 October 2024'
+		in:
+		'Pharo-11.0.0+build.726.sha.aece1b5473acf3830a0e082c1bc3a15d4ff3522b (64 Bit)'.
+
+	^ repoApi
 ]
 
 { #category : #accessing }
 BitBucketModelImporter >> bitBucketApi: anObject [
 
-	bitBucketApi := anObject
+	self
+		deprecated: 'Use #repoApi: instead'
+		on: '7 October 2024'
+		in:
+		'Pharo-11.0.0+build.726.sha.aece1b5473acf3830a0e082c1bc3a15d4ff3522b (64 Bit)'.
+
+	repoApi := anObject
 ]
 
 { #category : #'private - api' }
@@ -132,11 +142,17 @@ BitBucketModelImporter >> getContributionFromDiffs: diffs [
 	^ contribution
 ]
 
+{ #category : #'comment import' }
+BitBucketModelImporter >> importAndLoadLatestsCommitsOfProject: aGLHProject [ 
+	
+	^ self importCommitsOfProject: aGLHProject since: (Date today - 3 week) asDateAndTime  until: Date today asDateAndTime 
+]
+
 { #category : #'import - commits' }
 BitBucketModelImporter >> importCommitsOfProject: aGLHProject since: since until: until [
 
 	| commits |
-	commits := bitBucketApi
+	commits := self repoApi
 		           commitsOfRepo: aGLHProject id
 		           inProject: aGLHProject group id
 		           since: since
@@ -145,7 +161,7 @@ BitBucketModelImporter >> importCommitsOfProject: aGLHProject since: since until
 	commits := commits collect: [ :commit |
 		           | glhCommit commitDiffs contribution |
 		           glhCommit := self parseCommitIntoGLHCommit: commit.
-		           commitDiffs := self bitBucketApi
+		           commitDiffs := self repoApi
 			                          diffsOfCommit: glhCommit id
 			                          inRepo: aGLHProject id
 			                          inProject: aGLHProject group id.
@@ -167,17 +183,17 @@ BitBucketModelImporter >> importContributedProjectsOfUser: aGLHUser [
 
 	| projects repositories repositoriesCommits userRepositories userProjects |
 	"get all projects"
-	projects := self bitBucketApi projects.
+	projects := self repoApi projects.
 
 	"get all repos of projects"
 	repositories := projects flatCollect: [ :project |
-		                self bitBucketApi repositoriesOfProject:
+		                self repoApi repositoriesOfProject:
 			                (project at: #key) ].
 
 
 	"get all commits of repo"
 	repositoriesCommits := repositories collect: [ :repository |
-		                       repository -> (self bitBucketApi
+		                       repository -> (self repoApi
 			                        commitsOfRepo: (repository at: #slug)
 			                        inProject:
 			                        ((repository at: #project) at: #key)
@@ -238,21 +254,21 @@ BitBucketModelImporter >> importCreatorOfCommit: aGLHCommit [
 { #category : #api }
 BitBucketModelImporter >> importDiffOfCommit: aCommit [
 
-		| result diffsResult |
+	| result diffsResult |
 	aCommit diffs ifNotEmpty: [
 		'Diff already importer: ' , aCommit short_id printString recordInfo.
 		^ aCommit diffs ].
 	('Import diff of commit: ' , aCommit short_id printString) recordInfo.
-	result := self bitBucketApi 
+	result := self repoApi
 		          diffsOfCommit: aCommit id
-					 inRepo: aCommit repository project id
+		          inRepo: aCommit repository project id
 		          inProject: aCommit repository project group id.
-		         
+
 	diffsResult := self convertBitBucketDiffToGitDiff: result.
 
 
 	aCommit diffs addAll: diffsResult unless: self blockForDiffEquality.
-	
+
 	"changes are added into the model during the import"
 	aCommit diffs do: [ :diff | self importDiffRangesForDiff: diff ].
 
@@ -263,7 +279,7 @@ BitBucketModelImporter >> importDiffOfCommit: aCommit [
 BitBucketModelImporter >> importMergeRequestCommits: mergeRequest [
 
 	| commits |
-	commits := self bitBucketApi
+	commits := self repoApi
 		           commitsOfPullRequest: mergeRequest id
 		           ofRepo: mergeRequest project id
 		           inProject: mergeRequest project group id.
@@ -280,7 +296,7 @@ BitBucketModelImporter >> importMergeRequestCommits: mergeRequest [
 BitBucketModelImporter >> importMergeRequests: aGLHProject since: fromDate until: toDate [
 
 	| pullRequests |
-	pullRequests := bitBucketApi
+	pullRequests := self repoApi
 		                pullRequestsOfRepo: aGLHProject id
 		                inProject: aGLHProject group id
 		                since: fromDate
@@ -307,7 +323,7 @@ BitBucketModelImporter >> importMergeResquestMerger: mergeRequest [
 	mergeRequest merge_user ifNotNil: [ ^ mergeRequest merge_user ].
 	mergeRequest state = 'merged' ifFalse: [ ^ nil ].
 
-	activities := self bitBucketApi
+	activities := self repoApi
 		              activitiesOfPullRequest: mergeRequest id
 		              inRepo: mergeRequest project id
 		              ofProject: mergeRequest project group id.
@@ -333,17 +349,19 @@ BitBucketModelImporter >> importMergeResquestMerger: mergeRequest [
 { #category : #'import - users' }
 BitBucketModelImporter >> importUserByUsername: username [
 
-	| users user glhUser |
-	users := self bitBucketApi usersByUsername: username.
+	^ self userCatalogue at: username ifAbsent: [
+		|users glhUser user|
+		users := self repoApi usersByUsername: username.
+		users ifEmpty: [ ^ nil ].
+		user := users first.
+
+		glhUser := self parseUserIntoGLHUser: user.
+		self glhModel add: glhUser unless: self blockOnIdEquality.
+		self userCatalogue addUser: glhUser withName: username. 
+		glhUser
+		 ].
 	
-	users ifEmpty: [ ^nil ].
-
-	user := users first.
-
-	glhUser := self parseUserIntoGLHUser: user.
-
-	self glhModel add: glhUser unless: [ :nu :ou | nu id = ou id ].
-	^ glhUser
+	
 ]
 
 { #category : #parsing }
@@ -491,18 +509,6 @@ BitBucketModelImporter >> parseUserIntoGLHUser: userDictionnary [
 		public_email: (userDictionnary at: #emailAddress);
 		id: (userDictionnary at: #id);
 		username: (userDictionnary at: #name).
-]
-
-{ #category : #accessing }
-BitBucketModelImporter >> userCatalogue [
-
-	^ userCatalogue
-]
-
-{ #category : #accessing }
-BitBucketModelImporter >> userCatalogue: anObject [
-
-	userCatalogue := anObject
 ]
 
 { #category : #accessing }
