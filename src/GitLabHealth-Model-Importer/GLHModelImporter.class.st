@@ -685,9 +685,13 @@ GLHModelImporter >> importLastestCommitsOfProject: aGLHProject [
 		           perPage: 50
 		           page: nil.
 	parsedResults := self parseCommitsResult: results.
-	parsedResults := self glhModel addAll: parsedResults unless: self blockOnIdEquality.
+	parsedResults := self glhModel
+		                 addAll: parsedResults
+		                 unless: self blockOnIdEquality.
 
-	aGLHProject repository commits addAll: parsedResults unless: self blockOnIdEquality.
+	aGLHProject repository commits
+		addAll: parsedResults
+		unless: self blockOnIdEquality.
 	"parsedResults do: [ :commit |
 		commit repository: aGLHProject repository ]."
 
@@ -819,7 +823,7 @@ GLHModelImporter >> importUser: aUserID [
 		detect: [ :user | user id = aUserID ]
 		ifFound: [ :user | ^ user ].
 	('Import user: ' , aUserID printString) recordInfo.
-	result := self repoApi userWithId: aUserID.
+	result := self repoApi user: aUserID.
 	userResult := self parseUserResult: result.
 	^ self glhModel add: userResult unless: self blockOnIdEquality
 ]
@@ -840,7 +844,7 @@ GLHModelImporter >> importUserByUsername: anUsername [
 			              | result userId searchResult |
 			              ('Import user with username: '
 			               , anUsername printString) recordInfo.
-			              result := self repoApi usersSearchByUsername:
+			              result := self glhApi usersSearchByUsername:
 				                        anUsername.
 			              searchResult := NeoJSONReader fromString: result.
 
@@ -1084,7 +1088,7 @@ GLHModelImporter >> parseJobsResult: result ofProject: aProject [
 			mapProperty: #user
 			getter: [ :object | #ignore ]
 			setter: [ :object :value |
-			object userWithId: (self importUser: (value at: #id)) ].
+			object user: (self importUser: (value at: #id)) ].
 
 		mapping
 			mapProperty: #commit

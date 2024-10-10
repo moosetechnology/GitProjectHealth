@@ -165,7 +165,7 @@ UserMetric >> loadUserCommitsSince: since until: until [
 UserMetric >> loadUserCompleteCommitsSince: since until: until [
 
 	| commits |
-
+	1 halt.
 	commits := self loadUserCommitsSince: since until: until.
 	commits do: [ :commit | glhImporter completeImportedCommit: commit ].
 	^ commits
@@ -237,15 +237,15 @@ UserMetric >> name [
 	^ self subclassResponsibility
 ]
 
+{ #category : #accessing }
+UserMetric >> user: anObject [
+
+	user := anObject
+]
+
 { #category : #email }
 UserMetric >> userEmail [
 	^ ('' join: {
 			   user username.
 			   emailDomain }) asLowercase
-]
-
-{ #category : #accessing }
-UserMetric >> userWithId: anObject [
-
-	user := anObject
 ]

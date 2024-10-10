@@ -8,7 +8,7 @@ GLHUser >> computeCommitFrequencyOver: aDateWeekMonthOrYear [
 		                  a created_at < b created_at ].
 
 	^ GitMetric4User new
-		  userWithId: self;
+		  user: self;
 		glhImporter: GLHModelImporter current;
 		itsProjects: (self commits collect: [ :c |
 					   c repository project id -> c repository project ]) asDictionary ;
@@ -21,7 +21,7 @@ GLHUser >> computeCommitFrequencyOver: aDateWeekMonthOrYear [
 GLHUser >> computeCommitFrequencySince: since until: until overA: aDateWeekMonthOrYear [
 
 	^ GitMetric4User new
-		  userWithId: self;
+		  user: self;
 		  glhImporter: GLHModelImporter current;
 		  itsProjects: (self commits collect: [:c |  (c repository project id) -> (c repository project) ]) asDictionary;
 		  commitFrequencySince: since

@@ -31,7 +31,7 @@ OpenedMergeRequestMetricTest >> testCalculate [
 
 
 	openedMergeRequest := OpenedMergeRequestMetric new
-		                      userWithId: user;
+		                      user: user;
 		                      glhImporter: glhImporter;
 		                      setPeriodSince: '09-01-2024'
 		                      until: '09-07-2024';
@@ -76,7 +76,7 @@ OpenedMergeRequestMetricTest >> testCalculate1OpenedAnd2NotOpenedByUser [
 
 
 	openedMergeRequest := OpenedMergeRequestMetric new
-		                      userWithId: user;
+		                      user: user;
 		                      glhImporter: glhImporter;
 		                      setPeriodSince: '09-01-2024'
 		                      until: '09-07-2024';
@@ -103,7 +103,7 @@ OpenedMergeRequestMetricTest >> testCalculateNoMergeRequests [
 
 
 	openedMergeRequest := OpenedMergeRequestMetric new
-		                      userWithId: user;
+		                      user: user;
 		                      glhImporter: glhImporter;
 		                      setPeriodSince: '09-01-2024'
 		                      until: '09-07-2024';
@@ -145,7 +145,7 @@ OpenedMergeRequestMetricTest >> testCalculateNotOpenedByUser [
 
 
 	openedMergeRequest := OpenedMergeRequestMetric new
-		                      userWithId: user;
+		                      user: user;
 		                      glhImporter: glhImporter;
 		                      setPeriodSince: '09-01-2024'
 		                      until: '09-07-2024';

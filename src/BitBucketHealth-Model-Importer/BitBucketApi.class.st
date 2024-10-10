@@ -105,7 +105,7 @@ BitBucketApi >> commitsOfRepoProjectId: repositorySlug inProjectGroupId: project
 	self client path:
 		self basePath , '/projects/' , projectKey , '/repos/'
 		, repositorySlug , '/commits'.
-	self client queryAt: 'merges' put: 'exclude'.
+	"self client queryAt: 'merges' put: 'exclude'."
 
 	commits := OrderedCollection new.
 
@@ -236,7 +236,7 @@ BitBucketApi >> repositoryProjectsOfProjectGroupId: projectKey [
 ]
 
 { #category : #'api - user' }
-BitBucketApi >> userWithId: accountId [
+BitBucketApi >> user: accountId [
 	"https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/#api-user-get"
 
 	self prepareZnClient.

@@ -43,7 +43,7 @@ CodeAdditionByTicketMetricTest >> testCalculate [
 
 
 	codeAddition := CodeAdditionByTicketMetric new
-		                userWithId: user;
+		                user: user;
 		                glhImporter: glhImporter;
 		                jiraImporter: jiraImporter;
 		                setPeriodSince: '09-04-2024' until: '09-04-2024';
@@ -81,7 +81,7 @@ CodeAdditionByTicketMetricTest >> testCalculateNoCommits [
 
 
 	codeAddition := CodeAdditionByTicketMetric new
-		                userWithId: user;
+		                user: user;
 		                glhImporter: glhImporter;
 		                jiraImporter: jiraImporter;
 		                setPeriodSince: '09-04-2024' until: '09-04-2024';
@@ -113,7 +113,7 @@ CodeAdditionByTicketMetricTest >> testCalculateNoMergeRequests [
 
 
 	codeAddition := CodeAdditionByTicketMetric new
-		                userWithId: user;
+		                user: user;
 		                glhImporter: glhImporter;
 		                jiraImporter: jiraImporter;
 		                setPeriodSince: '09-04-2024' until: '09-04-2024';

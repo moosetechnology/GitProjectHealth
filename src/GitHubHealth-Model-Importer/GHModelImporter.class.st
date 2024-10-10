@@ -246,7 +246,7 @@ GHModelImporter >> importUser: userID [
 		detect: [ :user | user id = userID ]
 		ifFound: [ :user | ^ user ].
 	('Import user: ' , userID printString) recordInfo.
-	result := self api userWithId: userID.
+	result := self api user: userID.
 	userResult := self parseUserResult: result.
 	^ glhModel
 		  add: userResult

@@ -374,7 +374,7 @@ GitMetricExporter >> generateUsersAnalysesDuringPeriod: period over: aDateWeekMo
 				               setPeriodSince: (period at: #since)
 				               until: (period at: #until);
 				               over: aDateWeekMonthOrYear;
-				               userWithId: user;
+				               user: user;
 									emailDomain: emailDomain.
 
 

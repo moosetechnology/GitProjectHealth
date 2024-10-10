@@ -57,51 +57,66 @@ BitBucketModelImporter >> completeImportedCommit: aCommit [
 ]
 
 { #category : #convert }
-BitBucketModelImporter >> convertBitBucketDiffToGitDiff: response [ 
-	| bitbucketDiff gitDiff filePath fromHash toHash sourceLine sourceSpan destinationLine destinationSpan result filePathSource filePathDestination |
+BitBucketModelImporter >> convertBitBucketDiffToGitDiff: response [
+
+	| bitbucketDiff filePath fromHash toHash sourceLine sourceSpan destinationLine destinationSpan result filePathSource filePathDestination |
+	fromHash := (response at: 'fromHash') ifNil: ''.
+	toHash := (response at: 'toHash') ifNil: ''.
+
 	
-	 fromHash := (response at: 'fromHash') ifNil: '' .
-    toHash := (response at: 'toHash') ifNil: ''.
-	
-gitDiff := ''.
-"Iterate over each diff in 'diffs'"
-result := (response at: #diffs) collect: [:diff |
+	"Iterate over each diff in 'diffs'"
+	result := (response at: #diffs) collect: [ :diff | "Extract file path, hashes"
+		|gitDiff|
+		gitDiff := ''.
+		          filePathSource := (diff at: 'source')
+			                            ifNil: ''
+			                            ifNotNil: [ :source |
+			                            source at: 'toString' ].
+		          filePathDestination := (diff at: 'destination')
+			                                 ifNil: ''
+			                                 ifNotNil: [ :destination |
+			                                 destination at: 'toString' ].
 
-    "Extract file path, hashes"
-    filePathSource := (diff at: 'source') ifNil: '' ifNotNil: [ :source | source at: 'toString'  ]   .
-	 filePathDestination := (diff at: 'destination') ifNil: '' ifNotNil: [ :destination | destination at: 'toString'  ].
+		          "Build the diff header"
+		          " gitDiff := gitDiff , 'diff --git a/', filePath, ' b/', filePath, String cr."
+		          " gitDiff := gitDiff , 'index ', fromHash, '..', toHash, ' 100644', String cr."
+		          gitDiff := gitDiff , '--- a/' , filePathSource , String cr.
+		          gitDiff := gitDiff , '+++ b/' , filePathDestination
+		                     , String cr.
 
-    "Build the diff header"
-   " gitDiff := gitDiff , 'diff --git a/', filePath, ' b/', filePath, String cr."
-   " gitDiff := gitDiff , 'index ', fromHash, '..', toHash, ' 100644', String cr."
-    gitDiff := gitDiff , '--- a/', filePathSource, String cr.
-    gitDiff := gitDiff , '+++ b/', filePathDestination, String cr.
+		          "Iterate over hunks"
+		          (diff at: 'hunks') do: [ :hunk |
+			          sourceLine := hunk at: 'sourceLine'.
+			          sourceSpan := hunk at: 'sourceSpan'.
+			          destinationLine := hunk at: 'destinationLine'.
+			          destinationSpan := hunk at: 'destinationSpan'.
 
-    "Iterate over hunks"
-    (diff at: 'hunks') do: [:hunk |
-        sourceLine := hunk at: 'sourceLine'.
-        sourceSpan := hunk at: 'sourceSpan'.
-        destinationLine := hunk at: 'destinationLine'.
-        destinationSpan := hunk at: 'destinationSpan'.
+			          "Hunk header"
+			          gitDiff := gitDiff
+			                     , ('@@ -{1},{2} +{3},{4} @@' format: {
+						                      sourceLine.
+						                      sourceSpan.
+						                      destinationLine.
+						                      destinationSpan }) , String cr.
 
-        "Hunk header"
-        gitDiff := gitDiff , ('@@ -{1},{2} +{3},{4} @@' format: { sourceLine. sourceSpan. destinationLine. destinationSpan }), String cr.
+			          "Iterate over segments"
+			          (hunk at: 'segments') do: [ :segment |
+				          (segment at: 'lines') do: [ :line |
+								(segment at: 'type') = 'CONTEXT' ifTrue: [
+						          gitDiff := gitDiff , (line at: 'line')
+						                     , String cr ].
+								(segment at: 'type') = 'REMOVED' ifTrue: [
+						          gitDiff := gitDiff , '-' , (line at: 'line')
+						                     , String cr ].
+					          (segment at: 'type') = 'ADDED' ifTrue: [
+						          gitDiff := gitDiff , '+' , (line at: 'line')
+						                     , String cr ] ] ] ].
+		          GLHDiff new
+			          diffString: gitDiff;
+			          old_path: filePathSource;
+			          new_path: filePathDestination ].
 
-        "Iterate over segments"
-        (hunk at: 'segments') do: [:segment |
-            (segment at: 'lines') do: [:line |
-                (segment at: 'type') = 'REMOVED'
-                    ifTrue: [ gitDiff := gitDiff , '-', (line at: 'line'), String cr ].
-                (segment at: 'type') = 'ADDED'
-                    ifTrue: [ gitDiff := gitDiff , '+', (line at: 'line'), String cr ].
-            ].
-        ].
-    ].
-	GLHDiff new diffString: gitDiff; old_path: filePathSource ;new_path: filePathDestination .
-].
-
- ^ result
-
+	^ result
 ]
 
 { #category : #'private - api' }

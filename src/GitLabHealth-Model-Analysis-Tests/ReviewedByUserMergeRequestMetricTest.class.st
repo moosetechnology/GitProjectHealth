@@ -38,7 +38,7 @@ ReviewedByUserMergeRequestMetricTest >> testCalculate [
 
 	mergeRequests := ReviewedByUserMergeRequestMetric
 		                                   new
-		                                   userWithId: user;
+		                                   user: user;
 		                                   glhImporter: glhImporter;
 		                                   setPeriodSince: '09-04-2024'
 		                                   until: '09-04-2024';
@@ -67,7 +67,7 @@ ReviewedByUserMergeRequestMetricTest >> testCalculateNoMergeRequests [
 
 	mergeRequests := ReviewedByUserMergeRequestMetric
 		                                   new
-		                                   userWithId: user;
+		                                   user: user;
 		                                   glhImporter: glhImporter;
 		                                   setPeriodSince: '09-04-2024'
 		                                   until: '09-04-2024';
@@ -106,7 +106,7 @@ ReviewedByUserMergeRequestMetricTest >> testCalculateReviewButNotCreated [
 
 	mergedMergeRequestWithoutReview := ReviewedByUserMergeRequestMetric
 		                                   new
-		                                   userWithId: user;
+		                                   user: user;
 		                                   glhImporter: glhImporter;
 		                                   setPeriodSince: '09-04-2024'
 		                                   until: '09-04-2024';
@@ -151,7 +151,7 @@ ReviewedByUserMergeRequestMetricTest >> testCalculateReviewByOther [
 
 	mergedMergeRequestWithoutReview := ReviewedByUserMergeRequestMetric 
 		                                   new
-		                                   userWithId: user;
+		                                   user: user;
 		                                   glhImporter: glhImporter;
 		                                   setPeriodSince: '09-04-2024'
 		                                   until: '09-04-2024';

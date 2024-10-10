@@ -79,7 +79,6 @@ RSCommit >> buildCommitCompleteHierachyCanvas [
 	dic := Dictionary new.
 
 
-
 	churnAnalyzer := GitAnalyzer new
 		                 fromCommit: aCommit;
 		                 maxChildCommit: 50.
@@ -112,13 +111,13 @@ RSCommit >> buildCommitCompleteHierachyCanvas [
 	allCommitShps do: [ :shp |
 		| commit |
 		commit := shp model.
-		commit author_name  = aCommit author_name ifTrue: [
-		
-			(shp children detect: [ :c | c class = RSBox ]) border:
-				(RSBorder new
-					 width: 5;
-					 color: self defaultColor;
-					 yourself) ] ].
+		commit commitCreator = commitShape first model commitCreator
+			ifTrue: [
+				(shp children detect: [ :c | c class = RSBox ]) border:
+					(RSBorder new
+						 width: 5;
+						 color: self defaultColor;
+						 yourself) ] ].
 
 
 

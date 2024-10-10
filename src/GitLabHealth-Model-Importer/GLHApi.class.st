@@ -526,7 +526,7 @@ GLHApi >> treeOfRepository: aProjectID ofBranch: aBranchRef andPath: aPath [
 ]
 
 { #category : #api }
-GLHApi >> userWithId: aUserID [
+GLHApi >> user: aUserID [
 
 	^ self client get: self baseAPIUrl , '/users/' , aUserID printString
 ]

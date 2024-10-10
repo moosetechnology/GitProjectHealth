@@ -37,7 +37,7 @@ CommitsNumberByJiraTicketsMetricTest >> testCalculate [
 
 
 	commitsNumber := CommitsNumberByJiraTicketsMetric new
-		                 userWithId: user;
+		                 user: user;
 		                 glhImporter: glhImporter;
 		                 jiraImporter: jiraImporter;
 		                 setPeriodSince: '09-04-2024' until: '09-04-2024';
@@ -74,7 +74,7 @@ CommitsNumberByJiraTicketsMetricTest >> testCalculateNoCommits [
 
 
 	commitsNumber := CommitsNumberByJiraTicketsMetric new
-		                 userWithId: user;
+		                 user: user;
 		                 glhImporter: glhImporter;
 		                 jiraImporter: jiraImporter;
 		                 setPeriodSince: '09-04-2024' until: '09-04-2024';
@@ -106,7 +106,7 @@ CommitsNumberByJiraTicketsMetricTest >> testCalculateNoMergeRequests [
 
 
 	commitsNumber := CommitsNumberByJiraTicketsMetric new
-		                 userWithId: user;
+		                 user: user;
 		                 glhImporter: glhImporter;
 		                 jiraImporter: jiraImporter;
 		                 setPeriodSince: '09-04-2024' until: '09-04-2024';

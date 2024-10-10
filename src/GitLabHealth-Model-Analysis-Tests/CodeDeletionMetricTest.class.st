@@ -32,7 +32,7 @@ CodeDeletionMetricTest >> testCalculate [
 
 
 	codeDeletion := CodeDeletionMetric new
-		                userWithId: user;
+		                user: user;
 		                glhImporter: glhImporter;
 		                setPeriodSince: '04-09-2024' until: '04-09-2024';
 		                over: Week.
@@ -58,7 +58,7 @@ CodeDeletionMetricTest >> testCalculateNoCommits [
 
 
 	codeDeletion := CodeDeletionMetric new
-		                userWithId: user;
+		                user: user;
 		                glhImporter: glhImporter;
 		                setPeriodSince: '04-09-2024' until: '04-09-2024';
 		                over: Week.
