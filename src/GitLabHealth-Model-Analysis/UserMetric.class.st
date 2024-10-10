@@ -165,7 +165,6 @@ UserMetric >> loadUserCommitsSince: since until: until [
 UserMetric >> loadUserCompleteCommitsSince: since until: until [
 
 	| commits |
-	1 halt.
 	commits := self loadUserCommitsSince: since until: until.
 	commits do: [ :commit | glhImporter completeImportedCommit: commit ].
 	^ commits

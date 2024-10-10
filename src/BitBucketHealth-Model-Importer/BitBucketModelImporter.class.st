@@ -188,10 +188,9 @@ BitBucketModelImporter >> importCommitsOfProject: aGLHProject since: since until
 		           glhCommit deletions: (contribution at: #deletions).
 		           glhCommit ].
 
-	aGLHProject repository commits: commits.
-	self glhModel addAll: commits unless: self blockOnIdEquality.
-
-	^ commits
+	
+	commits := self glhModel addAll: commits unless: self blockOnIdEquality.
+	^ aGLHProject repository commits addAll: commits unless: self blockOnIdEquality.
 ]
 
 { #category : #'import - projects' }
@@ -322,7 +321,7 @@ BitBucketModelImporter >> importMergeRequests: aGLHProject since: fromDate until
 		                self parsePullRequestIntoGLPHEMergeRequest:
 			                pullRequest ].
 
-	self glhModel addAll: pullRequests unless: self blockOnIdEquality.
+	pullRequests := self glhModel addAll: pullRequests unless: self blockOnIdEquality.
 
 	^ pullRequests
 ]
