@@ -32,7 +32,7 @@ CodeAdditionMetricTest >> testCalculate [
 
 
 	codeAddition := CodeAdditionMetric new
-		                user: user;
+		                userWithId: user;
 		                glhImporter: glhImporter;
 		                setPeriodSince: '04-09-2024' until: '04-09-2024';
 		                over: Week.
@@ -58,7 +58,7 @@ CodeAdditionMetricTest >> testCalculateNoCommits [
 
 
 	codeAddition := CodeAdditionMetric new
-		                user: user;
+		                userWithId: user;
 		                glhImporter: glhImporter;
 		                setPeriodSince: '04-09-2024' until: '04-09-2024';
 		                over: Week.

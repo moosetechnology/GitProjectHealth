@@ -30,7 +30,7 @@ MergeRequestDurationMetricTest >> testCalculate [
 
 
 	mergeRequestDuration := MergeRequestDurationMetric new
-		                        user: user;
+		                        userWithId: user;
 		                        glhImporter: glhImporter;
 		                        setPeriodSince: '09-04-2024'
 		                        until: '09-04-2024';
@@ -56,7 +56,7 @@ MergeRequestDurationMetricTest >> testCalculateNoMergeRequests [
 	glhImporter := GLPHImporterMock new.
 
 	mergeRequestDuration := MergeRequestDurationMetric new
-		                        user: user;
+		                        userWithId: user;
 		                        glhImporter: glhImporter;
 		                        setPeriodSince: '09-04-2024'
 		                        until: '09-04-2024';

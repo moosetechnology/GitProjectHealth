@@ -236,7 +236,7 @@ BitBucketApi >> repositoryProjectsOfProjectGroupId: projectKey [
 ]
 
 { #category : #'api - user' }
-BitBucketApi >> user: accountId [
+BitBucketApi >> userWithId: accountId [
 	"https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/#api-user-get"
 
 	self prepareZnClient.

@@ -34,7 +34,7 @@ TimeBetweenCommitMetricTest >> testCalculate [
 
 
 	timeBetweenCommit := TimeBetweenCommitMetric new
-		                     user: user;
+		                     userWithId: user;
 		                     glhImporter: glhImporter;
 		                     setPeriodSince: '09-04-2024'
 		                     until: '09-04-2024';
@@ -61,7 +61,7 @@ TimeBetweenCommitMetricTest >> testCalculateNoCommits [
 
 
 	timeBetweenCommit := TimeBetweenCommitMetric new
-		                     user: user;
+		                     userWithId: user;
 		                     glhImporter: glhImporter;
 		                     setPeriodSince: '09-04-2024'
 		                     until: '09-04-2024';

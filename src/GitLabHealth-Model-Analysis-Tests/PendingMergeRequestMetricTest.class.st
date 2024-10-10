@@ -30,7 +30,7 @@ PendingMergeRequestMetricTest >> testCalculate [
 
 	mergedMergeRequestPending := PendingMergeRequestMetric 
 		                                   new
-		                                   user: user;
+		                                   userWithId: user;
 		                                   glhImporter: glhImporter;
 		                                   setPeriodSince: '09-01-2024'
 		                                   until: '09-07-2024';
@@ -70,7 +70,7 @@ PendingMergeRequestMetricTest >> testCalculate1Pending1Closed [
 
 	mergedMergeRequestPending := PendingMergeRequestMetric 
 		                                   new
-		                                   user: user;
+		                                   userWithId: user;
 		                                   glhImporter: glhImporter;
 		                                   setPeriodSince: '09-01-2024'
 		                                   until: '09-07-2024';
@@ -116,7 +116,7 @@ PendingMergeRequestMetricTest >> testCalculate1PendingByUser [
 
 	mergedMergeRequestPending := PendingMergeRequestMetric 
 		                                   new
-		                                   user: user;
+		                                   userWithId: user;
 		                                   glhImporter: glhImporter;
 		                                   setPeriodSince: '09-01-2024'
 		                                   until: '09-07-2024';
@@ -162,7 +162,7 @@ PendingMergeRequestMetricTest >> testCalculate2Pending [
 
 	mergedMergeRequestPending := PendingMergeRequestMetric 
 		                                   new
-		                                   user: user;
+		                                   userWithId: user;
 		                                   glhImporter: glhImporter;
 		                                   setPeriodSince: '09-01-2024'
 		                                   until: '09-07-2024';

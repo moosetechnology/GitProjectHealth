@@ -37,7 +37,7 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculate [
 
 
 	jiraMRDifference := JiraTimeMRTimeDifferenceMetric new
-		                    user: user;
+		                    userWithId: user;
 		                    glhImporter: glhImporter;
 		                    jiraImporter: jiraImporter;
 		                    setPeriodSince: '09-04-2024'
@@ -81,7 +81,7 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculate2PeriodWith1EmptyPeriod [
 
 
 	jiraMRDifference := JiraTimeMRTimeDifferenceMetric new
-		                    user: user;
+		                    userWithId: user;
 		                    glhImporter: glhImporter;
 		                    jiraImporter: jiraImporter;
 		                    setPeriodSince: '09-04-2024'
@@ -111,7 +111,7 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculateNoMergeRequests [
 
 
 	jiraMRDifference := JiraTimeMRTimeDifferenceMetric new
-		                    user: user;
+		                    userWithId: user;
 		                    glhImporter: glhImporter;
 		                    jiraImporter: jiraImporter;
 		                    setPeriodSince: '09-04-2024'
@@ -153,7 +153,7 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculateWithNoEstimatedTime [
 
 
 	jiraMRDifference := JiraTimeMRTimeDifferenceMetric new
-		                    user: user;
+		                    userWithId: user;
 		                    glhImporter: glhImporter;
 		                    jiraImporter: jiraImporter;
 		                    setPeriodSince: '09-04-2024'
@@ -197,7 +197,7 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculateWithTimeOriginalEstimateAndNo
 
 
 	jiraMRDifference := JiraTimeMRTimeDifferenceMetric new
-		                    user: user;
+		                    userWithId: user;
 		                    glhImporter: glhImporter;
 		                    jiraImporter: jiraImporter;
 		                    setPeriodSince: '09-04-2024'

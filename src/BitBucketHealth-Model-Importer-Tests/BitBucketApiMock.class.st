@@ -1156,7 +1156,19 @@ BitBucketApiMock >> user1 [
 ]
 
 { #category : #accessing }
-BitBucketApiMock >> user: accountId [
+BitBucketApiMock >> userMock [
+
+	^ userMock
+]
+
+{ #category : #accessing }
+BitBucketApiMock >> userMock: anObject [
+
+	userMock := anObject
+]
+
+{ #category : #accessing }
+BitBucketApiMock >> userWithId: accountId [
 
 	| user |
 	user := '{
@@ -1168,18 +1180,6 @@ BitBucketApiMock >> user: accountId [
    }'.
 
 	^ user
-]
-
-{ #category : #accessing }
-BitBucketApiMock >> userMock [
-
-	^ userMock
-]
-
-{ #category : #accessing }
-BitBucketApiMock >> userMock: anObject [
-
-	userMock := anObject
 ]
 
 { #category : #'api - user' }

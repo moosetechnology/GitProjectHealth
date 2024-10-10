@@ -34,7 +34,7 @@ SelfMergedUnderAMinuteMergeRequestMetricTest >> testCalculate [
 
 	mergedMergeRequestWithoutReview := SelfMergedUnderAMinuteMergeRequestMetric
 		                                   new
-		                                   user: user;
+		                                   userWithId: user;
 		                                   glhImporter: glhImporter;
 		                                   setPeriodSince: '09-04-2024'
 		                                   until: '09-04-2024';
@@ -79,7 +79,7 @@ SelfMergedUnderAMinuteMergeRequestMetricTest >> testCalculateMergeButNotCreated 
 
 	mergedMergeRequestWithoutReview := SelfMergedUnderAMinuteMergeRequestMetric
 		                                   new
-		                                   user: user;
+		                                   userWithId: user;
 		                                   glhImporter: glhImporter;
 		                                   setPeriodSince: '09-04-2024'
 		                                   until: '09-04-2024';
@@ -106,7 +106,7 @@ SelfMergedUnderAMinuteMergeRequestMetricTest >> testCalculateNoMergeRequests [
 
 	mergedMergeRequestWithoutReview := SelfMergedUnderAMinuteMergeRequestMetric
 		                                   new
-		                                   user: user;
+		                                   userWithId: user;
 		                                   glhImporter: glhImporter;
 		                                   setPeriodSince: '09-04-2024'
 		                                   until: '09-04-2024';

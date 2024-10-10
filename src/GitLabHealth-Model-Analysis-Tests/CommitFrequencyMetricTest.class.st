@@ -21,7 +21,7 @@ CommitFrequencyMetricTest >> testCalculate [
 
 
 	commitFrequency := CommitFrequencyMetric new
-		                   user: user;
+		                   userWithId: user;
 		                   glhImporter: glhImporter;
 		                   setPeriodSince: '04-09-2024' until: '04-09-2024';
 		                   over: Week.
@@ -47,7 +47,7 @@ CommitFrequencyMetricTest >> testCalculateNoCommits [
 
 
 	commitFrequency := CommitFrequencyMetric new
-		                   user: user;
+		                   userWithId: user;
 		                   glhImporter: glhImporter;
 		                   setPeriodSince: '04-09-2024' until: '04-09-2024';
 		                   over: Week.

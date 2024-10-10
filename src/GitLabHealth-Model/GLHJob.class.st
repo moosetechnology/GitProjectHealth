@@ -148,18 +148,18 @@ GLHJob >> user [
 	^ user
 ]
 
-{ #category : #accessing }
-GLHJob >> user: anObject [
-
-	<generated>
-	user := anObject
-]
-
 { #category : #navigation }
 GLHJob >> userGroup [
 	<generated>
 	<navigation: 'User'>
 	^ MooseSpecializedGroup with: self user
+]
+
+{ #category : #accessing }
+GLHJob >> userWithId: anObject [
+
+	<generated>
+	user := anObject
 ]
 
 { #category : #accessing }

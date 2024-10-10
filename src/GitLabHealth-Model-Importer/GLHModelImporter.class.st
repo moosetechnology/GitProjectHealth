@@ -677,7 +677,7 @@ GLHModelImporter >> importLastestCommitsOfProject: aGLHProject [
 		           until: nil
 		           path: nil
 		           author: nil
-		           all: nil
+		           all: true
 		           with_stats: true
 		           firstParent: nil
 		           order: nil
@@ -819,7 +819,7 @@ GLHModelImporter >> importUser: aUserID [
 		detect: [ :user | user id = aUserID ]
 		ifFound: [ :user | ^ user ].
 	('Import user: ' , aUserID printString) recordInfo.
-	result := self repoApi user: aUserID.
+	result := self repoApi userWithId: aUserID.
 	userResult := self parseUserResult: result.
 	^ self glhModel add: userResult unless: self blockOnIdEquality
 ]
@@ -1084,7 +1084,7 @@ GLHModelImporter >> parseJobsResult: result ofProject: aProject [
 			mapProperty: #user
 			getter: [ :object | #ignore ]
 			setter: [ :object :value |
-			object user: (self importUser: (value at: #id)) ].
+			object userWithId: (self importUser: (value at: #id)) ].
 
 		mapping
 			mapProperty: #commit

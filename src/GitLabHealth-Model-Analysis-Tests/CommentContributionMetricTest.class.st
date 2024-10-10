@@ -29,7 +29,7 @@ CommentContributionMetricTest >> testCalculate [
 
 
 	commentContribution := CommentContributionMetric new
-		                       user: user;
+		                       userWithId: user;
 		                       glhImporter: glhImporter;
 		                       setPeriodSince: '04-09-2024'
 		                       until: '04-09-2024';
@@ -55,7 +55,7 @@ CommentContributionMetricTest >> testCalculateNoCommits [
 
 
 	commentContribution := CommentContributionMetric new
-		                       user: user;
+		                       userWithId: user;
 		                       glhImporter: glhImporter;
 		                       setPeriodSince: '04-09-2024'
 		                       until: '04-09-2024';

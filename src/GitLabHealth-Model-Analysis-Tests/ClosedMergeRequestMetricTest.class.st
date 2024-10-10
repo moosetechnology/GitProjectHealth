@@ -32,7 +32,7 @@ ClosedMergeRequestMetricTest >> testCalculate [
 
 
 	closedMergeRequestMetric := ClosedMergeRequestMetric new
-		                            user: user;
+		                            userWithId: user;
 		                            glhImporter: glhImporter;
 		                            setPeriodSince: '09-04-2024'
 		                            until: '09-04-2024';
@@ -75,7 +75,7 @@ ClosedMergeRequestMetricTest >> testCalculate1MRinPeriod2Outside [
 
 
 	closedMergeRequestMetric := ClosedMergeRequestMetric new
-		                            user: user;
+		                            userWithId: user;
 		                            glhImporter: glhImporter;
 		                            setPeriodSince: '07-28-2024'
 		                            until: '08-03-2024';
@@ -118,7 +118,7 @@ ClosedMergeRequestMetricTest >> testCalculate3MR [
 
 
 	closedMergeRequestMetric := ClosedMergeRequestMetric new
-		                            user: user;
+		                            userWithId: user;
 		                            glhImporter: glhImporter;
 		                            setPeriodSince: '09-04-2024'
 		                            until: '09-04-2024';
@@ -171,7 +171,7 @@ ClosedMergeRequestMetricTest >> testCalculate3MRClosed2Opened [
 
 
 	closedMergeRequestMetric := ClosedMergeRequestMetric new
-		                            user: user;
+		                            userWithId: user;
 		                            glhImporter: glhImporter;
 		                            setPeriodSince: '09-04-2024'
 		                            until: '09-04-2024';
@@ -224,7 +224,7 @@ ClosedMergeRequestMetricTest >> testCalculateNoClosedMR [
 
 
 	closedMergeRequestMetric := ClosedMergeRequestMetric new
-		                            user: user;
+		                            userWithId: user;
 		                            glhImporter: glhImporter;
 		                            setPeriodSince: '09-04-2024'
 		                            until: '09-04-2024';
@@ -250,7 +250,7 @@ ClosedMergeRequestMetricTest >> testCalculateNoMergeRequests [
 	glhImporter := GLPHImporterMock new.
 
 	closedMergeRequestMetric := ClosedMergeRequestMetric new
-		                            user: user;
+		                            userWithId: user;
 		                            glhImporter: glhImporter;
 		                            setPeriodSince: '09-04-2024'
 		                            until: '09-04-2024';
@@ -288,7 +288,7 @@ ClosedMergeRequestMetricTest >> testCalculateOutSidePeriod [
 
 
 	closedMergeRequestMetric := ClosedMergeRequestMetric new
-		                            user: user;
+		                            userWithId: user;
 		                            glhImporter: glhImporter;
 		                            setPeriodSince: '08-01-2024'
 		                            until: '08-05-2024';

@@ -35,7 +35,7 @@ ContributedProjectMetricTest >> testCalculate [
 
 
 	contributedProject := ContributedProjectMetric new
-		                      user: user;
+		                      userWithId: user;
 		                      glhImporter: glhImporter;
 		                      setPeriodSince: '04-09-2024'
 		                      until: '04-09-2024';
@@ -63,7 +63,7 @@ ContributedProjectMetricTest >> testCalculateNoCommits [
 
 
 	contributedProject := ContributedProjectMetric new
-		                      user: user;
+		                      userWithId: user;
 		                      glhImporter: glhImporter;
 		                      setPeriodSince: '04-09-2024'
 		                      until: '04-09-2024';

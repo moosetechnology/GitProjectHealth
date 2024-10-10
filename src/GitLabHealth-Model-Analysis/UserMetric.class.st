@@ -237,15 +237,15 @@ UserMetric >> name [
 	^ self subclassResponsibility
 ]
 
-{ #category : #accessing }
-UserMetric >> user: anObject [
-
-	user := anObject
-]
-
 { #category : #email }
 UserMetric >> userEmail [
 	^ ('' join: {
 			   user username.
 			   emailDomain }) asLowercase
+]
+
+{ #category : #accessing }
+UserMetric >> userWithId: anObject [
+
+	user := anObject
 ]
