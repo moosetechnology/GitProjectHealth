@@ -840,7 +840,7 @@ GLHModelImporter >> importUserByUsername: anUsername [
 			              | result userId searchResult |
 			              ('Import user with username: '
 			               , anUsername printString) recordInfo.
-			              result := self glhApi usersSearchByUsername:
+			              result := self repoApi usersSearchByUsername:
 				                        anUsername.
 			              searchResult := NeoJSONReader fromString: result.
 
