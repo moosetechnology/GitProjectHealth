@@ -57,50 +57,66 @@ BitBucketModelImporter >> completeImportedCommit: aCommit [
 ]
 
 { #category : #convert }
-BitBucketModelImporter >> convertBitBucketDiffToGitDiff: response [ 
-	| bitbucketDiff gitDiff filePath fromHash toHash sourceLine sourceSpan destinationLine destinationSpan result|
+BitBucketModelImporter >> convertBitBucketDiffToGitDiff: response [
+
+	| bitbucketDiff filePath fromHash toHash sourceLine sourceSpan destinationLine destinationSpan result filePathSource filePathDestination |
+	fromHash := (response at: 'fromHash') ifNil: ''.
+	toHash := (response at: 'toHash') ifNil: ''.
+
 	
-	 fromHash := (response at: 'fromHash') ifNil: '' .
-    toHash := (response at: 'toHash') ifNil: ''.
-	
-gitDiff := ''.
-"Iterate over each diff in 'diffs'"
-result := (response at: #diffs) collect: [:diff |
+	"Iterate over each diff in 'diffs'"
+	result := (response at: #diffs) collect: [ :diff | "Extract file path, hashes"
+		|gitDiff|
+		gitDiff := ''.
+		          filePathSource := (diff at: 'source')
+			                            ifNil: ''
+			                            ifNotNil: [ :source |
+			                            source at: 'toString' ].
+		          filePathDestination := (diff at: 'destination')
+			                                 ifNil: ''
+			                                 ifNotNil: [ :destination |
+			                                 destination at: 'toString' ].
 
-    "Extract file path, hashes"
-    filePath := (diff at: 'source') at: 'toString'.
+		          "Build the diff header"
+		          " gitDiff := gitDiff , 'diff --git a/', filePath, ' b/', filePath, String cr."
+		          " gitDiff := gitDiff , 'index ', fromHash, '..', toHash, ' 100644', String cr."
+		          gitDiff := gitDiff , '--- a/' , filePathSource , String cr.
+		          gitDiff := gitDiff , '+++ b/' , filePathDestination
+		                     , String cr.
 
-    "Build the diff header"
-   " gitDiff := gitDiff , 'diff --git a/', filePath, ' b/', filePath, String cr."
-   " gitDiff := gitDiff , 'index ', fromHash, '..', toHash, ' 100644', String cr."
-    gitDiff := gitDiff , '--- a/', filePath, String cr.
-    gitDiff := gitDiff , '+++ b/', filePath, String cr.
+		          "Iterate over hunks"
+		          (diff at: 'hunks') do: [ :hunk |
+			          sourceLine := hunk at: 'sourceLine'.
+			          sourceSpan := hunk at: 'sourceSpan'.
+			          destinationLine := hunk at: 'destinationLine'.
+			          destinationSpan := hunk at: 'destinationSpan'.
 
-    "Iterate over hunks"
-    (diff at: 'hunks') do: [:hunk |
-        sourceLine := hunk at: 'sourceLine'.
-        sourceSpan := hunk at: 'sourceSpan'.
-        destinationLine := hunk at: 'destinationLine'.
-        destinationSpan := hunk at: 'destinationSpan'.
+			          "Hunk header"
+			          gitDiff := gitDiff
+			                     , ('@@ -{1},{2} +{3},{4} @@' format: {
+						                      sourceLine.
+						                      sourceSpan.
+						                      destinationLine.
+						                      destinationSpan }) , String cr.
 
-        "Hunk header"
-        gitDiff := gitDiff , ('@@ -{1},{2} +{3},{4} @@' format: { sourceLine. sourceSpan. destinationLine. destinationSpan }), String cr.
+			          "Iterate over segments"
+			          (hunk at: 'segments') do: [ :segment |
+				          (segment at: 'lines') do: [ :line |
+								(segment at: 'type') = 'CONTEXT' ifTrue: [
+						          gitDiff := gitDiff , (line at: 'line')
+						                     , String cr ].
+								(segment at: 'type') = 'REMOVED' ifTrue: [
+						          gitDiff := gitDiff , '-' , (line at: 'line')
+						                     , String cr ].
+					          (segment at: 'type') = 'ADDED' ifTrue: [
+						          gitDiff := gitDiff , '+' , (line at: 'line')
+						                     , String cr ] ] ] ].
+		          GLHDiff new
+			          diffString: gitDiff;
+			          old_path: filePathSource;
+			          new_path: filePathDestination ].
 
-        "Iterate over segments"
-        (hunk at: 'segments') do: [:segment |
-            (segment at: 'lines') do: [:line |
-                (segment at: 'type') = 'REMOVED'
-                    ifTrue: [ gitDiff := gitDiff , '-', (line at: 'line'), String cr ].
-                (segment at: 'type') = 'ADDED'
-                    ifTrue: [ gitDiff := gitDiff , '+', (line at: 'line'), String cr ].
-            ].
-        ].
-    ].
-	GLHDiff new diffString: gitDiff; new_path: filePath; old_path: 'filePath'.
-].
-
- ^ result
-
+	^ result
 ]
 
 { #category : #'private - api' }
@@ -153,8 +169,8 @@ BitBucketModelImporter >> importCommitsOfProject: aGLHProject since: since until
 
 	| commits |
 	commits := self repoApi
-		           commitsOfRepo: aGLHProject id
-		           inProject: aGLHProject group id
+		           commitsOfRepoProjectId: aGLHProject id
+		           inProjectGroupId: aGLHProject group id
 		           since: since
 		           until: until.
 
@@ -163,8 +179,8 @@ BitBucketModelImporter >> importCommitsOfProject: aGLHProject since: since until
 		           glhCommit := self parseCommitIntoGLHCommit: commit.
 		           commitDiffs := self repoApi
 			                          diffsOfCommit: glhCommit id
-			                          inRepo: aGLHProject id
-			                          inProject: aGLHProject group id.
+			                          inRepoProjectId: aGLHProject id
+			                          inProjectGroupId: aGLHProject group id.
 
 		           contribution := self getContributionFromDiffs:
 			                           (commitDiffs at: #diffs).
@@ -172,10 +188,9 @@ BitBucketModelImporter >> importCommitsOfProject: aGLHProject since: since until
 		           glhCommit deletions: (contribution at: #deletions).
 		           glhCommit ].
 
-	aGLHProject repository commits: commits.
-	self glhModel addAll: commits unless: self blockOnIdEquality.
-
-	^ commits
+	
+	commits := self glhModel addAll: commits unless: self blockOnIdEquality.
+	^ aGLHProject repository commits addAll: commits unless: self blockOnIdEquality.
 ]
 
 { #category : #'import - projects' }
@@ -187,15 +202,15 @@ BitBucketModelImporter >> importContributedProjectsOfUser: aGLHUser [
 
 	"get all repos of projects"
 	repositories := projects flatCollect: [ :project |
-		                self repoApi repositoriesOfProject:
+		                self repoApi repositoryProjectsOfProjectGroupId:
 			                (project at: #key) ].
 
 
 	"get all commits of repo"
 	repositoriesCommits := repositories collect: [ :repository |
 		                       repository -> (self repoApi
-			                        commitsOfRepo: (repository at: #slug)
-			                        inProject:
+			                        commitsOfRepoProjectId: (repository at: #slug)
+			                        inProjectGroupId:
 			                        ((repository at: #project) at: #key)
 			                        since: DateAndTime now - 10 days
 			                        until: DateAndTime now) ].
@@ -261,8 +276,8 @@ BitBucketModelImporter >> importDiffOfCommit: aCommit [
 	('Import diff of commit: ' , aCommit short_id printString) recordInfo.
 	result := self repoApi
 		          diffsOfCommit: aCommit id
-		          inRepo: aCommit repository project id
-		          inProject: aCommit repository project group id.
+		          inRepoProjectId: aCommit repository project id
+		          inProjectGroupId: aCommit repository project group id.
 
 	diffsResult := self convertBitBucketDiffToGitDiff: result.
 
@@ -281,8 +296,8 @@ BitBucketModelImporter >> importMergeRequestCommits: mergeRequest [
 	| commits |
 	commits := self repoApi
 		           commitsOfPullRequest: mergeRequest id
-		           ofRepo: mergeRequest project id
-		           inProject: mergeRequest project group id.
+		           ofRepoProjectId: mergeRequest project id
+		           inProjectGroupId: mergeRequest project group id.
 
 	commits := commits collect: [ :commit |
 		           self parseCommitIntoGLHCommit: commit ].
@@ -297,8 +312,8 @@ BitBucketModelImporter >> importMergeRequests: aGLHProject since: fromDate until
 
 	| pullRequests |
 	pullRequests := self repoApi
-		                pullRequestsOfRepo: aGLHProject id
-		                inProject: aGLHProject group id
+		                pullRequestsOfRepoProjectId: aGLHProject id
+		                inProjectGroupId: aGLHProject group id
 		                since: fromDate
 		                until: toDate.
 
@@ -306,7 +321,7 @@ BitBucketModelImporter >> importMergeRequests: aGLHProject since: fromDate until
 		                self parsePullRequestIntoGLPHEMergeRequest:
 			                pullRequest ].
 
-	self glhModel addAll: pullRequests unless: self blockOnIdEquality.
+	pullRequests := self glhModel addAll: pullRequests unless: self blockOnIdEquality.
 
 	^ pullRequests
 ]
@@ -325,8 +340,8 @@ BitBucketModelImporter >> importMergeResquestMerger: mergeRequest [
 
 	activities := self repoApi
 		              activitiesOfPullRequest: mergeRequest id
-		              inRepo: mergeRequest project id
-		              ofProject: mergeRequest project group id.
+		              inRepoProjectId: mergeRequest project id
+		              ofProjectGroupId: mergeRequest project group id.
 
 	mergeActivity := activities detect: [ :activity |
 		                 (activity at: #action) = 'MERGED' ].

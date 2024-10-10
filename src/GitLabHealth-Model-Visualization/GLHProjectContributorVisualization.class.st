@@ -107,7 +107,7 @@ GLHProjectContributorVisualization >> forProject: aGLHProject [
 	| c shapes legend |
 	c := RSCanvas new.
 
-	shapes := ((aGLHProject toScope: GLHCommit) collect: #commitCreator) asSet collect: [:author | self createShapeForUser: author ].
+	shapes := ((aGLHProject toScope: GLHCommit) collect: #commitCreator) asSet reject: #isNil thenCollect: [:author | self createShapeForUser: author ].
 "	shapes add: (self createShapeForProject: aGLHProject )."
 
 	c addAll: shapes.
