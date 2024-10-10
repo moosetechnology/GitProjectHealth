@@ -367,7 +367,7 @@ GLPHModelImporter >> importProject: aProjectID [
 	| result projectResult |
 	('Import project with id:  ' , aProjectID printString) recordInfo.
 
-	result := self glhApi project: aProjectID.
+	result := self repoApi project: aProjectID.
 	projectResult := self parseProjectResult: result.
 
 	^ self completeImportProject: projectResult

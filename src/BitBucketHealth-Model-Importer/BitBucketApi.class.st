@@ -13,7 +13,7 @@ Class {
 }
 
 { #category : #'api - pull-requests' }
-BitBucketApi >> activitiesOfPullRequest: pullRequestId inRepo: repositorySlug ofProject: projectKey [
+BitBucketApi >> activitiesOfPullRequest: pullRequestId inRepoProjectId: repositorySlug ofProjectGroupId: projectKey [
 
 	^ self allValuesOfPath:
 		  self basePath , '/projects/' , projectKey , '/repos/'
@@ -91,13 +91,13 @@ BitBucketApi >> client: anObject [
 ]
 
 { #category : #'api - pull-requests' }
-BitBucketApi >> commitsOfPullRequest: pullRequestId ofRepo: repoSlug inProject: projectKey [
+BitBucketApi >> commitsOfPullRequest: pullRequestId ofRepoProjectId: repoSlug inProjectGroupId: projectKey [
 	^ self allValuesOfPath: self basePath, '/projects/', projectKey, '/repos/', repoSlug, '/pull-requests/', pullRequestId printString, '/commits'.
 	
 ]
 
 { #category : #'api - commits' }
-BitBucketApi >> commitsOfRepo: repositorySlug inProject: projectKey since: since until: until [
+BitBucketApi >> commitsOfRepoProjectId: repositorySlug inProjectGroupId: projectKey since: since until: until [
 	"/rest/api/1.0/projects/{projectKey}/repos/{repositorySlug}/commits"
 
 	| results lastDate lastCommitterTimestamp commits |
@@ -134,7 +134,7 @@ BitBucketApi >> commitsOfRepo: repositorySlug inProject: projectKey since: since
 ]
 
 { #category : #'api - commits' }
-BitBucketApi >> diffsOfCommit: commitID inRepo: repositorySlug inProject: projectKey [
+BitBucketApi >> diffsOfCommit: commitID inRepoProjectId: repositorySlug inProjectGroupId: projectKey [
 
 	| results |
 	self prepareZnClient.
@@ -195,7 +195,7 @@ BitBucketApi >> projects [
 ]
 
 { #category : #'api - pull-requests' }
-BitBucketApi >> pullRequestsOfRepo: repositorySlug inProject: projectKey since: since until: until [
+BitBucketApi >> pullRequestsOfRepoProjectId: repositorySlug inProjectGroupId: projectKey since: since until: until [
 
 	| pullRequests results lastCommitterTimestamp lastDate |
 	self prepareZnClient.
@@ -231,7 +231,7 @@ BitBucketApi >> pullRequestsOfRepo: repositorySlug inProject: projectKey since: 
 ]
 
 { #category : #'api - projects' }
-BitBucketApi >> repositoriesOfProject: projectKey [
+BitBucketApi >> repositoryProjectsOfProjectGroupId: projectKey [
 	^self allValuesOfPath: self basePath, '/projects/', projectKey, '/repos'.
 ]
 
