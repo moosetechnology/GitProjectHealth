@@ -532,7 +532,7 @@ GLHModelImporter >> importContributedProjectsOfUser: aGLHUser [
 		page := page + 1.
 		('import contributed project of user ' , aGLHUser name , ' page '
 		 , page printString) recordInfo.
-		results := self glhApi
+		results := self repoApi
 			           contributedProjectsOfUserId: aGLHUser id
 			           orderBy: 'last_activity_at'
 			           simple: true
@@ -820,7 +820,7 @@ GLHModelImporter >> importUser: aUserID [
 		detect: [ :user | user id = aUserID ]
 		ifFound: [ :user | ^ user ].
 	('Import user: ' , aUserID printString) recordInfo.
-	result := self glhApi user: aUserID.
+	result := self repoApi user: aUserID.
 	userResult := self parseUserResult: result.
 	^ self glhModel add: userResult unless: self blockOnIdEquality
 ]
@@ -841,7 +841,7 @@ GLHModelImporter >> importUserByUsername: anUsername [
 			              | result userId searchResult |
 			              ('Import user with username: '
 			               , anUsername printString) recordInfo.
-			              result := self glhApi usersSearchByUsername:
+			              result := self repoApi usersSearchByUsername:
 				                        anUsername.
 			              searchResult := NeoJSONReader fromString: result.
 
