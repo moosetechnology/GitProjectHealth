@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'groupCommitBlock'
 	],
-	#category : 'GitLabHealth-Model-Visualization'
+	#category : #'GitLabHealth-Model-Visualization'
 }
 
 { #category : #'instance creation' }
@@ -12,6 +12,7 @@ GLHCommitDistributionVisualization >> forCommits: commits [
 
 	| c lb oldestCommit horizontal commitGroups groupToCommitByDate alreadyAdded dates |
 	c := RSCompositeChart new.
+	commits ifEmpty: [ ^ c canvas].
 	oldestCommit := commits last.
 	dates := (oldestCommit committed_date to: Date today) dates.
 

@@ -580,7 +580,7 @@ GLHModelImporter >> importDiffOfCommit: aCommit [
 		'Diff already importer: ' , aCommit short_id printString recordInfo.
 		^ aCommit diffs ].
 	('Import diff of commit: ' , aCommit short_id printString) recordInfo.
-	result := self glhApi
+	result := self repoApi
 		          commitDiff: aCommit id
 		          ofProject: aCommit repository project id
 		          unidiff: true.
@@ -671,14 +671,14 @@ GLHModelImporter >> importLastestCommitsOfProject: aGLHProject [
 	"limited to the last 50 commits"
 
 	| results parsedResults |
-	results := self glhApi
+	results := self repoApi
 		           commitsOfProject: aGLHProject id
 		           forRefName: nil
 		           since: nil
 		           until: nil
 		           path: nil
 		           author: nil
-		           all: nil
+		           all: true
 		           with_stats: true
 		           firstParent: nil
 		           order: nil
@@ -686,9 +686,13 @@ GLHModelImporter >> importLastestCommitsOfProject: aGLHProject [
 		           perPage: 50
 		           page: nil.
 	parsedResults := self parseCommitsResult: results.
-	parsedResults := self glhModel addAll: parsedResults unless: self blockOnIdEquality.
+	parsedResults := self glhModel
+		                 addAll: parsedResults
+		                 unless: self blockOnIdEquality.
 
-	aGLHProject repository commits addAll: parsedResults unless: self blockOnIdEquality.
+	aGLHProject repository commits
+		addAll: parsedResults
+		unless: self blockOnIdEquality.
 	"parsedResults do: [ :commit |
 		commit repository: aGLHProject repository ]."
 
@@ -791,7 +795,7 @@ GLHModelImporter >> importRepository: aGLHRepository [
 	('import the repository of project ' , aGLHRepository project name)
 		recordInfo.
 
-	resultBranches := self glhApi branchesOfRepository:
+	resultBranches := self repoApi branchesOfRepository:
 		                  aGLHRepository project id.
 	branches := self parseBranchesResult: resultBranches.
 
@@ -1185,7 +1189,7 @@ GLHModelImporter >> pipelinesOf: aProjectID [
 
 	| result |
 	('Search pipelines of: ' , aProjectID printString) recordInfo.
-	result := self glhApi pipelinesOfProject: aProjectID.
+	result := self repoApi pipelinesOfProject: aProjectID.
 	^ self parsePipelinesResult: result .
 ]
 
