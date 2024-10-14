@@ -245,6 +245,19 @@ GHModelImporter >> importGroup: aGroupName [
 	^ groupResult
 ]
 
+{ #category : #'import - merge request' }
+GHModelImporter >> importMergeRequests: aProject [ 
+	|response mergeRequests|
+	response := self repoApi 
+			mergeRequestsOfRepo: aProject group name 
+			ofProject: aProject name.
+	mergeRequests := self parseMergeRequestResult: response. 
+	
+	mergeRequests := aProject mergeRequests addAll:mergeRequests unless: self blockOnIdEquality.
+	^ mergeRequests
+	
+]
+
 { #category : #api }
 GHModelImporter >> importPipelinesOf: project [
 
@@ -458,6 +471,27 @@ GHModelImporter >> parseGroupResult: aResult [
 		mapping mapInstVar: #id to: #id.
 		mapping mapInstVar: #web_url to: #html_url ].
 	^ reader nextAs: GLHGroup
+]
+
+{ #category : #parsing }
+GHModelImporter >> parseMergeRequestResult: response [
+	|result|
+	self flag: 'temp version, must remade using NeoJsonReader' .
+	result := response collect: [ :aPull |
+
+		GLPHEMergeRequest new id: (aPull at: #id);
+			title: (aPull at: #title);
+			state: (aPull at: #state);
+			closed_at: ((aPull at: #closed_at) ifNotNil: #asDateAndTime);
+			merged_at: ((aPull at: #merged_at) ifNotNil: #asDateAndTime);
+			updated_at: ((aPull at: #updated_at) ifNotNil: #asDateAndTime);
+			created_at: ((aPull at: #created_at) ifNotNil: #asDateAndTime);
+			sha: (aPull at:#head at:#sha);
+			merge_commit_sha: (aPull at: #merge_commit_sha).			
+		
+		 ].
+	result := self glhModel addAll: result unless: self blockOnIdEquality.  
+	^ result.
 ]
 
 { #category : #parsing }

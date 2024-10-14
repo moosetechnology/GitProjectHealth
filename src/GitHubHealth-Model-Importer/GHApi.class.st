@@ -132,6 +132,42 @@ GHApi >> initialize [
 			 yourself)
 ]
 
+{ #category : #'as yet unclassified' }
+GHApi >> mergeRequestsOfRepo: aRepoName ofProject: aProjectName [
+
+	^ self
+		  mergeRequestsOfRepo: aRepoName
+		  ofProject: aProjectName
+		  state: 'all'
+		  head: nil
+		  base: nil
+		  sort: nil
+		  direction: nil
+		  per_page: nil
+		  page: nil
+]
+
+{ #category : #'merge request' }
+GHApi >> mergeRequestsOfRepo: organisationName ofProject: projectName state: state head: head base: base sort: sort direction: direction per_page: per_page page: page [ 
+	self client url:
+		self baseAPIUrl , '/repos/' , organisationName , '/' , projectName
+		, '/pulls'.
+		
+	state ifNotNil: [ self client queryAt: #state put: state ].
+	head ifNotNil: [ self client queryAt: #head put: head ].
+	base ifNotNil: [ self client queryAt: #base put: base ].
+	base ifNotNil: [ self client queryAt: #base put: base ].
+	sort ifNotNil: [ self client queryAt: #sort put: sort ].	
+	direction ifNotNil: [ self client queryAt: #direction put: direction ].
+	per_page ifNotNil: [ self client queryAt: #per_page put: per_page ].
+	page ifNotNil: [ self client queryAt: #page put: page ].
+	
+	('Call: ' , self client request url asString) recordInfo.
+
+	^ (NeoJSONReader on: self client get readStream) next
+	
+]
+
 { #category : #api }
 GHApi >> organization: anOrganizationName [
 
