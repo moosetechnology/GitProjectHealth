@@ -2,7 +2,6 @@ Class {
 	#name : #BitBucketModelImporter,
 	#superclass : #GPModelImporter,
 	#instVars : [
-		'withCommitDiffs',
 		'withInitialCommits'
 	],
 	#category : #'BitBucketHealth-Model-Importer'
@@ -282,12 +281,14 @@ BitBucketModelImporter >> importDiffOfCommit: aCommit [
 	diffsResult := self convertBitBucketDiffToGitDiff: result.
 
 
-	aCommit diffs addAll: diffsResult unless: self blockForDiffEquality.
+	diffsResult := aCommit diffs
+		               addAll: diffsResult
+		               unless: self blockForDiffEquality.
 
 	"changes are added into the model during the import"
-	aCommit diffs do: [ :diff | self importDiffRangesForDiff: diff ].
+	diffsResult do: [ :diff | self importDiffRangesForDiff: diff ].
 
-	^ aCommit diffs
+	^ diffsResult
 ]
 
 { #category : #'import - merge-requests' }
@@ -527,18 +528,6 @@ BitBucketModelImporter >> parseUserIntoGLHUser: userDictionnary [
 		public_email: (userDictionnary at: #emailAddress);
 		id: (userDictionnary at: #id);
 		username: (userDictionnary at: #name).
-]
-
-{ #category : #accessing }
-BitBucketModelImporter >> withCommitDiffs [
-
-	^ withCommitDiffs
-]
-
-{ #category : #accessing }
-BitBucketModelImporter >> withCommitDiffs: anObject [
-
-	withCommitDiffs := anObject
 ]
 
 { #category : #accessing }

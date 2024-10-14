@@ -12,7 +12,8 @@ Class {
 		'withFiles',
 		'glhModel',
 		'userCatalogue',
-		'repoApi'
+		'repoApi',
+		'withCommitDiffs'
 	],
 	#classVars : [
 		'currentImporter'
@@ -97,6 +98,22 @@ GPModelImporter >> chainsCommitsFrom: commitsCollection [
 						unless: [ :existing :new | existing id = new id ] ]
 				ifAbsent: [  ] ] ].
 	^ commitsCollection
+]
+
+{ #category : #commit }
+GPModelImporter >> completeImportedCommit: aGLHCommit [ 
+	
+	
+	('completing commit: ' , aGLHCommit short_id printString) recordInfo.
+	self importCreatorOfCommit: aGLHCommit.
+
+	self withCommitDiffs ifTrue: [
+		| diffs |
+		aGLHCommit diffs ifEmpty: [
+			diffs := self importDiffOfCommit: aGLHCommit.
+			self glhModel addAll: diffs unless: self blockForDiffEquality ] ].
+
+	^ aGLHCommit
 ]
 
 { #category : #'as yet unclassified' }
@@ -228,6 +245,18 @@ GPModelImporter >> userCatalogue: aGLHUserCatalogue [
 
 	userCatalogue := aGLHUserCatalogue.
 	aGLHUserCatalogue anImporter: self. 
+]
+
+{ #category : #accessing }
+GPModelImporter >> withCommitDiffs [
+
+	^ withCommitDiffs
+]
+
+{ #category : #accessing }
+GPModelImporter >> withCommitDiffs: anObject [
+
+	withCommitDiffs := anObject
 ]
 
 { #category : #accessing }

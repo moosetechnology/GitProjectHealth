@@ -53,6 +53,43 @@ GHApi >> client: anObject [
 ]
 
 { #category : #'api - commits' }
+GHApi >> commit: commitSHA ofOrganisation: anOrganisation ofProject: aProjectId [
+
+	self client path: (String streamContents: [ :str |
+			 str
+				 << self baseAPIUrl;
+				 << '/repos/';
+				 << anOrganisation asString;
+				 << '/';
+				 << aProjectId asString;
+				 << '/commits/';
+				 << commitSHA asString ]).
+
+
+	('Call: ' , self client request url asString) recordInfo.
+
+	^ (NeoJSONReader on: (self client get) readStream) next
+]
+
+{ #category : #'api - commits' }
+GHApi >> commitDiff: commitSHA ofProject: aProjectId unidiff: unidiff [ 
+		self client path: (String streamContents: [ :str |
+			 str
+				 << self baseAPIUrl;
+				 << '/projects/';
+				 << aProjectId asString;
+				 << '/repository/commits/';
+				 << commitSHA asString;
+				 << '/diff' ]).
+
+	unidiff ifNotNil: [ self client queryAt: #unidiff put: unidiff ].
+
+	('Call: ' , self client request url asString) recordInfo.
+
+	^ self client get
+]
+
+{ #category : #'api - commits' }
 GHApi >> commitsOfProject: aProjectId ofOrganization: organisationName [
 
 	^ self

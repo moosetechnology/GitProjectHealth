@@ -2,7 +2,6 @@ Class {
 	#name : #GLHModelImporter,
 	#superclass : #GPModelImporter,
 	#instVars : [
-		'withCommitDiffs',
 		'withInitialCommits',
 		'withInitialMergeRequest',
 		'generalReader'
@@ -1210,18 +1209,6 @@ GLHModelImporter >> subGroupsOf: aGroupID [
 				page := page + 1. ].
 	
 	^ results
-]
-
-{ #category : #accessing }
-GLHModelImporter >> withCommitDiffs [
-
-	^ withCommitDiffs
-]
-
-{ #category : #accessing }
-GLHModelImporter >> withCommitDiffs: anObject [
-
-	withCommitDiffs := anObject
 ]
 
 { #category : #accessing }
