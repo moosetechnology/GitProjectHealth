@@ -57,18 +57,19 @@ GHModelImporter >> completeImportedCommit: aGLHCommit [
 	aGLHCommit additions:
 		((result at: #files) collect: [ :file | file at: #additions ]) sum.
 
+
 	"import diffs of this commits"
 	self withCommitDiffs ifTrue: [
 		| diffs |
 		aGLHCommit diffs ifEmpty: [
-			
-		diffs := 	self parseDiffresult: result.
-		diffs := aGLHCommit diffs
-		 	 addAll: diffs
-		  	unless: self blockForDiffEquality.
-			self glhModel addAll: diffs unless: self blockForDiffEquality ] ].
+			diffs := self parseDiffresult: result.
+			diffs := aGLHCommit diffs
+				         addAll: diffs
+				         unless: self blockForDiffEquality.
+			self glhModel addAll: diffs unless: self blockForDiffEquality.
+			diffs do: [ :diff | self importDiffRangesForDiff: diff ] ] ].
 
-	^ aGLHCommit
+	^ aGLHCommit 
 ]
 
 { #category : #private }
