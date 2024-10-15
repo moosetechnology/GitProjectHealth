@@ -310,7 +310,7 @@ GLHModelImporter >> importCommitOfProject: anProject withId: anID [
 		           detectEntityType: GLHCommit
 		           overAttribut: #id
 		           equalTo: anID) ifNil: [
-		          result := self glhApi commit: anID ofProject: anProject id.
+		          result := self repoApi commit: anID ofProject: anProject id.
 		          commit := (self parseCommitsResult: '[' , result , ']')
 			                    first.
 
@@ -636,7 +636,7 @@ GLHModelImporter >> importGroup: aGroupID [
 	| result groupResult |
 	('Import group: ' , aGroupID printString) recordInfo.
 
-	result := self glhApi group: aGroupID.
+	result := self repoApi group: aGroupID.
 	groupResult := self parseGroupResult: result.
 	groupResult := self addGroupResultToModel: groupResult.
 
@@ -843,7 +843,7 @@ GLHModelImporter >> importUserByUsername: anUsername [
 			              | result userId searchResult |
 			              ('Import user with username: '
 			               , anUsername printString) recordInfo.
-			              result := self glhApi usersSearchByUsername:
+			              result := self repoApi usersSearchByUsername:
 				                        anUsername.
 			              searchResult := NeoJSONReader fromString: result.
 
@@ -1203,7 +1203,7 @@ GLHModelImporter >> subGroupsOf: aGroupID [
 	
 	parsedResult := { true }.
 	[ parsedResult size > 0 ] whileTrue: [ 
-		result := self glhApi subgroupsOfGroup: aGroupID page: page.
+		result := self repoApi subgroupsOfGroup: aGroupID page: page.
 		parsedResult := self parseSubGroupResult: result.
 		results addAll: parsedResult.
 				page := page + 1. ].

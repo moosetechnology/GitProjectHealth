@@ -273,7 +273,7 @@ GLPHModelImporter >> importMergeRequests: aGLHProject since: fromDate until: toD
 		| results |
 		page := page + 1.
 		('import MR page ' , page printString) recordInfo.
-		results := self glhApi
+		results := self repoApi
 			           mergeRequestsOfProject: aGLHProject id
 			           createdAfter:
 			           (fromDate ifNotNil: [ fromDate asDateAndTime asString ])
