@@ -491,7 +491,7 @@ GLHModelImporter >> importCommitsOfProject: aProject since: fromDate until: toDa
 		| results |
 		page := page + 1.
 		('import commit page ' , page printString) recordInfo.
-		results := self glhApi
+		results := self repoApi
 			           commitsOfProject: aProject id
 			           forRefName: nil
 			           since:
