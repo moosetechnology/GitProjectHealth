@@ -53,6 +53,43 @@ GHApi >> client: anObject [
 ]
 
 { #category : #'api - commits' }
+GHApi >> commit: commitSHA ofOrganisation: anOrganisation ofProject: aProjectId [
+
+	self client path: (String streamContents: [ :str |
+			 str
+				 << self baseAPIUrl;
+				 << '/repos/';
+				 << anOrganisation asString;
+				 << '/';
+				 << aProjectId asString;
+				 << '/commits/';
+				 << commitSHA asString ]).
+
+
+	('Call: ' , self client request url asString) recordInfo.
+
+	^ (NeoJSONReader on: (self client get) readStream) next
+]
+
+{ #category : #'api - commits' }
+GHApi >> commitDiff: commitSHA ofProject: aProjectId unidiff: unidiff [ 
+		self client path: (String streamContents: [ :str |
+			 str
+				 << self baseAPIUrl;
+				 << '/projects/';
+				 << aProjectId asString;
+				 << '/repository/commits/';
+				 << commitSHA asString;
+				 << '/diff' ]).
+
+	unidiff ifNotNil: [ self client queryAt: #unidiff put: unidiff ].
+
+	('Call: ' , self client request url asString) recordInfo.
+
+	^ self client get
+]
+
+{ #category : #'api - commits' }
 GHApi >> commitsOfProject: aProjectId ofOrganization: organisationName [
 
 	^ self
@@ -93,6 +130,42 @@ GHApi >> initialize [
 	self client: (ZnClient new
 			 accept: ZnMimeType applicationJson;
 			 yourself)
+]
+
+{ #category : #'as yet unclassified' }
+GHApi >> mergeRequestsOfRepo: aRepoName ofProject: aProjectName [
+
+	^ self
+		  mergeRequestsOfRepo: aRepoName
+		  ofProject: aProjectName
+		  state: 'all'
+		  head: nil
+		  base: nil
+		  sort: nil
+		  direction: nil
+		  per_page: nil
+		  page: nil
+]
+
+{ #category : #'merge request' }
+GHApi >> mergeRequestsOfRepo: organisationName ofProject: projectName state: state head: head base: base sort: sort direction: direction per_page: per_page page: page [ 
+	self client url:
+		self baseAPIUrl , '/repos/' , organisationName , '/' , projectName
+		, '/pulls'.
+		
+	state ifNotNil: [ self client queryAt: #state put: state ].
+	head ifNotNil: [ self client queryAt: #head put: head ].
+	base ifNotNil: [ self client queryAt: #base put: base ].
+	base ifNotNil: [ self client queryAt: #base put: base ].
+	sort ifNotNil: [ self client queryAt: #sort put: sort ].	
+	direction ifNotNil: [ self client queryAt: #direction put: direction ].
+	per_page ifNotNil: [ self client queryAt: #per_page put: per_page ].
+	page ifNotNil: [ self client queryAt: #page put: page ].
+	
+	('Call: ' , self client request url asString) recordInfo.
+
+	^ (NeoJSONReader on: self client get readStream) next
+	
 ]
 
 { #category : #api }

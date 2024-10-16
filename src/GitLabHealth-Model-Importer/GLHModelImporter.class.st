@@ -2,7 +2,6 @@ Class {
 	#name : #GLHModelImporter,
 	#superclass : #GPModelImporter,
 	#instVars : [
-		'withCommitDiffs',
 		'withInitialCommits',
 		'withInitialMergeRequest',
 		'generalReader'
@@ -311,7 +310,7 @@ GLHModelImporter >> importCommitOfProject: anProject withId: anID [
 		           detectEntityType: GLHCommit
 		           overAttribut: #id
 		           equalTo: anID) ifNil: [
-		          result := self glhApi commit: anID ofProject: anProject id.
+		          result := self repoApi commit: anID ofProject: anProject id.
 		          commit := (self parseCommitsResult: '[' , result , ']')
 			                    first.
 
@@ -492,7 +491,7 @@ GLHModelImporter >> importCommitsOfProject: aProject since: fromDate until: toDa
 		| results |
 		page := page + 1.
 		('import commit page ' , page printString) recordInfo.
-		results := self glhApi
+		results := self repoApi
 			           commitsOfProject: aProject id
 			           forRefName: nil
 			           since:
@@ -638,7 +637,7 @@ GLHModelImporter >> importGroup: aGroupID [
 	| result groupResult |
 	('Import group: ' , aGroupID printString) recordInfo.
 
-	result := self glhApi group: aGroupID.
+	result := self repoApi group: aGroupID.
 	groupResult := self parseGroupResult: result.
 	groupResult := self addGroupResultToModel: groupResult.
 
@@ -1210,24 +1209,12 @@ GLHModelImporter >> subGroupsOf: aGroupID [
 	
 	parsedResult := { true }.
 	[ parsedResult size > 0 ] whileTrue: [ 
-		result := self glhApi subgroupsOfGroup: aGroupID page: page.
+		result := self repoApi subgroupsOfGroup: aGroupID page: page.
 		parsedResult := self parseSubGroupResult: result.
 		results addAll: parsedResult.
 				page := page + 1. ].
 	
 	^ results
-]
-
-{ #category : #accessing }
-GLHModelImporter >> withCommitDiffs [
-
-	^ withCommitDiffs
-]
-
-{ #category : #accessing }
-GLHModelImporter >> withCommitDiffs: anObject [
-
-	withCommitDiffs := anObject
 ]
 
 { #category : #accessing }
