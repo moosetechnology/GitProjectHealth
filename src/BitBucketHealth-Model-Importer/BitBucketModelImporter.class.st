@@ -175,22 +175,18 @@ BitBucketModelImporter >> importCommitsOfProject: aGLHProject since: since until
 		           until: until.
 
 	commits := commits collect: [ :commit |
-		           | glhCommit commitDiffs contribution |
-		           glhCommit := self parseCommitIntoGLHCommit: commit.
-		           commitDiffs := self repoApi
-			                          diffsOfCommit: glhCommit id
-			                          inRepoProjectId: aGLHProject id
-			                          inProjectGroupId: aGLHProject group id.
+		     
+		           self parseCommitIntoGLHCommit: commit ofProject: aGLHProject.
 
-		           contribution := self getContributionFromDiffs:
-			                           (commitDiffs at: #diffs).
-		           glhCommit additions: (contribution at: #additions).
-		           glhCommit deletions: (contribution at: #deletions).
-		           glhCommit ].
+		         ].
 
-	
-	commits := self glhModel addAll: commits unless: self blockOnIdEquality.
-	^ aGLHProject repository commits addAll: commits unless: self blockOnIdEquality.
+
+	commits := self glhModel
+		           addAll: commits
+		           unless: self blockOnIdEquality.
+	^ aGLHProject repository commits
+		  addAll: commits
+		  unless: self blockOnIdEquality
 ]
 
 { #category : #'import - projects' }
@@ -300,7 +296,7 @@ BitBucketModelImporter >> importMergeRequestCommits: mergeRequest [
 		           inProjectGroupId: mergeRequest project group id.
 
 	commits := commits collect: [ :commit |
-		           self parseCommitIntoGLHCommit: commit ].
+		           self parseCommitIntoGLHCommit: commit ofProject: mergeRequest project ].
 
 	mergeRequest commits: commits.
 
@@ -383,14 +379,22 @@ BitBucketModelImporter >> importUserByUsername: username [
 ]
 
 { #category : #parsing }
-BitBucketModelImporter >> parseCommitIntoGLHCommit: commitDictionary [
+BitBucketModelImporter >> parseCommitIntoGLHCommit: commitDictionary ofProject: aGLHProject [
 
-	| author committer parentIds |
+	| author committer parentIds commitDiffs contribution |
 	author := commitDictionary at: #author.
 	committer := commitDictionary at: #committer.
 
 	parentIds := (commitDictionary at: #parents) collect: [ :parent |
 		             parent at: #id ].
+
+	commitDiffs := self repoApi
+		               diffsOfCommit: (commitDictionary at: #id)
+		               inRepoProjectId: aGLHProject id
+		               inProjectGroupId: aGLHProject group id.
+
+	contribution := self getContributionFromDiffs:
+		                (commitDiffs at: #diffs).
 
 	^ GLHCommit new
 		  id: (commitDictionary at: #id);
@@ -405,7 +409,9 @@ BitBucketModelImporter >> parseCommitIntoGLHCommit: commitDictionary [
 					   (commitDictionary at: #committerTimestamp) / 1000);
 		  committer_email: (committer at: #emailAddress);
 		  committer_name: (committer at: #name);
-		  parent_ids: parentIds
+		  parent_ids: parentIds;
+		  additions: (contribution at: #additions);
+		  deletions: (contribution at: #deletions)
 ]
 
 { #category : #parsing }

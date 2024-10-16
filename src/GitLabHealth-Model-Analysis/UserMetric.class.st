@@ -187,7 +187,9 @@ UserMetric >> loadUserCompleteMergeRequestsSince: since until: until [
 UserMetric >> loadUserCompleteMergeRequestsWithJiraIssueSince: since until: until [
 
 	| email mergeRequests |
-	mergeRequests := self loadUserCompleteMergeRequestsSince: since until: until.
+	mergeRequests := self
+		                 loadUserCompleteMergeRequestsSince: since
+		                 until: until.
 
 	email := self userEmail.
 
