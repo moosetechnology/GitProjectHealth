@@ -244,6 +244,9 @@ UserMetric >> user: anObject [
 
 { #category : #email }
 UserMetric >> userEmail [
+
+	user public_email = '' ifFalse: [ ^ user public_email ].
+
 	^ ('' join: {
 			   user username.
 			   emailDomain }) asLowercase
