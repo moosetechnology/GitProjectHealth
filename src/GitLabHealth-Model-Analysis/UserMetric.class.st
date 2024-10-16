@@ -187,7 +187,9 @@ UserMetric >> loadUserCompleteMergeRequestsSince: since until: until [
 UserMetric >> loadUserCompleteMergeRequestsWithJiraIssueSince: since until: until [
 
 	| email mergeRequests |
-	mergeRequests := self loadUserCompleteMergeRequestsSince: since until: until.
+	mergeRequests := self
+		                 loadUserCompleteMergeRequestsSince: since
+		                 until: until.
 
 	email := self userEmail.
 
@@ -244,6 +246,9 @@ UserMetric >> user: anObject [
 
 { #category : #email }
 UserMetric >> userEmail [
+
+	user public_email = '' ifFalse: [ ^ user public_email ].
+
 	^ ('' join: {
 			   user username.
 			   emailDomain }) asLowercase

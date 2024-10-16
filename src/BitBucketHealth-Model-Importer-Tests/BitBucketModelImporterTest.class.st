@@ -134,7 +134,7 @@ BitBucketModelImporterTest >> testGetContributionFromDiffsWithoutRemoved [
 { #category : #tests }
 BitBucketModelImporterTest >> testImportCommitsOfProjectSinceUntil [
 
-	| bitBucketApi glphModel bitBucketImporter project commits group repo |
+	| bitBucketApi glphModel bitBucketImporter project commits group repo firstCommit |
 	"Given"
 	bitBucketApi := BitBucketApiMock new.
 
@@ -160,8 +160,10 @@ BitBucketModelImporterTest >> testImportCommitsOfProjectSinceUntil [
 	self
 		assert: (bitBucketImporter glhModel allWithType: GLHCommit) size
 		equals: 1.
-		
-  self assert: project repository commits size equals: 1. 
+
+	self assert: project repository commits size equals: 1.
+	firstCommit := project repository commits first.
+	self assert: firstCommit additions equals: 1
 ]
 
 { #category : #tests }
@@ -282,7 +284,8 @@ BitBucketModelImporterTest >> testImportMergeRequestCommits [
 
 	"Then"
 	self deny: mergeRequest commits equals: nil.
-	self assert: mergeRequest commits equals: commits
+	self assert: mergeRequest commits equals: commits.
+	self assert: mergeRequest commits first additions equals: 1
 ]
 
 { #category : #tests }
