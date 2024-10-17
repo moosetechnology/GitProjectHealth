@@ -158,9 +158,18 @@ BitBucketModelImporter >> getContributionFromDiffs: diffs [
 ]
 
 { #category : #'comment import' }
-BitBucketModelImporter >> importAndLoadLatestsCommitsOfProject: aGLHProject [ 
-	
-	^ self importCommitsOfProject: aGLHProject since: (Date today - 3 week) asDateAndTime  until: Date today asDateAndTime 
+BitBucketModelImporter >> importAndLoadLatestsCommitsOfProject: aGLHProject [
+
+	| commits |
+	self completeImportProject: aGLHProject.
+
+	commits :=  self
+		  importCommitsOfProject: aGLHProject
+		  since: (Date today - 3 week) asDateAndTime
+		  until: Date today asDateAndTime.
+	commits do: [ :commit | self completeImportedCommit: commit ].
+	self chainsCommitsFrom: commits.
+	^ commits
 ]
 
 { #category : #'import - commits' }
