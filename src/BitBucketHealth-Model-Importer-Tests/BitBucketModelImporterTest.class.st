@@ -132,6 +132,54 @@ BitBucketModelImporterTest >> testGetContributionFromDiffsWithoutRemoved [
 ]
 
 { #category : #tests }
+BitBucketModelImporterTest >> testImportAndLoadLatestsCommitsOfProject [
+
+	| bitBucketApi glphModel bitBucketImporter project commits group repo firstCommit commit1 currentDate timestamp commit2 timestamp2 |
+	"Given"
+	bitBucketApi := BitBucketApiMock new.
+
+	glphModel := GLPHEModel new name: 'test'.
+
+	bitBucketImporter := BitBucketModelImporter new
+		                     bitBucketApi: bitBucketApi;
+		                     glhModel: glphModel;
+		                     withCommitDiffs: true.
+
+	group := GLHGroup new id: 1.
+	repo := GLHRepository new.
+	project := GLHProject new
+		           group: group;
+		           repository: repo.
+
+	commit1 := bitBucketApi commits1 first.
+	currentDate := DateAndTime today.
+	timestamp := (currentDate - 1 weeks) asUnixTime * 1000.
+	commit1 at: 'committerTimestamp' put: timestamp.
+
+	commit2 := bitBucketApi commit2.
+	timestamp2 := (currentDate - 4 weeks) asUnixTime * 1000.
+	commit2 at: 'committerTimestamp' put: timestamp2.
+
+
+	bitBucketApi commits: {
+			commit1.
+			commit2 }.
+
+	"When"
+	commits := bitBucketImporter importAndLoadLatestsCommitsOfProject:
+		           project.
+
+	"Then"
+	self
+		assert: (bitBucketImporter glhModel allWithType: GLHCommit) size
+		equals: 1.
+
+	self assert: project repository commits size equals: 1.
+	firstCommit := project repository commits first.
+	self assert: firstCommit additions equals: 1
+]
+
+{ #category : #tests }
 BitBucketModelImporterTest >> testImportCommitsOfProjectSinceUntil [
 
 	| bitBucketApi glphModel bitBucketImporter project commits group repo firstCommit |

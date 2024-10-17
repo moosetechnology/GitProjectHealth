@@ -31,7 +31,7 @@ BitBucketModelImporter >> bitBucketApi: anObject [
 	repoApi := anObject
 ]
 
-{ #category : #'private - api' }
+{ #category : #'import - projects' }
 BitBucketModelImporter >> completeImportProject: aGLHProject [
 
 	aGLHProject repository: GLHRepository new.
@@ -55,18 +55,18 @@ BitBucketModelImporter >> completeImportedCommit: aCommit [
 	^ aCommit
 ]
 
-{ #category : #convert }
+{ #category : #'private - api' }
 BitBucketModelImporter >> convertBitBucketDiffToGitDiff: response [
 
-	| bitbucketDiff filePath fromHash toHash sourceLine sourceSpan destinationLine destinationSpan result filePathSource filePathDestination |
+	| fromHash toHash sourceLine sourceSpan destinationLine destinationSpan result filePathSource filePathDestination |
 	fromHash := (response at: 'fromHash') ifNil: ''.
 	toHash := (response at: 'toHash') ifNil: ''.
 
-	
+
 	"Iterate over each diff in 'diffs'"
 	result := (response at: #diffs) collect: [ :diff | "Extract file path, hashes"
-		|gitDiff|
-		gitDiff := ''.
+		          | gitDiff |
+		          gitDiff := ''.
 		          filePathSource := (diff at: 'source')
 			                            ifNil: ''
 			                            ifNotNil: [ :source |
@@ -101,10 +101,9 @@ BitBucketModelImporter >> convertBitBucketDiffToGitDiff: response [
 			          "Iterate over segments"
 			          (hunk at: 'segments') do: [ :segment |
 				          (segment at: 'lines') do: [ :line |
-								(segment at: 'type') = 'CONTEXT' ifTrue: [
-						          gitDiff := gitDiff , (line at: 'line')
-						                     , String cr ].
-								(segment at: 'type') = 'REMOVED' ifTrue: [
+					          (segment at: 'type') = 'CONTEXT' ifTrue: [
+						          gitDiff := gitDiff , (line at: 'line') , String cr ].
+					          (segment at: 'type') = 'REMOVED' ifTrue: [
 						          gitDiff := gitDiff , '-' , (line at: 'line')
 						                     , String cr ].
 					          (segment at: 'type') = 'ADDED' ifTrue: [
@@ -157,10 +156,21 @@ BitBucketModelImporter >> getContributionFromDiffs: diffs [
 	^ contribution
 ]
 
-{ #category : #'comment import' }
-BitBucketModelImporter >> importAndLoadLatestsCommitsOfProject: aGLHProject [ 
+{ #category : #'import - commits' }
+BitBucketModelImporter >> importAndLoadLatestsCommitsOfProject: aGLHProject [
+
+	| commits |
+	self completeImportProject: aGLHProject.
+
+	commits := self
+		           importCommitsOfProject: aGLHProject
+		           since: (Date today - 3 week) asDateAndTime
+		           until: Date today asDateAndTime.
+	commits do: [ :commit | self completeImportedCommit: commit ].
 	
-	^ self importCommitsOfProject: aGLHProject since: (Date today - 3 week) asDateAndTime  until: Date today asDateAndTime 
+	self chainsCommitsFrom: commits.
+	
+	^ commits
 ]
 
 { #category : #'import - commits' }
@@ -261,7 +271,7 @@ BitBucketModelImporter >> importCreatorOfCommit: aGLHCommit [
 	^ creator
 ]
 
-{ #category : #api }
+{ #category : #'import - commits' }
 BitBucketModelImporter >> importDiffOfCommit: aCommit [
 
 	| result diffsResult |
