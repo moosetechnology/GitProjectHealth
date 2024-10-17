@@ -443,13 +443,16 @@ GitMetricExporter >> initialize [
 		           DelayUntilFirstChurnMetric.
 		           TimeBetweenCommitMetric.
 		           ContributedProjectMetric.
+		CodeAdditionByMRMetric .
+		CodeDeletionByMRMetric .
 		           MergeRequestDurationMetric.
 		           OpenedMergeRequestMetric.
 		           ClosedMergeRequestMetric.
 		           MergedMergeRequestMetric.
 		           SelfMergedUnderAMinuteMergeRequestMetric.
 		           ClosedTicketsMetric.
-		           JiraTimeMRTimeDifferenceMetric. CommitsNumberByJiraTicketsMetric }
+		           JiraTimeMRTimeDifferenceMetric.
+		           CommitsNumberByJiraTicketsMetric }
 ]
 
 { #category : #accessing }
