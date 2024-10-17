@@ -17,6 +17,38 @@ BitBucketApiMock >> activitiesOfPullRequest: pullRequestId inRepoProjectId: repo
 ]
 
 { #category : #accessing }
+BitBucketApiMock >> commit2 [
+
+	| commits2 |
+	commits2 := '
+    {
+      "id": "abcdef0123abcdef4567abcdef8987abcdef6543",
+		"message": "message test",
+      "displayId": "abcdef0123a",
+      "author": {
+        "name": "charlie",
+        "emailAddress": "charlie@example.com"
+      },
+      "authorTimestamp": 1727168151000,
+      "committer": {
+        "name": "charlie",
+        "emailAddress": "charlie@example.com"
+      },
+      "committerTimestamp": 1727168151000,
+      "message": "WIP on feature 1",
+      "parents": [
+        {
+          "id": "abcdef0123abcdef4567abcdef8987abcdef6543",
+          "displayId": "abcdef0"
+        }
+      ]
+    }
+  '.
+
+	^ commits2 := (NeoJSONReader on: commits2 readStream) next
+]
+
+{ #category : #accessing }
 BitBucketApiMock >> commits [
 
 	^ commits
@@ -71,8 +103,10 @@ BitBucketApiMock >> commitsOfRepoProjectId: repositorySlug inProjectGroupId: pro
 
 	^ self commits select: [ :commit |
 		  | commitDate |
+			
 		  commitDate := DateAndTime fromUnixTime:
 			                (commit at: #committerTimestamp) / 1000.
+			
 		  commitDate >= since asDate and: commitDate <= until asDate ]
 ]
 
