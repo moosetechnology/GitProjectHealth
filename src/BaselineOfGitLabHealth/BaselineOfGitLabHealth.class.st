@@ -145,20 +145,23 @@ BaselineOfGitLabHealth >> definePackages: spec [
 			spec requires:
 					#( 'GitLabHealth-Model-Importer' 'GitHubHealth-Model-Importer' ) ].
 	spec
+		package: 'GitLabHealth-Model-Tests'
+		with: [ spec requires: #( 'GitLabHealth-Model' ) ].
+	spec
 		package: 'GitHubHealth-Model-Importer-Tests'
 		with: [ spec requires: #( 'GitHubHealth-Model-Importer' ) ].
 
 	"bitBucket"
-	spec package: 'BitBucketHealth-Model-Importer';
-		package: 'BitBucketHealth-Model-Importer-Tests' with: [ spec requires: #( 'BitBucketHealth-Model-Importer' ) ].
+	spec
+		package: 'BitBucketHealth-Model-Importer';
+		package: 'BitBucketHealth-Model-Importer-Tests'
+		with: [ spec requires: #( 'BitBucketHealth-Model-Importer' ) ].
 
 	"model extension"
 	spec
 		package: 'GLPHExtended-Model' with: [
 			spec requires:
 					#( 'GitLabHealth-Model' 'GitLabHealth-Model-Extension' ) ];
-		package: 'GLPHExtended-Model-Tests'
-		with: [ spec requires: #( 'GLPHExtended-Model' ) ];
 		package: 'GitLabHealth-Model-Analysis'
 		with: [ spec requires: #( 'Voyage' 'AWS' ) ];
 		package: 'GitLabHealth-Model-Analysis-Tests'

@@ -3,11 +3,11 @@ Extension { #name : 'GLHLineOfCode' }
 { #category : '*GitLabHealth-Model-Extension' }
 GLHLineOfCode class >> newFrom: aDiffLine [
 
-	| aLoC infos ranges |
+	| aLoC infos |
 	infos := (aDiffLine splitOn: '@@') copyWithoutFirst.
 	aLoC := GLPHELineOfCode new.
 	aLoC sourceCode: infos second.
-	^ aLoC.
+	^ aLoC
 ]
 
 { #category : '*GitLabHealth-Model-Extension' }

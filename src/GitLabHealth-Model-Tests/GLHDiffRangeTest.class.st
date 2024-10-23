@@ -1,14 +1,16 @@
 "
-A GLPHEDiffRangeTest is a test class for testing the behavior of GLPHEDiffRange
+A GLHDiffRangeTest is a test class for testing the behavior of GLHDiffRange
 "
 Class {
-	#name : #GLPHEDiffRangeTest,
-	#superclass : #TestCase,
-	#category : 'GLPHExtended-Model-Tests-Entities'
+	#name : 'GLHDiffRangeTest',
+	#superclass : 'TestCase',
+	#category : 'GitLabHealth-Model-Tests-Entities',
+	#package : 'GitLabHealth-Model-Tests',
+	#tag : 'Entities'
 }
 
-{ #category : #tests }
-GLPHEDiffRangeTest >> testNewEntityFromString [
+{ #category : 'tests' }
+GLHDiffRangeTest >> testNewEntityFromString [
 
 	| diffRange |
 	diffRange := GLPHEDiffRange newFrom:
@@ -17,8 +19,8 @@ GLPHEDiffRangeTest >> testNewEntityFromString [
 	self assert: diffRange newLineRange equals: '+15,9'
 ]
 
-{ #category : #tests }
-GLPHEDiffRangeTest >> testNewEntityFromStringWithDifferentValues [
+{ #category : 'tests' }
+GLHDiffRangeTest >> testNewEntityFromStringWithDifferentValues [
 
 	| diffRange |
 	diffRange := GLPHEDiffRange newFrom:
