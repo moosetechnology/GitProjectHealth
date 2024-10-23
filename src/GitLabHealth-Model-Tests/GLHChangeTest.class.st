@@ -14,7 +14,7 @@ GLHChangeTest >> testNewEntityFromString [
 
 	| change |
 	change := GLHChange newFrom: '+ helloWorld'.
-	self assert: change class equals: GLPHEAddition.
+	self assert: change class equals: GLHAddition.
 	self assert: change sourceCode equals: '+ helloWorld'
 ]
 
@@ -22,8 +22,8 @@ GLHChangeTest >> testNewEntityFromString [
 GLHChangeTest >> testNewEntityFromStringDeletion [
 
 	| change |
-	change := GLPHEChange newFrom: '- helloWorld'.
-	self assert: change class equals: GLPHEDeletion.
+	change := GLHChange newFrom: '- helloWorld'.
+	self assert: change class equals: GLHDeletion.
 	self assert: change sourceCode equals: '- helloWorld'
 ]
 
@@ -31,7 +31,7 @@ GLHChangeTest >> testNewEntityFromStringDeletion [
 GLHChangeTest >> testNewEntityFromStringLOC [
 
 	| change |
-	change := GLPHEChange newFrom: 'helloWorld'.
-	self assert: change class equals: GLPHELineOfCode.
+	change := GLHChange newFrom: 'helloWorld'.
+	self assert: change class equals: GLHLineOfCode.
 	self assert: change sourceCode equals: 'helloWorld'
 ]

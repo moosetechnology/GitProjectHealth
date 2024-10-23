@@ -2,12 +2,13 @@
 A ClosedMergeRequestMetricTest is a test class for testing the behavior of ClosedMergeRequestMetric
 "
 Class {
-	#name : #ClosedMergeRequestMetricTest,
-	#superclass : #TestCase,
-	#category : #'GitLabHealth-Model-Analysis-Tests'
+	#name : 'ClosedMergeRequestMetricTest',
+	#superclass : 'TestCase',
+	#category : 'GitLabHealth-Model-Analysis-Tests',
+	#package : 'GitLabHealth-Model-Analysis-Tests'
 }
 
-{ #category : #tests }
+{ #category : 'tests' }
 ClosedMergeRequestMetricTest >> testCalculate [
 
 	| result glhImporter user closedMergeRequestMetric |
@@ -45,7 +46,7 @@ ClosedMergeRequestMetricTest >> testCalculate [
 	self assert: result equals: 2
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ClosedMergeRequestMetricTest >> testCalculate1MRinPeriod2Outside [
 
 	| result glhImporter user closedMergeRequestMetric |
@@ -88,7 +89,7 @@ ClosedMergeRequestMetricTest >> testCalculate1MRinPeriod2Outside [
 	self assert: result equals: 1
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ClosedMergeRequestMetricTest >> testCalculate3MR [
 
 	| result glhImporter user closedMergeRequestMetric |
@@ -131,7 +132,7 @@ ClosedMergeRequestMetricTest >> testCalculate3MR [
 	self assert: result equals: 3
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ClosedMergeRequestMetricTest >> testCalculate3MRClosed2Opened [
 
 	| result glhImporter user closedMergeRequestMetric |
@@ -184,7 +185,7 @@ ClosedMergeRequestMetricTest >> testCalculate3MRClosed2Opened [
 	self assert: result equals: 3
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ClosedMergeRequestMetricTest >> testCalculateNoClosedMR [
 
 	| result glhImporter user closedMergeRequestMetric |
@@ -237,7 +238,7 @@ ClosedMergeRequestMetricTest >> testCalculateNoClosedMR [
 	self assert: result equals: 0
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ClosedMergeRequestMetricTest >> testCalculateNoMergeRequests [
 
 	| result glhImporter user closedMergeRequestMetric |
@@ -263,7 +264,7 @@ ClosedMergeRequestMetricTest >> testCalculateNoMergeRequests [
 	self assert: result equals: 0
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ClosedMergeRequestMetricTest >> testCalculateOutSidePeriod [
 
 	| result glhImporter user closedMergeRequestMetric |

@@ -2,12 +2,13 @@
 A ClosedTicketsMetricTest is a test class for testing the behavior of ClosedTicketsMetric
 "
 Class {
-	#name : #ClosedTicketsMetricTest,
-	#superclass : #TestCase,
-	#category : #'GitLabHealth-Model-Analysis-Tests'
+	#name : 'ClosedTicketsMetricTest',
+	#superclass : 'TestCase',
+	#category : 'GitLabHealth-Model-Analysis-Tests',
+	#package : 'GitLabHealth-Model-Analysis-Tests'
 }
 
-{ #category : #tests }
+{ #category : 'tests' }
 ClosedTicketsMetricTest >> testCalculate [
 
 	| result glhImporter user closedTicket jiraImporter |

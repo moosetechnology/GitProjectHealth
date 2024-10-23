@@ -13,7 +13,7 @@ Class {
 GLHDiffRangeTest >> testNewEntityFromString [
 
 	| diffRange |
-	diffRange := GLPHEDiffRange newFrom:
+	diffRange := GLHDiffRange newFrom:
 		             '@@ -15,9 +15,9 @@ LLMModifierTest >> testGetViolationsMessage ['.
 	self assert: diffRange originalLineRange equals: '-15,9'.
 	self assert: diffRange newLineRange equals: '+15,9'
@@ -23,7 +23,7 @@ GLHDiffRangeTest >> testNewEntityFromString [
 GLHDiffRangeTest >> testNewEntityFromStringWithDifferentValues [
 
 	| diffRange |
-	diffRange := GLPHEDiffRange newFrom:
+	diffRange := GLHDiffRange newFrom:
 		             '@@ -15,7 +15,8 @@ LLMModifier >> getViolationsMessage: violations ['.
 	self assert: diffRange originalLineRange equals: '-15,7'.
 	self assert: diffRange newLineRange equals: '+15,8'

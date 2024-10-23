@@ -2,12 +2,13 @@
 A JiraTimeMRTimeDifferenceMetricTest is a test class for testing the behavior of JiraTimeMRTimeDifferenceMetric
 "
 Class {
-	#name : #JiraTimeMRTimeDifferenceMetricTest,
-	#superclass : #TestCase,
-	#category : #'GitLabHealth-Model-Analysis-Tests'
+	#name : 'JiraTimeMRTimeDifferenceMetricTest',
+	#superclass : 'TestCase',
+	#category : 'GitLabHealth-Model-Analysis-Tests',
+	#package : 'GitLabHealth-Model-Analysis-Tests'
 }
 
-{ #category : #tests }
+{ #category : 'tests' }
 JiraTimeMRTimeDifferenceMetricTest >> testCalculate [
 
 	| result glhImporter user jiraImporter jiraMRDifference |
@@ -18,7 +19,7 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculate [
 			        { (GLHProject new repository: GLHRepository new) }.
 
 	glhImporter := GLPHImporterMock new.
-	glhImporter mergeRequests: { (GLPHEMergeRequest new
+	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
 			 created_at: '09-05-2024';
 			 merged_at: '09-06-2024' asDate;
@@ -51,7 +52,7 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculate [
 	self assert: result equals: 1 hours asSeconds
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 JiraTimeMRTimeDifferenceMetricTest >> testCalculate2PeriodWith1EmptyPeriod [
 
 	| result glhImporter user jiraImporter jiraMRDifference |
@@ -62,7 +63,7 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculate2PeriodWith1EmptyPeriod [
 			        { (GLHProject new repository: GLHRepository new) }.
 
 	glhImporter := GLPHImporterMock new.
-	glhImporter mergeRequests: { (GLPHEMergeRequest new
+	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
 			 created_at: '09-05-2024';
 			 merged_at: '09-06-2024' asDate;
@@ -95,7 +96,7 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculate2PeriodWith1EmptyPeriod [
 	self assert: result equals: 1 hours /2 asSeconds
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 JiraTimeMRTimeDifferenceMetricTest >> testCalculateNoMergeRequests [
 
 	| result glhImporter user jiraImporter jiraMRDifference |
@@ -125,7 +126,7 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculateNoMergeRequests [
 	self assert: result equals: nil
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 JiraTimeMRTimeDifferenceMetricTest >> testCalculateWithNoEstimatedTime [
 
 	| result glhImporter user jiraImporter jiraMRDifference |
@@ -136,7 +137,7 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculateWithNoEstimatedTime [
 			        { (GLHProject new repository: GLHRepository new) }.
 
 	glhImporter := GLPHImporterMock new.
-	glhImporter mergeRequests: { (GLPHEMergeRequest new
+	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
 			 created_at: '09-05-2024';
 			 merged_at: '09-06-2024' asDate;
@@ -167,7 +168,7 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculateWithNoEstimatedTime [
 	self assert: result equals: nil
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 JiraTimeMRTimeDifferenceMetricTest >> testCalculateWithTimeOriginalEstimateAndNoTimeEstimate [
 
 	| result glhImporter user jiraImporter jiraMRDifference |
@@ -178,7 +179,7 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculateWithTimeOriginalEstimateAndNo
 			        { (GLHProject new repository: GLHRepository new) }.
 
 	glhImporter := GLPHImporterMock new.
-	glhImporter mergeRequests: { (GLPHEMergeRequest new
+	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
 			 created_at: '09-05-2024';
 			 merged_at: '09-06-2024' asDate;

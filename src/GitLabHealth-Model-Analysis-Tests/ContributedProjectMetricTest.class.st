@@ -2,12 +2,13 @@
 A ContributedProjectMetricTest is a test class for testing the behavior of ContributedProjectMetric
 "
 Class {
-	#name : #ContributedProjectMetricTest,
-	#superclass : #TestCase,
-	#category : #'GitLabHealth-Model-Analysis-Tests'
+	#name : 'ContributedProjectMetricTest',
+	#superclass : 'TestCase',
+	#category : 'GitLabHealth-Model-Analysis-Tests',
+	#package : 'GitLabHealth-Model-Analysis-Tests'
 }
 
-{ #category : #tests }
+{ #category : 'tests' }
 ContributedProjectMetricTest >> testCalculate [
 
 	| user glhImporter result contributedProject project1 repository1 |
@@ -48,7 +49,7 @@ ContributedProjectMetricTest >> testCalculate [
 	self assert: result equals: 1
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ContributedProjectMetricTest >> testCalculateNoCommits [
 
 	| user glhImporter result contributedProject project1 repository1 |
