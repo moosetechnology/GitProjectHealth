@@ -1,10 +1,11 @@
 Class {
-	#name : #ClosedTicketsMetric,
-	#superclass : #UserJiraMetric,
-	#category : #'GitLabHealth-Model-Analysis'
+	#name : 'ClosedTicketsMetric',
+	#superclass : 'UserJiraMetric',
+	#category : 'GitLabHealth-Model-Analysis',
+	#package : 'GitLabHealth-Model-Analysis'
 }
 
-{ #category : #calculating }
+{ #category : 'calculating' }
 ClosedTicketsMetric >> calculate [
 
 	| groupedByDate dateOver |
@@ -23,13 +24,13 @@ ClosedTicketsMetric >> calculate [
 	^ groupedByDate average asFloat
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ClosedTicketsMetric >> description [
 
 	^ 'number of closed merge request associated with a jira ticket'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ClosedTicketsMetric >> name [
 
 	^ 'closedTickets'

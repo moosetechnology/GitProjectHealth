@@ -1,8 +1,9 @@
 Class {
-	#name : #ProjectMetric,
-	#superclass : #Metric,
+	#name : 'ProjectMetric',
+	#superclass : 'Metric',
 	#instVars : [
 		'project'
 	],
-	#category : #'GitLabHealth-Model-Analysis'
+	#category : 'GitLabHealth-Model-Analysis',
+	#package : 'GitLabHealth-Model-Analysis'
 }

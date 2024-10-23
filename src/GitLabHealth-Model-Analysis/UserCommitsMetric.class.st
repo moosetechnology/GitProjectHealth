@@ -1,22 +1,23 @@
 Class {
-	#name : #UserCommitsMetric,
-	#superclass : #UserMetric,
-	#category : #'GitLabHealth-Model-Analysis'
+	#name : 'UserCommitsMetric',
+	#superclass : 'UserMetric',
+	#category : 'GitLabHealth-Model-Analysis',
+	#package : 'GitLabHealth-Model-Analysis'
 }
 
-{ #category : #calculating }
+{ #category : 'calculating' }
 UserCommitsMetric >> calculate [
 
 	^ self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 UserCommitsMetric >> description [
 
 	^ self subclassResponsibility
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 UserCommitsMetric >> load [
 
 	userCommits := self
@@ -24,7 +25,7 @@ UserCommitsMetric >> load [
 		               until: (period at: #until)
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 UserCommitsMetric >> name [
 
 	^ self class name asString

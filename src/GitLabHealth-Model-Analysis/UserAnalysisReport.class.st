@@ -1,19 +1,20 @@
 Class {
-	#name : #UserAnalysisReport,
-	#superclass : #AnalysisReport,
+	#name : 'UserAnalysisReport',
+	#superclass : 'AnalysisReport',
 	#instVars : [
 		'username'
 	],
-	#category : #'GitLabHealth-Model-Analysis'
+	#category : 'GitLabHealth-Model-Analysis',
+	#package : 'GitLabHealth-Model-Analysis'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 UserAnalysisReport >> username [
 
 	^ username
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 UserAnalysisReport >> username: anObject [
 
 	username := anObject
