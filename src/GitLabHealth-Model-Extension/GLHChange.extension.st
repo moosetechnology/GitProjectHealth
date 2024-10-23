@@ -8,7 +8,7 @@ GLHChange class >> createFrom: aDiffLine [
 	aChange := nil.
 	(aDiffLine beginsWith: #'@@') ifTrue: [
 		| infos |
-		aChange := GLPHELineOfCode newFromLoCRange: aDiffLine.
+		aChange := GLHLineOfCode newFromLoCRange: aDiffLine.
 
 		infos := (aDiffLine splitOn: '@@') copyWithoutFirst.
 		infos := aDiffLine splitOn: ' ' ].
@@ -29,11 +29,11 @@ GLHChange class >> newFrom: aDiffLine [
 	trimedLine := aDiffLine trim.
 
 	aChange := (trimedLine beginsWith: #+)
-		           ifTrue: [ GLPHEAddition new ]
+		           ifTrue: [ GLHAddition new ]
 		           ifFalse: [
 			           (aDiffLine trim beginsWith: #-)
-				           ifTrue: [ GLPHEDeletion new ]
-				           ifFalse: [ GLPHELineOfCode new ] ].
+				           ifTrue: [ GLHDeletion new ]
+				           ifFalse: [ GLHLineOfCode new ] ].
 
 	code := aDiffLine.
 	(trimedLine beginsWith: #'@@') ifTrue: [
