@@ -36,6 +36,7 @@ a gitlab merge request
 | `blocking_discussions_resolved` | `Boolean` | nil | |
 | `changes_count` | `String` | nil | |
 | `closed_at` | `Object` | nil | |
+| `commits` | `Object` | nil | |
 | `created_at` | `Object` | nil | |
 | `description` | `String` | nil | |
 | `detailed_merge_status` | `String` | nil | |
@@ -333,12 +334,14 @@ GLHMergeRequest >> closed_by: anObject [
 { #category : 'accessing' }
 GLHMergeRequest >> commits [
 
+	<FMProperty: #commits type: #Object>
+	<generated>
 	^ commits
 ]
 
 { #category : 'accessing' }
 GLHMergeRequest >> commits: anObject [
-
+	<generated>
 	commits := anObject
 ]
 

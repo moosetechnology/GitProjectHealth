@@ -384,7 +384,10 @@ GLHMetamodelGenerator >> mergeRequestProperties [
 	mergeRequest property: #latest_build_started_at type: #String.
 	mergeRequest property: #latest_build_finished_at type: #String.
 	mergeRequest property: #first_deployed_to_production_at type: #String.
-	mergeRequest property: #approved type: #Boolean
+	mergeRequest property: #approved type: #Boolean.
+
+	"see https://github.com/moosetechnology/GitProjectHealth/issues/88"
+	mergeRequest property: #commits type: #Object
 ]
 
 { #category : 'definition' }
