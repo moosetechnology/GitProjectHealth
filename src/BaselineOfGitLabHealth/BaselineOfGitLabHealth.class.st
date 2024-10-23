@@ -81,19 +81,19 @@ BaselineOfGitLabHealth >> defineGroups: spec [
 			   'GitProject-FamixConnector-Tests' ).
 	spec
 		group: 'Core'
-		with: #( 'GitLabHealth-Model' 'GitLabHealth-Model-Extension'
+		with: #( 'GitLabHealth-Model' 'GitLabHealth-Model-Extension' 'GitLabHealth-Model-Tests'
 			   'GitLabHealth-Model-Extension-Tests'
 			   'GitLabHealth-Model-Generator' 'GitLabHealth-Model-Inspector'
 			   'GitLabHealth-Model-Visualization'
 			   'GitLabHealth-Model-Importer' 'GitLabHealth-Model-Importer-Tests'
 			   'GitHubHealth-Model-Importer-Tests'
-			   'GLPHExtended-Model' 'GLPHExtended-Model-Tests'
-			   'GLPHExtended-Model-Extension' 'GitLabHealth-Model-Analysis'
+			   'GLPHExtended-Model' 'GitLabHealth-Model-Analysis'
 			   'GitLabHealth-Model-Analysis-Tests'
 			   'GitLabHealth-Visualization' 'GitLabProjectHealth-ExtendModel-Generator'
 			   'GitLabProjectHealth-Model-Importer'
 			   'GitLabProjectHealth-Model-Importer-Tests'
-			   'BitBucketHealth-Model-Importer' 'BitBucketHealth-Model-Importer-Tests' ).
+			   'BitBucketHealth-Model-Importer'
+			   'BitBucketHealth-Model-Importer-Tests' ).
 	spec group: 'default' with: #( 'Core' )
 ]
 
