@@ -5,7 +5,7 @@ GLHLineOfCode class >> newFrom: aDiffLine [
 
 	| aLoC infos |
 	infos := (aDiffLine splitOn: '@@') copyWithoutFirst.
-	aLoC := GLPHELineOfCode new.
+	aLoC := GLHLineOfCode new.
 	aLoC sourceCode: infos second.
 	^ aLoC
 ]
@@ -16,7 +16,7 @@ GLHLineOfCode class >> newFromLoCRange: aDiffLine [
 	| aLoC infos ranges |
 	infos := (aDiffLine splitOn: '@@') copyWithoutFirst.
 	ranges := infos first splitOn: ','.
-	aLoC := GLPHELineOfCode new.
+	aLoC := GLHLineOfCode new.
 	aLoC originalLineRange: ranges first.
 	aLoC newLineRange: 1.
 	aLoC lineOfCode: infos second
