@@ -156,7 +156,8 @@ Class {
 		'#mergeRequestCommit => FMOne type: #GLHCommit opposite: #commitedMergeRequest',
 		'#squashCommit => FMOne type: #GLHCommit opposite: #squashedMergeRequest',
 		'#diffs => FMMany type: #GLHDiff opposite: #mergeRequest',
-		'#project => FMOne type: #GLHProject opposite: #mergeRequests'
+		'#project => FMOne type: #GLHProject opposite: #mergeRequests',
+		'#commits => FMProperty'
 	],
 	#category : 'GitLabHealth-Model-Entities',
 	#package : 'GitLabHealth-Model',
@@ -327,6 +328,18 @@ GLHMergeRequest >> closed_by: anObject [
 
 	<generated>
 	closed_by := anObject
+]
+
+{ #category : 'accessing' }
+GLHMergeRequest >> commits [
+
+	^ commits
+]
+
+{ #category : 'accessing' }
+GLHMergeRequest >> commits: anObject [
+
+	commits := anObject
 ]
 
 { #category : 'accessing' }

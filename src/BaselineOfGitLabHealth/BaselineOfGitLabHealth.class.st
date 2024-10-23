@@ -81,14 +81,13 @@ BaselineOfGitLabHealth >> defineGroups: spec [
 			   'GitProject-FamixConnector-Tests' ).
 	spec
 		group: 'Core'
-		with: #( 'GitLabHealth-Model' 'GitLabHealth-Model-Extension' 'GitLabHealth-Model-Tests'
-			   'GitLabHealth-Model-Extension-Tests'
+		with: #( 'GitLabHealth-Model' 'GitLabHealth-Model-Extension'
+			   'GitLabHealth-Model-Tests' 'GitLabHealth-Model-Extension-Tests'
 			   'GitLabHealth-Model-Generator' 'GitLabHealth-Model-Inspector'
 			   'GitLabHealth-Model-Visualization'
 			   'GitLabHealth-Model-Importer' 'GitLabHealth-Model-Importer-Tests'
 			   'GitHubHealth-Model-Importer-Tests'
-			   'GLPHExtended-Model' 'GitLabHealth-Model-Analysis'
-			   'GitLabHealth-Model-Analysis-Tests'
+			   'GitLabHealth-Model-Analysis' 'GitLabHealth-Model-Analysis-Tests'
 			   'GitLabHealth-Visualization' 'GitLabProjectHealth-ExtendModel-Generator'
 			   'GitLabProjectHealth-Model-Importer'
 			   'GitLabProjectHealth-Model-Importer-Tests'
@@ -159,9 +158,6 @@ BaselineOfGitLabHealth >> definePackages: spec [
 
 	"model extension"
 	spec
-		package: 'GLPHExtended-Model' with: [
-			spec requires:
-					#( 'GitLabHealth-Model' 'GitLabHealth-Model-Extension' ) ];
 		package: 'GitLabHealth-Model-Analysis'
 		with: [ spec requires: #( 'Voyage' 'AWS' ) ];
 		package: 'GitLabHealth-Model-Analysis-Tests'
