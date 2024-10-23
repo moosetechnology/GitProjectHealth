@@ -18,7 +18,7 @@ GLHModelImporterTestResource >> glhImporter [
 { #category : 'setup' }
 GLHModelImporterTestResource >> importModel [
 
-	model := GLPHEModel new.
+	model := GLHModel new.
 
 	glphApi := GLPHApi new
 		           privateToken: '';
