@@ -19,7 +19,7 @@ JiraImporterMock >> importAllCurrentAndPastIssuesOf: email [
 { #category : 'initialization' }
 JiraImporterMock >> initialize [
 
-	model := GLPHEModel new name: 'model'.
+	model := GLHModel new name: 'model'.
 	issues := {  }.
 ]
 
