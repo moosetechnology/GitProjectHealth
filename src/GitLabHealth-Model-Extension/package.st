@@ -1,1 +1,1 @@
-Package { #name : #'GitLabHealth-Model-Extension' }
+Package { #name : 'GitLabHealth-Model-Extension' }

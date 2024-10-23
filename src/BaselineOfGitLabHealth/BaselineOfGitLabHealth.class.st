@@ -159,9 +159,6 @@ BaselineOfGitLabHealth >> definePackages: spec [
 					#( 'GitLabHealth-Model' 'GitLabHealth-Model-Extension' ) ];
 		package: 'GLPHExtended-Model-Tests'
 		with: [ spec requires: #( 'GLPHExtended-Model' ) ];
-		package: 'GLPHExtended-Model-Extension' with: [
-			spec requires:
-					#( 'GLPHExtended-Model' 'GitLabHealth-Model' 'GitLabHealth-Model-Extension' ) ];
 		package: 'GitLabHealth-Model-Analysis'
 		with: [ spec requires: #( 'Voyage' 'AWS' ) ];
 		package: 'GitLabHealth-Model-Analysis-Tests'

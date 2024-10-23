@@ -19,17 +19,19 @@ A git repository
 
 "
 Class {
-	#name : #GLHRepository,
-	#superclass : #GLHEntity,
+	#name : 'GLHRepository',
+	#superclass : 'GLHEntity',
 	#instVars : [
 		'#project => FMOne type: #GLHProject opposite: #repository',
 		'#branches => FMMany type: #GLHBranch opposite: #repository',
 		'#commits => FMMany type: #GLHCommit opposite: #repository'
 	],
-	#category : #'GitLabHealth-Model-Entities'
+	#category : 'GitLabHealth-Model-Entities',
+	#package : 'GitLabHealth-Model',
+	#tag : 'Entities'
 }
 
-{ #category : #meta }
+{ #category : 'meta' }
 GLHRepository class >> annotation [
 
 	<FMClass: #Repository super: #GLHEntity>
@@ -38,19 +40,19 @@ GLHRepository class >> annotation [
 	^ self
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 GLHRepository >> addBranch: anObject [
 	<generated>
 	^ self branches add: anObject
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 GLHRepository >> addCommit: anObject [
 	<generated>
 	^ self commits add: anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GLHRepository >> branches [
 	"Relation named: #branches type: #GLHBranch opposite: #repository"
 
@@ -59,21 +61,21 @@ GLHRepository >> branches [
 	^ branches
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GLHRepository >> branches: anObject [
 
 	<generated>
 	branches value: anObject
 ]
 
-{ #category : #navigation }
+{ #category : 'navigation' }
 GLHRepository >> branchesGroup [
 	<generated>
 	<navigation: 'Branches'>
 	^ MooseSpecializedGroup withAll: self branches asSet
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GLHRepository >> commits [
 	"Relation named: #commits type: #GLHCommit opposite: #repository"
 
@@ -82,21 +84,21 @@ GLHRepository >> commits [
 	^ commits
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GLHRepository >> commits: anObject [
 
 	<generated>
 	commits value: anObject
 ]
 
-{ #category : #navigation }
+{ #category : 'navigation' }
 GLHRepository >> commitsGroup [
 	<generated>
 	<navigation: 'Commits'>
 	^ MooseSpecializedGroup withAll: self commits asSet
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GLHRepository >> project [
 	"Relation named: #project type: #GLHProject opposite: #repository"
 
@@ -106,14 +108,14 @@ GLHRepository >> project [
 	^ project
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GLHRepository >> project: anObject [
 
 	<generated>
 	project := anObject
 ]
 
-{ #category : #navigation }
+{ #category : 'navigation' }
 GLHRepository >> projectGroup [
 	<generated>
 	<navigation: 'Project'>

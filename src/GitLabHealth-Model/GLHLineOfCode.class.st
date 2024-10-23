@@ -1,20 +1,20 @@
 "
-A file blob
+a line of code in a diff comparaison 
 
 
 "
 Class {
-	#name : 'GLHFileBlob',
-	#superclass : 'GLHFile',
+	#name : 'GLHLineOfCode',
+	#superclass : 'GLHChange',
 	#category : 'GitLabHealth-Model-Entities',
 	#package : 'GitLabHealth-Model',
 	#tag : 'Entities'
 }
 
 { #category : 'meta' }
-GLHFileBlob class >> annotation [
+GLHLineOfCode class >> annotation [
 
-	<FMClass: #FileBlob super: #GLHFile>
+	<FMClass: #LineOfCode super: #GLHChange>
 	<package: #'GitLabHealth-Model'>
 	<generated>
 	^ self

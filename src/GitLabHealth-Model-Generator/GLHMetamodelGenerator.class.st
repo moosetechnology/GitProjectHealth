@@ -124,10 +124,12 @@ GLHMetamodelGenerator >> defineClasses [
 		            newClassNamed: #Addition
 		            comment:
 		            'a detected addition of a line, seen within a diff '.
+	addition withTesting.
 	deletion := builder
 		            newClassNamed: #Deletion
 		            comment:
 		            'a detected deletion of a line, seen within a diff '.
+	deletion withTesting.
 
 	lineOfCode := builder
 		              newClassNamed: #LineOfCode

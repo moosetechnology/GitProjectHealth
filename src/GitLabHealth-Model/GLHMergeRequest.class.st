@@ -7,24 +7,24 @@ a gitlab merge request
 ### Parents
 | Relation | Origin | Opposite | Type | Comment |
 |---|
-| `project` | `GLPHEMergeRequest` | `mergeRequests` | `GLHProject` | |
+| `project` | `GLHMergeRequest` | `mergeRequests` | `GLHProject` | |
 
 ### Other
 | Relation | Origin | Opposite | Type | Comment |
 |---|
-| `approved_by` | `GLPHEMergeRequest` | `approcheMergeRequests` | `GLHUser` | |
-| `assignee` | `GLPHEMergeRequest` | `currentlyAssignedMergeRequest` | `GLHUser` | |
-| `assignees` | `GLPHEMergeRequest` | `assignedMergeRequests` | `GLHUser` | |
-| `author` | `GLPHEMergeRequest` | `createdMergeRequests` | `GLHUser` | |
-| `closed_by` | `GLPHEMergeRequest` | `closedMergeRequests` | `GLHUser` | |
-| `diffs` | `GLPHEMergeRequest` | `mergeRequest` | `GLHDiff` | |
-| `mergeRequestCommit` | `GLPHEMergeRequest` | `commitedMergeRequest` | `GLHCommit` | |
-| `merge_user` | `GLPHEMergeRequest` | `usedMerges` | `GLHUser` | |
-| `mergedCommit` | `GLPHEMergeRequest` | `commitedMergeRequest` | `GLHCommit` | |
-| `merged_by` | `GLPHEMergeRequest` | `mergerOfMergeRequests` | `GLHUser` | |
-| `pipeline` | `GLPHEMergeRequest` | `mergeResquest` | `GLHPipeline` | |
-| `reviewers` | `GLPHEMergeRequest` | `reviewedMergeResquest` | `GLHUser` | |
-| `squashCommit` | `GLPHEMergeRequest` | `squashedMergeRequest` | `GLHCommit` | |
+| `approved_by` | `GLHMergeRequest` | `approcheMergeRequests` | `GLHUser` | |
+| `assignee` | `GLHMergeRequest` | `currentlyAssignedMergeRequest` | `GLHUser` | |
+| `assignees` | `GLHMergeRequest` | `assignedMergeRequests` | `GLHUser` | |
+| `author` | `GLHMergeRequest` | `createdMergeRequests` | `GLHUser` | |
+| `closed_by` | `GLHMergeRequest` | `closedMergeRequests` | `GLHUser` | |
+| `diffs` | `GLHMergeRequest` | `mergeRequest` | `GLHDiff` | |
+| `mergeRequestCommit` | `GLHMergeRequest` | `commitedMergeRequest` | `GLHCommit` | |
+| `merge_user` | `GLHMergeRequest` | `usedMerges` | `GLHUser` | |
+| `mergedCommit` | `GLHMergeRequest` | `commitedMergeRequest` | `GLHCommit` | |
+| `merged_by` | `GLHMergeRequest` | `mergerOfMergeRequests` | `GLHUser` | |
+| `pipeline` | `GLHMergeRequest` | `mergeResquest` | `GLHPipeline` | |
+| `reviewers` | `GLHMergeRequest` | `reviewedMergeResquest` | `GLHUser` | |
+| `squashCommit` | `GLHMergeRequest` | `squashedMergeRequest` | `GLHCommit` | |
 
 
 ## Properties
@@ -87,104 +87,117 @@ a gitlab merge request
 
 "
 Class {
-	#name : 'GLPHEMergeRequest',
-	#superclass : 'GLPHEEntity',
+	#name : 'GLHMergeRequest',
+	#superclass : 'GLHEntity',
 	#traits : 'FamixTNamedEntity',
 	#classTraits : 'FamixTNamedEntity classTrait',
 	#instVars : [
-		'#approved => FMProperty',
-		'#blocking_discussions_resolved => FMProperty',
-		'#changes_count => FMProperty',
-		'#closed_at => FMProperty',
-		'#created_at => FMProperty',
-		'#commits => FMProperty',
-		'#description => FMProperty',
-		'#detailed_merge_status => FMProperty',
-		'#discussion_locked => FMProperty',
-		'#downvotes => FMProperty',
-		'#draft => FMProperty',
-		'#first_deployed_to_production_at => FMProperty',
-		'#force_remove_source_branch => FMProperty',
-		'#has_conflicts => FMProperty',
 		'#id => FMProperty',
 		'#iid => FMProperty',
-		'#labels => FMProperty',
-		'#latest_build_finished_at => FMProperty',
-		'#latest_build_started_at => FMProperty',
-		'#merge_commit_sha => FMProperty',
-		'#merge_status => FMProperty',
-		'#merge_when_pipeline_succeeds => FMProperty',
-		'#merged_at => FMProperty',
-		'#milestone => FMProperty',
 		'#project_id => FMProperty',
-		'#reference => FMProperty',
-		'#references_full => FMProperty',
-		'#references_relative => FMProperty',
-		'#references_short => FMProperty',
-		'#sha => FMProperty',
-		'#should_remove_source_branch => FMProperty',
-		'#source_branch => FMProperty',
-		'#source_project_id => FMProperty',
-		'#squash => FMProperty',
-		'#squash_commit_sha => FMProperty',
-		'#squash_on_merge => FMProperty',
+		'#title => FMProperty',
+		'#description => FMProperty',
 		'#state => FMProperty',
-		'#subscribed => FMProperty',
+		'#created_at => FMProperty',
+		'#updated_at => FMProperty',
+		'#merged_at => FMProperty',
+		'#closed_at => FMProperty',
 		'#target_branch => FMProperty',
+		'#source_branch => FMProperty',
+		'#user_notes_count => FMProperty',
+		'#upvotes => FMProperty',
+		'#downvotes => FMProperty',
+		'#source_project_id => FMProperty',
 		'#target_project_id => FMProperty',
-		'#task_completion_status_completed_count => FMProperty',
-		'#task_completion_status_count => FMProperty',
-		'#time_stats_human_time_estimate => FMProperty',
-		'#time_stats_human_total_time_spent => FMProperty',
+		'#labels => FMProperty',
+		'#draft => FMProperty',
+		'#work_in_progress => FMProperty',
+		'#milestone => FMProperty',
+		'#merge_when_pipeline_succeeds => FMProperty',
+		'#merge_status => FMProperty',
+		'#detailed_merge_status => FMProperty',
+		'#sha => FMProperty',
+		'#merge_commit_sha => FMProperty',
+		'#squash_commit_sha => FMProperty',
+		'#discussion_locked => FMProperty',
+		'#should_remove_source_branch => FMProperty',
+		'#force_remove_source_branch => FMProperty',
+		'#reference => FMProperty',
+		'#references_short => FMProperty',
+		'#references_relative => FMProperty',
+		'#references_full => FMProperty',
+		'#web_url => FMProperty',
 		'#time_stats_time_estimate => FMProperty',
 		'#time_stats_total_time_spent => FMProperty',
-		'#title => FMProperty',
-		'#updated_at => FMProperty',
-		'#upvotes => FMProperty',
-		'#user_notes_count => FMProperty',
-		'#web_url => FMProperty',
-		'#work_in_progress => FMProperty'
+		'#time_stats_human_time_estimate => FMProperty',
+		'#time_stats_human_total_time_spent => FMProperty',
+		'#squash => FMProperty',
+		'#squash_on_merge => FMProperty',
+		'#task_completion_status_count => FMProperty',
+		'#task_completion_status_completed_count => FMProperty',
+		'#has_conflicts => FMProperty',
+		'#blocking_discussions_resolved => FMProperty',
+		'#subscribed => FMProperty',
+		'#changes_count => FMProperty',
+		'#latest_build_started_at => FMProperty',
+		'#latest_build_finished_at => FMProperty',
+		'#first_deployed_to_production_at => FMProperty',
+		'#approved => FMProperty',
+		'#author => FMOne type: #GLHUser opposite: #createdMergeRequests',
+		'#approved_by => FMMany type: #GLHUser opposite: #approcheMergeRequests',
+		'#merge_user => FMOne type: #GLHUser opposite: #usedMerges',
+		'#closed_by => FMOne type: #GLHUser opposite: #closedMergeRequests',
+		'#merged_by => FMOne type: #GLHUser opposite: #mergerOfMergeRequests',
+		'#assignees => FMMany type: #GLHUser opposite: #assignedMergeRequests',
+		'#assignee => FMOne type: #GLHUser opposite: #currentlyAssignedMergeRequest',
+		'#reviewers => FMMany type: #GLHUser opposite: #reviewedMergeResquest',
+		'#pipeline => FMOne type: #GLHPipeline opposite: #mergeResquest',
+		'#mergedCommit => FMOne type: #GLHCommit opposite: #commitedMergeRequest',
+		'#mergeRequestCommit => FMOne type: #GLHCommit opposite: #commitedMergeRequest',
+		'#squashCommit => FMOne type: #GLHCommit opposite: #squashedMergeRequest',
+		'#diffs => FMMany type: #GLHDiff opposite: #mergeRequest',
+		'#project => FMOne type: #GLHProject opposite: #mergeRequests'
 	],
-	#category : 'GLPHExtended-Model-Entities',
-	#package : 'GLPHExtended-Model',
+	#category : 'GitLabHealth-Model-Entities',
+	#package : 'GitLabHealth-Model',
 	#tag : 'Entities'
 }
 
 { #category : 'meta' }
-GLPHEMergeRequest class >> annotation [
+GLHMergeRequest class >> annotation [
 
-	<FMClass: #MergeRequest super: #GLPHEEntity>
-	<package: #'GLPHExtended-Model'>
+	<FMClass: #MergeRequest super: #GLHEntity>
+	<package: #'GitLabHealth-Model'>
 	<generated>
 	^ self
 ]
 
 { #category : 'adding' }
-GLPHEMergeRequest >> addApproved_by: anObject [
+GLHMergeRequest >> addApproved_by: anObject [
 	<generated>
 	^ self approved_by add: anObject
 ]
 
 { #category : 'adding' }
-GLPHEMergeRequest >> addAssignee: anObject [
+GLHMergeRequest >> addAssignee: anObject [
 	<generated>
 	^ self assignees add: anObject
 ]
 
 { #category : 'adding' }
-GLPHEMergeRequest >> addDiff: anObject [
+GLHMergeRequest >> addDiff: anObject [
 	<generated>
 	^ self diffs add: anObject
 ]
 
 { #category : 'adding' }
-GLPHEMergeRequest >> addReviewer: anObject [
+GLHMergeRequest >> addReviewer: anObject [
 	<generated>
 	^ self reviewers add: anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> approved [
+GLHMergeRequest >> approved [
 
 	<FMProperty: #approved type: #Boolean>
 	<generated>
@@ -192,79 +205,75 @@ GLPHEMergeRequest >> approved [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> approved: anObject [
+GLHMergeRequest >> approved: anObject [
 	<generated>
 	approved := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> approved_by [
+GLHMergeRequest >> approved_by [
 	"Relation named: #approved_by type: #GLHUser opposite: #approcheMergeRequests"
 
 	<generated>
 	<derived>
-	<FMProperty: #approved_by type: #GLHUser opposite: #approcheMergeRequests>
-	^ self attributeAt: #approved_by ifAbsentPut: [ FMMultiMultivalueLink on: self opposite: #approcheMergeRequests ]
+	^ approved_by
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> approved_by: anObject [
+GLHMergeRequest >> approved_by: anObject [
 
 	<generated>
-	self approved_by value: anObject
+	approved_by value: anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> assignee [
+GLHMergeRequest >> assignee [
 	"Relation named: #assignee type: #GLHUser opposite: #currentlyAssignedMergeRequest"
 
 	<generated>
-	<FMProperty: #assignee type: #GLHUser opposite: #currentlyAssignedMergeRequest>
-	^ self attributeAt: #assignee ifAbsent: [ nil ]
+	^ assignee
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> assignee: anObject [
+GLHMergeRequest >> assignee: anObject [
 
 	<generated>
-	self attributeAt: #assignee put: (FMMultivalueLink on: self update: #currentlyAssignedMergeRequest from: self assignee to: anObject).
+	assignee := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> assignees [
+GLHMergeRequest >> assignees [
 	"Relation named: #assignees type: #GLHUser opposite: #assignedMergeRequests"
 
 	<generated>
 	<derived>
-	<FMProperty: #assignees type: #GLHUser opposite: #assignedMergeRequests>
-	^ self attributeAt: #assignees ifAbsentPut: [ FMMultiMultivalueLink on: self opposite: #assignedMergeRequests ]
+	^ assignees
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> assignees: anObject [
+GLHMergeRequest >> assignees: anObject [
 
 	<generated>
-	self assignees value: anObject
+	assignees value: anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> author [
+GLHMergeRequest >> author [
 	"Relation named: #author type: #GLHUser opposite: #createdMergeRequests"
 
 	<generated>
-	<FMProperty: #author type: #GLHUser opposite: #createdMergeRequests>
-	^ self attributeAt: #author ifAbsent: [ nil ]
+	^ author
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> author: anObject [
+GLHMergeRequest >> author: anObject [
 
 	<generated>
-	self attributeAt: #author put: (FMMultivalueLink on: self update: #createdMergeRequests from: self author to: anObject).
+	author := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> blocking_discussions_resolved [
+GLHMergeRequest >> blocking_discussions_resolved [
 
 	<FMProperty: #blocking_discussions_resolved type: #Boolean>
 	<generated>
@@ -272,13 +281,13 @@ GLPHEMergeRequest >> blocking_discussions_resolved [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> blocking_discussions_resolved: anObject [
+GLHMergeRequest >> blocking_discussions_resolved: anObject [
 	<generated>
 	blocking_discussions_resolved := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> changes_count [
+GLHMergeRequest >> changes_count [
 
 	<FMProperty: #changes_count type: #String>
 	<generated>
@@ -286,13 +295,13 @@ GLPHEMergeRequest >> changes_count [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> changes_count: anObject [
+GLHMergeRequest >> changes_count: anObject [
 	<generated>
 	changes_count := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> closed_at [
+GLHMergeRequest >> closed_at [
 
 	<FMProperty: #closed_at type: #Object>
 	<generated>
@@ -300,41 +309,28 @@ GLPHEMergeRequest >> closed_at [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> closed_at: anObject [
+GLHMergeRequest >> closed_at: anObject [
 	<generated>
 	closed_at := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> closed_by [
+GLHMergeRequest >> closed_by [
 	"Relation named: #closed_by type: #GLHUser opposite: #closedMergeRequests"
 
 	<generated>
-	<FMProperty: #closed_by type: #GLHUser opposite: #closedMergeRequests>
-	^ self attributeAt: #closed_by ifAbsent: [ nil ]
+	^ closed_by
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> closed_by: anObject [
+GLHMergeRequest >> closed_by: anObject [
 
 	<generated>
-	self attributeAt: #closed_by put: (FMMultivalueLink on: self update: #closedMergeRequests from: self closed_by to: anObject).
+	closed_by := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> commits [
-
-	^ commits
-]
-
-{ #category : 'accessing' }
-GLPHEMergeRequest >> commits: anObject [
-
-	commits := anObject
-]
-
-{ #category : 'accessing' }
-GLPHEMergeRequest >> created_at [
+GLHMergeRequest >> created_at [
 
 	<FMProperty: #created_at type: #Object>
 	<generated>
@@ -342,13 +338,13 @@ GLPHEMergeRequest >> created_at [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> created_at: anObject [
+GLHMergeRequest >> created_at: anObject [
 	<generated>
 	created_at := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> description [
+GLHMergeRequest >> description [
 
 	<FMProperty: #description type: #String>
 	<generated>
@@ -356,13 +352,13 @@ GLPHEMergeRequest >> description [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> description: anObject [
+GLHMergeRequest >> description: anObject [
 	<generated>
 	description := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> detailed_merge_status [
+GLHMergeRequest >> detailed_merge_status [
 
 	<FMProperty: #detailed_merge_status type: #String>
 	<generated>
@@ -370,30 +366,29 @@ GLPHEMergeRequest >> detailed_merge_status [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> detailed_merge_status: anObject [
+GLHMergeRequest >> detailed_merge_status: anObject [
 	<generated>
 	detailed_merge_status := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> diffs [
+GLHMergeRequest >> diffs [
 	"Relation named: #diffs type: #GLHDiff opposite: #mergeRequest"
 
 	<generated>
 	<derived>
-	<FMProperty: #diffs type: #GLHDiff opposite: #mergeRequest>
-	^ self attributeAt: #diffs ifAbsentPut: [ FMMultivalueLink on: self opposite: #mergeRequest: ]
+	^ diffs
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> diffs: anObject [
+GLHMergeRequest >> diffs: anObject [
 
 	<generated>
-	self diffs value: anObject
+	diffs value: anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> discussion_locked [
+GLHMergeRequest >> discussion_locked [
 
 	<FMProperty: #discussion_locked type: #String>
 	<generated>
@@ -401,13 +396,13 @@ GLPHEMergeRequest >> discussion_locked [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> discussion_locked: anObject [
+GLHMergeRequest >> discussion_locked: anObject [
 	<generated>
 	discussion_locked := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> downvotes [
+GLHMergeRequest >> downvotes [
 
 	<FMProperty: #downvotes type: #Number>
 	<generated>
@@ -415,13 +410,13 @@ GLPHEMergeRequest >> downvotes [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> downvotes: anObject [
+GLHMergeRequest >> downvotes: anObject [
 	<generated>
 	downvotes := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> draft [
+GLHMergeRequest >> draft [
 
 	<FMProperty: #draft type: #Boolean>
 	<generated>
@@ -429,13 +424,13 @@ GLPHEMergeRequest >> draft [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> draft: anObject [
+GLHMergeRequest >> draft: anObject [
 	<generated>
 	draft := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> first_deployed_to_production_at [
+GLHMergeRequest >> first_deployed_to_production_at [
 
 	<FMProperty: #first_deployed_to_production_at type: #String>
 	<generated>
@@ -443,13 +438,13 @@ GLPHEMergeRequest >> first_deployed_to_production_at [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> first_deployed_to_production_at: anObject [
+GLHMergeRequest >> first_deployed_to_production_at: anObject [
 	<generated>
 	first_deployed_to_production_at := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> force_remove_source_branch [
+GLHMergeRequest >> force_remove_source_branch [
 
 	<FMProperty: #force_remove_source_branch type: #Boolean>
 	<generated>
@@ -457,13 +452,13 @@ GLPHEMergeRequest >> force_remove_source_branch [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> force_remove_source_branch: anObject [
+GLHMergeRequest >> force_remove_source_branch: anObject [
 	<generated>
 	force_remove_source_branch := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> has_conflicts [
+GLHMergeRequest >> has_conflicts [
 
 	<FMProperty: #has_conflicts type: #Boolean>
 	<generated>
@@ -471,13 +466,13 @@ GLPHEMergeRequest >> has_conflicts [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> has_conflicts: anObject [
+GLHMergeRequest >> has_conflicts: anObject [
 	<generated>
 	has_conflicts := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> id [
+GLHMergeRequest >> id [
 
 	<FMProperty: #id type: #Number>
 	<generated>
@@ -485,13 +480,13 @@ GLPHEMergeRequest >> id [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> id: anObject [
+GLHMergeRequest >> id: anObject [
 	<generated>
 	id := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> iid [
+GLHMergeRequest >> iid [
 
 	<FMProperty: #iid type: #Number>
 	<generated>
@@ -499,13 +494,13 @@ GLPHEMergeRequest >> iid [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> iid: anObject [
+GLHMergeRequest >> iid: anObject [
 	<generated>
 	iid := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> labels [
+GLHMergeRequest >> labels [
 
 	<FMProperty: #labels type: #Object>
 	<generated>
@@ -513,13 +508,13 @@ GLPHEMergeRequest >> labels [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> labels: anObject [
+GLHMergeRequest >> labels: anObject [
 	<generated>
 	labels := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> latest_build_finished_at [
+GLHMergeRequest >> latest_build_finished_at [
 
 	<FMProperty: #latest_build_finished_at type: #String>
 	<generated>
@@ -527,13 +522,13 @@ GLPHEMergeRequest >> latest_build_finished_at [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> latest_build_finished_at: anObject [
+GLHMergeRequest >> latest_build_finished_at: anObject [
 	<generated>
 	latest_build_finished_at := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> latest_build_started_at [
+GLHMergeRequest >> latest_build_started_at [
 
 	<FMProperty: #latest_build_started_at type: #String>
 	<generated>
@@ -541,36 +536,28 @@ GLPHEMergeRequest >> latest_build_started_at [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> latest_build_started_at: anObject [
+GLHMergeRequest >> latest_build_started_at: anObject [
 	<generated>
 	latest_build_started_at := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> mergeRequestCommit [
+GLHMergeRequest >> mergeRequestCommit [
 	"Relation named: #mergeRequestCommit type: #GLHCommit opposite: #commitedMergeRequest"
 
 	<generated>
-	<FMProperty: #mergeRequestCommit type: #GLHCommit opposite: #commitedMergeRequest>
-	^ self attributeAt: #mergeRequestCommit ifAbsent: [ nil ]
+	^ mergeRequestCommit
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> mergeRequestCommit: anObject [
+GLHMergeRequest >> mergeRequestCommit: anObject [
 
 	<generated>
-	(self attributeAt: #mergeRequestCommit ifAbsentPut: [nil]) == anObject ifTrue: [ ^ anObject ].
-	anObject ifNil: [ | otherSide |
-		otherSide :=  self mergeRequestCommit.
-		self attributeAt: #mergeRequestCommit put: anObject.
-		otherSide commitedMergeRequest: nil ]
-	ifNotNil: [ 
-		self attributeAt: #mergeRequestCommit put: anObject.
-		anObject commitedMergeRequest: self ]
+	mergeRequestCommit := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> merge_commit_sha [
+GLHMergeRequest >> merge_commit_sha [
 
 	<FMProperty: #merge_commit_sha type: #String>
 	<generated>
@@ -578,13 +565,13 @@ GLPHEMergeRequest >> merge_commit_sha [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> merge_commit_sha: anObject [
+GLHMergeRequest >> merge_commit_sha: anObject [
 	<generated>
 	merge_commit_sha := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> merge_status [
+GLHMergeRequest >> merge_status [
 
 	<FMProperty: #merge_status type: #String>
 	<generated>
@@ -592,29 +579,28 @@ GLPHEMergeRequest >> merge_status [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> merge_status: anObject [
+GLHMergeRequest >> merge_status: anObject [
 	<generated>
 	merge_status := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> merge_user [
+GLHMergeRequest >> merge_user [
 	"Relation named: #merge_user type: #GLHUser opposite: #usedMerges"
 
 	<generated>
-	<FMProperty: #merge_user type: #GLHUser opposite: #usedMerges>
-	^ self attributeAt: #merge_user ifAbsent: [ nil ]
+	^ merge_user
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> merge_user: anObject [
+GLHMergeRequest >> merge_user: anObject [
 
 	<generated>
-	self attributeAt: #merge_user put: (FMMultivalueLink on: self update: #usedMerges from: self merge_user to: anObject).
+	merge_user := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> merge_when_pipeline_succeeds [
+GLHMergeRequest >> merge_when_pipeline_succeeds [
 
 	<FMProperty: #merge_when_pipeline_succeeds type: #Boolean>
 	<generated>
@@ -622,36 +608,28 @@ GLPHEMergeRequest >> merge_when_pipeline_succeeds [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> merge_when_pipeline_succeeds: anObject [
+GLHMergeRequest >> merge_when_pipeline_succeeds: anObject [
 	<generated>
 	merge_when_pipeline_succeeds := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> mergedCommit [
+GLHMergeRequest >> mergedCommit [
 	"Relation named: #mergedCommit type: #GLHCommit opposite: #commitedMergeRequest"
 
 	<generated>
-	<FMProperty: #mergedCommit type: #GLHCommit opposite: #commitedMergeRequest>
-	^ self attributeAt: #mergedCommit ifAbsent: [ nil ]
+	^ mergedCommit
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> mergedCommit: anObject [
+GLHMergeRequest >> mergedCommit: anObject [
 
 	<generated>
-	(self attributeAt: #mergedCommit ifAbsentPut: [nil]) == anObject ifTrue: [ ^ anObject ].
-	anObject ifNil: [ | otherSide |
-		otherSide :=  self mergedCommit.
-		self attributeAt: #mergedCommit put: anObject.
-		otherSide commitedMergeRequest: nil ]
-	ifNotNil: [ 
-		self attributeAt: #mergedCommit put: anObject.
-		anObject commitedMergeRequest: self ]
+	mergedCommit := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> merged_at [
+GLHMergeRequest >> merged_at [
 
 	<FMProperty: #merged_at type: #Object>
 	<generated>
@@ -659,29 +637,28 @@ GLPHEMergeRequest >> merged_at [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> merged_at: anObject [
+GLHMergeRequest >> merged_at: anObject [
 	<generated>
 	merged_at := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> merged_by [
+GLHMergeRequest >> merged_by [
 	"Relation named: #merged_by type: #GLHUser opposite: #mergerOfMergeRequests"
 
 	<generated>
-	<FMProperty: #merged_by type: #GLHUser opposite: #mergerOfMergeRequests>
-	^ self attributeAt: #merged_by ifAbsent: [ nil ]
+	^ merged_by
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> merged_by: anObject [
+GLHMergeRequest >> merged_by: anObject [
 
 	<generated>
-	self attributeAt: #merged_by put: (FMMultivalueLink on: self update: #mergerOfMergeRequests from: self merged_by to: anObject).
+	merged_by := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> milestone [
+GLHMergeRequest >> milestone [
 
 	<FMProperty: #milestone type: #String>
 	<generated>
@@ -689,60 +666,59 @@ GLPHEMergeRequest >> milestone [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> milestone: anObject [
+GLHMergeRequest >> milestone: anObject [
 	<generated>
 	milestone := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> pipeline [
+GLHMergeRequest >> name [
+
+	<FMProperty: #name type: #String>
+	<FMComment: 'Basic name of the entity, not full reference.'>
+	^ title
+]
+
+{ #category : 'accessing' }
+GLHMergeRequest >> pipeline [
 	"Relation named: #pipeline type: #GLHPipeline opposite: #mergeResquest"
 
 	<generated>
-	<FMProperty: #pipeline type: #GLHPipeline opposite: #mergeResquest>
-	^ self attributeAt: #pipeline ifAbsent: [ nil ]
+	^ pipeline
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> pipeline: anObject [
+GLHMergeRequest >> pipeline: anObject [
 
 	<generated>
-	(self attributeAt: #pipeline ifAbsentPut: [nil]) == anObject ifTrue: [ ^ anObject ].
-	anObject ifNil: [ | otherSide |
-		otherSide :=  self pipeline.
-		self attributeAt: #pipeline put: anObject.
-		otherSide mergeResquest: nil ]
-	ifNotNil: [ 
-		self attributeAt: #pipeline put: anObject.
-		anObject mergeResquest: self ]
+	pipeline := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> project [
+GLHMergeRequest >> project [
 	"Relation named: #project type: #GLHProject opposite: #mergeRequests"
 
 	<generated>
 	<container>
-	<FMProperty: #project type: #GLHProject opposite: #mergeRequests>
-	^ self attributeAt: #project ifAbsent: [ nil ]
+	^ project
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> project: anObject [
+GLHMergeRequest >> project: anObject [
 
 	<generated>
-	self attributeAt: #project put: (FMMultivalueLink on: self update: #mergeRequests from: self project to: anObject).
+	project := anObject
 ]
 
 { #category : 'navigation' }
-GLPHEMergeRequest >> projectGroup [
+GLHMergeRequest >> projectGroup [
 	<generated>
 	<navigation: 'Project'>
 	^ MooseSpecializedGroup with: self project
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> project_id [
+GLHMergeRequest >> project_id [
 
 	<FMProperty: #project_id type: #Number>
 	<generated>
@@ -750,13 +726,13 @@ GLPHEMergeRequest >> project_id [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> project_id: anObject [
+GLHMergeRequest >> project_id: anObject [
 	<generated>
 	project_id := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> reference [
+GLHMergeRequest >> reference [
 
 	<FMProperty: #reference type: #String>
 	<generated>
@@ -764,13 +740,13 @@ GLPHEMergeRequest >> reference [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> reference: anObject [
+GLHMergeRequest >> reference: anObject [
 	<generated>
 	reference := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> references_full [
+GLHMergeRequest >> references_full [
 
 	<FMProperty: #references_full type: #String>
 	<generated>
@@ -778,13 +754,13 @@ GLPHEMergeRequest >> references_full [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> references_full: anObject [
+GLHMergeRequest >> references_full: anObject [
 	<generated>
 	references_full := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> references_relative [
+GLHMergeRequest >> references_relative [
 
 	<FMProperty: #references_relative type: #String>
 	<generated>
@@ -792,13 +768,13 @@ GLPHEMergeRequest >> references_relative [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> references_relative: anObject [
+GLHMergeRequest >> references_relative: anObject [
 	<generated>
 	references_relative := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> references_short [
+GLHMergeRequest >> references_short [
 
 	<FMProperty: #references_short type: #String>
 	<generated>
@@ -806,30 +782,29 @@ GLPHEMergeRequest >> references_short [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> references_short: anObject [
+GLHMergeRequest >> references_short: anObject [
 	<generated>
 	references_short := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> reviewers [
+GLHMergeRequest >> reviewers [
 	"Relation named: #reviewers type: #GLHUser opposite: #reviewedMergeResquest"
 
 	<generated>
 	<derived>
-	<FMProperty: #reviewers type: #GLHUser opposite: #reviewedMergeResquest>
-	^ self attributeAt: #reviewers ifAbsentPut: [ FMMultiMultivalueLink on: self opposite: #reviewedMergeResquest ]
+	^ reviewers
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> reviewers: anObject [
+GLHMergeRequest >> reviewers: anObject [
 
 	<generated>
-	self reviewers value: anObject
+	reviewers value: anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> sha [
+GLHMergeRequest >> sha [
 
 	<FMProperty: #sha type: #String>
 	<generated>
@@ -837,13 +812,13 @@ GLPHEMergeRequest >> sha [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> sha: anObject [
+GLHMergeRequest >> sha: anObject [
 	<generated>
 	sha := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> should_remove_source_branch [
+GLHMergeRequest >> should_remove_source_branch [
 
 	<FMProperty: #should_remove_source_branch type: #Boolean>
 	<generated>
@@ -851,13 +826,13 @@ GLPHEMergeRequest >> should_remove_source_branch [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> should_remove_source_branch: anObject [
+GLHMergeRequest >> should_remove_source_branch: anObject [
 	<generated>
 	should_remove_source_branch := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> source_branch [
+GLHMergeRequest >> source_branch [
 
 	<FMProperty: #source_branch type: #String>
 	<generated>
@@ -865,13 +840,13 @@ GLPHEMergeRequest >> source_branch [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> source_branch: anObject [
+GLHMergeRequest >> source_branch: anObject [
 	<generated>
 	source_branch := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> source_project_id [
+GLHMergeRequest >> source_project_id [
 
 	<FMProperty: #source_project_id type: #Number>
 	<generated>
@@ -879,13 +854,13 @@ GLPHEMergeRequest >> source_project_id [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> source_project_id: anObject [
+GLHMergeRequest >> source_project_id: anObject [
 	<generated>
 	source_project_id := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> squash [
+GLHMergeRequest >> squash [
 
 	<FMProperty: #squash type: #Boolean>
 	<generated>
@@ -893,36 +868,28 @@ GLPHEMergeRequest >> squash [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> squash: anObject [
+GLHMergeRequest >> squash: anObject [
 	<generated>
 	squash := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> squashCommit [
+GLHMergeRequest >> squashCommit [
 	"Relation named: #squashCommit type: #GLHCommit opposite: #squashedMergeRequest"
 
 	<generated>
-	<FMProperty: #squashCommit type: #GLHCommit opposite: #squashedMergeRequest>
-	^ self attributeAt: #squashCommit ifAbsent: [ nil ]
+	^ squashCommit
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> squashCommit: anObject [
+GLHMergeRequest >> squashCommit: anObject [
 
 	<generated>
-	(self attributeAt: #squashCommit ifAbsentPut: [nil]) == anObject ifTrue: [ ^ anObject ].
-	anObject ifNil: [ | otherSide |
-		otherSide :=  self squashCommit.
-		self attributeAt: #squashCommit put: anObject.
-		otherSide squashedMergeRequest: nil ]
-	ifNotNil: [ 
-		self attributeAt: #squashCommit put: anObject.
-		anObject squashedMergeRequest: self ]
+	squashCommit := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> squash_commit_sha [
+GLHMergeRequest >> squash_commit_sha [
 
 	<FMProperty: #squash_commit_sha type: #String>
 	<generated>
@@ -930,13 +897,13 @@ GLPHEMergeRequest >> squash_commit_sha [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> squash_commit_sha: anObject [
+GLHMergeRequest >> squash_commit_sha: anObject [
 	<generated>
 	squash_commit_sha := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> squash_on_merge [
+GLHMergeRequest >> squash_on_merge [
 
 	<FMProperty: #squash_on_merge type: #Boolean>
 	<generated>
@@ -944,13 +911,13 @@ GLPHEMergeRequest >> squash_on_merge [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> squash_on_merge: anObject [
+GLHMergeRequest >> squash_on_merge: anObject [
 	<generated>
 	squash_on_merge := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> state [
+GLHMergeRequest >> state [
 
 	<FMProperty: #state type: #String>
 	<generated>
@@ -958,13 +925,13 @@ GLPHEMergeRequest >> state [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> state: anObject [
+GLHMergeRequest >> state: anObject [
 	<generated>
 	state := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> subscribed [
+GLHMergeRequest >> subscribed [
 
 	<FMProperty: #subscribed type: #Boolean>
 	<generated>
@@ -972,13 +939,13 @@ GLPHEMergeRequest >> subscribed [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> subscribed: anObject [
+GLHMergeRequest >> subscribed: anObject [
 	<generated>
 	subscribed := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> target_branch [
+GLHMergeRequest >> target_branch [
 
 	<FMProperty: #target_branch type: #String>
 	<generated>
@@ -986,13 +953,13 @@ GLPHEMergeRequest >> target_branch [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> target_branch: anObject [
+GLHMergeRequest >> target_branch: anObject [
 	<generated>
 	target_branch := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> target_project_id [
+GLHMergeRequest >> target_project_id [
 
 	<FMProperty: #target_project_id type: #Number>
 	<generated>
@@ -1000,13 +967,13 @@ GLPHEMergeRequest >> target_project_id [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> target_project_id: anObject [
+GLHMergeRequest >> target_project_id: anObject [
 	<generated>
 	target_project_id := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> task_completion_status_completed_count [
+GLHMergeRequest >> task_completion_status_completed_count [
 
 	<FMProperty: #task_completion_status_completed_count type: #Number>
 	<generated>
@@ -1014,13 +981,13 @@ GLPHEMergeRequest >> task_completion_status_completed_count [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> task_completion_status_completed_count: anObject [
+GLHMergeRequest >> task_completion_status_completed_count: anObject [
 	<generated>
 	task_completion_status_completed_count := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> task_completion_status_count [
+GLHMergeRequest >> task_completion_status_count [
 
 	<FMProperty: #task_completion_status_count type: #Number>
 	<generated>
@@ -1028,13 +995,13 @@ GLPHEMergeRequest >> task_completion_status_count [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> task_completion_status_count: anObject [
+GLHMergeRequest >> task_completion_status_count: anObject [
 	<generated>
 	task_completion_status_count := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> time_stats_human_time_estimate [
+GLHMergeRequest >> time_stats_human_time_estimate [
 
 	<FMProperty: #time_stats_human_time_estimate type: #String>
 	<generated>
@@ -1042,13 +1009,13 @@ GLPHEMergeRequest >> time_stats_human_time_estimate [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> time_stats_human_time_estimate: anObject [
+GLHMergeRequest >> time_stats_human_time_estimate: anObject [
 	<generated>
 	time_stats_human_time_estimate := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> time_stats_human_total_time_spent [
+GLHMergeRequest >> time_stats_human_total_time_spent [
 
 	<FMProperty: #time_stats_human_total_time_spent type: #String>
 	<generated>
@@ -1056,13 +1023,13 @@ GLPHEMergeRequest >> time_stats_human_total_time_spent [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> time_stats_human_total_time_spent: anObject [
+GLHMergeRequest >> time_stats_human_total_time_spent: anObject [
 	<generated>
 	time_stats_human_total_time_spent := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> time_stats_time_estimate [
+GLHMergeRequest >> time_stats_time_estimate [
 
 	<FMProperty: #time_stats_time_estimate type: #Number>
 	<generated>
@@ -1070,13 +1037,13 @@ GLPHEMergeRequest >> time_stats_time_estimate [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> time_stats_time_estimate: anObject [
+GLHMergeRequest >> time_stats_time_estimate: anObject [
 	<generated>
 	time_stats_time_estimate := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> time_stats_total_time_spent [
+GLHMergeRequest >> time_stats_total_time_spent [
 
 	<FMProperty: #time_stats_total_time_spent type: #Number>
 	<generated>
@@ -1084,13 +1051,13 @@ GLPHEMergeRequest >> time_stats_total_time_spent [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> time_stats_total_time_spent: anObject [
+GLHMergeRequest >> time_stats_total_time_spent: anObject [
 	<generated>
 	time_stats_total_time_spent := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> title [
+GLHMergeRequest >> title [
 
 	<FMProperty: #title type: #String>
 	<generated>
@@ -1098,13 +1065,13 @@ GLPHEMergeRequest >> title [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> title: anObject [
+GLHMergeRequest >> title: anObject [
 	<generated>
 	title := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> updated_at [
+GLHMergeRequest >> updated_at [
 
 	<FMProperty: #updated_at type: #Object>
 	<generated>
@@ -1112,13 +1079,13 @@ GLPHEMergeRequest >> updated_at [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> updated_at: anObject [
+GLHMergeRequest >> updated_at: anObject [
 	<generated>
 	updated_at := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> upvotes [
+GLHMergeRequest >> upvotes [
 
 	<FMProperty: #upvotes type: #Number>
 	<generated>
@@ -1126,13 +1093,13 @@ GLPHEMergeRequest >> upvotes [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> upvotes: anObject [
+GLHMergeRequest >> upvotes: anObject [
 	<generated>
 	upvotes := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> user_notes_count [
+GLHMergeRequest >> user_notes_count [
 
 	<FMProperty: #user_notes_count type: #Number>
 	<generated>
@@ -1140,13 +1107,13 @@ GLPHEMergeRequest >> user_notes_count [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> user_notes_count: anObject [
+GLHMergeRequest >> user_notes_count: anObject [
 	<generated>
 	user_notes_count := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> web_url [
+GLHMergeRequest >> web_url [
 
 	<FMProperty: #web_url type: #String>
 	<generated>
@@ -1154,13 +1121,13 @@ GLPHEMergeRequest >> web_url [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> web_url: anObject [
+GLHMergeRequest >> web_url: anObject [
 	<generated>
 	web_url := anObject
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> work_in_progress [
+GLHMergeRequest >> work_in_progress [
 
 	<FMProperty: #work_in_progress type: #Boolean>
 	<generated>
@@ -1168,7 +1135,7 @@ GLPHEMergeRequest >> work_in_progress [
 ]
 
 { #category : 'accessing' }
-GLPHEMergeRequest >> work_in_progress: anObject [
+GLHMergeRequest >> work_in_progress: anObject [
 	<generated>
 	work_in_progress := anObject
 ]

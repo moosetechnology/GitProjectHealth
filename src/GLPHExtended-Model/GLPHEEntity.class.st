@@ -1,12 +1,14 @@
 Class {
-	#name : #GLPHEEntity,
-	#superclass : #MooseEntity,
+	#name : 'GLPHEEntity',
+	#superclass : 'MooseEntity',
 	#traits : 'TEntityMetaLevelDependency',
 	#classTraits : 'TEntityMetaLevelDependency classTrait',
-	#category : #'GLPHExtended-Model-Entities'
+	#category : 'GLPHExtended-Model-Entities',
+	#package : 'GLPHExtended-Model',
+	#tag : 'Entities'
 }
 
-{ #category : #meta }
+{ #category : 'meta' }
 GLPHEEntity class >> annotation [
 
 	<FMClass: #Entity super: #MooseEntity>
@@ -16,14 +18,14 @@ GLPHEEntity class >> annotation [
 	^ self
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 GLPHEEntity class >> isAbstract [
 
 	<generated>
 	^ self == GLPHEEntity
 ]
 
-{ #category : #meta }
+{ #category : 'meta' }
 GLPHEEntity class >> metamodel [
 
 	<generated>

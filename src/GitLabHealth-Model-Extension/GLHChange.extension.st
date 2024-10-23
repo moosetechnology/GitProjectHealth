@@ -1,7 +1,7 @@
-Extension { #name : #GLPHEChange }
+Extension { #name : 'GLHChange' }
 
-{ #category : #'*GLPHExtended-Model-Extension' }
-GLPHEChange class >> createFrom: aDiffLine [
+{ #category : '*GitLabHealth-Model-Extension' }
+GLHChange class >> createFrom: aDiffLine [
 	"Factory a Change from a loc"
 
 	| aChange |
@@ -15,26 +15,14 @@ GLPHEChange class >> createFrom: aDiffLine [
 	^ aChange
 ]
 
-{ #category : #'*GLPHExtended-Model-Extension' }
-GLPHEChange >> isAddition [
-
-	^ false
-]
-
-{ #category : #'*GLPHExtended-Model-Extension' }
-GLPHEChange >> isDeletion [
-
-	^ false
-]
-
-{ #category : #'*GLPHExtended-Model-Extension' }
-GLPHEChange >> name [
+{ #category : '*GitLabHealth-Model-Extension' }
+GLHChange >> name [
 
 	^ sourceCode 
 ]
 
-{ #category : #'*GLPHExtended-Model-Extension' }
-GLPHEChange class >> newFrom: aDiffLine [
+{ #category : '*GitLabHealth-Model-Extension' }
+GLHChange class >> newFrom: aDiffLine [
 	"Factory a Change from a loc"
 
 	| aChange trimedLine code |

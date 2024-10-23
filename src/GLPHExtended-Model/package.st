@@ -1,1 +1,1 @@
-Package { #name : #'GLPHExtended-Model' }
+Package { #name : 'GLPHExtended-Model' }
