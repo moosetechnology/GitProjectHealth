@@ -5,8 +5,8 @@ I am a try of normalization for the different importer.
 I also define some contract so it is easier to switch from one importer to another
 "
 Class {
-	#name : 'GPModelImporter',
-	#superclass : 'Object',
+	#name : #GPModelImporter,
+	#superclass : #Object,
 	#instVars : [
 		'withCommitsSince',
 		'withFiles',
@@ -18,46 +18,45 @@ Class {
 	#classVars : [
 		'currentImporter'
 	],
-	#category : 'GitProjectHealth-Model-Importer',
-	#package : 'GitProjectHealth-Model-Importer'
+	#category : #'GitProjectHealth-Model-Importer'
 }
 
-{ #category : 'accessing - global variables' }
+{ #category : #'accessing - global variables' }
 GPModelImporter class >> importers [
 	^ currentImporter 
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 GPModelImporter class >> reset [
 	currentImporter := OrderedDictionary new.
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GPModelImporter >> beWithFiles [
 
 	withFiles := true
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GPModelImporter >> beWithoutFiles [
 
 	withFiles := false
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 GPModelImporter >> blockEqualityOn: aSymbol [
 	^ [ :existing :new |
 	  (existing perform: aSymbol) = (new perform: aSymbol) ]
 ]
 
-{ #category : 'equality' }
+{ #category : #equality }
 GPModelImporter >> blockForDiffEquality [
 	^ [ :existing :new |
 			existing diffString size = new diffString size and: [
 				existing diffString = new diffString ] ]
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 GPModelImporter >> blockForDiffRangeEquality [
 
 	^ [ :existing :new |
@@ -66,20 +65,20 @@ GPModelImporter >> blockForDiffRangeEquality [
 			  existing newLineRange = new newLineRange ] ] ]
 ]
 
-{ #category : 'equality' }
+{ #category : #equality }
 GPModelImporter >> blockOnIdEquality [
 
 	^ [ :existing :new |
 	  existing id = new id ]
 ]
 
-{ #category : 'equality' }
+{ #category : #equality }
 GPModelImporter >> blockOnNameEquality [
 
 	^ self blockEqualityOn: #name
 ]
 
-{ #category : 'commit' }
+{ #category : #commit }
 GPModelImporter >> chainsCommitsFrom: commitsCollection [
 
 	| dic |
@@ -101,7 +100,7 @@ GPModelImporter >> chainsCommitsFrom: commitsCollection [
 	^ commitsCollection
 ]
 
-{ #category : 'commit' }
+{ #category : #commit }
 GPModelImporter >> completeImportedCommit: aGLHCommit [ 
 	
 	
@@ -117,7 +116,7 @@ GPModelImporter >> completeImportedCommit: aGLHCommit [
 	^ aGLHCommit
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 GPModelImporter >> filterCommitChanges: aCollection [
 
 	^ aCollection reject: [ :line |
@@ -128,19 +127,19 @@ GPModelImporter >> filterCommitChanges: aCollection [
 				  trimmedLine beginsWith: '\ No newline at end of file' ] ] ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GPModelImporter >> glhModel [
 
 	^ glhModel
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GPModelImporter >> glhModel: anObject [
 
 	glhModel := anObject
 ]
 
-{ #category : 'import' }
+{ #category : #import }
 GPModelImporter >> importDiffRangesForDiff: aGLHDiff [
 
 	| diffRanges |
@@ -159,7 +158,7 @@ GPModelImporter >> importDiffRangesForDiff: aGLHDiff [
 		  unless: self blockForDiffRangeEquality
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 GPModelImporter >> initialize [
 
 	super initialize.
@@ -169,12 +168,12 @@ GPModelImporter >> initialize [
 		                 yourself.
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 GPModelImporter >> makeGlobal [
 	^ self makeGlobal: DateAndTime now printString.
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 GPModelImporter >> makeGlobal: aLabel [ 
 
 	currentImporter := GHModelImporter importers ifNil: [ OrderedDictionary new ].
@@ -182,7 +181,7 @@ GPModelImporter >> makeGlobal: aLabel [
 	^ currentImporter 
 ]
 
-{ #category : 'parsing' }
+{ #category : #parsing }
 GPModelImporter >> parseDiffString: aDiff [
 	"parse diff string to create entities for each lines"
 
@@ -199,7 +198,7 @@ GPModelImporter >> parseDiffString: aDiff [
 		| aChange |
 		firstChangeRange := false.
 		(line trim beginsWith: #'@@') ifTrue: [
-			range := GLHDiffRange newFrom: line.
+			range := GLPHEDiffRange newFrom: line.
 			firstChangeRange := true.
 			range := aDiff diffRanges add: range unless: [ :existing :new |
 				         existing originalLineRange = new originalLineRange and: [
@@ -207,7 +206,7 @@ GPModelImporter >> parseDiffString: aDiff [
 
 		self withCommitDiffs ifTrue: [
 			firstChangeRange ifFalse: [
-				aChange := GLHChange newFrom: line.
+				aChange := GLPHEChange newFrom: line.
 				aChange relativeIndex: index.
 				aChange := range changes add: aChange unless: [ :existing :new |
 					           existing sourceCode = new sourceCode and: [
@@ -224,61 +223,61 @@ GPModelImporter >> parseDiffString: aDiff [
 	^ aDiff diffRanges
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GPModelImporter >> repoApi [
 
 	^ repoApi
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GPModelImporter >> repoApi: anObject [
 
 	repoApi := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GPModelImporter >> userCatalogue [
 	^ userCatalogue 
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GPModelImporter >> userCatalogue: aGLHUserCatalogue [
 
 	userCatalogue := aGLHUserCatalogue.
 	aGLHUserCatalogue anImporter: self. 
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GPModelImporter >> withCommitDiffs [
 
 	^ withCommitDiffs
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GPModelImporter >> withCommitDiffs: anObject [
 
 	withCommitDiffs := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GPModelImporter >> withCommitsSince [
 
 	^ withCommitsSince
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GPModelImporter >> withCommitsSince: anObject [
 
 	withCommitsSince := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GPModelImporter >> withFiles [
 
 	^ withFiles
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GPModelImporter >> withFiles: anObject [
 
 	withFiles := anObject

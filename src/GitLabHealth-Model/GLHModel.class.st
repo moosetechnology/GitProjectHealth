@@ -1,20 +1,18 @@
 Class {
-	#name : 'GLHModel',
-	#superclass : 'MooseModel',
+	#name : #GLHModel,
+	#superclass : #MooseModel,
 	#traits : 'GLHTEntityCreator',
 	#classTraits : 'GLHTEntityCreator classTrait',
-	#category : 'GitLabHealth-Model-Model',
-	#package : 'GitLabHealth-Model',
-	#tag : 'Model'
+	#category : #'GitLabHealth-Model-Model'
 }
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHModel class >> allSubmetamodelsPackagesNames [
 	<generated>
 	^ #(#'Moose-Query' #'Famix-Traits')
 ]
 
-{ #category : 'meta' }
+{ #category : #meta }
 GLHModel class >> annotation [
 	<FMClass: #GLHModel super: #MooseModel>
 	<package: #'GitLabHealth-Model'>

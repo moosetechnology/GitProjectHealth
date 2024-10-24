@@ -2,29 +2,28 @@
 A GPJCConnectorTest is a test class for testing the behavior of GPJCConnector
 "
 Class {
-	#name : 'GPJCConnectorTest',
-	#superclass : 'TestCase',
+	#name : #GPJCConnectorTest,
+	#superclass : #TestCase,
 	#instVars : [
 		'connector',
 		'gitProject',
 		'jiraModel'
 	],
-	#category : 'GitProject-JiraConnector-Tests',
-	#package : 'GitProject-JiraConnector-Tests'
+	#category : #'GitProject-JiraConnector-Tests'
 }
 
-{ #category : 'running' }
+{ #category : #running }
 GPJCConnectorTest >> setUp [
 
 	super setUp.
 	connector := GPJCConnector new.
-	gitProject := GLHModel new.
+	gitProject := GLPHEModel new.
 	jiraModel := JPModel new.
 	connector jiraModel: jiraModel.
 	connector gpModel: gitProject
 ]
 
-{ #category : 'test' }
+{ #category : #test }
 GPJCConnectorTest >> testConnectCommit [
 
 	| issue commit |
@@ -39,7 +38,7 @@ GPJCConnectorTest >> testConnectCommit [
 	self assert: commit jiraIssue equals: issue
 ]
 
-{ #category : 'test' }
+{ #category : #test }
 GPJCConnectorTest >> testConnectCommitDoesNotExist [
 
 	| issue commit |
@@ -54,7 +53,7 @@ GPJCConnectorTest >> testConnectCommitDoesNotExist [
 	self assert: commit jiraIssue equals: nil
 ]
 
-{ #category : 'test' }
+{ #category : #test }
 GPJCConnectorTest >> testConnectMergeRequest [
 
 	| issue mergeRequest |
@@ -69,7 +68,7 @@ GPJCConnectorTest >> testConnectMergeRequest [
 	self assert: mergeRequest jiraIssue equals: issue
 ]
 
-{ #category : 'test' }
+{ #category : #test }
 GPJCConnectorTest >> testConnectMergeRequestDoesNotExist [
 
 	| issue mergeRequest |
@@ -84,7 +83,7 @@ GPJCConnectorTest >> testConnectMergeRequestDoesNotExist [
 	self assert: mergeRequest jiraIssue equals: nil
 ]
 
-{ #category : 'test' }
+{ #category : #test }
 GPJCConnectorTest >> testConnectSeveralCommit [
 
 	| issue commit commit2 commit3 |

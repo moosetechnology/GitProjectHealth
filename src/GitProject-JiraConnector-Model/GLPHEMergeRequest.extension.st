@@ -1,7 +1,7 @@
-Extension { #name : 'GLHMergeRequest' }
+Extension { #name : #GLPHEMergeRequest }
 
-{ #category : '*GitProject-JiraConnector-Model-accessing' }
-GLHMergeRequest >> jiraIssue [
+{ #category : #'*GitProject-JiraConnector-Model-accessing' }
+GLPHEMergeRequest >> jiraIssue [
 	"Relation named: #jiraIssue type: #JPIssue opposite: #mergeRequest"
 
 	<generated>
@@ -12,8 +12,8 @@ GLHMergeRequest >> jiraIssue [
 	^ self attributeAt: #jiraIssue ifAbsent: [ nil ]
 ]
 
-{ #category : '*GitProject-JiraConnector-Model-accessing' }
-GLHMergeRequest >> jiraIssue: anObject [
+{ #category : #'*GitProject-JiraConnector-Model-accessing' }
+GLPHEMergeRequest >> jiraIssue: anObject [
 
 	<generated>
 	(self attributeAt: #jiraIssue ifAbsentPut: [nil]) == anObject ifTrue: [ ^ anObject ].

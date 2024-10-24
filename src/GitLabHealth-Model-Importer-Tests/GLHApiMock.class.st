@@ -1,11 +1,10 @@
 Class {
-	#name : 'GLHApiMock',
-	#superclass : 'GLHApi',
-	#category : 'GitLabHealth-Model-Importer-Tests',
-	#package : 'GitLabHealth-Model-Importer-Tests'
+	#name : #GLHApiMock,
+	#superclass : #GLHApi,
+	#category : #'GitLabHealth-Model-Importer-Tests'
 }
 
-{ #category : 'api - commits' }
+{ #category : #'api - commits' }
 GLHApiMock >> commitDiff: aCommitID ofProject: aProjectId unidiff: aBoolean [
 
 	aCommitID = 'createError' ifTrue: [

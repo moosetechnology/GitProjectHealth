@@ -2,13 +2,12 @@
 A CodeDeletionByMRMetricTest is a test class for testing the behavior of CodeDeletionByMRMetric
 "
 Class {
-	#name : 'CodeDeletionByMRMetricTest',
-	#superclass : 'TestCase',
-	#category : 'GitLabHealth-Model-Analysis-Tests',
-	#package : 'GitLabHealth-Model-Analysis-Tests'
+	#name : #CodeDeletionByMRMetricTest,
+	#superclass : #TestCase,
+	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
-{ #category : 'tests' }
+{ #category : #tests }
 CodeDeletionByMRMetricTest >> testCalculate [
 
 	| result glhImporter user codeDeletion |
@@ -19,7 +18,7 @@ CodeDeletionByMRMetricTest >> testCalculate [
 			        { (GLHProject new repository: GLHRepository new) }.
 
 	glhImporter := GLPHImporterMock new.
-	glhImporter mergeRequests: { (GLHMergeRequest new
+	glhImporter mergeRequests: { (GLPHEMergeRequest new
 			 author: user;
 			 created_at: '09-05-2024';
 			 merged_at: '09-06-2024' asDate;
@@ -52,7 +51,7 @@ CodeDeletionByMRMetricTest >> testCalculate [
 	self assert: result equals: 10
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 CodeDeletionByMRMetricTest >> testCalculateNoCommits [
 
 	| result glhImporter user codeDeletion |
@@ -63,7 +62,7 @@ CodeDeletionByMRMetricTest >> testCalculateNoCommits [
 			        { (GLHProject new repository: GLHRepository new) }.
 
 	glhImporter := GLPHImporterMock new.
-	glhImporter mergeRequests: { (GLHMergeRequest new
+	glhImporter mergeRequests: { (GLPHEMergeRequest new
 			 author: user;
 			 created_at: '09-05-2024';
 			 merged_at: '09-06-2024' asDate;
@@ -82,7 +81,7 @@ CodeDeletionByMRMetricTest >> testCalculateNoCommits [
 	self assert: result equals: 0
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 CodeDeletionByMRMetricTest >> testCalculateNoMergeRequests [
 
 	| result glhImporter user codeDeletion |
@@ -93,7 +92,7 @@ CodeDeletionByMRMetricTest >> testCalculateNoMergeRequests [
 			        { (GLHProject new repository: GLHRepository new) }.
 
 	glhImporter := GLPHImporterMock new.
-	glhImporter mergeRequests: { (GLHMergeRequest new
+	glhImporter mergeRequests: { (GLPHEMergeRequest new
 			 author: user;
 			 created_at: '09-05-2024';
 			 merged_at: '09-06-2024' asDate;

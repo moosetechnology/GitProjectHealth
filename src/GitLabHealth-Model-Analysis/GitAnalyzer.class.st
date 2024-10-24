@@ -1,6 +1,6 @@
 Class {
-	#name : 'GitAnalyzer',
-	#superclass : 'Object',
+	#name : #GitAnalyzer,
+	#superclass : #Object,
 	#instVars : [
 		'glModel',
 		'fromCommit',
@@ -8,11 +8,10 @@ Class {
 		'onProject',
 		'maxChildCommits'
 	],
-	#category : 'GitLabHealth-Model-Analysis',
-	#package : 'GitLabHealth-Model-Analysis'
+	#category : #'GitLabHealth-Model-Analysis'
 }
 
-{ #category : 'analyze' }
+{ #category : #analyze }
 GitAnalyzer >> analyseChurn [
 
 	| commitFiles totalContribution childCommits access |
@@ -40,7 +39,7 @@ GitAnalyzer >> analyseChurn [
 			  yourself ]
 ]
 
-{ #category : 'analyze' }
+{ #category : #analyze }
 GitAnalyzer >> analyseCommentContribution [
 
 	| numberOfComments |
@@ -51,14 +50,14 @@ GitAnalyzer >> analyseCommentContribution [
 	fromCommit diffs do: [ :diff |
 		diff diffRanges do: [ :range |
 			range changes do: [ :change |
-				((change isKindOf: GLHAddition) and: [
+				((change isKindOf: GLPHEAddition) and: [
 					 (change sourceCode withoutPrefix: '+') trimLeft
 						 beginsWithAnyOf: { '#'. '//'. '/*'. '*'. '*/' } ]) ifTrue: [
 					numberOfComments := numberOfComments + 1 ] ] ] ].
 	^ numberOfComments
 ]
 
-{ #category : 'commit' }
+{ #category : #commit }
 GitAnalyzer >> analyseCommitContribution [
 	
 	
@@ -69,7 +68,7 @@ GitAnalyzer >> analyseCommitContribution [
 	  (#deletion -> fromCommit deletions). } asDictionary 
 ]
 
-{ #category : 'analyze' }
+{ #category : #analyze }
 GitAnalyzer >> analyseCommitFrequencyFromCommits: initialCommits [
 
 	| commits response |
@@ -88,7 +87,7 @@ GitAnalyzer >> analyseCommitFrequencyFromCommits: initialCommits [
 	^ commits
 ]
 
-{ #category : 'analyze' }
+{ #category : #analyze }
 GitAnalyzer >> analyseCommitFrequencySince: since until: until [ 
 
 	| commits response |
@@ -112,7 +111,7 @@ GitAnalyzer >> analyseCommitFrequencySince: since until: until [
 	^ commits
 ]
 
-{ #category : 'analyze' }
+{ #category : #analyze }
 GitAnalyzer >> analyseDelayUntilFirstChurn [
 	"return the first commit that modify the same lines of code as the fromCommit"
 
@@ -133,7 +132,7 @@ GitAnalyzer >> analyseDelayUntilFirstChurn [
 	 res]
 ]
 
-{ #category : 'analyze' }
+{ #category : #analyze }
 GitAnalyzer >> analyseMergeResquestValidation: aGLHPMergeRequest [
 
 	| creationDate mergedDate response |
@@ -164,7 +163,7 @@ GitAnalyzer >> analyseMergeResquestValidation: aGLHPMergeRequest [
 				  yourself ]
 ]
 
-{ #category : 'filter' }
+{ #category : #filter }
 GitAnalyzer >> arrangeCommitsByDate: commits [
 
 	| date2commits |
@@ -183,7 +182,7 @@ GitAnalyzer >> arrangeCommitsByDate: commits [
 	^ date2commits
 ]
 
-{ #category : 'churn' }
+{ #category : #churn }
 GitAnalyzer >> computeChurnOnFiles: aCollection [
 
 	| changesDic perFileChanges churns initialAuthor followingAuthors|
@@ -242,7 +241,7 @@ GitAnalyzer >> computeChurnOnFiles: aCollection [
 		  (#details -> perFileChanges) } asDictionary
 ]
 
-{ #category : 'churn' }
+{ #category : #churn }
 GitAnalyzer >> computeSpecificChurnOf: commit2Changes [
 
 	| changesDic |
@@ -272,7 +271,7 @@ GitAnalyzer >> computeSpecificChurnOf: commit2Changes [
 	^ self sortChangeDic: changesDic
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GitAnalyzer >> firstAmandmentFromChrun: aChurnAnalysis [ 
 	|details whereChangesOccurs firstCommitsPerFile|
 	
@@ -295,17 +294,17 @@ GitAnalyzer >> firstAmandmentFromChrun: aChurnAnalysis [
 
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GitAnalyzer >> fromCommit: aCommit [
 	fromCommit := aCommit. 
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GitAnalyzer >> glhImporter: anImporter [
 	glhImporter := anImporter .
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 GitAnalyzer >> impactedFilesInFollowUpCommitsOf: aGLHCommit [
 
 	^ self
@@ -313,7 +312,7 @@ GitAnalyzer >> impactedFilesInFollowUpCommitsOf: aGLHCommit [
 		  withMaxCommits: self maxChildCommits. 
 ]
 
-{ #category : 'churn' }
+{ #category : #churn }
 GitAnalyzer >> impactedFilesInFollowUpCommitsOf: aGLHCommit withMaxCommits: max [
 
 	| commitFiles |
@@ -329,17 +328,17 @@ GitAnalyzer >> impactedFilesInFollowUpCommitsOf: aGLHCommit withMaxCommits: max 
 	^ commitFiles
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 GitAnalyzer >> initialize [
 
-	glModel := GLHModel new.
+	glModel := GLPHEModel new.
 	fromCommit := GLHCommit new.
 	glhImporter := GLPHModelImporter new.
 	onProject := GLHProject new.
 	maxChildCommits := -1
 ]
 
-{ #category : 'insertion' }
+{ #category : #insertion }
 GitAnalyzer >> insertDiff: aGLPHEDiffRange into: fileChangesDic startingFrom: from [ 
 	|index|
 	index := from. 
@@ -357,38 +356,38 @@ GitAnalyzer >> insertDiff: aGLPHEDiffRange into: fileChangesDic startingFrom: fr
 		 ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GitAnalyzer >> maxChildCommit: max [ 
 	maxChildCommits := max
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GitAnalyzer >> maxChildCommits [
 	^ maxChildCommits
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 GitAnalyzer >> onModel: agitHealthModel [
 	glModel := agitHealthModel
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GitAnalyzer >> onProject: aGLHProject [ 
 	onProject := aGLHProject
 ]
 
-{ #category : 'sorting' }
+{ #category : #sorting }
 GitAnalyzer >> sortChangeDic: aCollection [ 
 	^ (aCollection associations sortAscending: [ :e | e key ] ) asOrderedDictionary 
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 GitAnalyzer >> visitChildCommits: commits lookingForFiles: commitFiles [
 
 	^ self visitChildCommits:  commits lookingForFiles: commitFiles upto: -1 
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 GitAnalyzer >> visitChildCommits: commits lookingForFiles: commitFiles upto: nCommits [
 
 	commits ifEmpty: [ ^ commitFiles ].
@@ -412,7 +411,7 @@ GitAnalyzer >> visitChildCommits: commits lookingForFiles: commitFiles upto: nCo
 	^ commitFiles
 ]
 
-{ #category : 'visiting' }
+{ #category : #visiting }
 GitAnalyzer >> visitChildCommits: commits toStoreThemIn: commitsFound upto: nCommits [
 
 	commits ifEmpty: [ ^ commitsFound ].

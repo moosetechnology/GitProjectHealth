@@ -2,37 +2,36 @@
 A GLHModelImporterTest is a test class for testing the behavior of GLHModelImporter
 "
 Class {
-	#name : 'GLHModelImporterTest',
-	#superclass : 'TestCase',
+	#name : #GLHModelImporterTest,
+	#superclass : #TestCase,
 	#instVars : [
 		'glphModel',
 		'glphApi',
 		'since',
 		'glhImporter'
 	],
-	#category : 'GitLabHealth-Model-Importer-Tests',
-	#package : 'GitLabHealth-Model-Importer-Tests'
+	#category : #'GitLabHealth-Model-Importer-Tests'
 }
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHModelImporterTest class >> resources [
 
 	^ Array with: GLHModelImporterTestResource
 ]
 
-{ #category : 'running' }
+{ #category : #running }
 GLHModelImporterTest >> glhImporter [
 
 	^ self class resources first current glhImporter
 ]
 
-{ #category : 'running' }
+{ #category : #running }
 GLHModelImporterTest >> model [
 
 	^ self class resources first current model
 ]
 
-{ #category : 'test' }
+{ #category : #test }
 GLHModelImporterTest >> testFilterCommitChanges [
 
 	| importer collection resultCollection |
@@ -53,7 +52,7 @@ GLHModelImporterTest >> testFilterCommitChanges [
 	self assert: resultCollection size equals: 7
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 GLHModelImporterTest >> testImportBranch [
 
 	| testCodeChurnRepository |
@@ -62,7 +61,7 @@ GLHModelImporterTest >> testImportBranch [
 	self assert: testCodeChurnRepository branches isNotEmpty
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 GLHModelImporterTest >> testImportCommits [
 
 	| projectTestCodeChurn |
@@ -75,7 +74,7 @@ GLHModelImporterTest >> testImportCommits [
 		equals: 'Nicolas Hlad'
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 GLHModelImporterTest >> testImportGroup [
 
 	| evrefGroup |
@@ -87,7 +86,7 @@ GLHModelImporterTest >> testImportGroup [
 		(evrefGroup projects anySatisfy: [ :project | project id = 57841283 ])
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 GLHModelImporterTest >> testImportProject [
 
 	self assert: (self model allWithType: GLHProject) size equals: 1.

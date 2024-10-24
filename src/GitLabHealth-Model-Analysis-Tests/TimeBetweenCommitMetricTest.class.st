@@ -2,13 +2,12 @@
 A TimeBetweenCommitMetricTest is a test class for testing the behavior of TimeBetweenCommitMetric
 "
 Class {
-	#name : 'TimeBetweenCommitMetricTest',
-	#superclass : 'TestCase',
-	#category : 'GitLabHealth-Model-Analysis-Tests',
-	#package : 'GitLabHealth-Model-Analysis-Tests'
+	#name : #TimeBetweenCommitMetricTest,
+	#superclass : #TestCase,
+	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
-{ #category : 'tests' }
+{ #category : #tests }
 TimeBetweenCommitMetricTest >> testCalculate [
 
 	| user glhImporter result timeBetweenCommit |
@@ -48,7 +47,7 @@ TimeBetweenCommitMetricTest >> testCalculate [
 	self assert: result equals: (23 hours asSeconds)
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 TimeBetweenCommitMetricTest >> testCalculateNoCommits [
 
 	| user glhImporter result timeBetweenCommit |
