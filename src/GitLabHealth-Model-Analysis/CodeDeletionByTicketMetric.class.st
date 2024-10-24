@@ -1,14 +1,16 @@
 Class {
-	#name : #CodeDeletionByTicketMetric,
-	#superclass : #UserJiraMetric,
-	#category : #'GitLabHealth-Model-Analysis'
+	#name : 'CodeDeletionByTicketMetric',
+	#superclass : 'UserJiraMetric',
+	#category : 'GitLabHealth-Model-Analysis',
+	#package : 'GitLabHealth-Model-Analysis'
 }
 
-{ #category : #calculating }
+{ #category : 'calculating' }
 CodeDeletionByTicketMetric >> calculate [
 
 	| groupedByDate dateOver |
 	userMergeRequests ifNil: [ self load ].
+	
 	groupedByDate := self setupGroupedDate.
 	userMergeRequests ifEmpty: [ ^ 0 ].
 
@@ -28,13 +30,13 @@ CodeDeletionByTicketMetric >> calculate [
 	^ groupedByDate average asFloat
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 CodeDeletionByTicketMetric >> description [
 
 	^ 'average code deletion by merge request associated with a jira ticket'
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 CodeDeletionByTicketMetric >> load [
 
 	userMergeRequests := self

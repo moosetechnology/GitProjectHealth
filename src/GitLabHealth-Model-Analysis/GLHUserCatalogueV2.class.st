@@ -1,10 +1,11 @@
 Class {
-	#name : #GLHUserCatalogueV2,
-	#superclass : #GLHUserCatalogue,
-	#category : #'GitLabHealth-Model-Analysis'
+	#name : 'GLHUserCatalogueV2',
+	#superclass : 'GLHUserCatalogue',
+	#category : 'GitLabHealth-Model-Analysis',
+	#package : 'GitLabHealth-Model-Analysis'
 }
 
-{ #category : #import }
+{ #category : 'import' }
 GLHUserCatalogueV2 class >> loadFromJson: aString [
 
 	| catalogue dic |
@@ -30,7 +31,7 @@ GLHUserCatalogueV2 class >> loadFromJson: aString [
 	^ catalogue
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GLHUserCatalogueV2 class >> scrapeContributedProjectsForCommitAuthorsRelatedToUser: aGLHUser [
 	"get all "
 
@@ -61,7 +62,7 @@ GLHUserCatalogueV2 class >> scrapeContributedProjectsForCommitAuthorsRelatedToUs
 	^ (aGLHUser commits collect: [ :commit | commit author_name ]) asSet
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GLHUserCatalogueV2 class >> scrapeWithImporter: anImporter contributedProjectsForCommitAuthorsRelatedToUser: aGLHUser [
 	"get all "
 
@@ -85,7 +86,7 @@ GLHUserCatalogueV2 class >> scrapeWithImporter: anImporter contributedProjectsFo
 	^ (aGLHUser commits collect: [ :commit | commit author_name ]) asSet
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GLHUserCatalogueV2 >> RSHeatMapLevenshtein [
 	
 		| builder|
@@ -100,7 +101,7 @@ GLHUserCatalogueV2 >> RSHeatMapLevenshtein [
 	builder canvas open
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GLHUserCatalogueV2 >> RSHeatMapLevenshteinTrimedAt: aBlockCondition [
 	
 		| builder matrice|
@@ -125,21 +126,21 @@ GLHUserCatalogueV2 >> RSHeatMapLevenshteinTrimedAt: aBlockCondition [
 	builder canvas open
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 GLHUserCatalogueV2 >> addUser: aGLHUser [
 
 	^ self at: aGLHUser name ifAbsentPut: [
 		self initACatalogueEntryForUser: aGLHUser ]
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 GLHUserCatalogueV2 >> addUser: aGLHUser withName: name [
 
 	^ self addUser: aGLHUser withNames: { name }
 	
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 GLHUserCatalogueV2 >> addUser: aGLHUser withNames: aCollectionOfNames [
 	| entry |
 	entry := (self
@@ -149,13 +150,13 @@ GLHUserCatalogueV2 >> addUser: aGLHUser withNames: aCollectionOfNames [
 	^ entry
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 GLHUserCatalogueV2 >> addUser: aGLHUser withNames: aCollectionOfNames withProject: aProjectID [
 
 	^ self addUser: aGLHUser withNames: aCollectionOfNames withProjects: { aProjectID }
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 GLHUserCatalogueV2 >> addUser: aGLHUser withNames: aCollectionOfNames withProjects: aCollectionOfProjectIDs [
 	|entry|
 	
@@ -165,14 +166,14 @@ GLHUserCatalogueV2 >> addUser: aGLHUser withNames: aCollectionOfNames withProjec
 	
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 GLHUserCatalogueV2 >> addUser: aGLHUser withProject: aProjectID [
 	
 	^ self addUser: aGLHUser withProjects: {aProjectID}.
 	
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 GLHUserCatalogueV2 >> addUser: aGLHUser withProjects: aCollectionOfProjectIDs [
 	|entry|
 
@@ -182,35 +183,36 @@ GLHUserCatalogueV2 >> addUser: aGLHUser withProjects: aCollectionOfProjectIDs [
 	
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GLHUserCatalogueV2 >> anImporter: aGLHModelImporter [
 	anImporter := aGLHModelImporter
 	
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GLHUserCatalogueV2 >> atId: anId [ 
 	^ self detect: [ :entry |
 		(entry at: #user) id =  anId ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GLHUserCatalogueV2 >> collectUsernames [
 
 	| username2User |
-	self ifEmpty: [ ^ {  } ].
+	self ifEmpty: [ ^ OrderedDictionary new ].
 
 	username2User := OrderedDictionary new.
 
 	self associationsDo: [ :assoc |
 		| user |
-		user := assoc value at: #user .
-		(assoc value at: #names) do: [ :username | username2User at: username put: user ] ].
+		user := assoc value at: #user.
+		(assoc value at: #names) do: [ :username |
+			username2User at: username put: user ] ].
 
 	^ username2User
 ]
 
-{ #category : #completion }
+{ #category : 'completion' }
 GLHUserCatalogueV2 >> completeAuthorNameOfUser: aGLHUser with: authorName [
 
 	self
@@ -222,7 +224,7 @@ GLHUserCatalogueV2 >> completeAuthorNameOfUser: aGLHUser with: authorName [
 	self addUser: aGLHUser withName: authorName
 ]
 
-{ #category : #completion }
+{ #category : 'completion' }
 GLHUserCatalogueV2 >> completeAuthorNameOfUser: aGLHUser withAll: authorNames [
 
 	self
@@ -235,7 +237,7 @@ GLHUserCatalogueV2 >> completeAuthorNameOfUser: aGLHUser withAll: authorNames [
 	self addUser: aGLHUser withNames: authorNames
 ]
 
-{ #category : #export }
+{ #category : 'export' }
 GLHUserCatalogueV2 >> exportToJson [
 
 	| tempDic |
@@ -262,7 +264,7 @@ GLHUserCatalogueV2 >> exportToJson [
 	^ STONJSON toStringPretty: tempDic
 ]
 
-{ #category : #fuse }
+{ #category : 'fuse' }
 GLHUserCatalogueV2 >> fuse: mainUser with: subUser [ 
 	self at: mainUser ifPresent: [ :entry |
 		self at: subUser ifAbsent: [ ^ self ]. 
@@ -272,7 +274,7 @@ GLHUserCatalogueV2 >> fuse: mainUser with: subUser [
 		 ].
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 GLHUserCatalogueV2 >> initACatalogueEntryForUser: aGLHUser [.
 
 ^ Dictionary new
@@ -287,13 +289,13 @@ GLHUserCatalogueV2 >> initACatalogueEntryForUser: aGLHUser [.
 			yourself
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 GLHUserCatalogueV2 >> initialize [
 
 	anImporter := GLHModelImporter new.
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GLHUserCatalogueV2 >> levenshteinMatrix [ 
 	| matrix|
 
@@ -310,17 +312,17 @@ GLHUserCatalogueV2 >> levenshteinMatrix [
 	^ matrix.
 ]
 
-{ #category : #'accessing - name' }
+{ #category : 'accessing - name' }
 GLHUserCatalogueV2 >> names [
 	^ self collect: [ :entry | entry at: #names ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GLHUserCatalogueV2 >> namesAt: aGLHUser [
 	^ (self at: aGLHUser name) at: #names.
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GLHUserCatalogueV2 >> reImportAllUsers [
 	"use it after a catalogue import from JSON"
 
@@ -336,7 +338,7 @@ GLHUserCatalogueV2 >> reImportAllUsers [
 		assoc value at: #user put: user ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GLHUserCatalogueV2 >> reImportUser: aGLHUser [
 	"use it after a catalogue import from JSON"
 	|user|
@@ -352,7 +354,7 @@ GLHUserCatalogueV2 >> reImportUser: aGLHUser [
 	
 ]
 
-{ #category : #scrape }
+{ #category : 'scrape' }
 GLHUserCatalogueV2 >> scrapeAuthorNameForAllRealUsers [
 	
 	|listOfUsers|
@@ -360,7 +362,7 @@ GLHUserCatalogueV2 >> scrapeAuthorNameForAllRealUsers [
 	listOfUsers do: [ :user | self scrapeAuthorNameForUser: user ].
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GLHUserCatalogueV2 >> scrapeAuthorNameForAllUsers [
 
 	|listOfUsers|
@@ -369,7 +371,7 @@ GLHUserCatalogueV2 >> scrapeAuthorNameForAllUsers [
 	listOfUsers do: [ :user | self scrapeAuthorNameForUser: user ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GLHUserCatalogueV2 >> scrapeAuthorNameForUser: aGLHUser [
 
 	self addUser: aGLHUser withNames: (GLHUserCatalogue
@@ -377,7 +379,7 @@ GLHUserCatalogueV2 >> scrapeAuthorNameForUser: aGLHUser [
 			 contributedProjectsForCommitAuthorsRelatedToUser: aGLHUser).
 ]
 
-{ #category : #scrape }
+{ #category : 'scrape' }
 GLHUserCatalogueV2 >> scrapeAuthorNamesForUsers: aUserCollection [ 
 	
 	aUserCollection do: [ :aGLHUser |
@@ -385,19 +387,19 @@ GLHUserCatalogueV2 >> scrapeAuthorNamesForUsers: aUserCollection [
 		 ].
 ]
 
-{ #category : #search }
+{ #category : 'search' }
 GLHUserCatalogueV2 >> searchId: anId [ 
 	^ self select: [ :entry | (entry at: #user) id = anId ].
 ]
 
-{ #category : #completion }
+{ #category : 'completion' }
 GLHUserCatalogueV2 >> searchModelForAuthorNamesOfUser: aGLHUser [
 
 	self addUser: aGLHUser withNames: 
 		(aGLHUser commits collect: [ :c | c author_name ])
 ]
 
-{ #category : #search }
+{ #category : 'search' }
 GLHUserCatalogueV2 >> searchName: aName [
 
 	^ self select: [ :entry |
@@ -407,24 +409,24 @@ GLHUserCatalogueV2 >> searchName: aName [
 			  aName asLowercase ]
 ]
 
-{ #category : #search }
+{ #category : 'search' }
 GLHUserCatalogueV2 >> searchUserWithName: aName [
 
 	^ (self searchName: aName) users
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GLHUserCatalogueV2 >> userAt: aGLHUser [
 	^ (self at: aGLHUser name) at: #user.  
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GLHUserCatalogueV2 >> users [
 
 	^ self collect: [ :entry | entry at: #user ].
 ]
 
-{ #category : #search }
+{ #category : 'search' }
 GLHUserCatalogueV2 >> weirdUsers [
 	"return user that have name containing weird caracter, making them suspicious"
 	^ self select: [ :entry |

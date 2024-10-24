@@ -2,12 +2,13 @@
 A CodeAdditionByTicketMetricTest is a test class for testing the behavior of CodeAdditionByTicketMetric
 "
 Class {
-	#name : #CodeAdditionByTicketMetricTest,
-	#superclass : #TestCase,
-	#category : #'GitLabHealth-Model-Analysis-Tests'
+	#name : 'CodeAdditionByTicketMetricTest',
+	#superclass : 'TestCase',
+	#category : 'GitLabHealth-Model-Analysis-Tests',
+	#package : 'GitLabHealth-Model-Analysis-Tests'
 }
 
-{ #category : #tests }
+{ #category : 'tests' }
 CodeAdditionByTicketMetricTest >> testCalculate [
 
 	| result glhImporter user jiraImporter codeAddition |
@@ -18,7 +19,7 @@ CodeAdditionByTicketMetricTest >> testCalculate [
 			        { (GLHProject new repository: GLHRepository new) }.
 
 	glhImporter := GLPHImporterMock new.
-	glhImporter mergeRequests: { (GLPHEMergeRequest new
+	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
 			 created_at: '09-05-2024';
 			 merged_at: '09-06-2024' asDate;
@@ -56,7 +57,7 @@ CodeAdditionByTicketMetricTest >> testCalculate [
 	self assert: result equals: 10
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CodeAdditionByTicketMetricTest >> testCalculateNoCommits [
 
 	| result glhImporter user jiraImporter codeAddition |
@@ -67,7 +68,7 @@ CodeAdditionByTicketMetricTest >> testCalculateNoCommits [
 			        { (GLHProject new repository: GLHRepository new) }.
 
 	glhImporter := GLPHImporterMock new.
-	glhImporter mergeRequests: { (GLPHEMergeRequest new
+	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
 			 created_at: '09-05-2024';
 			 merged_at: '09-06-2024' asDate;
@@ -94,7 +95,7 @@ CodeAdditionByTicketMetricTest >> testCalculateNoCommits [
 	self assert: result equals: 0
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CodeAdditionByTicketMetricTest >> testCalculateNoMergeRequests [
 
 	| result glhImporter user jiraImporter codeAddition |

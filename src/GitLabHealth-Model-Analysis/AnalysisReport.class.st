@@ -1,45 +1,46 @@
 Class {
-	#name : #AnalysisReport,
-	#superclass : #Object,
+	#name : 'AnalysisReport',
+	#superclass : 'Object',
 	#instVars : [
 		'period',
 		'over',
 		'metrics'
 	],
-	#category : #'GitLabHealth-Model-Analysis'
+	#category : 'GitLabHealth-Model-Analysis',
+	#package : 'GitLabHealth-Model-Analysis'
 }
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 AnalysisReport >> initialize [
 
 	metrics := Dictionary new
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 AnalysisReport >> metrics [
 
 	^ metrics
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 AnalysisReport >> over [
 
 	^ over
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 AnalysisReport >> over: anObject [
 
 	over := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 AnalysisReport >> period [
 
 	^ period
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 AnalysisReport >> period: anObject [
 
 	period := anObject

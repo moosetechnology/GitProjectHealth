@@ -1,25 +1,35 @@
 Class {
-	#name : #GHModelImporter,
-	#superclass : #GPModelImporter,
-	#instVars : [
-		'api'
-	],
-	#category : #'GitHubHealth-Model-Importer'
+	#name : 'GHModelImporter',
+	#superclass : 'GPModelImporter',
+	#category : 'GitHubHealth-Model-Importer',
+	#package : 'GitHubHealth-Model-Importer'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GHModelImporter >> api [
 
-	^ api
+	self
+		deprecated: 'Use #repoApi instead'
+		on: '7 October 2024'
+		in:
+		'Pharo-11.0.0+build.726.sha.aece1b5473acf3830a0e082c1bc3a15d4ff3522b (64 Bit)'.
+
+	^ repoApi
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GHModelImporter >> api: anObject [
 
-	api := anObject
+	self
+		deprecated: 'Use #repoApi: instead'
+		on: '7 October 2024'
+		in:
+		'Pharo-11.0.0+build.726.sha.aece1b5473acf3830a0e082c1bc3a15d4ff3522b (64 Bit)'.
+
+	repoApi := anObject
 ]
 
-{ #category : #api }
+{ #category : 'api' }
 GHModelImporter >> completeImportProject: aGLHProject [
 
 	self importPipelinesOf: aGLHProject.
@@ -30,7 +40,40 @@ GHModelImporter >> completeImportProject: aGLHProject [
 		self chainsCommitsFrom: commits ]
 ]
 
-{ #category : #private }
+{ #category : 'commit' }
+GHModelImporter >> completeImportedCommit: aGLHCommit [
+
+	| result |
+	('completing commit: ' , aGLHCommit short_id printString) recordInfo.
+	"link commit to user"
+	self importCreatorOfCommit: aGLHCommit.
+
+	"import deletion and addition"
+	result := self repoApi
+		          commit: aGLHCommit id
+		          ofOrganisation: aGLHCommit repository project group name
+		          ofProject: aGLHCommit repository project name.
+	aGLHCommit deletions:
+		((result at: #files) collect: [ :file | file at: #deletions ]) sum.
+	aGLHCommit additions:
+		((result at: #files) collect: [ :file | file at: #additions ]) sum.
+
+
+	"import diffs of this commits"
+	self withCommitDiffs ifTrue: [
+		| diffs |
+		aGLHCommit diffs ifEmpty: [
+			diffs := self parseDiffresult: result.
+			diffs := aGLHCommit diffs
+				         addAll: diffs
+				         unless: self blockForDiffEquality.
+			self glhModel addAll: diffs unless: self blockForDiffEquality.
+			diffs do: [ :diff | self importDiffRangesForDiff: diff ] ] ].
+
+	^ aGLHCommit 
+]
+
+{ #category : 'private' }
 GHModelImporter >> convertApiFileAsFile: aAPIFile [
 
 	aAPIFile type = 'dir' ifTrue: [ 
@@ -42,7 +85,7 @@ GHModelImporter >> convertApiFileAsFile: aAPIFile [
 		  yourself
 ]
 
-{ #category : #api }
+{ #category : 'api' }
 GHModelImporter >> ensureGroupNamed: aGroupName [
 
 	^ self glhModel
@@ -51,13 +94,13 @@ GHModelImporter >> ensureGroupNamed: aGroupName [
 		  ifNone: [ self glhModel newGroupNamed: aGroupName ]
 ]
 
-{ #category : #api }
+{ #category : 'api' }
 GHModelImporter >> importBranchesOf: project [
 
 	"add the pipeline (actions runs) in the project"
 
 	| branchesResult branches repository |
-	branchesResult := self api
+	branchesResult := self repoApi
 		                  branchesOfRepo: project name
 		                  ofOrganization: project group name.
 	branches := self parseBranchesResult: branchesResult.
@@ -70,7 +113,7 @@ GHModelImporter >> importBranchesOf: project [
 		self withFiles ifTrue: [ self importFilesOfBranch: branch ] ]
 ]
 
-{ #category : #api }
+{ #category : 'api' }
 GHModelImporter >> importCommitsOfProject: aGLHProject [
 
 	| itemByPage foundCommits tmp pageNumber |
@@ -82,7 +125,7 @@ GHModelImporter >> importCommitsOfProject: aGLHProject [
 	 , (foundCommits size + itemByPage) printString) recordInfo.
 	"also check that there is at least one commit with the error handling"
 	[
-	tmp := self parseCommitsResult: (self api
+	tmp := self parseCommitsResult: (self repoApi
 			        commitsOfProject: aGLHProject name
 			        ofOrganization: aGLHProject group name
 			        since: self withCommitsSince
@@ -96,7 +139,7 @@ GHModelImporter >> importCommitsOfProject: aGLHProject [
 		pageNumber := pageNumber + 1.
 		('Extract issues from ' , foundCommits size printString , ' to '
 		 , (foundCommits size + itemByPage) printString) recordInfo.
-		tmp := self parseCommitsResult: (self api
+		tmp := self parseCommitsResult: (self repoApi
 				        commitsOfProject: aGLHProject name
 				        ofOrganization: aGLHProject group name
 				        since: self withCommitsSince
@@ -114,7 +157,42 @@ GHModelImporter >> importCommitsOfProject: aGLHProject [
 		  unless: [ :existing :new | existing id = new id ]
 ]
 
-{ #category : #api }
+{ #category : 'import - commits' }
+GHModelImporter >> importCreatorOfCommit: aGLHCommit [ 
+		| creator |
+	(self glhModel allWithType: GLHUser)
+		detect: [ :user | user username = aGLHCommit author_name ]
+		ifFound: [ :user |
+			aGLHCommit commitCreator: user.
+			^ user ].
+
+	creator := self importUserByUsername: aGLHCommit author_name.
+	aGLHCommit commitCreator: creator.
+	^ creator
+]
+
+{ #category : 'api' }
+GHModelImporter >> importDiffOfCommit: aGLHCommit [
+
+	| result diffsResult |
+	aGLHCommit diffs ifNotEmpty: [
+		'Diff already importer: '
+		, aGLHCommit short_id printString recordInfo.
+		^ aGLHCommit diffs ].
+	('Import diff of commit: ' , aGLHCommit short_id printString)
+		recordInfo.
+	result := self repoApi
+		          commit: aGLHCommit id
+		          ofOrganisation: aGLHCommit repository project group name
+		          ofProject: aGLHCommit repository project name.
+	diffsResult := self parseDiffresult: result.
+
+	^ aGLHCommit diffs
+		  addAll: diffsResult
+		  unless: self blockForDiffEquality
+]
+
+{ #category : 'api' }
 GHModelImporter >> importDirectoryFiles: aDirectoryFile OfBranch: aBranch [
 
 	| result files apiFiles |
@@ -136,7 +214,7 @@ GHModelImporter >> importDirectoryFiles: aDirectoryFile OfBranch: aBranch [
 		self importDirectoryFiles: file OfBranch: aBranch ]
 ]
 
-{ #category : #api }
+{ #category : 'api' }
 GHModelImporter >> importFilesOfBranch: aBranch [
 
 	| result files apiFiles |
@@ -157,24 +235,37 @@ GHModelImporter >> importFilesOfBranch: aBranch [
 		self importDirectoryFiles: file OfBranch: aBranch ]
 ]
 
-{ #category : #api }
+{ #category : 'api' }
 GHModelImporter >> importGroup: aGroupName [
 
 	| result groupResult |
-	result := self api organization: aGroupName.
+	result := self repoApi organization: aGroupName.
 	groupResult := self parseGroupResult: result.
 	self glhModel add: groupResult.
 	self importRepositoriesOfGroup: groupResult.
 	^ groupResult
 ]
 
-{ #category : #api }
+{ #category : 'import - merge request' }
+GHModelImporter >> importMergeRequests: aProject [ 
+	|response mergeRequests|
+	response := self repoApi 
+			mergeRequestsOfRepo: aProject group name 
+			ofProject: aProject name.
+	mergeRequests := self parseMergeRequestResult: response. 
+	
+	mergeRequests := aProject mergeRequests addAll:mergeRequests unless: self blockOnIdEquality.
+	^ mergeRequests
+	
+]
+
+{ #category : 'api' }
 GHModelImporter >> importPipelinesOf: project [
 
 	"add the pipeline (actions runs) in the project"
 
 	| pipelinesResult ghApiPipelineOverview |
-	pipelinesResult := self api
+	pipelinesResult := self repoApi
 		                   actionsRunOfRepo: project name
 		                   ofOrganization: project group name.
 	ghApiPipelineOverview := self parsePipelinesResult: pipelinesResult.
@@ -182,12 +273,12 @@ GHModelImporter >> importPipelinesOf: project [
 		project addPipeline: pipeline ]
 ]
 
-{ #category : #api }
+{ #category : 'api' }
 GHModelImporter >> importProject: aProjectName ofGroup: aGroupName [
 
 	| result projectResult group |
 	group := self ensureGroupNamed: aGroupName.
-	result := self api organization: aGroupName repo: aProjectName.
+	result := self repoApi organization: aGroupName repo: aProjectName.
 	projectResult := self parseProjectResult: result.
 	projectResult group: group.
 	self glhModel add: projectResult.
@@ -195,7 +286,7 @@ GHModelImporter >> importProject: aProjectName ofGroup: aGroupName [
 	^ projectResult
 ]
 
-{ #category : #api }
+{ #category : 'api' }
 GHModelImporter >> importRepositoriesOfGroup: groupResult [
 
 	| reposResult itemByPage pageNumber reposFound tmp |
@@ -205,7 +296,7 @@ GHModelImporter >> importRepositoriesOfGroup: groupResult [
 	reposFound := OrderedCollection new.
 	('Extract commits from ' , reposFound size printString , ' to '
 	 , (reposFound size + itemByPage) printString) recordInfo.
-	tmp := self parseArrayOfProject: (self api
+	tmp := self parseArrayOfProject: (self repoApi
 			        reposOfOrganization: groupResult name
 			        perPage: itemByPage
 			        page: pageNumber).
@@ -215,13 +306,13 @@ GHModelImporter >> importRepositoriesOfGroup: groupResult [
 		pageNumber := pageNumber + 1.
 		('Extract issues from ' , reposFound size printString , ' to '
 		 , (reposFound size + itemByPage) printString) recordInfo.
-		tmp := self parseArrayOfProject: (self api
+		tmp := self parseArrayOfProject: (self repoApi
 				        reposOfOrganization: groupResult name
 				        perPage: itemByPage
 				        page: pageNumber).
 		reposFound addAll: tmp ].
 
-	reposResult := self api reposOfOrganization: groupResult name.
+	reposResult := self repoApi reposOfOrganization: groupResult name.
 	groupResult projects addAll: reposFound.
 	self glhModel addAll: groupResult projects.
 	groupResult projects do: [ :project |
@@ -229,7 +320,7 @@ GHModelImporter >> importRepositoriesOfGroup: groupResult [
 	^ groupResult
 ]
 
-{ #category : #api }
+{ #category : 'api' }
 GHModelImporter >> importUser: userID [
 
 	| result userResult |
@@ -237,22 +328,23 @@ GHModelImporter >> importUser: userID [
 		detect: [ :user | user id = userID ]
 		ifFound: [ :user | ^ user ].
 	('Import user: ' , userID printString) recordInfo.
-	result := self api user: userID.
+	result := self repoApi user: userID.
 	userResult := self parseUserResult: result.
 	^ glhModel
 		  add: userResult
 		  unless: [ :current :new | current id = new id ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 GHModelImporter >> initialize [
 
 	super initialize.
-	self api: GHApi new.
+	self repoApi: GHApi new.
+	self withCommitDiffs: false.
 	withFiles := false
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 GHModelImporter >> parseArrayOfProject: arrayOfProjects [
 
 	| reader |
@@ -271,7 +363,7 @@ GHModelImporter >> parseArrayOfProject: arrayOfProjects [
 	^ reader nextAs: #ArrayOfProjects
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 GHModelImporter >> parseBranchesResult: arrayOfBranch [
 
 	| reader |
@@ -284,17 +376,19 @@ GHModelImporter >> parseBranchesResult: arrayOfBranch [
 	^ reader nextAs: #ArrayOfBranch
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 GHModelImporter >> parseCommitsResult: result [
 
 	| reader |
 	(result includesSubstring: '"status":"409"') ifTrue: [
 		GHRepositoryEmptyError signal: 'Git Repository is empty' ].
+
 	reader := NeoJSONReader on: result readStream.
 
 	reader for: GLHCommit do: [ :mapping |
 		mapping mapInstVar: #id to: #sha.
 		mapping mapInstVar: #web_url to: #html_url.
+
 		mapping
 			mapProperty: #commit
 			getter: [ :object | #ignore ]
@@ -337,10 +431,24 @@ GHModelImporter >> parseCommitsResult: result [
 		customDo: [ :customMappting |
 		customMappting listOfElementSchema: GLHCommit ].
 
+
 	^ reader nextAs: #ArrayOfCommit
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
+GHModelImporter >> parseDiffresult: response [
+
+	| result |
+	result := (response at: #files) collect: [ :file |
+		          GLHDiff new
+			          diffString: (file at: #patch);
+			          old_path: (file at: #filename);
+			          new_path: (file at: #filename) ].
+
+	^ result
+]
+
+{ #category : 'parsing' }
 GHModelImporter >> parseFileTreeResult: aResult [
 
 	| reader |
@@ -353,7 +461,7 @@ GHModelImporter >> parseFileTreeResult: aResult [
 	^ reader nextAs: #ArrayOfFile
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 GHModelImporter >> parseGroupResult: aResult [
 
 	| reader |
@@ -366,7 +474,31 @@ GHModelImporter >> parseGroupResult: aResult [
 	^ reader nextAs: GLHGroup
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
+GHModelImporter >> parseMergeRequestResult: response [
+
+	| result |
+	self flag: 'temp version, must remade using NeoJsonReader'.
+	result := response collect: [ :aPull |
+		          GLHMergeRequest new
+			          id: (aPull at: #id);
+			          title: (aPull at: #title);
+			          state: (aPull at: #state);
+			          closed_at:
+				          ((aPull at: #closed_at) ifNotNil: #asDateAndTime);
+			          merged_at:
+				          ((aPull at: #merged_at) ifNotNil: #asDateAndTime);
+			          updated_at:
+				          ((aPull at: #updated_at) ifNotNil: #asDateAndTime);
+			          created_at:
+				          ((aPull at: #created_at) ifNotNil: #asDateAndTime);
+			          sha: (aPull at: #head at: #sha);
+			          merge_commit_sha: (aPull at: #merge_commit_sha) ].
+	result := self glhModel addAll: result unless: self blockOnIdEquality.
+	^ result
+]
+
+{ #category : 'parsing' }
 GHModelImporter >> parsePipelinesResult: pipelineOverview [
 
 	| reader |
@@ -388,7 +520,7 @@ GHModelImporter >> parsePipelinesResult: pipelineOverview [
 	^ reader nextAs: GHAPIPipelineOverview
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 GHModelImporter >> parseProjectResult: aResult [
 
 	| reader |
@@ -403,7 +535,7 @@ GHModelImporter >> parseProjectResult: aResult [
 	^ reader nextAs: GLHProject
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 GHModelImporter >> parseUserResult: result [
 
 	| reader |
@@ -422,12 +554,12 @@ GHModelImporter >> parseUserResult: result [
 	^ reader nextAs: GLHUser
 ]
 
-{ #category : #api }
+{ #category : 'api' }
 GHModelImporter >> privateToken [
 	^ self api privateToken
 ]
 
-{ #category : #api }
+{ #category : 'api' }
 GHModelImporter >> privateToken: aTokenString [
-	^ self api privateToken: aTokenString
+	^ self repoApi privateToken: aTokenString
 ]

@@ -1,6 +1,6 @@
 Class {
-	#name : #GitMetricExporter,
-	#superclass : #Object,
+	#name : 'GitMetricExporter',
+	#superclass : 'Object',
 	#instVars : [
 		'glhImporter',
 		'jiraImporter',
@@ -15,10 +15,11 @@ Class {
 		'metrics',
 		'analyses'
 	],
-	#category : #'GitLabHealth-Model-Analysis'
+	#category : 'GitLabHealth-Model-Analysis',
+	#package : 'GitLabHealth-Model-Analysis'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GitMetricExporter class >> demoPeriod [
 
 	^ self new
@@ -27,7 +28,7 @@ GitMetricExporter class >> demoPeriod [
 		  addAPeriodFrom: '01 march 2024' to: '31 may 2024'
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 GitMetricExporter >> addAPeriodFrom: since to: until [
 
 	runningPeriods add: {
@@ -37,7 +38,7 @@ GitMetricExporter >> addAPeriodFrom: since to: until [
 	^runningPeriods 
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 GitMetricExporter >> addEntitiesFromUserNames: userNames [
 	"import all the project since a certain time"
 	
@@ -85,7 +86,7 @@ GitMetricExporter >> addEntitiesFromUserNames: userNames [
 	^ self
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 GitMetricExporter >> addEntitiesFromUserNamesAndProjects: usersWithProjects [
 
 	self
@@ -111,7 +112,7 @@ GitMetricExporter >> addEntitiesFromUserNamesAndProjects: usersWithProjects [
 	^ self 
 ]
 
-{ #category : #utilities }
+{ #category : 'utilities' }
 GitMetricExporter >> constructFilePath: runningOver [
 
 	| file |
@@ -124,7 +125,7 @@ GitMetricExporter >> constructFilePath: runningOver [
 	^ file
 ]
 
-{ #category : #exporting }
+{ #category : 'exporting' }
 GitMetricExporter >> csvMetricsFor: metricCollection at: date [
 
 	| csvMetrics |
@@ -142,12 +143,12 @@ GitMetricExporter >> csvMetricsFor: metricCollection at: date [
 	^ csvMetrics asOrderedDictionary
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GitMetricExporter >> entities: aCollection [ 
 	entities := aCollection
 ]
 
-{ #category : #exporting }
+{ #category : 'exporting' }
 GitMetricExporter >> exportFor: usersWithProjects [
 
 	self
@@ -163,7 +164,7 @@ GitMetricExporter >> exportFor: usersWithProjects [
 			Year }
 ]
 
-{ #category : #exporting }
+{ #category : 'exporting' }
 GitMetricExporter >> exportFor: usersWithProjects over: aCollectionOfDateWeekMonthOrYear [
 
 	self
@@ -178,21 +179,21 @@ GitMetricExporter >> exportFor: usersWithProjects over: aCollectionOfDateWeekMon
 	self exportFor: aCollectionOfDateWeekMonthOrYear
 ]
 
-{ #category : #exporting }
+{ #category : 'exporting' }
 GitMetricExporter >> exportInCSV [
 
 	self exportUserAnalysesInCSV.
 	self exportProjectAnalysesInCSV.
 ]
 
-{ #category : #exporting }
+{ #category : 'exporting' }
 GitMetricExporter >> exportInDB: repository [
 
 	repository enableSingleton.
 	analyses do: [ :analysis | analysis save ]
 ]
 
-{ #category : #exporting }
+{ #category : 'exporting' }
 GitMetricExporter >> exportInS3: bucketName accessKey: accessKey secretKey: secretKey region: region [
 
 	| s3 bucket ston date fileName |
@@ -216,7 +217,7 @@ GitMetricExporter >> exportInS3: bucketName accessKey: accessKey secretKey: secr
 	bucket atKey: fileName putObject: ston
 ]
 
-{ #category : #exporting }
+{ #category : 'exporting' }
 GitMetricExporter >> exportProjectAnalysesInCSV [
 
 	| exportBrowserModel groupedByOver group groupOver groupByName periods csvMetrics file |
@@ -258,7 +259,7 @@ GitMetricExporter >> exportProjectAnalysesInCSV [
 			exportBrowserModel writeCSVOn: aStream ] ]
 ]
 
-{ #category : #exporting }
+{ #category : 'exporting' }
 GitMetricExporter >> exportUserAnalysesInCSV [
 
 	| exportBrowserModel groupedByOver group groupOver groupByName periods csvMetrics file |
@@ -296,7 +297,7 @@ GitMetricExporter >> exportUserAnalysesInCSV [
 			exportBrowserModel writeCSVOn: aStream ] ]
 ]
 
-{ #category : #projects }
+{ #category : 'projects' }
 GitMetricExporter >> findParticipationOfCommitAuthorNamed: username amongProjects: aCollectionOfProjects [
 
 	| response itsProjects i size |
@@ -326,12 +327,12 @@ GitMetricExporter >> findParticipationOfCommitAuthorNamed: username amongProject
 	^ itsProjects
 ]
 
-{ #category : #projects }
+{ #category : 'projects' }
 GitMetricExporter >> findProjectsOfUser: aCollection [ 
 	self shouldBeImplemented.
 ]
 
-{ #category : #analysis }
+{ #category : 'analysis' }
 GitMetricExporter >> generateAnalysesOver: aDateWeekMonthOrYear [
 
 	analyses := OrderedCollection new.
@@ -347,7 +348,7 @@ GitMetricExporter >> generateAnalysesOver: aDateWeekMonthOrYear [
 	^ analyses
 ]
 
-{ #category : #analysis }
+{ #category : 'analysis' }
 GitMetricExporter >> generateProjectsAnalysesDuringPeriod: period over: aDateWeekMonthOrYear [
 
 	^self projectEntities collect: [ :project |
@@ -357,7 +358,7 @@ GitMetricExporter >> generateProjectsAnalysesDuringPeriod: period over: aDateWee
 			over: aDateWeekMonthOrYear ]
 ]
 
-{ #category : #analysis }
+{ #category : 'analysis' }
 GitMetricExporter >> generateUsersAnalysesDuringPeriod: period over: aDateWeekMonthOrYear [
 
 	| userAnalysisReport newMetric result |
@@ -375,7 +376,7 @@ GitMetricExporter >> generateUsersAnalysesDuringPeriod: period over: aDateWeekMo
 				               until: (period at: #until);
 				               over: aDateWeekMonthOrYear;
 				               user: user;
-									emailDomain: emailDomain.
+				               emailDomain: emailDomain.
 
 
 			  result := newMetric calculate.
@@ -384,7 +385,7 @@ GitMetricExporter >> generateUsersAnalysesDuringPeriod: period over: aDateWeekMo
 		  userAnalysisReport ]
 ]
 
-{ #category : #utilities }
+{ #category : 'utilities' }
 GitMetricExporter >> getAnalysisWithDate: date from: analysisCollection [
 
 	^analysisCollection
@@ -392,13 +393,13 @@ GitMetricExporter >> getAnalysisWithDate: date from: analysisCollection [
 		ifNone: [ nil ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GitMetricExporter >> glhImporter: anImporter [
 
 	glhImporter := anImporter withInitialCommits: false; yourself. 
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 GitMetricExporter >> importAnalysesFromS3: bucketName accessKey: accessKey secretKey: secretKey region: region [
 
 	| s3 bucket xmlObjects contentElements filesContent |
@@ -422,7 +423,7 @@ GitMetricExporter >> importAnalysesFromS3: bucketName accessKey: accessKey secre
 		              flattened
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 GitMetricExporter >> initialize [
 
 	entities := OrderedCollection new.
@@ -443,38 +444,41 @@ GitMetricExporter >> initialize [
 		           DelayUntilFirstChurnMetric.
 		           TimeBetweenCommitMetric.
 		           ContributedProjectMetric.
+		CodeAdditionByMRMetric .
+		CodeDeletionByMRMetric .
 		           MergeRequestDurationMetric.
 		           OpenedMergeRequestMetric.
 		           ClosedMergeRequestMetric.
 		           MergedMergeRequestMetric.
 		           SelfMergedUnderAMinuteMergeRequestMetric.
 		           ClosedTicketsMetric.
-		           JiraTimeMRTimeDifferenceMetric. CommitsNumberByJiraTicketsMetric }
+		           JiraTimeMRTimeDifferenceMetric.
+		           CommitsNumberByJiraTicketsMetric }
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GitMetricExporter >> jiraImporter: anObject [
 
 	jiraImporter := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GitMetricExporter >> label: aString [ 
 	label := aString
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GitMetricExporter >> maxCommitWindow: anInteger [
 	maxCommitWindow := anInteger abs
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GitMetricExporter >> metrics: anObject [
 
 	metrics := anObject
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 GitMetricExporter >> onlyImportProjectsOfGroup: groupId [
 
 	| group |
@@ -482,25 +486,25 @@ GitMetricExporter >> onlyImportProjectsOfGroup: groupId [
 	projectCache := group toScope: GLHProject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GitMetricExporter >> projectAnalyses [
 
 	^ analyses select: [ :analysis | analysis class = ProjectAnalysisReport ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GitMetricExporter >> projectEntities [
 
 	^ entities select: [ :entity | entity class = GLHProject ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GitMetricExporter >> projectMetrics [
 
 	^ metrics select: [ :metric | metric inheritsFrom: ProjectMetric ]
 ]
 
-{ #category : #setup }
+{ #category : 'setup' }
 GitMetricExporter >> setupAnalysisForProjectsWithIds: projectIds [
 
 	| projects |
@@ -509,7 +513,7 @@ GitMetricExporter >> setupAnalysisForProjectsWithIds: projectIds [
 	entities addAll: projects
 ]
 
-{ #category : #setup }
+{ #category : 'setup' }
 GitMetricExporter >> setupAnalysisForUsersWithNames: userNames [
 	"import all the project since a certain time"
 
@@ -532,25 +536,25 @@ GitMetricExporter >> setupAnalysisForUsersWithNames: userNames [
 	^ self
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GitMetricExporter >> userAnalyses [
 
 	^ analyses select: [ :analysis | analysis class = UserAnalysisReport ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GitMetricExporter >> userEntities [
 
 	^ entities select: [ :entity | entity class = GLHUser ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GitMetricExporter >> userMetrics [
 
 	^ metrics select: [ :metric | metric inheritsFrom: UserMetric ]
 ]
 
-{ #category : #setup }
+{ #category : 'setup' }
 GitMetricExporter >> withEmailDomain: anEmailDomain [
 
 	"define the email domain of your Git user. Usefull to link them between service (i.e. Jira)"

@@ -30,8 +30,8 @@ A GitLab Group
 
 "
 Class {
-	#name : #GLHGroup,
-	#superclass : #GLHEntity,
+	#name : 'GLHGroup',
+	#superclass : 'GLHEntity',
 	#traits : 'FamixTNamedEntity',
 	#classTraits : 'FamixTNamedEntity classTrait',
 	#instVars : [
@@ -44,10 +44,12 @@ Class {
 		'#subGroups => FMMany type: #GLHGroup opposite: #group',
 		'#group => FMOne type: #GLHGroup opposite: #subGroups'
 	],
-	#category : #'GitLabHealth-Model-Entities'
+	#category : 'GitLabHealth-Model-Entities',
+	#package : 'GitLabHealth-Model',
+	#tag : 'Entities'
 }
 
-{ #category : #meta }
+{ #category : 'meta' }
 GLHGroup class >> annotation [
 
 	<FMClass: #Group super: #GLHEntity>
@@ -56,26 +58,26 @@ GLHGroup class >> annotation [
 	^ self
 ]
 
-{ #category : #groups }
+{ #category : 'groups' }
 GLHGroup class >> annotationGLHGroupGroup [
 	<generated>
 	<mooseGroup>
 	^ GLHGroupGroup
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 GLHGroup >> addProject: anObject [
 	<generated>
 	^ self projects add: anObject
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 GLHGroup >> addSubGroup: anObject [
 	<generated>
 	^ self subGroups add: anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GLHGroup >> avatar_url [
 
 	<FMProperty: #avatar_url type: #String>
@@ -83,13 +85,13 @@ GLHGroup >> avatar_url [
 	^ avatar_url
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GLHGroup >> avatar_url: anObject [
 	<generated>
 	avatar_url := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GLHGroup >> description [
 
 	<FMProperty: #description type: #String>
@@ -97,13 +99,13 @@ GLHGroup >> description [
 	^ description
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GLHGroup >> description: anObject [
 	<generated>
 	description := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GLHGroup >> group [
 	"Relation named: #group type: #GLHGroup opposite: #subGroups"
 
@@ -112,21 +114,21 @@ GLHGroup >> group [
 	^ group
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GLHGroup >> group: anObject [
 
 	<generated>
 	group := anObject
 ]
 
-{ #category : #navigation }
+{ #category : 'navigation' }
 GLHGroup >> groupGroup [
 	<generated>
 	<navigation: 'Group'>
 	^ MooseSpecializedGroup with: self group
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GLHGroup >> id [
 
 	<FMProperty: #id type: #Number>
@@ -134,13 +136,13 @@ GLHGroup >> id [
 	^ id
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GLHGroup >> id: anObject [
 	<generated>
 	id := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GLHGroup >> projects [
 	"Relation named: #projects type: #GLHProject opposite: #group"
 
@@ -149,21 +151,21 @@ GLHGroup >> projects [
 	^ projects
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GLHGroup >> projects: anObject [
 
 	<generated>
 	projects value: anObject
 ]
 
-{ #category : #navigation }
+{ #category : 'navigation' }
 GLHGroup >> projectsGroup [
 	<generated>
 	<navigation: 'Projects'>
 	^ MooseSpecializedGroup withAll: self projects asSet
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GLHGroup >> subGroups [
 	"Relation named: #subGroups type: #GLHGroup opposite: #group"
 
@@ -172,21 +174,21 @@ GLHGroup >> subGroups [
 	^ subGroups
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GLHGroup >> subGroups: anObject [
 
 	<generated>
 	subGroups value: anObject
 ]
 
-{ #category : #navigation }
+{ #category : 'navigation' }
 GLHGroup >> subGroupsGroup [
 	<generated>
 	<navigation: 'SubGroups'>
 	^ MooseSpecializedGroup withAll: self subGroups asSet
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GLHGroup >> visibility [
 
 	<FMProperty: #visibility type: #String>
@@ -194,13 +196,13 @@ GLHGroup >> visibility [
 	^ visibility
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GLHGroup >> visibility: anObject [
 	<generated>
 	visibility := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GLHGroup >> web_url [
 
 	<FMProperty: #web_url type: #String>
@@ -208,7 +210,7 @@ GLHGroup >> web_url [
 	^ web_url
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GLHGroup >> web_url: anObject [
 	<generated>
 	web_url := anObject

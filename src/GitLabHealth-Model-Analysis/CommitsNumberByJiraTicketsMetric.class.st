@@ -1,10 +1,11 @@
 Class {
-	#name : #CommitsNumberByJiraTicketsMetric,
-	#superclass : #UserJiraMetric,
-	#category : #'GitLabHealth-Model-Analysis'
+	#name : 'CommitsNumberByJiraTicketsMetric',
+	#superclass : 'UserJiraMetric',
+	#category : 'GitLabHealth-Model-Analysis',
+	#package : 'GitLabHealth-Model-Analysis'
 }
 
-{ #category : #calculating }
+{ #category : 'calculating' }
 CommitsNumberByJiraTicketsMetric >> calculate [
 
 	| groupedByDate dateOver |
@@ -23,13 +24,13 @@ CommitsNumberByJiraTicketsMetric >> calculate [
 	^ groupedByDate average asFloat
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 CommitsNumberByJiraTicketsMetric >> description [
 
 	^ 'average number of commit by merge request associated to a jira ticket'
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 CommitsNumberByJiraTicketsMetric >> load [
 
 	userMergeRequests := self
