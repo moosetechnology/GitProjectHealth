@@ -119,8 +119,11 @@ BaselineOfGitLabHealth >> defineJiraConnector: spec [
 { #category : #baselines }
 BaselineOfGitLabHealth >> definePackages: spec [
 	"generic"
+
 	spec package: 'GitProjectHealth-Model-Importer'.
-	spec package: 'GitProjectHealth-Model-Importer-Tests' with: [ spec requires: #(GitProjectHealth-Model-Importer) ].
+	spec
+		package: 'GitProjectHealth-Model-Importer-Tests'
+		with: [ spec requires: #( 'GitProjectHealth-Model-Importer' ) ].
 
 	"gitlab"
 	spec
