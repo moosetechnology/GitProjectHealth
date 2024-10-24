@@ -13,7 +13,7 @@ authors:
   given-names: "Nicolas"
   orcid: "https://orcid.org/0000-0003-1486-8399"
 title: "GitProjectHealth"
-version: v1.0.0
-doi: 10.5281/zenodo.13886505
-date-released: 2024-10-03
+version: v1.1.0
+doi: 10.5281/zenodo.13886504
+date-released: 2024-10-24
 url: "https://github.com/moosetechnology/GitProjectHealth"
