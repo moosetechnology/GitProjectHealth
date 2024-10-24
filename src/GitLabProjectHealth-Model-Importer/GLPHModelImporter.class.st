@@ -1,10 +1,11 @@
 Class {
-	#name : #GLPHModelImporter,
-	#superclass : #GLHModelImporter,
-	#category : #'GitLabProjectHealth-Model-Importer'
+	#name : 'GLPHModelImporter',
+	#superclass : 'GLHModelImporter',
+	#category : 'GitLabProjectHealth-Model-Importer',
+	#package : 'GitLabProjectHealth-Model-Importer'
 }
 
-{ #category : #commit }
+{ #category : 'commit' }
 GLPHModelImporter >> commitsOfProject: aGLHProject forRefName: refName until: toDate [
 
 	| newlyFoundCommit page |
@@ -44,7 +45,7 @@ GLPHModelImporter >> commitsOfProject: aGLHProject forRefName: refName until: to
 			self importDiffOfCommit: commit ] ]
 ]
 
-{ #category : #'private - api' }
+{ #category : 'private - api' }
 GLPHModelImporter >> completeImportProject: aGLHProject [
 	|completedProject|
 	completedProject := super completeImportProject: aGLHProject.
@@ -58,15 +59,15 @@ GLPHModelImporter >> completeImportProject: aGLHProject [
 	^ completedProject
 ]
 
-{ #category : #'private - configure reader' }
+{ #category : 'private - configure reader' }
 GLPHModelImporter >> configureReaderForMergeRequest: reader [
 	"declare quil y a un array a mapper"
 
 	reader for: #ArrayOfMergeRequest customDo: [ :customMappting |
-		customMappting listOfElementSchema: GLPHEMergeRequest ].
+		customMappting listOfElementSchema: GLHMergeRequest ].
 
 	"declare la liste des properties"
-	reader for: GLPHEMergeRequest do: [ :mapping |
+	reader for: GLHMergeRequest do: [ :mapping |
 		mapping mapInstVars:
 			#( blocking_discussions_resolved changes_count description
 			   detailed_merge_status discussion_locked downvotes draft first_deployed_to_production_at
@@ -107,7 +108,7 @@ GLPHModelImporter >> configureReaderForMergeRequest: reader [
 			string ifNil: [ nil ] ifNotNil: [ DateAndTime fromString: string ] ] ]
 ]
 
-{ #category : #import }
+{ #category : 'import' }
 GLPHModelImporter >> importCommitsOfBranch: aGLHBranch [
 
 	| commits |
@@ -127,7 +128,7 @@ GLPHModelImporter >> importCommitsOfBranch: aGLHBranch [
 		 ]
 ]
 
-{ #category : #api }
+{ #category : 'api' }
 GLPHModelImporter >> importDiffOfCommit: aCommit [
 
 	super importDiffOfCommit: aCommit.
@@ -138,7 +139,7 @@ GLPHModelImporter >> importDiffOfCommit: aCommit [
 	^ aCommit diffs
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GLPHModelImporter >> importDiffOfMergeRequest: aMergeRequest [
 
 	| result diffsResult |
@@ -167,7 +168,7 @@ GLPHModelImporter >> importDiffOfMergeRequest: aMergeRequest [
 	^ aMergeRequest diffs
 ]
 
-{ #category : #'import - merge request' }
+{ #category : 'import - merge request' }
 GLPHModelImporter >> importMergeRequestCommits: aGLPHEMergeRequest [
 
 	| results page commits parseResult |
@@ -196,7 +197,7 @@ GLPHModelImporter >> importMergeRequestCommits: aGLPHEMergeRequest [
 	^ commits
 ]
 
-{ #category : #import }
+{ #category : 'import' }
 GLPHModelImporter >> importMergeRequestMergeCommits: aGLPHEMergeRequest [
 
 	| foundCommits |
@@ -229,7 +230,7 @@ GLPHModelImporter >> importMergeRequestMergeCommits: aGLPHEMergeRequest [
 	^ foundCommits
 ]
 
-{ #category : #'import - merge request' }
+{ #category : 'import - merge request' }
 GLPHModelImporter >> importMergeRequests: aGLHProject [
 
 	| results parsedResults mrs|
@@ -260,7 +261,7 @@ GLPHModelImporter >> importMergeRequests: aGLHProject [
 	^ mrs
 ]
 
-{ #category : #'import - merge request' }
+{ #category : 'import - merge request' }
 GLPHModelImporter >> importMergeRequests: aGLHProject since: fromDate until: toDate [
 
 	| newlyFoundMR page foundMR |
@@ -305,7 +306,7 @@ GLPHModelImporter >> importMergeRequests: aGLHProject since: fromDate until: toD
 	^ foundMR
 ]
 
-{ #category : #'import - merge request' }
+{ #category : 'import - merge request' }
 GLPHModelImporter >> importMergeResquestApprovals: aGLPHEMergeRequest [
 
 	| results parsedResult |
@@ -327,7 +328,7 @@ GLPHModelImporter >> importMergeResquestApprovals: aGLPHEMergeRequest [
 	^ aGLPHEMergeRequest
 ]
 
-{ #category : #'import - merge request' }
+{ #category : 'import - merge request' }
 GLPHModelImporter >> importMergeResquestAuthor: aGLPHEMergeRequest [
 
 	| authorID |
@@ -342,7 +343,7 @@ GLPHModelImporter >> importMergeResquestAuthor: aGLPHEMergeRequest [
 	aGLPHEMergeRequest author: (self importUser: authorID)
 ]
 
-{ #category : #'import - merge request' }
+{ #category : 'import - merge request' }
 GLPHModelImporter >> importMergeResquestMerger: aGLPHEMergeRequest [
 
 	| authorID |
@@ -361,7 +362,7 @@ GLPHModelImporter >> importMergeResquestMerger: aGLPHEMergeRequest [
 	aGLPHEMergeRequest merge_user: (self importUser: authorID)
 ]
 
-{ #category : #'private - api' }
+{ #category : 'private - api' }
 GLPHModelImporter >> importProject: aProjectID [
 
 	| result projectResult |
@@ -373,7 +374,7 @@ GLPHModelImporter >> importProject: aProjectID [
 	^ self completeImportProject: projectResult
 ]
 
-{ #category : #'private - api' }
+{ #category : 'private - api' }
 GLPHModelImporter >> importRepository: aGLHRepository [
 
 	super importRepository: aGLHRepository.
@@ -383,28 +384,28 @@ GLPHModelImporter >> importRepository: aGLHRepository [
 			self importCommitsOfBranch: branch ] ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 GLPHModelImporter >> initReader [
 
 	super initReader.
 	self configureReaderForMergeRequest: generalReader
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 GLPHModelImporter >> initialize [
 
 	super initialize.
 	withCommitDiffs := true
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 GLPHModelImporter >> parseMergeRequestResult: result [
 
 	generalReader on: result readStream.
 	^ generalReader nextAs: #ArrayOfMergeRequest
 ]
 
-{ #category : #parsing }
+{ #category : 'parsing' }
 GLPHModelImporter >> parseProjectResult: aResult [ 
 		| reader |
 	reader := NeoJSONReader on: aResult readStream.
@@ -415,7 +416,7 @@ GLPHModelImporter >> parseProjectResult: aResult [
 	^ reader nextAs: GLHProject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GLPHModelImporter >> withCommitsSince: someDays [
 	"substract the current date with a given number of days. Use to retrieve the commits submit in the last giving days"
 

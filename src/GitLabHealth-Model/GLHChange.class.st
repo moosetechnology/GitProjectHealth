@@ -7,7 +7,7 @@ super class for addition and deletion
 ### Other
 | Relation | Origin | Opposite | Type | Comment |
 |---|
-| `diffRange` | `GLPHEChange` | `changes` | `GLPHEDiffRange` | |
+| `diffRange` | `GLHChange` | `changes` | `GLHDiffRange` | |
 
 
 ## Properties
@@ -22,81 +22,83 @@ super class for addition and deletion
 
 "
 Class {
-	#name : #GLPHEChange,
-	#superclass : #GLPHEEntity,
+	#name : 'GLHChange',
+	#superclass : 'GLHEntity',
 	#traits : 'FamixTNamedEntity',
 	#classTraits : 'FamixTNamedEntity classTrait',
 	#instVars : [
-		'#diffRange => FMOne type: #GLPHEDiffRange opposite: #changes',
 		'#index => FMProperty',
 		'#relativeIndex => FMProperty',
-		'#sourceCode => FMProperty'
+		'#sourceCode => FMProperty',
+		'#diffRange => FMOne type: #GLHDiffRange opposite: #changes'
 	],
-	#category : #'GLPHExtended-Model-Entities'
+	#category : 'GitLabHealth-Model-Entities',
+	#package : 'GitLabHealth-Model',
+	#tag : 'Entities'
 }
 
-{ #category : #meta }
-GLPHEChange class >> annotation [
+{ #category : 'meta' }
+GLHChange class >> annotation [
 
-	<FMClass: #Change super: #GLPHEEntity>
-	<package: #'GLPHExtended-Model'>
+	<FMClass: #Change super: #GLHEntity>
+	<package: #'GitLabHealth-Model'>
 	<generated>
 	^ self
 ]
 
-{ #category : #accessing }
-GLPHEChange >> diffRange [
-	"Relation named: #diffRange type: #GLPHEDiffRange opposite: #changes"
+{ #category : 'accessing' }
+GLHChange >> diffRange [
+	"Relation named: #diffRange type: #GLHDiffRange opposite: #changes"
 
 	<generated>
 	^ diffRange
 ]
 
-{ #category : #accessing }
-GLPHEChange >> diffRange: anObject [
+{ #category : 'accessing' }
+GLHChange >> diffRange: anObject [
 
 	<generated>
 	diffRange := anObject
 ]
 
-{ #category : #accessing }
-GLPHEChange >> index [
+{ #category : 'accessing' }
+GLHChange >> index [
 
 	<FMProperty: #index type: #Number>
 	<generated>
 	^ index
 ]
 
-{ #category : #accessing }
-GLPHEChange >> index: anObject [
+{ #category : 'accessing' }
+GLHChange >> index: anObject [
 	<generated>
 	index := anObject
 ]
 
-{ #category : #accessing }
-GLPHEChange >> relativeIndex [
+{ #category : 'accessing' }
+GLHChange >> relativeIndex [
 
 	<FMProperty: #relativeIndex type: #Number>
 	<generated>
 	^ relativeIndex
 ]
 
-{ #category : #accessing }
-GLPHEChange >> relativeIndex: anObject [
+{ #category : 'accessing' }
+GLHChange >> relativeIndex: anObject [
 	<generated>
 	relativeIndex := anObject
 ]
 
-{ #category : #accessing }
-GLPHEChange >> sourceCode [
+{ #category : 'accessing' }
+GLHChange >> sourceCode [
 
 	<FMProperty: #sourceCode type: #String>
 	<generated>
 	^ sourceCode
 ]
 
-{ #category : #accessing }
-GLPHEChange >> sourceCode: anObject [
+{ #category : 'accessing' }
+GLHChange >> sourceCode: anObject [
 	<generated>
 	sourceCode := anObject
 ]

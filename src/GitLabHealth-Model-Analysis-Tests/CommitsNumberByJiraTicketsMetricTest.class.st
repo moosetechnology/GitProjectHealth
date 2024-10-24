@@ -2,12 +2,13 @@
 A CommitsNumberByJiraTicketsMetricTest is a test class for testing the behavior of CommitsNumberByJiraTicketsMetric
 "
 Class {
-	#name : #CommitsNumberByJiraTicketsMetricTest,
-	#superclass : #TestCase,
-	#category : #'GitLabHealth-Model-Analysis-Tests'
+	#name : 'CommitsNumberByJiraTicketsMetricTest',
+	#superclass : 'TestCase',
+	#category : 'GitLabHealth-Model-Analysis-Tests',
+	#package : 'GitLabHealth-Model-Analysis-Tests'
 }
 
-{ #category : #tests }
+{ #category : 'tests' }
 CommitsNumberByJiraTicketsMetricTest >> testCalculate [
 
 	| result glhImporter user jiraImporter commitsNumber |
@@ -18,7 +19,7 @@ CommitsNumberByJiraTicketsMetricTest >> testCalculate [
 			        { (GLHProject new repository: GLHRepository new) }.
 
 	glhImporter := GLPHImporterMock new.
-	glhImporter mergeRequests: { (GLPHEMergeRequest new
+	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
 			 created_at: '09-05-2024';
 			 merged_at: '09-06-2024' asDate;
@@ -50,7 +51,7 @@ CommitsNumberByJiraTicketsMetricTest >> testCalculate [
 	self assert: result equals: 1
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CommitsNumberByJiraTicketsMetricTest >> testCalculateNoCommits [
 
 	| result glhImporter user jiraImporter commitsNumber |
@@ -61,7 +62,7 @@ CommitsNumberByJiraTicketsMetricTest >> testCalculateNoCommits [
 			        { (GLHProject new repository: GLHRepository new) }.
 
 	glhImporter := GLPHImporterMock new.
-	glhImporter mergeRequests: { (GLPHEMergeRequest new
+	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
 			 created_at: '09-05-2024';
 			 merged_at: '09-06-2024' asDate;
@@ -87,7 +88,7 @@ CommitsNumberByJiraTicketsMetricTest >> testCalculateNoCommits [
 	self assert: result equals: 0
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CommitsNumberByJiraTicketsMetricTest >> testCalculateNoMergeRequests [
 
 	| result glhImporter user jiraImporter commitsNumber |

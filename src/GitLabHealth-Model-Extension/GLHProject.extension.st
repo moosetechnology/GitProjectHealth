@@ -1,6 +1,6 @@
-Extension { #name : #GLHProject }
+Extension { #name : 'GLHProject' }
 
-{ #category : #'*GitLabHealth-Model-Extension' }
+{ #category : '*GitLabHealth-Model-Extension' }
 GLHProject >> projectContributorsInspector: aBuilder [
 
 	<inspectorPresentationOrder: 100 title: 'Contributors'>

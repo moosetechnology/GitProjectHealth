@@ -1,6 +1,6 @@
-Extension { #name : #GLHCommit }
+Extension { #name : 'GLHCommit' }
 
-{ #category : #'*GitProject-JiraConnector-Model-accessing' }
+{ #category : '*GitProject-JiraConnector-Model-accessing' }
 GLHCommit >> jiraIssue [
 	"Relation named: #jiraIssue type: #JPIssue opposite: #commits"
 
@@ -12,7 +12,7 @@ GLHCommit >> jiraIssue [
 	^ self attributeAt: #jiraIssue ifAbsent: [ nil ]
 ]
 
-{ #category : #'*GitProject-JiraConnector-Model-accessing' }
+{ #category : '*GitProject-JiraConnector-Model-accessing' }
 GLHCommit >> jiraIssue: anObject [
 
 	<generated>

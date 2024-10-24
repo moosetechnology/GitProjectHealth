@@ -8,6 +8,7 @@ A file
 | Relation | Origin | Opposite | Type | Comment |
 |---|
 | `branch` | `GLHFile` | `files` | `GLHBranch` | |
+| `diffs` | `GLHFile` | `file` | `GLHDiff` | |
 | `directoryOwner` | `GLHFile` | `files` | `GLHFileDirectory` | |
 
 
@@ -20,17 +21,20 @@ A file
 
 "
 Class {
-	#name : #GLHFile,
-	#superclass : #GLHEntity,
+	#name : 'GLHFile',
+	#superclass : 'GLHEntity',
 	#instVars : [
-		'#name => FMProperty',
 		'#branch => FMOne type: #GLHBranch opposite: #files',
-		'#directoryOwner => FMOne type: #GLHFileDirectory opposite: #files'
+		'#diffs => FMOne type: #GLHDiff opposite: #file',
+		'#directoryOwner => FMOne type: #GLHFileDirectory opposite: #files',
+		'#name => FMProperty'
 	],
-	#category : #'GitLabHealth-Model-Entities'
+	#category : 'GitLabHealth-Model-Entities',
+	#package : 'GitLabHealth-Model',
+	#tag : 'Entities'
 }
 
-{ #category : #meta }
+{ #category : 'meta' }
 GLHFile class >> annotation [
 
 	<FMClass: #File super: #GLHEntity>
@@ -39,7 +43,7 @@ GLHFile class >> annotation [
 	^ self
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GLHFile >> branch [
 	"Relation named: #branch type: #GLHBranch opposite: #files"
 
@@ -48,21 +52,44 @@ GLHFile >> branch [
 	^ branch
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GLHFile >> branch: anObject [
 
 	<generated>
 	branch := anObject
 ]
 
-{ #category : #navigation }
+{ #category : 'navigation' }
 GLHFile >> branchGroup [
 	<generated>
 	<navigation: 'Branch'>
 	^ MooseSpecializedGroup with: self branch
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
+GLHFile >> diffs [
+	"Relation named: #diffs type: #GLHDiff opposite: #file"
+
+	<generated>
+	<container>
+	^ diffs
+]
+
+{ #category : 'accessing' }
+GLHFile >> diffs: anObject [
+
+	<generated>
+	diffs := anObject
+]
+
+{ #category : 'navigation' }
+GLHFile >> diffsGroup [
+	<generated>
+	<navigation: 'Diffs'>
+	^ MooseSpecializedGroup with: self diffs
+]
+
+{ #category : 'accessing' }
 GLHFile >> directoryOwner [
 	"Relation named: #directoryOwner type: #GLHFileDirectory opposite: #files"
 
@@ -71,21 +98,21 @@ GLHFile >> directoryOwner [
 	^ directoryOwner
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GLHFile >> directoryOwner: anObject [
 
 	<generated>
 	directoryOwner := anObject
 ]
 
-{ #category : #navigation }
+{ #category : 'navigation' }
 GLHFile >> directoryOwnerGroup [
 	<generated>
 	<navigation: 'DirectoryOwner'>
 	^ MooseSpecializedGroup with: self directoryOwner
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GLHFile >> name [
 
 	<FMProperty: #name type: #String>
@@ -93,7 +120,7 @@ GLHFile >> name [
 	^ name
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GLHFile >> name: anObject [
 	<generated>
 	name := anObject

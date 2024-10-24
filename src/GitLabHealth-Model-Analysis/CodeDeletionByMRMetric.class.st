@@ -1,10 +1,11 @@
 Class {
-	#name : #CodeDeletionByMRMetric,
-	#superclass : #UserMergeRequestMetric,
-	#category : #'GitLabHealth-Model-Analysis'
+	#name : 'CodeDeletionByMRMetric',
+	#superclass : 'UserMergeRequestMetric',
+	#category : 'GitLabHealth-Model-Analysis',
+	#package : 'GitLabHealth-Model-Analysis'
 }
 
-{ #category : #calculating }
+{ #category : 'calculating' }
 CodeDeletionByMRMetric >> calculate [
 
 	| groupedByDate dateOver |
@@ -29,13 +30,13 @@ CodeDeletionByMRMetric >> calculate [
 	^ groupedByDate average asFloat
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 CodeDeletionByMRMetric >> description [
 
 	^ 'average code deletion by merge request'
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 CodeDeletionByMRMetric >> load [
 
 	userMergeRequests := self

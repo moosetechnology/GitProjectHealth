@@ -2,27 +2,28 @@
 The test suite for `GLHModelImporter` but not using remote API
 "
 Class {
-	#name : #GLHModelImporterLocalTest,
-	#superclass : #TestCase,
+	#name : 'GLHModelImporterLocalTest',
+	#superclass : 'TestCase',
 	#instVars : [
 		'importer',
 		'model'
 	],
-	#category : #'GitLabHealth-Model-Importer-Tests'
+	#category : 'GitLabHealth-Model-Importer-Tests',
+	#package : 'GitLabHealth-Model-Importer-Tests'
 }
 
-{ #category : #running }
+{ #category : 'running' }
 GLHModelImporterLocalTest >> setUp [
 
 	super setUp.
 
 	importer := GLHModelImporter new.
-	model := GLPHEModel new.
+	model := GLHModel new.
 	importer glhModel: model.
 	importer glhApi: GLHApiMock new
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 GLHModelImporterLocalTest >> testImportDiffOfCommitWithServerRaiseError [
 
 	| commit repo project |
@@ -36,7 +37,7 @@ GLHModelImporterLocalTest >> testImportDiffOfCommitWithServerRaiseError [
 	self assert: commit diffs isEmpty
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 GLHModelImporterLocalTest >> testImportUserAlreadyInModel [
 
 	| user |
@@ -47,7 +48,7 @@ GLHModelImporterLocalTest >> testImportUserAlreadyInModel [
 	self assert: (importer importUser: 12) equals: user
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 GLHModelImporterLocalTest >> testIsServerError [
 
 	self assert:

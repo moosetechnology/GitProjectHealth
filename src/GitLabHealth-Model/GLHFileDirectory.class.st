@@ -13,15 +13,17 @@ A file directory
 
 "
 Class {
-	#name : #GLHFileDirectory,
-	#superclass : #GLHFile,
+	#name : 'GLHFileDirectory',
+	#superclass : 'GLHFile',
 	#instVars : [
 		'#files => FMMany type: #GLHFile opposite: #directoryOwner'
 	],
-	#category : #'GitLabHealth-Model-Entities'
+	#category : 'GitLabHealth-Model-Entities',
+	#package : 'GitLabHealth-Model',
+	#tag : 'Entities'
 }
 
-{ #category : #meta }
+{ #category : 'meta' }
 GLHFileDirectory class >> annotation [
 
 	<FMClass: #FileDirectory super: #GLHFile>
@@ -30,13 +32,13 @@ GLHFileDirectory class >> annotation [
 	^ self
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 GLHFileDirectory >> addFile: anObject [
 	<generated>
 	^ self files add: anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GLHFileDirectory >> files [
 	"Relation named: #files type: #GLHFile opposite: #directoryOwner"
 
@@ -45,14 +47,14 @@ GLHFileDirectory >> files [
 	^ files
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GLHFileDirectory >> files: anObject [
 
 	<generated>
 	files value: anObject
 ]
 
-{ #category : #navigation }
+{ #category : 'navigation' }
 GLHFileDirectory >> filesGroup [
 	<generated>
 	<navigation: 'Files'>
