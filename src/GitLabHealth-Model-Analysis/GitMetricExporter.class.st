@@ -375,7 +375,7 @@ GitMetricExporter >> generateUsersAnalysesDuringPeriod: period over: aDateWeekMo
 				               until: (period at: #until);
 				               over: aDateWeekMonthOrYear;
 				               user: user;
-									emailDomain: emailDomain.
+				               emailDomain: emailDomain.
 
 
 			  result := newMetric calculate.
@@ -443,13 +443,16 @@ GitMetricExporter >> initialize [
 		           DelayUntilFirstChurnMetric.
 		           TimeBetweenCommitMetric.
 		           ContributedProjectMetric.
+		CodeAdditionByMRMetric .
+		CodeDeletionByMRMetric .
 		           MergeRequestDurationMetric.
 		           OpenedMergeRequestMetric.
 		           ClosedMergeRequestMetric.
 		           MergedMergeRequestMetric.
 		           SelfMergedUnderAMinuteMergeRequestMetric.
 		           ClosedTicketsMetric.
-		           JiraTimeMRTimeDifferenceMetric. CommitsNumberByJiraTicketsMetric }
+		           JiraTimeMRTimeDifferenceMetric.
+		           CommitsNumberByJiraTicketsMetric }
 ]
 
 { #category : #accessing }

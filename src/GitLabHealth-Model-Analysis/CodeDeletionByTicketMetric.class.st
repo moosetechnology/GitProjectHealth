@@ -9,6 +9,7 @@ CodeDeletionByTicketMetric >> calculate [
 
 	| groupedByDate dateOver |
 	userMergeRequests ifNil: [ self load ].
+	
 	groupedByDate := self setupGroupedDate.
 	userMergeRequests ifEmpty: [ ^ 0 ].
 

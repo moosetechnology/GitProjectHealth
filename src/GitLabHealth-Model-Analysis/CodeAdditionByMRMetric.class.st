@@ -1,15 +1,15 @@
 Class {
-	#name : #CodeAdditionByTicketMetric,
-	#superclass : #UserJiraMetric,
+	#name : #CodeAdditionByMRMetric,
+	#superclass : #UserMergeRequestMetric,
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
 { #category : #calculating }
-CodeAdditionByTicketMetric >> calculate [
+CodeAdditionByMRMetric >> calculate [
 
 	| groupedByDate dateOver |
 	userMergeRequests ifNil: [ self load ].
-	
+
 	groupedByDate := self setupGroupedDate.
 	userMergeRequests ifEmpty: [ ^ 0 ].
 
@@ -30,16 +30,15 @@ CodeAdditionByTicketMetric >> calculate [
 ]
 
 { #category : #accessing }
-CodeAdditionByTicketMetric >> description [
+CodeAdditionByMRMetric >> description [
 
-	^ 'average code addition by merge request associated with a jira ticket'
+	^ 'average code addition by merge request'
 ]
 
 { #category : #loading }
-CodeAdditionByTicketMetric >> load [
+CodeAdditionByMRMetric >> load [
 
 	userMergeRequests := self
-		                     loadUserCompleteMergeRequestsWithJiraIssueSince:
-		                     (period at: #since)
+		                     loadUserCompleteMergeRequestsSince:  (period at: #since)
 		                     until: (period at: #until)
 ]

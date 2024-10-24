@@ -11,9 +11,41 @@ Class {
 }
 
 { #category : #'api - pull-requests' }
-BitBucketApiMock >> activitiesOfPullRequest: pullRequestId inRepo: repoSlug ofProject: projectKey [
+BitBucketApiMock >> activitiesOfPullRequest: pullRequestId inRepoProjectId: repoSlug ofProjectGroupId: projectKey [
 
 	^self pullRequestActivities
+]
+
+{ #category : #accessing }
+BitBucketApiMock >> commit2 [
+
+	| commits2 |
+	commits2 := '
+    {
+      "id": "abcdef0123abcdef4567abcdef8987abcdef6543",
+		"message": "message test",
+      "displayId": "abcdef0123a",
+      "author": {
+        "name": "charlie",
+        "emailAddress": "charlie@example.com"
+      },
+      "authorTimestamp": 1727168151000,
+      "committer": {
+        "name": "charlie",
+        "emailAddress": "charlie@example.com"
+      },
+      "committerTimestamp": 1727168151000,
+      "message": "WIP on feature 1",
+      "parents": [
+        {
+          "id": "abcdef0123abcdef4567abcdef8987abcdef6543",
+          "displayId": "abcdef0"
+        }
+      ]
+    }
+  '.
+
+	^ commits2 := (NeoJSONReader on: commits2 readStream) next
 ]
 
 { #category : #accessing }
@@ -61,18 +93,20 @@ BitBucketApiMock >> commits: anObject [
 ]
 
 { #category : #'api - pull-requests' }
-BitBucketApiMock >> commitsOfPullRequest: mergeRequestId ofRepo: repoSlug inProject: projectKey [
+BitBucketApiMock >> commitsOfPullRequest: mergeRequestId ofRepoProjectId: repoSlug inProjectGroupId: projectKey [
 
 	^commits
 ]
 
 { #category : #'api - projects' }
-BitBucketApiMock >> commitsOfRepo: repositorySlug inProject: projectKey since: since until: until [
+BitBucketApiMock >> commitsOfRepoProjectId: repositorySlug inProjectGroupId: projectKey since: since until: until [
 
 	^ self commits select: [ :commit |
 		  | commitDate |
+			
 		  commitDate := DateAndTime fromUnixTime:
 			                (commit at: #committerTimestamp) / 1000.
+			
 		  commitDate >= since asDate and: commitDate <= until asDate ]
 ]
 
@@ -382,7 +416,7 @@ BitBucketApiMock >> diffs: anObject [
 ]
 
 { #category : #'api - commits' }
-BitBucketApiMock >> diffsOfCommit: commitID inRepo: repositorySlug inProject: projectKey [
+BitBucketApiMock >> diffsOfCommit: commitID inRepoProjectId: repositorySlug inProjectGroupId: projectKey [
 	^diffs 
 ]
 
@@ -1078,13 +1112,13 @@ BitBucketApiMock >> pullRequestActivities [
 ]
 
 { #category : #'api - pull-requests' }
-BitBucketApiMock >> pullRequestsOfRepo: repoSlug inProject: projectKey since: since until: until [
+BitBucketApiMock >> pullRequestsOfRepoProjectId: repoSlug inProjectGroupId: projectKey since: since until: until [
 	
 	^ mergeRequests
 ]
 
 { #category : #'api - projects' }
-BitBucketApiMock >> repositoriesOfProject: projectKey [
+BitBucketApiMock >> repositoryProjectsOfProjectGroupId: projectKey [
 
 	| repos |
 	repos := '[

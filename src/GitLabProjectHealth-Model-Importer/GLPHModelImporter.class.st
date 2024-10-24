@@ -4,15 +4,6 @@ Class {
 	#category : #'GitLabProjectHealth-Model-Importer'
 }
 
-{ #category : #'as yet unclassified' }
-GLPHModelImporter >> blockForDiffRangeEquality [
-
-	^ [ :existing :new |
-	  existing diff mooseID = new diff mooseID and: [
-		  existing originalLineRange = new originalLineRange and: [
-			  existing newLineRange = new newLineRange ] ] ]
-]
-
 { #category : #commit }
 GLPHModelImporter >> commitsOfProject: aGLHProject forRefName: refName until: toDate [
 
@@ -176,25 +167,6 @@ GLPHModelImporter >> importDiffOfMergeRequest: aMergeRequest [
 	^ aMergeRequest diffs
 ]
 
-{ #category : #import }
-GLPHModelImporter >> importDiffRangesForDiff: aGLHDiff [
-
-	| diffRanges |
-	aGLHDiff diffRanges ifNotEmpty: [
-		('Diffs already imported for ' , aGLHDiff printString) recordInfo.
-		^ aGLHDiff diffRanges ].
-
-	('Import changes of diff ' , aGLHDiff printString) recordInfo.
-	"the import of 'diffRanges' entites is technically done inside the parseDiffString"
-
-	diffRanges := self glhModel
-		              addAll: (self parseDiffString: aGLHDiff)
-		              unless: self blockForDiffRangeEquality.
-	^ aGLHDiff diffRanges
-		  addAll: diffRanges
-		  unless: self blockForDiffRangeEquality
-]
-
 { #category : #'import - merge request' }
 GLPHModelImporter >> importMergeRequestCommits: aGLPHEMergeRequest [
 
@@ -206,7 +178,7 @@ GLPHModelImporter >> importMergeRequestCommits: aGLPHEMergeRequest [
 	commits := OrderedCollection new.
 
 	[
-	results := glhApi
+	results := repoApi
 		           commitsOfMergeRequest: aGLPHEMergeRequest iid
 		           ofProject: aGLPHEMergeRequest project id
 		           page: page
@@ -301,7 +273,7 @@ GLPHModelImporter >> importMergeRequests: aGLHProject since: fromDate until: toD
 		| results |
 		page := page + 1.
 		('import MR page ' , page printString) recordInfo.
-		results := self glhApi
+		results := self repoApi
 			           mergeRequestsOfProject: aGLHProject id
 			           createdAfter:
 			           (fromDate ifNotNil: [ fromDate asDateAndTime asString ])
@@ -395,7 +367,7 @@ GLPHModelImporter >> importProject: aProjectID [
 	| result projectResult |
 	('Import project with id:  ' , aProjectID printString) recordInfo.
 
-	result := self glhApi project: aProjectID.
+	result := self repoApi project: aProjectID.
 	projectResult := self parseProjectResult: result.
 
 	^ self completeImportProject: projectResult
@@ -423,48 +395,6 @@ GLPHModelImporter >> initialize [
 
 	super initialize.
 	withCommitDiffs := true
-]
-
-{ #category : #parsing }
-GLPHModelImporter >> parseDiffString: aDiff [
-	"parse diff string to create entities for each lines"
-
-	| lines range index firstChangeRange |
-	lines := aDiff diffString lines.
-	index := 0.
-	range := nil.
-
-	lines ifEmpty: [ ^ aDiff diffRanges ].
-	lines := self filterCommitChanges: lines.
-	(lines first beginsWith: '@@') ifFalse: [ ^ aDiff diffRanges ].
-
-	lines do: [ :line |
-		| aChange |
-		firstChangeRange := false.
-		(line trim beginsWith: #'@@') ifTrue: [
-			range := GLPHEDiffRange newFrom: line.
-			firstChangeRange := true.
-			range := aDiff diffRanges add: range unless: [ :existing :new |
-				         existing originalLineRange = new originalLineRange and: [
-					         existing newLineRange = new newLineRange ] ] ].
-
-		self withCommitDiffs ifTrue: [
-			firstChangeRange ifFalse: [
-				aChange := GLPHEChange newFrom: line.
-				aChange relativeIndex: index.
-				aChange := range changes add: aChange unless: [ :existing :new |
-					           existing sourceCode = new sourceCode and: [
-						           existing index = new index ] ].
-				index := index + 1 ] ] ].
-
-	"add changes to the diff range"
-	aDiff diffRanges do: [ :diffRange |
-		self glhModel addAll: diffRange changes unless: [ :existing :new |
-			existing diffRange mooseID = new diffRange mooseID and: [
-				existing sourceCode = new sourceCode and: [
-					existing index = new index ] ] ] ].
-
-	^ aDiff diffRanges
 ]
 
 { #category : #parsing }
