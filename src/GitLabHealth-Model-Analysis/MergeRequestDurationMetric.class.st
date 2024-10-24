@@ -1,10 +1,11 @@
 Class {
-	#name : #MergeRequestDurationMetric,
-	#superclass : #UserMergeRequestMetric,
-	#category : #'GitLabHealth-Model-Analysis'
+	#name : 'MergeRequestDurationMetric',
+	#superclass : 'UserMergeRequestMetric',
+	#category : 'GitLabHealth-Model-Analysis',
+	#package : 'GitLabHealth-Model-Analysis'
 }
 
-{ #category : #calculating }
+{ #category : 'calculating' }
 MergeRequestDurationMetric >> calculate [
 
 	| groupedByDate gitAnalyzer mergeRequestsValidation filterGroups |
@@ -51,13 +52,13 @@ MergeRequestDurationMetric >> calculate [
 	^ filterGroups average asSeconds
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 MergeRequestDurationMetric >> description [
 
 	^ 'average time to merge a merge request (in seconds)'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 MergeRequestDurationMetric >> name [
 
 	^ 'mergeRequestDuration'

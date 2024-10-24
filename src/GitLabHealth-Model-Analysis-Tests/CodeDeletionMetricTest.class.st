@@ -2,12 +2,13 @@
 A CodeDeletionMetricTest is a test class for testing the behavior of CodeDeletionMetric
 "
 Class {
-	#name : #CodeDeletionMetricTest,
-	#superclass : #TestCase,
-	#category : #'GitLabHealth-Model-Analysis-Tests'
+	#name : 'CodeDeletionMetricTest',
+	#superclass : 'TestCase',
+	#category : 'GitLabHealth-Model-Analysis-Tests',
+	#package : 'GitLabHealth-Model-Analysis-Tests'
 }
 
-{ #category : #tests }
+{ #category : 'tests' }
 CodeDeletionMetricTest >> testCalculate [
 
 	| user glhImporter result codeDeletion |
@@ -44,7 +45,7 @@ CodeDeletionMetricTest >> testCalculate [
 	self assert: result equals: 10
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 CodeDeletionMetricTest >> testCalculateNoCommits [
 
 	| user glhImporter result codeDeletion |

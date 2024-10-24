@@ -2,12 +2,13 @@
 A ClosedTicketsMetricTest is a test class for testing the behavior of ClosedTicketsMetric
 "
 Class {
-	#name : #ClosedTicketsMetricTest,
-	#superclass : #TestCase,
-	#category : #'GitLabHealth-Model-Analysis-Tests'
+	#name : 'ClosedTicketsMetricTest',
+	#superclass : 'TestCase',
+	#category : 'GitLabHealth-Model-Analysis-Tests',
+	#package : 'GitLabHealth-Model-Analysis-Tests'
 }
 
-{ #category : #tests }
+{ #category : 'tests' }
 ClosedTicketsMetricTest >> testCalculate [
 
 	| result glhImporter user closedTicket jiraImporter |
@@ -18,10 +19,10 @@ ClosedTicketsMetricTest >> testCalculate [
 			        { (GLHProject new repository: GLHRepository new) }.
 
 	glhImporter := GLPHImporterMock new.
-	glhImporter mergeRequests: { (GLPHEMergeRequest new
+	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
 			 created_at: '09-05-2024';
-			title: '205 feat do something') }.
+			 title: '205 feat do something') }.
 
 	jiraImporter := JiraImporterMock new.
 	jiraImporter issues: { (JPIssue new key: '205') }.

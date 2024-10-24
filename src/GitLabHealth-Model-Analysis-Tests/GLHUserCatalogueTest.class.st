@@ -2,21 +2,22 @@
 A GLHUserCatalogueTest is a test class for testing the behavior of GLHUserCatalogue
 "
 Class {
-	#name : #GLHUserCatalogueTest,
-	#superclass : #TestCase,
+	#name : 'GLHUserCatalogueTest',
+	#superclass : 'TestCase',
 	#instVars : [
 		'catalogue'
 	],
-	#category : #'GitLabHealth-Model-Analysis-Tests'
+	#category : 'GitLabHealth-Model-Analysis-Tests',
+	#package : 'GitLabHealth-Model-Analysis-Tests'
 }
 
-{ #category : #running }
+{ #category : 'running' }
 GLHUserCatalogueTest >> setUp [
 
 	catalogue := GLHUserCatalogue new. 
 ]
 
-{ #category : #test }
+{ #category : 'test' }
 GLHUserCatalogueTest >> testAddSameUser [
 
 	| user |
@@ -32,7 +33,7 @@ GLHUserCatalogueTest >> testAddSameUser [
 	self assert: catalogue size equals: 1
 ]
 
-{ #category : #test }
+{ #category : 'test' }
 GLHUserCatalogueTest >> testAddUser [
 
 	| user  |
@@ -48,7 +49,7 @@ GLHUserCatalogueTest >> testAddUser [
 	self assert: catalogue size equals: 1
 ]
 
-{ #category : #test }
+{ #category : 'test' }
 GLHUserCatalogueTest >> testAddUserWithName [
 
 	| user |
@@ -69,7 +70,7 @@ GLHUserCatalogueTest >> testAddUserWithName [
 		equals: true
 ]
 
-{ #category : #test }
+{ #category : 'test' }
 GLHUserCatalogueTest >> testAddUserWithNames [
 
 	| user |
@@ -88,7 +89,7 @@ GLHUserCatalogueTest >> testAddUserWithNames [
 	self assert: ((catalogue at: user) includes: 'titi') equals: true
 ]
 
-{ #category : #test }
+{ #category : 'test' }
 GLHUserCatalogueTest >> testAddUsers [
 
 	| user1 user2  |
@@ -110,7 +111,7 @@ GLHUserCatalogueTest >> testAddUsers [
 	self assert: catalogue size equals: 2
 ]
 
-{ #category : #test }
+{ #category : 'test' }
 GLHUserCatalogueTest >> testCollectUsernames [
 
 	| user1 user2  res |
@@ -139,7 +140,7 @@ GLHUserCatalogueTest >> testCollectUsernames [
 	self assert: (res at: 'test user2') equals: user2
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 GLHUserCatalogueTest >> testExportAndLoad [
 
 	| user json  res |
@@ -156,7 +157,7 @@ GLHUserCatalogueTest >> testExportAndLoad [
 	self assert: res size equals: catalogue size
 ]
 
-{ #category : #test }
+{ #category : 'test' }
 GLHUserCatalogueTest >> testExportToJson [
 
 	| user user2 json  res |
@@ -183,7 +184,7 @@ GLHUserCatalogueTest >> testExportToJson [
 	self assert: ((res at: 'test user') at: #foundNames) size equals: 2
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 GLHUserCatalogueTest >> testLoadFromJson [
 
 	| json res |
@@ -195,7 +196,7 @@ GLHUserCatalogueTest >> testLoadFromJson [
 		self assert: (res searchUserWithName: 'VERHAEGHE') isNotEmpty equals: true.
 ]
 
-{ #category : #test }
+{ #category : 'test' }
 GLHUserCatalogueTest >> testNamesAt [
 
 	| user  |
@@ -221,7 +222,7 @@ GLHUserCatalogueTest >> testNamesAt [
 		equals: true
 ]
 
-{ #category : #test }
+{ #category : 'test' }
 GLHUserCatalogueTest >> testNamesAtChangingUser [
 
 	| user  |

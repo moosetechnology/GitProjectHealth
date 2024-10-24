@@ -1,10 +1,11 @@
 Class {
-	#name : #SelfMergedUnderAMinuteMergeRequestMetric,
-	#superclass : #UserMergeRequestMetric,
-	#category : #'GitLabHealth-Model-Analysis'
+	#name : 'SelfMergedUnderAMinuteMergeRequestMetric',
+	#superclass : 'UserMergeRequestMetric',
+	#category : 'GitLabHealth-Model-Analysis',
+	#package : 'GitLabHealth-Model-Analysis'
 }
 
-{ #category : #calculating }
+{ #category : 'calculating' }
 SelfMergedUnderAMinuteMergeRequestMetric >> calculate [
 
 	| groupedByDate mergedMergeRequest noVerificationMergeRequests dateOver gitAnalyzer |
@@ -43,13 +44,13 @@ SelfMergedUnderAMinuteMergeRequestMetric >> calculate [
 	^ groupedByDate average asFloat
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SelfMergedUnderAMinuteMergeRequestMetric >> description [
 
 	^ 'number of merge requests merged by its author under a minute after creation'
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 SelfMergedUnderAMinuteMergeRequestMetric >> load [
 
 	userMergeRequests := self
@@ -58,7 +59,7 @@ SelfMergedUnderAMinuteMergeRequestMetric >> load [
 		                     until: (period at: #until)
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 SelfMergedUnderAMinuteMergeRequestMetric >> name [
 
 	^ 'SelfMergedUnderAMinuteMergeRequest'

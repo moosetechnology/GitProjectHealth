@@ -2,18 +2,19 @@
 A BitBucketModelImporterTest is a test class for testing the behavior of BitBucketModelImporter
 "
 Class {
-	#name : #BitBucketModelImporterTest,
-	#superclass : #TestCase,
-	#category : #'BitBucketHealth-Model-Importer-Tests'
+	#name : 'BitBucketModelImporterTest',
+	#superclass : 'TestCase',
+	#category : 'BitBucketHealth-Model-Importer-Tests',
+	#package : 'BitBucketHealth-Model-Importer-Tests'
 }
 
-{ #category : #tests }
+{ #category : 'tests' }
 BitBucketModelImporterTest >> testCompleteImportProject [
 	"Given"
 
 	| glphModel project bitBucketApi bitBucketImporter |
 		bitBucketApi := BitBucketApiMock new.
-	glphModel := GLPHEModel new name: 'test'.
+	glphModel := GLHModel new name: 'test'.
 
 	project := GLHProject new.
 
@@ -33,14 +34,14 @@ BitBucketModelImporterTest >> testCompleteImportProject [
 		equals: 1
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 BitBucketModelImporterTest >> testGetContributionFromDiffs [
 	"Given"
 
 	| bitBucketApi glphModel bitBucketImporter diffs contribution |
 	bitBucketApi := BitBucketApiMock new.
 
-	glphModel := GLPHEModel new name: 'test'.
+	glphModel := GLHModel new name: 'test'.
 
 	bitBucketImporter := BitBucketModelImporter new
 		                     bitBucketApi: bitBucketApi;
@@ -56,14 +57,14 @@ BitBucketModelImporterTest >> testGetContributionFromDiffs [
 	self assert: (contribution at: #deletions) equals: 1
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 BitBucketModelImporterTest >> testGetContributionFromDiffsWithoutAdded [
 	"Given"
 
 	| bitBucketApi glphModel bitBucketImporter diffs contribution |
 	bitBucketApi := BitBucketApiMock new.
 
-	glphModel := GLPHEModel new name: 'test'.
+	glphModel := GLHModel new name: 'test'.
 
 	bitBucketImporter := BitBucketModelImporter new
 		                     bitBucketApi: bitBucketApi;
@@ -81,14 +82,14 @@ BitBucketModelImporterTest >> testGetContributionFromDiffsWithoutAdded [
 	self assert: (contribution at: #deletions) equals: 1
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 BitBucketModelImporterTest >> testGetContributionFromDiffsWithoutHunks [
 	"Given"
 
 	| bitBucketApi glphModel bitBucketImporter diffs contribution |
 	bitBucketApi := BitBucketApiMock new.
 
-	glphModel := GLPHEModel new name: 'test'.
+	glphModel := GLHModel new name: 'test'.
 
 	bitBucketImporter := BitBucketModelImporter new
 		                     bitBucketApi: bitBucketApi;
@@ -106,14 +107,14 @@ BitBucketModelImporterTest >> testGetContributionFromDiffsWithoutHunks [
 	self assert: (contribution at: #deletions) equals: 0
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 BitBucketModelImporterTest >> testGetContributionFromDiffsWithoutRemoved [
 	"Given"
 
 	| bitBucketApi glphModel bitBucketImporter diffs contribution |
 	bitBucketApi := BitBucketApiMock new.
 
-	glphModel := GLPHEModel new name: 'test'.
+	glphModel := GLHModel new name: 'test'.
 
 	bitBucketImporter := BitBucketModelImporter new
 		                     bitBucketApi: bitBucketApi;
@@ -131,14 +132,14 @@ BitBucketModelImporterTest >> testGetContributionFromDiffsWithoutRemoved [
 	self assert: (contribution at: #deletions) equals: 0
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 BitBucketModelImporterTest >> testImportAndLoadLatestsCommitsOfProject [
 
 	| bitBucketApi glphModel bitBucketImporter project commits group repo firstCommit commit1 currentDate timestamp commit2 timestamp2 |
 	"Given"
 	bitBucketApi := BitBucketApiMock new.
 
-	glphModel := GLPHEModel new name: 'test'.
+	glphModel := GLHModel new name: 'test'.
 
 	bitBucketImporter := BitBucketModelImporter new
 		                     bitBucketApi: bitBucketApi;
@@ -179,14 +180,14 @@ BitBucketModelImporterTest >> testImportAndLoadLatestsCommitsOfProject [
 	self assert: firstCommit additions equals: 1
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 BitBucketModelImporterTest >> testImportCommitsOfProjectSinceUntil [
 
 	| bitBucketApi glphModel bitBucketImporter project commits group repo firstCommit |
 	"Given"
 	bitBucketApi := BitBucketApiMock new.
 
-	glphModel := GLPHEModel new name: 'test'.
+	glphModel := GLHModel new name: 'test'.
 
 	bitBucketImporter := BitBucketModelImporter new
 		                     bitBucketApi: bitBucketApi;
@@ -214,13 +215,13 @@ BitBucketModelImporterTest >> testImportCommitsOfProjectSinceUntil [
 	self assert: firstCommit additions equals: 1
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 BitBucketModelImporterTest >> testImportContributedProjectsOfUser [
 
 	| bitBucketApi glphModel bitBucketImporter user projects commits yesterdayAsTimestamp |
 	bitBucketApi := BitBucketApiMock new.
 
-	glphModel := GLPHEModel new name: 'test'.
+	glphModel := GLHModel new name: 'test'.
 
 	bitBucketImporter := BitBucketModelImporter new
 		                     bitBucketApi: bitBucketApi;
@@ -252,7 +253,7 @@ BitBucketModelImporterTest >> testImportContributedProjectsOfUser [
 		hasSameElements: projects
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 BitBucketModelImporterTest >> testImportCreatorOfCommit [
 
 	| bitBucketApi glphModel bitBucketImporter creator commit |
@@ -260,7 +261,7 @@ BitBucketModelImporterTest >> testImportCreatorOfCommit [
 	"Given"
 	bitBucketApi := BitBucketApiMock new.
 
-	glphModel := GLPHEModel new name: 'test'.
+	glphModel := GLHModel new name: 'test'.
 
 	bitBucketImporter := BitBucketModelImporter new
 		                     bitBucketApi: bitBucketApi;
@@ -280,14 +281,14 @@ BitBucketModelImporterTest >> testImportCreatorOfCommit [
 	self assert: commit commitCreator equals: creator
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 BitBucketModelImporterTest >> testImportCreatorOfCommitIfAlreadyExist [
 
 	| bitBucketApi glphModel bitBucketImporter creator commit |
 	"Given"
 	bitBucketApi := BitBucketApiMock new.
 
-	glphModel := GLPHEModel new name: 'test'.
+	glphModel := GLHModel new name: 'test'.
 
 	bitBucketImporter := BitBucketModelImporter new
 		                     bitBucketApi: bitBucketApi;
@@ -309,14 +310,14 @@ BitBucketModelImporterTest >> testImportCreatorOfCommitIfAlreadyExist [
 	self assert: commit commitCreator equals: creator
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 BitBucketModelImporterTest >> testImportMergeRequestCommits [
 
 	| bitBucketApi glphModel bitBucketImporter mergeRequest commits |
 	"Given"
 	bitBucketApi := BitBucketApiMock new.
 
-	glphModel := GLPHEModel new name: 'test'.
+	glphModel := GLHModel new name: 'test'.
 
 	bitBucketImporter := BitBucketModelImporter new
 		                     bitBucketApi: bitBucketApi;
@@ -336,14 +337,14 @@ BitBucketModelImporterTest >> testImportMergeRequestCommits [
 	self assert: mergeRequest commits first additions equals: 1
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 BitBucketModelImporterTest >> testImportMergeRequestsSinceUntil [
 
 	| bitBucketApi glphModel bitBucketImporter group repo project mergeRequests mergeRequest |
 	"Given"
 	bitBucketApi := BitBucketApiMock new.
 
-	glphModel := GLPHEModel new name: 'test'.
+	glphModel := GLHModel new name: 'test'.
 
 	bitBucketImporter := BitBucketModelImporter new
 		                     bitBucketApi: bitBucketApi;
@@ -364,7 +365,7 @@ BitBucketModelImporterTest >> testImportMergeRequestsSinceUntil [
 	"Then"
 	self
 		assert:
-		(bitBucketImporter glhModel allWithType: GLPHEMergeRequest) size
+		(bitBucketImporter glhModel allWithType: GLHMergeRequest) size
 		equals: 1.
 
 	self assert: mergeRequests size equals: 1.
@@ -374,14 +375,14 @@ BitBucketModelImporterTest >> testImportMergeRequestsSinceUntil [
 	self assert: mergeRequest closed_at equals: nil.
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 BitBucketModelImporterTest >> testImportMergeRequestsSinceUntilClosedMR [
 
 	| bitBucketApi glphModel bitBucketImporter group repo project mergeRequests mergeRequest |
 	"Given"
 	bitBucketApi := BitBucketApiMock new.
 
-	glphModel := GLPHEModel new name: 'test'.
+	glphModel := GLHModel new name: 'test'.
 
 	bitBucketImporter := BitBucketModelImporter new
 		                     bitBucketApi: bitBucketApi;
@@ -404,7 +405,7 @@ BitBucketModelImporterTest >> testImportMergeRequestsSinceUntilClosedMR [
 	"Then"
 	self
 		assert:
-		(bitBucketImporter glhModel allWithType: GLPHEMergeRequest) size
+		(bitBucketImporter glhModel allWithType: GLHMergeRequest) size
 		equals: 1.
 
 	self assert: mergeRequests size equals: 1.
@@ -415,14 +416,14 @@ BitBucketModelImporterTest >> testImportMergeRequestsSinceUntilClosedMR [
 	self deny: mergeRequest merged_at equals: nil.
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 BitBucketModelImporterTest >> testImportMergeRequestsSinceUntilDeclinedMR [
 
 	| bitBucketApi glphModel bitBucketImporter group repo project mergeRequests mergeRequest |
 	"Given"
 	bitBucketApi := BitBucketApiMock new.
 
-	glphModel := GLPHEModel new name: 'test'.
+	glphModel := GLHModel new name: 'test'.
 
 	bitBucketImporter := BitBucketModelImporter new
 		                     bitBucketApi: bitBucketApi;
@@ -445,7 +446,7 @@ BitBucketModelImporterTest >> testImportMergeRequestsSinceUntilDeclinedMR [
 	"Then"
 	self
 		assert:
-		(bitBucketImporter glhModel allWithType: GLPHEMergeRequest) size
+		(bitBucketImporter glhModel allWithType: GLHMergeRequest) size
 		equals: 1.
 
 	self assert: mergeRequests size equals: 1.
@@ -456,14 +457,14 @@ BitBucketModelImporterTest >> testImportMergeRequestsSinceUntilDeclinedMR [
 	self assert: mergeRequest merged_at equals: nil
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 BitBucketModelImporterTest >> testImportMergeResquestMerger [
 
 	| bitBucketApi glphModel bitBucketImporter mergeRequest mergeUser |
 	"Given"
 	bitBucketApi := BitBucketApiMock new.
 
-	glphModel := GLPHEModel new name: 'test'.
+	glphModel := GLHModel new name: 'test'.
 
 	bitBucketImporter := BitBucketModelImporter new
 		                     bitBucketApi: bitBucketApi;
@@ -483,14 +484,14 @@ BitBucketModelImporterTest >> testImportMergeResquestMerger [
 	self assert: mergeRequest merge_user equals: mergeUser
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 BitBucketModelImporterTest >> testImportUserByUsername [
 	"Given"
 
 	| bitBucketApi glphModel bitBucketImporter user |
 	bitBucketApi := BitBucketApiMock new.
 
-	glphModel := GLPHEModel new name: 'test'.
+	glphModel := GLHModel new name: 'test'.
 
 	bitBucketImporter := BitBucketModelImporter new
 		                     bitBucketApi: bitBucketApi;
@@ -506,14 +507,14 @@ BitBucketModelImporterTest >> testImportUserByUsername [
 		hasSameElements: {user}.
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 BitBucketModelImporterTest >> testImportUserByUsernameWithoutUsers [
 	"Given"
 
 	| bitBucketApi glphModel bitBucketImporter user |
 	bitBucketApi := BitBucketApiMock new.
 
-	glphModel := GLPHEModel new name: 'test'.
+	glphModel := GLHModel new name: 'test'.
 
 	bitBucketImporter := BitBucketModelImporter new
 		                     bitBucketApi: bitBucketApi;
