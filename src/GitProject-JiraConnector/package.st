@@ -1,1 +1,1 @@
-Package { #name : 'GitProject-JiraConnector' }
+Package { #name : #'GitProject-JiraConnector' }

@@ -1,6 +1,6 @@
 Class {
-	#name : 'GLHMetamodelGenerator',
-	#superclass : 'FamixMetamodelGenerator',
+	#name : #GLHMetamodelGenerator,
+	#superclass : #FamixMetamodelGenerator,
 	#instVars : [
 		'project',
 		'group',
@@ -14,51 +14,34 @@ Class {
 		'commit',
 		'commitStats',
 		'diff',
-		'job',
-		'mergeRequest',
-		'diffRange',
-		'change',
-		'addition',
-		'deletion',
-		'lineOfCode'
+		'job'
 	],
-	#category : 'GitLabHealth-Model-Generator',
-	#package : 'GitLabHealth-Model-Generator'
+	#category : #'GitLabHealth-Model-Generator'
 }
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHMetamodelGenerator class >> packageName [
 	^ #'GitLabHealth-Model'
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHMetamodelGenerator class >> prefix [
 	^ #GLH
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHMetamodelGenerator class >> submetamodels [
 
 	^ { FamixMooseQueryGenerator . FamixGenerator }
 ]
 
-{ #category : 'definition' }
+{ #category : #definition }
 GLHMetamodelGenerator >> branchProperties [
 
 	branch property: #name type: #String
 ]
 
-{ #category : 'definition' }
-GLHMetamodelGenerator >> changeProperties [
-
-	change property: #index type: #Number.
-	change property: #relativeIndex type: #Number.
-	change property: #sourceCode type: #String. 
-	addition property: #delimiter type: #String defaultValue: '#+'.
-	deletion property: #delimiter type: #String defaultValue: '#-'
-]
-
-{ #category : 'definition' }
+{ #category : #definition }
 GLHMetamodelGenerator >> commitProperties [
 
 	commit property: #parent_ids type: #Object defaultValue: 'OrderedCollection new'.
@@ -83,7 +66,7 @@ GLHMetamodelGenerator >> commitProperties [
 		'The number of line that git consider deleted'
 ]
 
-{ #category : 'definition' }
+{ #category : #definition }
 GLHMetamodelGenerator >> defineClasses [
 
 	super defineClasses.
@@ -110,38 +93,10 @@ GLHMetamodelGenerator >> defineClasses [
 		          comment: 'a commit attached to a repository'.
 	diff := builder newClassNamed: #Diff comment: 'The diff of a commit'.
 	
-	job := builder newClassNamed: #Job comment: 'A CI Job'.
-	
-	mergeRequest := builder
-		                newClassNamed: #MergeRequest
-		                comment: 'a gitlab merge request'.
-
-	change := builder
-		          newClassNamed: #Change
-		          comment: 'super class for addition and deletion '.
-
-	addition := builder
-		            newClassNamed: #Addition
-		            comment:
-		            'a detected addition of a line, seen within a diff '.
-	addition withTesting.
-	deletion := builder
-		            newClassNamed: #Deletion
-		            comment:
-		            'a detected deletion of a line, seen within a diff '.
-	deletion withTesting.
-
-	lineOfCode := builder
-		              newClassNamed: #LineOfCode
-		              comment: 'a line of code in a diff comparaison '.
-
-	diffRange := builder
-		             newClassNamed: #DiffRange
-		             comment:
-		             'a indicate on which line of code are concerned by a diff (usually declared with @@ oldRange, newRange @@) '.
+	job := builder newClassNamed: #Job comment: 'A CI Job'
 ]
 
-{ #category : 'definition' }
+{ #category : #definition }
 GLHMetamodelGenerator >> defineHierarchy [
 
 	super defineHierarchy.
@@ -154,16 +109,11 @@ GLHMetamodelGenerator >> defineHierarchy [
 	user --|> #TNamedEntity.
 	commit --|> #TNamedEntity.
 	diff --|> #TNamedEntity.
-	job --|> #TNamedEntity.
+	job --|> #TNamedEntity
 
-	change --|> #TNamedEntity.
-	change <|-- addition.
-	change <|-- deletion.
-	change <|-- lineOfCode.
-	mergeRequest --|> #TNamedEntity
 ]
 
-{ #category : 'definition' }
+{ #category : #definition }
 GLHMetamodelGenerator >> defineProperties [
 
 	super defineProperties.
@@ -199,13 +149,10 @@ GLHMetamodelGenerator >> defineProperties [
 	self fileProperties.
 	self commitProperties.
 	self diffProperties.
-	self jobProperties.
-	self changeProperties.
-	self mergeRequestProperties.
-	self diffRangeProperties
+	self jobProperties
 ]
 
-{ #category : 'definition' }
+{ #category : #definition }
 GLHMetamodelGenerator >> defineRelations [
 
 	super defineRelations.
@@ -213,8 +160,7 @@ GLHMetamodelGenerator >> defineRelations [
 	(group property: #subGroups) <>-* (group property: #group).
 	(project property: #pipelines) <>-* (pipeline property: #project).
 	(project property: #creator) *- (user property: #createdProjects).
-	(project property: #contributors)
-	*-* (user property: #contributedProjects).
+	(project property: #contributors) *-* (user property: #contributedProjects).
 	(project property: #repository) <>- (repository property: #project).
 	(repository property: #branches) <>-* (branch property: #repository).
 	(branch property: #files) <>-* (file property: #branch).
@@ -229,56 +175,10 @@ GLHMetamodelGenerator >> defineRelations [
 	*-* (commit property: #childCommits).
 	(commit property: #jobs) <>-* (job property: #commit).
 	(pipeline property: #jobs) <>-* (job property: #pipeline).
-	(user property: #jobs) <>-* (job property: #user).
-
-	"MERGE REQUEST RELATIONS"
-	(mergeRequest property: #author)
-	*- (user property: #createdMergeRequests).
-
-	(mergeRequest property: #approved_by)
-	*-* (user property: #approcheMergeRequests).
-
-	(mergeRequest property: #merge_user) *- (user property: #usedMerges).
-
-	(mergeRequest property: #closed_by)
-	*- (user property: #closedMergeRequests).
-
-	(mergeRequest property: #merged_by)
-	*- (user property: #mergerOfMergeRequests).
-
-	(mergeRequest property: #assignees)
-	*-* (user property: #assignedMergeRequests).
-
-	(mergeRequest property: #assignee)
-	*- (user property: #currentlyAssignedMergeRequest).
-
-	(mergeRequest property: #reviewers)
-	*-* (user property: #reviewedMergeResquest).
-
-	(mergeRequest property: #pipeline)
-	- (pipeline property: #mergeResquest).
-
-	(mergeRequest property: #mergedCommit)
-	- (commit property: #commitedMergeRequest).
-
-	(mergeRequest property: #mergeRequestCommit)
-	- (commit property: #commitedMergeRequest).
-
-	(mergeRequest property: #squashCommit)
-	- (commit property: #squashedMergeRequest).
-
-	(mergeRequest property: #diffs) -* (diff property: #mergeRequest).
-
-	(project property: #mergeRequests)
-	<>-* (mergeRequest property: #project).
-
-	"DIFF"
-	(diff property: #file) <>-* (file property: #diffs).
-	(diff property: #diffRanges) <>-* (diffRange property: #diff).
-	(diffRange property: #changes) -* (change property: #diffRange)
+	(user property: #jobs) <>-* (job property: #user)
 ]
 
-{ #category : 'definition' }
+{ #category : #definition }
 GLHMetamodelGenerator >> diffProperties [
 
 	(diff property: #diffString type: #String) comment:
@@ -301,23 +201,13 @@ GLHMetamodelGenerator >> diffProperties [
 		comment: 'Is the file of the diff has been removed'
 ]
 
-{ #category : 'definition' }
-GLHMetamodelGenerator >> diffRangeProperties [
-"must parse the range. 
-	originalLineRange = '-120,5' --> change starts at line #120
-	5 is the number of lines in the original file affected by the change"
-	diffRange property: #originalLineRange type: #String.
-	diffRange property: #newLineRange type: #String.
-	diffRange property: #lineOfCode type: #String
-]
-
-{ #category : 'definition' }
+{ #category : #definition }
 GLHMetamodelGenerator >> fileProperties [
 
 	file property: #name type: #String
 ]
 
-{ #category : 'definition' }
+{ #category : #definition }
 GLHMetamodelGenerator >> jobProperties [
 
 	job property: #id type: #Number.
@@ -327,70 +217,7 @@ GLHMetamodelGenerator >> jobProperties [
 	job property: #allow_failure type: #Boolean
 ]
 
-{ #category : 'definition' }
-GLHMetamodelGenerator >> mergeRequestProperties [
-
-	mergeRequest property: #id type: #Number.
-	mergeRequest property: #iid type: #Number.
-	mergeRequest property: #project_id type: #Number.
-	mergeRequest property: #title type: #String.
-	mergeRequest property: #description type: #String.
-	mergeRequest property: #state type: #String.
-	mergeRequest property: #created_at type: #Object.
-	mergeRequest property: #updated_at type: #Object.
-	mergeRequest property: #merged_at type: #Object.
-	mergeRequest property: #closed_at type: #Object.
-	mergeRequest property: #target_branch type: #String.
-	mergeRequest property: #source_branch type: #String.
-	mergeRequest property: #user_notes_count type: #Number.
-	mergeRequest property: #upvotes type: #Number.
-	mergeRequest property: #downvotes type: #Number.
-	mergeRequest property: #source_project_id type: #Number.
-	mergeRequest property: #target_project_id type: #Number.
-	mergeRequest property: #labels type: #Object.
-	mergeRequest property: #draft type: #Boolean.
-	mergeRequest property: #work_in_progress type: #Boolean.
-	mergeRequest property: #milestone type: #String.
-	mergeRequest property: #merge_when_pipeline_succeeds type: #Boolean.
-	mergeRequest property: #merge_status type: #String.
-	mergeRequest property: #detailed_merge_status type: #String.
-	mergeRequest property: #sha type: #String.
-	mergeRequest property: #merge_commit_sha type: #String.
-	mergeRequest property: #squash_commit_sha type: #String.
-	mergeRequest property: #discussion_locked type: #String.
-	mergeRequest property: #should_remove_source_branch type: #Boolean.
-	mergeRequest property: #force_remove_source_branch type: #Boolean.
-	mergeRequest property: #reference type: #String.
-	mergeRequest property: #references_short type: #String.
-	mergeRequest property: #references_relative type: #String.
-	mergeRequest property: #references_full type: #String.
-	mergeRequest property: #web_url type: #String.
-	mergeRequest property: #time_stats_time_estimate type: #Number.
-	mergeRequest property: #time_stats_total_time_spent type: #Number.
-	mergeRequest property: #time_stats_human_time_estimate type: #String.
-	mergeRequest
-		property: #time_stats_human_total_time_spent
-		type: #String.
-	mergeRequest property: #squash type: #Boolean.
-	mergeRequest property: #squash_on_merge type: #Boolean.
-	mergeRequest property: #task_completion_status_count type: #Number.
-	mergeRequest
-		property: #task_completion_status_completed_count
-		type: #Number.
-	mergeRequest property: #has_conflicts type: #Boolean.
-	mergeRequest property: #blocking_discussions_resolved type: #Boolean.
-	mergeRequest property: #subscribed type: #Boolean.
-	mergeRequest property: #changes_count type: #String.
-	mergeRequest property: #latest_build_started_at type: #String.
-	mergeRequest property: #latest_build_finished_at type: #String.
-	mergeRequest property: #first_deployed_to_production_at type: #String.
-	mergeRequest property: #approved type: #Boolean.
-
-	"see https://github.com/moosetechnology/GitProjectHealth/issues/88"
-	mergeRequest property: #commits type: #Object
-]
-
-{ #category : 'definition' }
+{ #category : #definition }
 GLHMetamodelGenerator >> userProperties [
 	user property: #id type: #Number.
 	user property: #username type: #String.

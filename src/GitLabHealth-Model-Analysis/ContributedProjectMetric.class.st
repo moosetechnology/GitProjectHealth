@@ -1,11 +1,10 @@
 Class {
-	#name : 'ContributedProjectMetric',
-	#superclass : 'UserCommitsMetric',
-	#category : 'GitLabHealth-Model-Analysis',
-	#package : 'GitLabHealth-Model-Analysis'
+	#name : #ContributedProjectMetric,
+	#superclass : #UserCommitsMetric,
+	#category : #'GitLabHealth-Model-Analysis'
 }
 
-{ #category : 'calculating' }
+{ #category : #calculating }
 ContributedProjectMetric >> calculate [
 
 	| groupedByDate dateOver projects |
@@ -26,7 +25,7 @@ ContributedProjectMetric >> calculate [
 	^ groupedByDate average asFloat
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ContributedProjectMetric >> description [
 
 	^ 'number of project with min 1 commit of user'

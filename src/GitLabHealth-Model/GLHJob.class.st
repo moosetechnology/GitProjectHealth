@@ -26,8 +26,8 @@ A CI Job
 
 "
 Class {
-	#name : 'GLHJob',
-	#superclass : 'GLHEntity',
+	#name : #GLHJob,
+	#superclass : #GLHEntity,
 	#traits : 'FamixTNamedEntity',
 	#classTraits : 'FamixTNamedEntity classTrait',
 	#instVars : [
@@ -39,12 +39,10 @@ Class {
 		'#user => FMOne type: #GLHUser opposite: #jobs',
 		'#web_url => FMProperty'
 	],
-	#category : 'GitLabHealth-Model-Entities',
-	#package : 'GitLabHealth-Model',
-	#tag : 'Entities'
+	#category : #'GitLabHealth-Model-Entities'
 }
 
-{ #category : 'meta' }
+{ #category : #meta }
 GLHJob class >> annotation [
 
 	<FMClass: #Job super: #GLHEntity>
@@ -53,7 +51,7 @@ GLHJob class >> annotation [
 	^ self
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHJob >> allow_failure [
 
 	<FMProperty: #allow_failure type: #Boolean>
@@ -61,13 +59,13 @@ GLHJob >> allow_failure [
 	^ allow_failure
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHJob >> allow_failure: anObject [
 	<generated>
 	allow_failure := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHJob >> commit [
 	"Relation named: #commit type: #GLHCommit opposite: #jobs"
 
@@ -76,21 +74,21 @@ GLHJob >> commit [
 	^ commit
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHJob >> commit: anObject [
 
 	<generated>
 	commit := anObject
 ]
 
-{ #category : 'navigation' }
+{ #category : #navigation }
 GLHJob >> commitGroup [
 	<generated>
 	<navigation: 'Commit'>
 	^ MooseSpecializedGroup with: self commit
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHJob >> duration [
 
 	<FMProperty: #duration type: #Object>
@@ -98,13 +96,13 @@ GLHJob >> duration [
 	^ duration
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHJob >> duration: anObject [
 	<generated>
 	duration := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHJob >> id [
 
 	<FMProperty: #id type: #Number>
@@ -112,13 +110,13 @@ GLHJob >> id [
 	^ id
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHJob >> id: anObject [
 	<generated>
 	id := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHJob >> pipeline [
 	"Relation named: #pipeline type: #GLHPipeline opposite: #jobs"
 
@@ -127,21 +125,21 @@ GLHJob >> pipeline [
 	^ pipeline
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHJob >> pipeline: anObject [
 
 	<generated>
 	pipeline := anObject
 ]
 
-{ #category : 'navigation' }
+{ #category : #navigation }
 GLHJob >> pipelineGroup [
 	<generated>
 	<navigation: 'Pipeline'>
 	^ MooseSpecializedGroup with: self pipeline
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHJob >> user [
 	"Relation named: #user type: #GLHUser opposite: #jobs"
 
@@ -150,21 +148,21 @@ GLHJob >> user [
 	^ user
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHJob >> user: anObject [
 
 	<generated>
 	user := anObject
 ]
 
-{ #category : 'navigation' }
+{ #category : #navigation }
 GLHJob >> userGroup [
 	<generated>
 	<navigation: 'User'>
 	^ MooseSpecializedGroup with: self user
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHJob >> web_url [
 
 	<FMProperty: #web_url type: #String>
@@ -172,7 +170,7 @@ GLHJob >> web_url [
 	^ web_url
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHJob >> web_url: anObject [
 	<generated>
 	web_url := anObject

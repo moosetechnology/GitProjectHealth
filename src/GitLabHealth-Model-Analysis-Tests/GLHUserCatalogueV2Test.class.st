@@ -1,20 +1,19 @@
 Class {
-	#name : 'GLHUserCatalogueV2Test',
-	#superclass : 'TestCase',
+	#name : #GLHUserCatalogueV2Test,
+	#superclass : #TestCase,
 	#instVars : [
 		'catalogue'
 	],
-	#category : 'GitLabHealth-Model-Analysis-Tests',
-	#package : 'GitLabHealth-Model-Analysis-Tests'
+	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
-{ #category : 'running' }
+{ #category : #running }
 GLHUserCatalogueV2Test >> setUp [
 
 	catalogue := GLHUserCatalogueV2 new
 ]
 
-{ #category : 'test' }
+{ #category : #test }
 GLHUserCatalogueV2Test >> testAddSameUser [
 
 	| user |
@@ -30,7 +29,7 @@ GLHUserCatalogueV2Test >> testAddSameUser [
 	self assert: catalogue size equals: 1
 ]
 
-{ #category : 'test' }
+{ #category : #test }
 GLHUserCatalogueV2Test >> testAddUser [
 
 	| user  |
@@ -46,7 +45,7 @@ GLHUserCatalogueV2Test >> testAddUser [
 	self assert: catalogue size equals: 1
 ]
 
-{ #category : 'test' }
+{ #category : #test }
 GLHUserCatalogueV2Test >> testAddUserWithName [
 
 	| user |
@@ -67,7 +66,7 @@ GLHUserCatalogueV2Test >> testAddUserWithName [
 		equals: true
 ]
 
-{ #category : 'test' }
+{ #category : #test }
 GLHUserCatalogueV2Test >> testAddUserWithNames [
 
 	| user |
@@ -90,7 +89,7 @@ GLHUserCatalogueV2Test >> testAddUserWithNames [
 		equals: true
 ]
 
-{ #category : 'test' }
+{ #category : #test }
 GLHUserCatalogueV2Test >> testAddUsers [
 
 	| user1 user2  |
@@ -112,7 +111,7 @@ GLHUserCatalogueV2Test >> testAddUsers [
 	self assert: catalogue size equals: 2
 ]
 
-{ #category : 'test' }
+{ #category : #test }
 GLHUserCatalogueV2Test >> testCollectUsernames [
 
 	| user1 user2  res |
@@ -141,7 +140,7 @@ GLHUserCatalogueV2Test >> testCollectUsernames [
 	self assert: (res at: 'test user2') equals: user2
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 GLHUserCatalogueV2Test >> testExportAndLoad [
 
 	| user json  res |
@@ -161,7 +160,7 @@ GLHUserCatalogueV2Test >> testExportAndLoad [
 	self assert: ((res at: 'test user' at: #names) includes: 'testUser') equals: true.
 ]
 
-{ #category : 'test' }
+{ #category : #test }
 GLHUserCatalogueV2Test >> testExportToJson [
 
 	| user user2 json  res |
@@ -192,7 +191,7 @@ GLHUserCatalogueV2Test >> testExportToJson [
 	self assert: ((res at: 'test user2') at: #contributedProjects) size equals: 2.
 ]
 
-{ #category : 'test' }
+{ #category : #test }
 GLHUserCatalogueV2Test >> testExportToJsonApostrophe [
 
 	| user  json  res |
@@ -217,31 +216,31 @@ GLHUserCatalogueV2Test >> testExportToJsonApostrophe [
 
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 GLHUserCatalogueV2Test >> testLevenshteinDistanceBetweenBenoitAndNicolas [
 	self assert: ('benoit' levenshteinDistanceWith: 'nicolas') equals: 6
 	
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 GLHUserCatalogueV2Test >> testLevenshteinDistanceBetweenExamenAndExaman [
 	self assert: ('examen' levenshteinDistanceWith: 'examan') equals: 1
 	
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 GLHUserCatalogueV2Test >> testLevenshteinDistanceBetweenExamenAndExamen [
 	self assert: ('examen' levenshteinDistanceWith: 'examen') equals: 0
 	
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 GLHUserCatalogueV2Test >> testLevenshteinDistanceBetweenNicolasAndNico [
 	self assert: ('nicolas' levenshteinDistanceWith: 'nico') equals: 3
 	
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 GLHUserCatalogueV2Test >> testLoadFromJson [
 
 	| json res |
@@ -258,7 +257,7 @@ GLHUserCatalogueV2Test >> testLoadFromJson [
 		equals: 'Benoit VERHAEGHE'.
 ]
 
-{ #category : 'test' }
+{ #category : #test }
 GLHUserCatalogueV2Test >> testNamesAt [
 
 	| user  |
@@ -284,7 +283,7 @@ GLHUserCatalogueV2Test >> testNamesAt [
 		equals: true
 ]
 
-{ #category : 'test' }
+{ #category : #test }
 GLHUserCatalogueV2Test >> testNamesAtChangingUser [
 
 	| user  |

@@ -1,9 +1,8 @@
 Class {
-	#name : 'GHRepositoryEmptyError',
-	#superclass : 'Error',
+	#name : #GHRepositoryEmptyError,
+	#superclass : #Error,
 	#instVars : [
 		'api'
 	],
-	#category : 'GitHubHealth-Model-Importer',
-	#package : 'GitHubHealth-Model-Importer'
+	#category : 'GitHubHealth-Model-Importer'
 }

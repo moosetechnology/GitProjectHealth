@@ -2,13 +2,12 @@
 A ClosedMergeRequestMetricTest is a test class for testing the behavior of ClosedMergeRequestMetric
 "
 Class {
-	#name : 'ClosedMergeRequestMetricTest',
-	#superclass : 'TestCase',
-	#category : 'GitLabHealth-Model-Analysis-Tests',
-	#package : 'GitLabHealth-Model-Analysis-Tests'
+	#name : #ClosedMergeRequestMetricTest,
+	#superclass : #TestCase,
+	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
-{ #category : 'tests' }
+{ #category : #tests }
 ClosedMergeRequestMetricTest >> testCalculate [
 
 	| result glhImporter user closedMergeRequestMetric |
@@ -20,12 +19,12 @@ ClosedMergeRequestMetricTest >> testCalculate [
 
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: {
-			(GLHMergeRequest new
+			(GLPHEMergeRequest new
 				 author: user;
 				 created_at: '09-05-2024';
 				 merged_at: '09-05-2024';
 				 state: 'closed').
-			(GLHMergeRequest new
+			(GLPHEMergeRequest new
 				 author: user;
 				 created_at: '09-05-2024';
 				 merged_at: nil;
@@ -46,7 +45,7 @@ ClosedMergeRequestMetricTest >> testCalculate [
 	self assert: result equals: 2
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 ClosedMergeRequestMetricTest >> testCalculate1MRinPeriod2Outside [
 
 	| result glhImporter user closedMergeRequestMetric |
@@ -58,17 +57,17 @@ ClosedMergeRequestMetricTest >> testCalculate1MRinPeriod2Outside [
 
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: {
-			(GLHMergeRequest new
+			(GLPHEMergeRequest new
 				 author: user;
 				 created_at: '09-05-2024';
 				 merged_at: '09-05-2024';
 				 state: 'closed').
-			(GLHMergeRequest new
+			(GLPHEMergeRequest new
 				 author: user;
 				 created_at: '09-05-2024';
 				 merged_at: nil;
 				 state: 'closed').
-			(GLHMergeRequest new
+			(GLPHEMergeRequest new
 				 author: user;
 				 created_at: '08-01-2024';
 				 merged_at: nil;
@@ -89,7 +88,7 @@ ClosedMergeRequestMetricTest >> testCalculate1MRinPeriod2Outside [
 	self assert: result equals: 1
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 ClosedMergeRequestMetricTest >> testCalculate3MR [
 
 	| result glhImporter user closedMergeRequestMetric |
@@ -101,17 +100,17 @@ ClosedMergeRequestMetricTest >> testCalculate3MR [
 
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: {
-			(GLHMergeRequest new
+			(GLPHEMergeRequest new
 				 author: user;
 				 created_at: '09-05-2024';
 				 merged_at: '09-05-2024';
 				 state: 'closed').
-			(GLHMergeRequest new
+			(GLPHEMergeRequest new
 				 author: user;
 				 created_at: '09-05-2024';
 				 merged_at: nil;
 				 state: 'closed').
-			(GLHMergeRequest new
+				(GLPHEMergeRequest new
 				 author: user;
 				 created_at: '09-05-2024';
 				 merged_at: nil;
@@ -132,7 +131,7 @@ ClosedMergeRequestMetricTest >> testCalculate3MR [
 	self assert: result equals: 3
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 ClosedMergeRequestMetricTest >> testCalculate3MRClosed2Opened [
 
 	| result glhImporter user closedMergeRequestMetric |
@@ -144,27 +143,27 @@ ClosedMergeRequestMetricTest >> testCalculate3MRClosed2Opened [
 
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: {
-			(GLHMergeRequest new
+			(GLPHEMergeRequest new
 				 author: user;
 				 created_at: '09-05-2024';
 				 merged_at: '09-05-2024';
 				 state: 'closed').
-			(GLHMergeRequest new
+			(GLPHEMergeRequest new
 				 author: user;
 				 created_at: '09-05-2024';
 				 merged_at: nil;
 				 state: 'closed').
-			(GLHMergeRequest new
+				(GLPHEMergeRequest new
 				 author: user;
 				 created_at: '09-05-2024';
 				 merged_at: nil;
 				 state: 'closed').
-			(GLHMergeRequest new
+				(GLPHEMergeRequest new
 				 author: user;
 				 created_at: '09-05-2024';
 				 merged_at: nil;
 				 state: 'opened').
-			(GLHMergeRequest new
+				(GLPHEMergeRequest new
 				 author: user;
 				 created_at: '09-05-2024';
 				 merged_at: nil;
@@ -185,7 +184,7 @@ ClosedMergeRequestMetricTest >> testCalculate3MRClosed2Opened [
 	self assert: result equals: 3
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 ClosedMergeRequestMetricTest >> testCalculateNoClosedMR [
 
 	| result glhImporter user closedMergeRequestMetric |
@@ -197,27 +196,27 @@ ClosedMergeRequestMetricTest >> testCalculateNoClosedMR [
 
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: {
-			(GLHMergeRequest new
+			(GLPHEMergeRequest new
 				 author: user;
 				 created_at: '09-05-2024';
 				 merged_at: '09-05-2024';
 				 state: 'opened').
-			(GLHMergeRequest new
+			(GLPHEMergeRequest new
 				 author: user;
 				 created_at: '09-05-2024';
 				 merged_at: nil;
 				 state: 'opened').
-			(GLHMergeRequest new
+				(GLPHEMergeRequest new
 				 author: user;
 				 created_at: '09-05-2024';
 				 merged_at: nil;
 				 state: 'opened').
-			(GLHMergeRequest new
+				(GLPHEMergeRequest new
 				 author: user;
 				 created_at: '09-05-2024';
 				 merged_at: nil;
 				 state: 'opened').
-			(GLHMergeRequest new
+				(GLPHEMergeRequest new
 				 author: user;
 				 created_at: '09-05-2024';
 				 merged_at: nil;
@@ -238,7 +237,7 @@ ClosedMergeRequestMetricTest >> testCalculateNoClosedMR [
 	self assert: result equals: 0
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 ClosedMergeRequestMetricTest >> testCalculateNoMergeRequests [
 
 	| result glhImporter user closedMergeRequestMetric |
@@ -264,7 +263,7 @@ ClosedMergeRequestMetricTest >> testCalculateNoMergeRequests [
 	self assert: result equals: 0
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 ClosedMergeRequestMetricTest >> testCalculateOutSidePeriod [
 
 	| result glhImporter user closedMergeRequestMetric |
@@ -276,12 +275,12 @@ ClosedMergeRequestMetricTest >> testCalculateOutSidePeriod [
 
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: {
-			(GLHMergeRequest new
+			(GLPHEMergeRequest new
 				 author: user;
 				 created_at: '09-05-2024';
 				 merged_at: '09-05-2024';
 				 state: 'closed').
-			(GLHMergeRequest new
+			(GLPHEMergeRequest new
 				 author: user;
 				 created_at: '09-05-2024';
 				 merged_at: nil;

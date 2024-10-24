@@ -82,17 +82,18 @@ BaselineOfGitLabHealth >> defineGroups: spec [
 	spec
 		group: 'Core'
 		with: #( 'GitLabHealth-Model' 'GitLabHealth-Model-Extension'
-			   'GitLabHealth-Model-Tests' 'GitLabHealth-Model-Extension-Tests'
+			   'GitLabHealth-Model-Extension-Tests'
 			   'GitLabHealth-Model-Generator' 'GitLabHealth-Model-Inspector'
 			   'GitLabHealth-Model-Visualization'
 			   'GitLabHealth-Model-Importer' 'GitLabHealth-Model-Importer-Tests'
 			   'GitHubHealth-Model-Importer-Tests'
-			   'GitLabHealth-Model-Analysis' 'GitLabHealth-Model-Analysis-Tests'
+			   'GLPHExtended-Model' 'GLPHExtended-Model-Tests'
+			   'GLPHExtended-Model-Extension' 'GitLabHealth-Model-Analysis'
+			   'GitLabHealth-Model-Analysis-Tests'
 			   'GitLabHealth-Visualization' 'GitLabProjectHealth-ExtendModel-Generator'
 			   'GitLabProjectHealth-Model-Importer'
 			   'GitLabProjectHealth-Model-Importer-Tests'
-			   'BitBucketHealth-Model-Importer'
-			   'BitBucketHealth-Model-Importer-Tests' ).
+			   'BitBucketHealth-Model-Importer' 'BitBucketHealth-Model-Importer-Tests' ).
 	spec group: 'default' with: #( 'Core' )
 ]
 
@@ -144,20 +145,23 @@ BaselineOfGitLabHealth >> definePackages: spec [
 			spec requires:
 					#( 'GitLabHealth-Model-Importer' 'GitHubHealth-Model-Importer' ) ].
 	spec
-		package: 'GitLabHealth-Model-Tests'
-		with: [ spec requires: #( 'GitLabHealth-Model' ) ].
-	spec
 		package: 'GitHubHealth-Model-Importer-Tests'
 		with: [ spec requires: #( 'GitHubHealth-Model-Importer' ) ].
 
 	"bitBucket"
-	spec
-		package: 'BitBucketHealth-Model-Importer';
-		package: 'BitBucketHealth-Model-Importer-Tests'
-		with: [ spec requires: #( 'BitBucketHealth-Model-Importer' ) ].
+	spec package: 'BitBucketHealth-Model-Importer';
+		package: 'BitBucketHealth-Model-Importer-Tests' with: [ spec requires: #( 'BitBucketHealth-Model-Importer' ) ].
 
 	"model extension"
 	spec
+		package: 'GLPHExtended-Model' with: [
+			spec requires:
+					#( 'GitLabHealth-Model' 'GitLabHealth-Model-Extension' ) ];
+		package: 'GLPHExtended-Model-Tests'
+		with: [ spec requires: #( 'GLPHExtended-Model' ) ];
+		package: 'GLPHExtended-Model-Extension' with: [
+			spec requires:
+					#( 'GLPHExtended-Model' 'GitLabHealth-Model' 'GitLabHealth-Model-Extension' ) ];
 		package: 'GitLabHealth-Model-Analysis'
 		with: [ spec requires: #( 'Voyage' 'AWS' ) ];
 		package: 'GitLabHealth-Model-Analysis-Tests'

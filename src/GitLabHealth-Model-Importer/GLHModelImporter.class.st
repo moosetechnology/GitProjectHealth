@@ -2,9 +2,12 @@ Class {
 	#name : #GLHModelImporter,
 	#superclass : #GPModelImporter,
 	#instVars : [
+		'glhApi',
+		'withCommitDiffs',
 		'withInitialCommits',
 		'withInitialMergeRequest',
-		'generalReader'
+		'generalReader',
+		'userCatalogue'
 	],
 	#category : #'GitLabHealth-Model-Importer'
 }
@@ -34,6 +37,32 @@ GLHModelImporter >> addGroupResultToModel: groupResult [
 		addAll: group projects
 		unless: self blockOnIdEquality.
 	^ group 
+]
+
+{ #category : #'as yet unclassified' }
+GLHModelImporter >> blockEqualityOn: aSymbol [
+	^ [ :existing :new |
+	  (existing perform: aSymbol) = (new perform: aSymbol) ]
+]
+
+{ #category : #equality }
+GLHModelImporter >> blockForDiffEquality [
+	^ [ :existing :new |
+			existing diffString size = new diffString size and: [
+				existing diffString = new diffString ] ]
+]
+
+{ #category : #equality }
+GLHModelImporter >> blockOnIdEquality [
+
+	^ [ :existing :new |
+	  existing id = new id ]
+]
+
+{ #category : #equality }
+GLHModelImporter >> blockOnNameEquality [
+
+	^ self blockEqualityOn: #name
 ]
 
 { #category : #'as yet unclassified' }
@@ -183,28 +212,27 @@ GLHModelImporter >> detectEntityType: aType overAttribut: aSelector equalTo: val
 		  (entity perform: aSelector) = value ] ifNone: [ nil ]. 
 ]
 
+{ #category : #'as yet unclassified' }
+GLHModelImporter >> filterCommitChanges: aCollection [
+
+	^ aCollection reject: [ :line |
+		  | trimmedLine |
+		  trimmedLine := line trimLeft.
+		  (trimmedLine beginsWith: '---') or: [
+			  (trimmedLine beginsWith: '+++') or: [
+				  trimmedLine beginsWith: '\ No newline at end of file' ] ] ]
+]
+
 { #category : #accessing }
 GLHModelImporter >> glhApi [
 
-	self
-		deprecated: 'Use #repoApi instead'
-		on: '7 October 2024'
-		in:
-		'Pharo-11.0.0+build.726.sha.aece1b5473acf3830a0e082c1bc3a15d4ff3522b (64 Bit)'.
-
-	^ repoApi
+	^ glhApi
 ]
 
 { #category : #accessing }
 GLHModelImporter >> glhApi: anObject [
 
-	self
-		deprecated: 'Use #repoApi: instead'
-		on: '7 October 2024'
-		in:
-		'Pharo-11.0.0+build.726.sha.aece1b5473acf3830a0e082c1bc3a15d4ff3522b (64 Bit)'.
-
-	repoApi := anObject
+	glhApi := anObject
 ]
 
 { #category : #accessing }
@@ -310,7 +338,7 @@ GLHModelImporter >> importCommitOfProject: anProject withId: anID [
 		           detectEntityType: GLHCommit
 		           overAttribut: #id
 		           equalTo: anID) ifNil: [
-		          result := self repoApi commit: anID ofProject: anProject id.
+		          result := self glhApi commit: anID ofProject: anProject id.
 		          commit := (self parseCommitsResult: '[' , result , ']')
 			                    first.
 
@@ -491,7 +519,7 @@ GLHModelImporter >> importCommitsOfProject: aProject since: fromDate until: toDa
 		| results |
 		page := page + 1.
 		('import commit page ' , page printString) recordInfo.
-		results := self repoApi
+		results := self glhApi
 			           commitsOfProject: aProject id
 			           forRefName: nil
 			           since:
@@ -531,7 +559,7 @@ GLHModelImporter >> importContributedProjectsOfUser: aGLHUser [
 		page := page + 1.
 		('import contributed project of user ' , aGLHUser name , ' page '
 		 , page printString) recordInfo.
-		results := self repoApi
+		results := self glhApi
 			           contributedProjectsOfUserId: aGLHUser id
 			           orderBy: 'last_activity_at'
 			           simple: true
@@ -579,11 +607,10 @@ GLHModelImporter >> importDiffOfCommit: aCommit [
 		'Diff already importer: ' , aCommit short_id printString recordInfo.
 		^ aCommit diffs ].
 	('Import diff of commit: ' , aCommit short_id printString) recordInfo.
-	result := self repoApi
+	result := self glhApi
 		          commitDiff: aCommit id
 		          ofProject: aCommit repository project id
 		          unidiff: true.
-	(self isServerError: result) ifTrue: [ ^ {  } ].
 	diffsResult := self newParseDiffResult: result.
 
 	^ aCommit diffs addAll: diffsResult unless: self blockForDiffEquality.
@@ -637,7 +664,7 @@ GLHModelImporter >> importGroup: aGroupID [
 	| result groupResult |
 	('Import group: ' , aGroupID printString) recordInfo.
 
-	result := self repoApi group: aGroupID.
+	result := self glhApi group: aGroupID.
 	groupResult := self parseGroupResult: result.
 	groupResult := self addGroupResultToModel: groupResult.
 
@@ -670,14 +697,14 @@ GLHModelImporter >> importLastestCommitsOfProject: aGLHProject [
 	"limited to the last 50 commits"
 
 	| results parsedResults |
-	results := self repoApi
+	results := self glhApi
 		           commitsOfProject: aGLHProject id
 		           forRefName: nil
 		           since: nil
 		           until: nil
 		           path: nil
 		           author: nil
-		           all: true
+		           all: nil
 		           with_stats: true
 		           firstParent: nil
 		           order: nil
@@ -685,13 +712,9 @@ GLHModelImporter >> importLastestCommitsOfProject: aGLHProject [
 		           perPage: 50
 		           page: nil.
 	parsedResults := self parseCommitsResult: results.
-	parsedResults := self glhModel
-		                 addAll: parsedResults
-		                 unless: self blockOnIdEquality.
+	parsedResults := self glhModel addAll: parsedResults unless: self blockOnIdEquality.
 
-	aGLHProject repository commits
-		addAll: parsedResults
-		unless: self blockOnIdEquality.
+	aGLHProject repository commits addAll: parsedResults unless: self blockOnIdEquality.
 	"parsedResults do: [ :commit |
 		commit repository: aGLHProject repository ]."
 
@@ -794,7 +817,7 @@ GLHModelImporter >> importRepository: aGLHRepository [
 	('import the repository of project ' , aGLHRepository project name)
 		recordInfo.
 
-	resultBranches := self repoApi branchesOfRepository:
+	resultBranches := self glhApi branchesOfRepository:
 		                  aGLHRepository project id.
 	branches := self parseBranchesResult: resultBranches.
 
@@ -823,7 +846,7 @@ GLHModelImporter >> importUser: aUserID [
 		detect: [ :user | user id = aUserID ]
 		ifFound: [ :user | ^ user ].
 	('Import user: ' , aUserID printString) recordInfo.
-	result := self repoApi user: aUserID.
+	result := self glhApi user: aUserID.
 	userResult := self parseUserResult: result.
 	^ self glhModel add: userResult unless: self blockOnIdEquality
 ]
@@ -844,7 +867,7 @@ GLHModelImporter >> importUserByUsername: anUsername [
 			              | result userId searchResult |
 			              ('Import user with username: '
 			               , anUsername printString) recordInfo.
-			              result := self repoApi usersSearchByUsername:
+			              result := self glhApi usersSearchByUsername:
 				                        anUsername.
 			              searchResult := NeoJSONReader fromString: result.
 
@@ -896,14 +919,12 @@ GLHModelImporter >> initialize [
 	withInitialMergeRequest := false.
 
 	withCommitsSince := (Date today - 1 week) asDateAndTime.
-
+	userCatalogue := GLHUserCatalogueV2 new
+		                 anImporter: self;
+		                 yourself.
 	self initReader.
 
-]
-
-{ #category : #api }
-GLHModelImporter >> isServerError: aString [
-	^ aString = '{"message":"500 Internal Server Error"}'
+	currentImporter := self
 ]
 
 { #category : #importer }
@@ -912,6 +933,19 @@ GLHModelImporter >> loadAllProjectsFromRepositorySoftware [
 	|projects|
 	
 	projects := self glhApi projects. 
+]
+
+{ #category : #'as yet unclassified' }
+GLHModelImporter >> makeGlobal [
+	^ self makeGlobal: DateAndTime now printString.
+]
+
+{ #category : #'as yet unclassified' }
+GLHModelImporter >> makeGlobal: aLabel [ 
+
+	currentImporter := currentImporter ifNil: [ OrderedDictionary new ].
+	currentImporter at: aLabel put: self. 
+	^ self
 ]
 
 { #category : #private }
@@ -1188,7 +1222,7 @@ GLHModelImporter >> pipelinesOf: aProjectID [
 
 	| result |
 	('Search pipelines of: ' , aProjectID printString) recordInfo.
-	result := self repoApi pipelinesOfProject: aProjectID.
+	result := self glhApi pipelinesOfProject: aProjectID.
 	^ self parsePipelinesResult: result .
 ]
 
@@ -1209,12 +1243,36 @@ GLHModelImporter >> subGroupsOf: aGroupID [
 	
 	parsedResult := { true }.
 	[ parsedResult size > 0 ] whileTrue: [ 
-		result := self repoApi subgroupsOfGroup: aGroupID page: page.
+		result := self glhApi subgroupsOfGroup: aGroupID page: page.
 		parsedResult := self parseSubGroupResult: result.
 		results addAll: parsedResult.
 				page := page + 1. ].
 	
 	^ results
+]
+
+{ #category : #accessing }
+GLHModelImporter >> userCatalogue [
+	^ userCatalogue 
+]
+
+{ #category : #accessing }
+GLHModelImporter >> userCatalogue: aGLHUserCatalogue [
+
+	userCatalogue := aGLHUserCatalogue.
+	aGLHUserCatalogue anImporter: self. 
+]
+
+{ #category : #accessing }
+GLHModelImporter >> withCommitDiffs [
+
+	^ withCommitDiffs
+]
+
+{ #category : #accessing }
+GLHModelImporter >> withCommitDiffs: anObject [
+
+	withCommitDiffs := anObject
 ]
 
 { #category : #accessing }

@@ -1,11 +1,10 @@
 Class {
-	#name : 'CodeDeletionMetric',
-	#superclass : 'UserCommitsMetric',
-	#category : 'GitLabHealth-Model-Analysis',
-	#package : 'GitLabHealth-Model-Analysis'
+	#name : #CodeDeletionMetric,
+	#superclass : #UserCommitsMetric,
+	#category : #'GitLabHealth-Model-Analysis'
 }
 
-{ #category : 'calculating' }
+{ #category : #calculating }
 CodeDeletionMetric >> calculate [
 
 	| gitAnalyzer contributions groupedByDate |
@@ -37,7 +36,7 @@ CodeDeletionMetric >> calculate [
 	^ groupedByDate average asFloat
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 CodeDeletionMetric >> description [
 
 	^'code deletion (avg)'

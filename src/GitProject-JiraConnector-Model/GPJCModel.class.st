@@ -1,20 +1,18 @@
 Class {
-	#name : 'GPJCModel',
-	#superclass : 'MooseModel',
-	#traits : 'GLHTEntityCreator + JPTEntityCreator',
-	#classTraits : 'GLHTEntityCreator classTrait + JPTEntityCreator classTrait',
-	#category : 'GitProject-JiraConnector-Model-Model',
-	#package : 'GitProject-JiraConnector-Model',
-	#tag : 'Model'
+	#name : #GPJCModel,
+	#superclass : #MooseModel,
+	#traits : 'GLHTEntityCreator + GLPHETEntityCreator + JPTEntityCreator',
+	#classTraits : 'GLHTEntityCreator classTrait + GLPHETEntityCreator classTrait + JPTEntityCreator classTrait',
+	#category : #'GitProject-JiraConnector-Model-Model'
 }
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GPJCModel class >> allSubmetamodelsPackagesNames [
 	<generated>
-	^ #(#'Moose-Query' #'JiraPharoAPI-Model' #'GitLabHealth-Model' #'Famix-Traits')
+	^ #(#'Moose-Query' #'JiraPharoAPI-Model' #'GitLabHealth-Model' #'GLPHExtended-Model' #'Famix-Traits')
 ]
 
-{ #category : 'meta' }
+{ #category : #meta }
 GPJCModel class >> annotation [
 	<FMClass: #GPJCModel super: #MooseModel>
 	<package: #'GitProject-JiraConnector-Model'>
