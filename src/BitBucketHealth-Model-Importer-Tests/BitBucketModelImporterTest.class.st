@@ -85,8 +85,8 @@ BitBucketModelImporterTest >> testConvertBitBucketDiffToGitDiffNoHunks [
 	"Then"
 	self assert: glhDiffs size equals: 1.
 	diffs := glhDiffs first.
-	self assert: diffs diffString equals: '--- a/build.gradle
-+++ b/build.gradle
+	self assert: diffs diffString equals: '--- a/
++++ b/api/api.xlsx
 '
 ]
 

@@ -425,26 +425,19 @@ BitBucketApiMock >> diffsNohunks [
   "contextLines": 10,
   "whitespace": "SHOW",
   "diffs": [
-    {
-      "source": {
-        "components": [
-          "build.gradle"
-        ],
-        "parent": "",
-        "name": "build.gradle",
-        "extension": "gradle",
-        "toString": "build.gradle"
-      },
+      {
+      "source": null,
       "destination": {
         "components": [
-          "build.gradle"
+          "api",
+          "api.xlsx"
         ],
-        "parent": "",
-        "name": "build.gradle",
-        "extension": "gradle",
-        "toString": "build.gradle"
+        "parent": "api",
+        "name": "api.xlsx",
+        "extension": "xlsx",
+        "toString": "api/api.xlsx"
       },
-      "truncated": false
+      "binary": true
     }
   ],
   "truncated": false
