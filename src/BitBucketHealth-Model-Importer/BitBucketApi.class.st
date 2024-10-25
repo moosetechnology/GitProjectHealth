@@ -1,6 +1,6 @@
 Class {
-	#name : 'BitBucketApi',
-	#superclass : 'Object',
+	#name : #BitBucketApi,
+	#superclass : #Object,
 	#instVars : [
 		'endpoint',
 		'basePath',
@@ -9,11 +9,10 @@ Class {
 		'apiToken',
 		'username'
 	],
-	#category : 'BitBucketHealth-Model-Importer',
-	#package : 'BitBucketHealth-Model-Importer'
+	#category : 'BitBucketHealth-Model-Importer'
 }
 
-{ #category : 'api - pull-requests' }
+{ #category : #'api - pull-requests' }
 BitBucketApi >> activitiesOfPullRequest: pullRequestId inRepoProjectId: repositorySlug ofProjectGroupId: projectKey [
 
 	^ self allValuesOfPath:
@@ -22,7 +21,7 @@ BitBucketApi >> activitiesOfPullRequest: pullRequestId inRepoProjectId: reposito
 		  , '/activities'
 ]
 
-{ #category : 'private - building' }
+{ #category : #'private - building' }
 BitBucketApi >> allValuesOfPath: path [
 
 	| results values |
@@ -43,61 +42,61 @@ BitBucketApi >> allValuesOfPath: path [
 	^ values
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 BitBucketApi >> apiToken [
 
 	^ apiToken
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 BitBucketApi >> apiToken: anObject [
 
 	apiToken := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 BitBucketApi >> basePath [
 
 	^ basePath
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 BitBucketApi >> basePath: anObject [
 
 	basePath := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 BitBucketApi >> bearerToken [
 
 	^ bearerToken
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 BitBucketApi >> bearerToken: anObject [
 
 	bearerToken := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 BitBucketApi >> client [
 
 	^ client
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 BitBucketApi >> client: anObject [
 
 	client := anObject
 ]
 
-{ #category : 'api - pull-requests' }
+{ #category : #'api - pull-requests' }
 BitBucketApi >> commitsOfPullRequest: pullRequestId ofRepoProjectId: repoSlug inProjectGroupId: projectKey [
 	^ self allValuesOfPath: self basePath, '/projects/', projectKey, '/repos/', repoSlug, '/pull-requests/', pullRequestId printString, '/commits'.
 	
 ]
 
-{ #category : 'api - commits' }
+{ #category : #'api - commits' }
 BitBucketApi >> commitsOfRepoProjectId: repositorySlug inProjectGroupId: projectKey since: since until: until [
 	"/rest/api/1.0/projects/{projectKey}/repos/{repositorySlug}/commits"
 
@@ -134,7 +133,7 @@ BitBucketApi >> commitsOfRepoProjectId: repositorySlug inProjectGroupId: project
 			  commitDate <= until asDateAndTime ]
 ]
 
-{ #category : 'api - commits' }
+{ #category : #'api - commits' }
 BitBucketApi >> diffsOfCommit: commitID inRepoProjectId: repositorySlug inProjectGroupId: projectKey [
 
 	| results |
@@ -149,19 +148,19 @@ BitBucketApi >> diffsOfCommit: commitID inRepoProjectId: repositorySlug inProjec
 	^ (NeoJSONReader on: results readStream) next
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 BitBucketApi >> endpoint [
 
 	^ endpoint
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 BitBucketApi >> endpoint: anObject [
 
 	endpoint := anObject
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 BitBucketApi >> initialize [
 
 	self client: (ZnClient new
@@ -171,7 +170,7 @@ BitBucketApi >> initialize [
 	self basePath: 'rest/api/1.0'
 ]
 
-{ #category : 'private - building' }
+{ #category : #'private - building' }
 BitBucketApi >> prepareZnClient [
 
 	client := ZnClient new
@@ -188,14 +187,14 @@ BitBucketApi >> prepareZnClient [
 			, (self username , ':' , self apiToken) utf8Encoded base64Encoded ].
 ]
 
-{ #category : 'api - projects' }
+{ #category : #'api - projects' }
 BitBucketApi >> projects [
 	"/rest/api/1.0/projects"
 
 	^ self allValuesOfPath: self basePath , '/projects'.
 ]
 
-{ #category : 'api - pull-requests' }
+{ #category : #'api - pull-requests' }
 BitBucketApi >> pullRequestsOfRepoProjectId: repositorySlug inProjectGroupId: projectKey since: since until: until [
 
 	| pullRequests results lastCommitterTimestamp lastDate |
@@ -231,12 +230,12 @@ BitBucketApi >> pullRequestsOfRepoProjectId: repositorySlug inProjectGroupId: pr
 		  commitDate >= since asDate and: commitDate <= until asDate ]
 ]
 
-{ #category : 'api - projects' }
+{ #category : #'api - projects' }
 BitBucketApi >> repositoryProjectsOfProjectGroupId: projectKey [
 	^self allValuesOfPath: self basePath, '/projects/', projectKey, '/repos'.
 ]
 
-{ #category : 'api - user' }
+{ #category : #'api - user' }
 BitBucketApi >> user: accountId [
 	"https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/#api-user-get"
 
@@ -246,19 +245,19 @@ BitBucketApi >> user: accountId [
 	^ self client get
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 BitBucketApi >> username [
 
 	^ username
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 BitBucketApi >> username: anObject [
 
 	username := anObject
 ]
 
-{ #category : 'api - user' }
+{ #category : #'api - user' }
 BitBucketApi >> usersByUsername: usernameString [
 
 	| users |

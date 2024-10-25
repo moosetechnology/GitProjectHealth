@@ -2,13 +2,12 @@
 A BitBucketModelImporterTest is a test class for testing the behavior of BitBucketModelImporter
 "
 Class {
-	#name : 'BitBucketModelImporterTest',
-	#superclass : 'TestCase',
-	#category : 'BitBucketHealth-Model-Importer-Tests',
-	#package : 'BitBucketHealth-Model-Importer-Tests'
+	#name : #BitBucketModelImporterTest,
+	#superclass : #TestCase,
+	#category : #'BitBucketHealth-Model-Importer-Tests'
 }
 
-{ #category : 'tests' }
+{ #category : #tests }
 BitBucketModelImporterTest >> testCompleteImportProject [
 	"Given"
 
@@ -34,7 +33,64 @@ BitBucketModelImporterTest >> testCompleteImportProject [
 		equals: 1
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
+BitBucketModelImporterTest >> testConvertBitBucketDiffToGitDiff [
+
+	"Given"
+		| bitBucketApi glhModel bitBucketImporter diffs glhDiffs |
+	bitBucketApi := BitBucketApiMock new.
+	
+	glhModel := GLHModel new name: 'test'.
+	
+	bitBucketImporter := BitBucketModelImporter new
+		                     bitBucketApi: bitBucketApi;
+		                     glhModel: glhModel.
+	
+	diffs := bitBucketApi diffs.
+	
+	"When"
+	glhDiffs := bitBucketImporter convertBitBucketDiffToGitDiff: diffs.
+	
+	"Then"
+	self assert: glhDiffs size equals: 1.
+	diffs := glhDiffs first.
+	self assert: diffs diffString equals: '--- a/build.gradle
++++ b/build.gradle
+@@ -1,14 +1,14 @@
+ line
+-line4
++line5
+
+'
+]
+
+{ #category : #tests }
+BitBucketModelImporterTest >> testConvertBitBucketDiffToGitDiffNoHunks [
+
+	"Given"
+		| bitBucketApi glhModel bitBucketImporter diffs glhDiffs |
+	bitBucketApi := BitBucketApiMock new.
+	
+	glhModel := GLHModel new name: 'test'.
+	
+	bitBucketImporter := BitBucketModelImporter new
+		                     bitBucketApi: bitBucketApi;
+		                     glhModel: glhModel.
+	
+	diffs := bitBucketApi diffsNohunks.
+	
+	"When"
+	glhDiffs := bitBucketImporter convertBitBucketDiffToGitDiff: diffs.
+	
+	"Then"
+	self assert: glhDiffs size equals: 1.
+	diffs := glhDiffs first.
+	self assert: diffs diffString equals: '--- a/build.gradle
++++ b/build.gradle
+'
+]
+
+{ #category : #tests }
 BitBucketModelImporterTest >> testGetContributionFromDiffs [
 	"Given"
 
@@ -57,7 +113,7 @@ BitBucketModelImporterTest >> testGetContributionFromDiffs [
 	self assert: (contribution at: #deletions) equals: 1
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 BitBucketModelImporterTest >> testGetContributionFromDiffsWithoutAdded [
 	"Given"
 
@@ -82,7 +138,7 @@ BitBucketModelImporterTest >> testGetContributionFromDiffsWithoutAdded [
 	self assert: (contribution at: #deletions) equals: 1
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 BitBucketModelImporterTest >> testGetContributionFromDiffsWithoutHunks [
 	"Given"
 
@@ -107,7 +163,7 @@ BitBucketModelImporterTest >> testGetContributionFromDiffsWithoutHunks [
 	self assert: (contribution at: #deletions) equals: 0
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 BitBucketModelImporterTest >> testGetContributionFromDiffsWithoutRemoved [
 	"Given"
 
@@ -132,7 +188,7 @@ BitBucketModelImporterTest >> testGetContributionFromDiffsWithoutRemoved [
 	self assert: (contribution at: #deletions) equals: 0
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 BitBucketModelImporterTest >> testImportAndLoadLatestsCommitsOfProject [
 
 	| bitBucketApi glphModel bitBucketImporter project commits group repo firstCommit commit1 currentDate timestamp commit2 timestamp2 |
@@ -180,7 +236,7 @@ BitBucketModelImporterTest >> testImportAndLoadLatestsCommitsOfProject [
 	self assert: firstCommit additions equals: 1
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 BitBucketModelImporterTest >> testImportCommitsOfProjectSinceUntil [
 
 	| bitBucketApi glphModel bitBucketImporter project commits group repo firstCommit |
@@ -215,7 +271,7 @@ BitBucketModelImporterTest >> testImportCommitsOfProjectSinceUntil [
 	self assert: firstCommit additions equals: 1
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 BitBucketModelImporterTest >> testImportContributedProjectsOfUser [
 
 	| bitBucketApi glphModel bitBucketImporter user projects commits yesterdayAsTimestamp |
@@ -253,7 +309,7 @@ BitBucketModelImporterTest >> testImportContributedProjectsOfUser [
 		hasSameElements: projects
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 BitBucketModelImporterTest >> testImportCreatorOfCommit [
 
 	| bitBucketApi glphModel bitBucketImporter creator commit |
@@ -281,7 +337,7 @@ BitBucketModelImporterTest >> testImportCreatorOfCommit [
 	self assert: commit commitCreator equals: creator
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 BitBucketModelImporterTest >> testImportCreatorOfCommitIfAlreadyExist [
 
 	| bitBucketApi glphModel bitBucketImporter creator commit |
@@ -310,7 +366,7 @@ BitBucketModelImporterTest >> testImportCreatorOfCommitIfAlreadyExist [
 	self assert: commit commitCreator equals: creator
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 BitBucketModelImporterTest >> testImportMergeRequestCommits [
 
 	| bitBucketApi glphModel bitBucketImporter mergeRequest commits |
@@ -337,7 +393,7 @@ BitBucketModelImporterTest >> testImportMergeRequestCommits [
 	self assert: mergeRequest commits first additions equals: 1
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 BitBucketModelImporterTest >> testImportMergeRequestsSinceUntil [
 
 	| bitBucketApi glphModel bitBucketImporter group repo project mergeRequests mergeRequest |
@@ -375,7 +431,7 @@ BitBucketModelImporterTest >> testImportMergeRequestsSinceUntil [
 	self assert: mergeRequest closed_at equals: nil.
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 BitBucketModelImporterTest >> testImportMergeRequestsSinceUntilClosedMR [
 
 	| bitBucketApi glphModel bitBucketImporter group repo project mergeRequests mergeRequest |
@@ -416,7 +472,7 @@ BitBucketModelImporterTest >> testImportMergeRequestsSinceUntilClosedMR [
 	self deny: mergeRequest merged_at equals: nil.
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 BitBucketModelImporterTest >> testImportMergeRequestsSinceUntilDeclinedMR [
 
 	| bitBucketApi glphModel bitBucketImporter group repo project mergeRequests mergeRequest |
@@ -457,7 +513,7 @@ BitBucketModelImporterTest >> testImportMergeRequestsSinceUntilDeclinedMR [
 	self assert: mergeRequest merged_at equals: nil
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 BitBucketModelImporterTest >> testImportMergeResquestMerger [
 
 	| bitBucketApi glphModel bitBucketImporter mergeRequest mergeUser |
@@ -484,7 +540,7 @@ BitBucketModelImporterTest >> testImportMergeResquestMerger [
 	self assert: mergeRequest merge_user equals: mergeUser
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 BitBucketModelImporterTest >> testImportUserByUsername [
 	"Given"
 
@@ -507,7 +563,7 @@ BitBucketModelImporterTest >> testImportUserByUsername [
 		hasSameElements: {user}.
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 BitBucketModelImporterTest >> testImportUserByUsernameWithoutUsers [
 	"Given"
 

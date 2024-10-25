@@ -1,1 +1,1 @@
-Package { #name : 'BitBucketHealth-Model-Importer-Tests' }
+Package { #name : #'BitBucketHealth-Model-Importer-Tests' }
