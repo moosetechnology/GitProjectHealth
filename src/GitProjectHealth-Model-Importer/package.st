@@ -1,1 +1,1 @@
-Package { #name : 'GitProjectHealth-Model-Importer' }
+Package { #name : #'GitProjectHealth-Model-Importer' }
