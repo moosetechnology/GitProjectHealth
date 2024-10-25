@@ -315,7 +315,7 @@ GitMetricExporter >> findParticipationOfCommitAuthorNamed: username amongProject
 				                size.
 				                ']' }) recordInfo.
 
-		               response := glhImporter glhApi
+		               response := glhImporter repoApi
 			                           commitsOfUser: username
 			                           inProject: project id
 			                           since: '01 january 2023' asDateAndTime

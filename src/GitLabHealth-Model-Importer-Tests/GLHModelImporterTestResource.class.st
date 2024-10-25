@@ -26,7 +26,7 @@ GLHModelImporterTestResource >> importModel [
 		           yourself.
 
 	glhImporter := GLHModelImporter new
-		               glhApi: glphApi;
+		               repoApi: glphApi;
 		               glhModel: model;
 		               withFiles: false;
 		               withCommitDiffs: true.

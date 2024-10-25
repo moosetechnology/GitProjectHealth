@@ -15,7 +15,7 @@ GLPHModelImporter >> commitsOfProject: aGLHProject forRefName: refName until: to
 		| results parsedResults existingCommits |
 		page := page + 1.
 		('import commit page ' , page printString) recordInfo.
-		results := self glhApi
+		results := self repoApi
 			           commitsOfProject: aGLHProject id
 			           forRefName: refName
 			           since: nil
@@ -149,7 +149,7 @@ GLPHModelImporter >> importDiffOfMergeRequest: aMergeRequest [
 		^ aMergeRequest diffs ].
 	('Import diff commits of MR ' , aMergeRequest iid printString)
 		recordInfo.
-	result := self glhApi
+	result := self repoApi
 		          diffsMergeRequestOfProject: aMergeRequest project_id
 		          withId: aMergeRequest iid.
 
@@ -233,11 +233,11 @@ GLPHModelImporter >> importMergeRequestMergeCommits: aGLPHEMergeRequest [
 { #category : 'import - merge request' }
 GLPHModelImporter >> importMergeRequests: aGLHProject [
 
-	| results parsedResults mrs|
+	| results parsedResults mrs |
 	('Import merge request of Project: ' , aGLHProject id printString)
 		recordInfo.
 
-	results := self glhApi mergeRequestOfProject: aGLHProject id.
+	results := self repoApi mergeRequestOfProject: aGLHProject id.
 	parsedResults := self parseMergeRequestResult: results.
 
 	aGLHProject mergeRequests
@@ -245,8 +245,8 @@ GLPHModelImporter >> importMergeRequests: aGLHProject [
 		unless: self blockOnIdEquality.
 
 	mrs := self glhModel
-		addAll: aGLHProject mergeRequests
-		unless: self blockOnIdEquality.
+		       addAll: aGLHProject mergeRequests
+		       unless: self blockOnIdEquality.
 
 
 	"gets it related commits"
@@ -257,7 +257,7 @@ GLPHModelImporter >> importMergeRequests: aGLHProject [
 	self withCommitDiffs ifTrue: [
 		aGLHProject mergeRequests do: [ :mr |
 			self importDiffOfMergeRequest: mr ] ].
-	
+
 	^ mrs
 ]
 
@@ -313,7 +313,7 @@ GLPHModelImporter >> importMergeResquestApprovals: aGLPHEMergeRequest [
 	(String streamContents: [ :str |
 		 str << 'Check approvals of '.
 		 aGLPHEMergeRequest printOn: str ]) recordInfo.
-	results := self glhApi
+	results := self repoApi
 		           approvalsOfMergeQuest: aGLPHEMergeRequest iid
 		           ofProject: aGLPHEMergeRequest project id.
 
@@ -335,7 +335,7 @@ GLPHModelImporter >> importMergeResquestAuthor: aGLPHEMergeRequest [
 	aGLPHEMergeRequest author ifNotNil: [ ^ aGLPHEMergeRequest author ].
 	authorID := aGLPHEMergeRequest cacheAt: #authorID ifAbsent: [
 		            (generalReader
-			             on: (self glhApi
+			             on: (self repoApi
 					              mergeRequestOfProject:
 						              aGLPHEMergeRequest project_id
 					              withId: aGLPHEMergeRequest iid) readStream;
@@ -351,7 +351,7 @@ GLPHModelImporter >> importMergeResquestMerger: aGLPHEMergeRequest [
 		^ aGLPHEMergeRequest merge_user ].
 	authorID := aGLPHEMergeRequest cacheAt: #mergeUserID ifAbsent: [
 		            (generalReader
-			             on: (self glhApi
+			             on: (self repoApi
 					              mergeRequestOfProject:
 						              aGLPHEMergeRequest project_id
 					              withId: aGLPHEMergeRequest iid) readStream;

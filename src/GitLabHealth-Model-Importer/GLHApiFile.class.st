@@ -1,32 +1,33 @@
 Class {
-	#name : #GLHApiFile,
-	#superclass : #Object,
+	#name : 'GLHApiFile',
+	#superclass : 'Object',
 	#instVars : [
 		'name',
 		'type'
 	],
-	#category : 'GitLabHealth-Model-Importer'
+	#category : 'GitLabHealth-Model-Importer',
+	#package : 'GitLabHealth-Model-Importer'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GLHApiFile >> name [
 
 	^ name
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GLHApiFile >> name: anObject [
 
 	name := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GLHApiFile >> type [
 
 	^ type
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GLHApiFile >> type: anObject [
 
 	type := anObject

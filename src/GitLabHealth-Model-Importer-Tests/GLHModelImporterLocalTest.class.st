@@ -20,7 +20,7 @@ GLHModelImporterLocalTest >> setUp [
 	importer := GLHModelImporter new.
 	model := GLHModel new.
 	importer glhModel: model.
-	importer glhApi: GLHApiMock new
+	importer repoApi: GLHApiMock new
 ]
 
 { #category : 'tests' }
