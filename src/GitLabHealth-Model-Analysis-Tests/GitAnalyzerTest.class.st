@@ -32,7 +32,7 @@ GitAnalyzerTest >> setUp [
 	since := Date today - 2 day.
 
 	glhImporter := GLPHModelImporter new
-		               glhApi: glphApi;
+		               repoApi: glphApi;
 		               glhModel: glphModel;
 		               withFiles: false;
 		              
