@@ -1,10 +1,11 @@
 Class {
-	#name : #BaselineOfGitLabHealth,
-	#superclass : #BaselineOf,
-	#category : #BaselineOfGitLabHealth
+	#name : 'BaselineOfGitLabHealth',
+	#superclass : 'BaselineOf',
+	#category : 'BaselineOfGitLabHealth',
+	#package : 'BaselineOfGitLabHealth'
 }
 
-{ #category : #baselines }
+{ #category : 'baselines' }
 BaselineOfGitLabHealth >> baseline: spec [
 
 	<baseline>
@@ -23,14 +24,14 @@ BaselineOfGitLabHealth >> baseline: spec [
 			spec package: 'GitLabHealth-Model' with: [ spec requires: #( 'Moose' ) ] ] ]
 ]
 
-{ #category : #baselines }
+{ #category : 'baselines' }
 BaselineOfGitLabHealth >> customProjectAttributes [
     self class environment at: #MooseEntity ifAbsent: [ ^ #(#WithoutFamix) ].
 
     ^ #()
 ]
 
-{ #category : #baselines }
+{ #category : 'baselines' }
 BaselineOfGitLabHealth >> defineDependencies: spec [
 
 	spec
@@ -51,7 +52,7 @@ BaselineOfGitLabHealth >> defineDependencies: spec [
 		]
 ]
 
-{ #category : #baselines }
+{ #category : 'baselines' }
 BaselineOfGitLabHealth >> defineFamixConnector: spec [
 
 	spec
@@ -64,7 +65,7 @@ BaselineOfGitLabHealth >> defineFamixConnector: spec [
 		with: [ spec requires: #( 'GitProject-FamixConnector' ) ]
 ]
 
-{ #category : #baselines }
+{ #category : 'baselines' }
 BaselineOfGitLabHealth >> defineGroups: spec [
 
 	spec
@@ -87,7 +88,7 @@ BaselineOfGitLabHealth >> defineGroups: spec [
 			   'GitLabHealth-Model-Importer' 'GitLabHealth-Model-Importer-Tests'
 			   'GitHubHealth-Model-Importer-Tests'
 			   'GitLabHealth-Model-Analysis' 'GitLabHealth-Model-Analysis-Tests'
-			   'GitLabHealth-Visualization' 'GitLabProjectHealth-ExtendModel-Generator'
+			   'GitLabHealth-Visualization'
 			   'GitLabProjectHealth-Model-Importer'
 			   'GitLabProjectHealth-Model-Importer-Tests'
 			   'BitBucketHealth-Model-Importer'
@@ -95,7 +96,7 @@ BaselineOfGitLabHealth >> defineGroups: spec [
 	spec group: 'default' with: #( 'Core' )
 ]
 
-{ #category : #baselines }
+{ #category : 'baselines' }
 BaselineOfGitLabHealth >> defineJiraConnector: spec [
 
 	spec
@@ -116,7 +117,7 @@ BaselineOfGitLabHealth >> defineJiraConnector: spec [
 		spec repository: 'github://Evref-BL/Jira-Pharo-API:main/src' ]
 ]
 
-{ #category : #baselines }
+{ #category : 'baselines' }
 BaselineOfGitLabHealth >> definePackages: spec [
 	"generic"
 
@@ -165,7 +166,6 @@ BaselineOfGitLabHealth >> definePackages: spec [
 		package: 'GitLabHealth-Model-Analysis-Tests'
 		with: [ spec requires: #( 'GitLabHealth-Model-Analysis' ) ];
 		package: 'GitLabHealth-Visualization';
-		package: 'GitLabProjectHealth-ExtendModel-Generator';
 		package: 'GitLabProjectHealth-Model-Importer';
 		package: 'GitLabProjectHealth-Model-Importer-Tests'
 		with: [ spec requires: #( 'GitLabProjectHealth-Model-Importer' ) ]
