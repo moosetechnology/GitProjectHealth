@@ -370,7 +370,7 @@ GitMetricExporter >> generateUsersAnalysesDuringPeriod: period over: aDateWeekMo
 	^ self userEntities collect: [ :user |
 		  userAnalysisReport := UserAnalysisReport new
 			                        username: user name;
-											email: (user email ifNil: #public_email);
+											email: (user email ifNil: [ user public_email]);
 			                        period: period;
 			                        over: aDateWeekMonthOrYear.
 

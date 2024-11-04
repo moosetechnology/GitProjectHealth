@@ -86,7 +86,7 @@ Metric >> setupGroupedDate [
 		over := #day ].
 
 
-	[ groupedByDate keys last asDate asDateAndTime < end ] whileTrue: [
+	[ groupedByDate keys last asDateAndTime < end ] whileTrue: [
 		| index |
 		index := groupedByDate keys last asDateAndTime
 		         + (increment perform: overSymbol).
