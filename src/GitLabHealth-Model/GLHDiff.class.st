@@ -36,8 +36,8 @@ The diff of a commit
 
 "
 Class {
-	#name : 'GLHDiff',
-	#superclass : 'GLHEntity',
+	#name : #GLHDiff,
+	#superclass : #GLHEntity,
 	#traits : 'FamixTNamedEntity',
 	#classTraits : 'FamixTNamedEntity classTrait',
 	#instVars : [
@@ -52,12 +52,10 @@ Class {
 		'#old_path => FMProperty',
 		'#renamed_file => FMProperty defaultValue: false'
 	],
-	#category : 'GitLabHealth-Model-Entities',
-	#package : 'GitLabHealth-Model',
-	#tag : 'Entities'
+	#category : 'GitLabHealth-Model-Entities'
 }
 
-{ #category : 'meta' }
+{ #category : #meta }
 GLHDiff class >> annotation [
 
 	<FMClass: #Diff super: #GLHEntity>
@@ -66,19 +64,19 @@ GLHDiff class >> annotation [
 	^ self
 ]
 
-{ #category : 'adding' }
+{ #category : #adding }
 GLHDiff >> addDiffRange: anObject [
 	<generated>
 	^ self diffRanges add: anObject
 ]
 
-{ #category : 'adding' }
+{ #category : #adding }
 GLHDiff >> addFile: anObject [
 	<generated>
 	^ self file add: anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHDiff >> commit [
 	"Relation named: #commit type: #GLHCommit opposite: #diffs"
 
@@ -87,21 +85,21 @@ GLHDiff >> commit [
 	^ commit
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHDiff >> commit: anObject [
 
 	<generated>
 	commit := anObject
 ]
 
-{ #category : 'navigation' }
+{ #category : #navigation }
 GLHDiff >> commitGroup [
 	<generated>
 	<navigation: 'Commit'>
 	^ MooseSpecializedGroup with: self commit
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHDiff >> deleted_file [
 
 	<FMProperty: #deleted_file type: #Boolean defaultValue: false>
@@ -110,13 +108,13 @@ GLHDiff >> deleted_file [
 	^ deleted_file ifNil: [ deleted_file := false ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHDiff >> deleted_file: anObject [
 	<generated>
 	deleted_file := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHDiff >> diffRanges [
 	"Relation named: #diffRanges type: #GLHDiffRange opposite: #diff"
 
@@ -125,21 +123,21 @@ GLHDiff >> diffRanges [
 	^ diffRanges
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHDiff >> diffRanges: anObject [
 
 	<generated>
 	diffRanges value: anObject
 ]
 
-{ #category : 'navigation' }
+{ #category : #navigation }
 GLHDiff >> diffRangesGroup [
 	<generated>
 	<navigation: 'DiffRanges'>
 	^ MooseSpecializedGroup withAll: self diffRanges asSet
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHDiff >> diffString [
 
 	<FMProperty: #diffString type: #String>
@@ -148,13 +146,13 @@ GLHDiff >> diffString [
 	^ diffString
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHDiff >> diffString: anObject [
 	<generated>
 	diffString := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHDiff >> file [
 	"Relation named: #file type: #GLHFile opposite: #diffs"
 
@@ -163,21 +161,21 @@ GLHDiff >> file [
 	^ file
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHDiff >> file: anObject [
 
 	<generated>
 	file value: anObject
 ]
 
-{ #category : 'navigation' }
+{ #category : #navigation }
 GLHDiff >> fileGroup [
 	<generated>
 	<navigation: 'File'>
 	^ MooseSpecializedGroup withAll: self file asSet
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 GLHDiff >> inspectionGLHDiff [
 
 	<inspectorPresentationOrder: 3 title: 'Files Impacted'>
@@ -187,7 +185,7 @@ GLHDiff >> inspectionGLHDiff [
 	^ canvas asPresenter
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHDiff >> mergeRequest [
 	"Relation named: #mergeRequest type: #GLHMergeRequest opposite: #diffs"
 
@@ -195,14 +193,14 @@ GLHDiff >> mergeRequest [
 	^ mergeRequest
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHDiff >> mergeRequest: anObject [
 
 	<generated>
 	mergeRequest := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHDiff >> new_file [
 
 	<FMProperty: #new_file type: #Boolean defaultValue: false>
@@ -211,13 +209,13 @@ GLHDiff >> new_file [
 	^ new_file ifNil: [ new_file := false ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHDiff >> new_file: anObject [
 	<generated>
 	new_file := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHDiff >> new_path [
 
 	<FMProperty: #new_path type: #String>
@@ -226,13 +224,13 @@ GLHDiff >> new_path [
 	^ new_path
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHDiff >> new_path: anObject [
 	<generated>
 	new_path := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHDiff >> old_path [
 
 	<FMProperty: #old_path type: #String>
@@ -241,13 +239,13 @@ GLHDiff >> old_path [
 	^ old_path
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHDiff >> old_path: anObject [
 	<generated>
 	old_path := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHDiff >> renamed_file [
 
 	<FMProperty: #renamed_file type: #Boolean defaultValue: false>
@@ -256,7 +254,7 @@ GLHDiff >> renamed_file [
 	^ renamed_file ifNil: [ renamed_file := false ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHDiff >> renamed_file: anObject [
 	<generated>
 	renamed_file := anObject

@@ -2,13 +2,12 @@
 An OpenedMergeRequestMetricTest is a test class for testing the behavior of OpenedMergeRequestMetric
 "
 Class {
-	#name : 'OpenedMergeRequestMetricTest',
-	#superclass : 'TestCase',
-	#category : 'GitLabHealth-Model-Analysis-Tests',
-	#package : 'GitLabHealth-Model-Analysis-Tests'
+	#name : #OpenedMergeRequestMetricTest,
+	#superclass : #TestCase,
+	#category : 'GitLabHealth-Model-Analysis-Tests'
 }
 
-{ #category : 'tests' }
+{ #category : #tests }
 OpenedMergeRequestMetricTest >> testCalculate [
 
 	| openedMergeRequest result glhImporter user user2|
@@ -45,7 +44,7 @@ OpenedMergeRequestMetricTest >> testCalculate [
 	self assert: result equals: 1
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 OpenedMergeRequestMetricTest >> testCalculate1OpenedAnd2NotOpenedByUser [
 
 	| openedMergeRequest result glhImporter user user2 |
@@ -89,7 +88,7 @@ OpenedMergeRequestMetricTest >> testCalculate1OpenedAnd2NotOpenedByUser [
 	self assert: result equals: 1
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 OpenedMergeRequestMetricTest >> testCalculateNoMergeRequests [
 
 	| openedMergeRequest result glhImporter user |
@@ -116,7 +115,7 @@ OpenedMergeRequestMetricTest >> testCalculateNoMergeRequests [
 	self assert: result equals: 0
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 OpenedMergeRequestMetricTest >> testCalculateNotOpenedByUser [
 
 	| openedMergeRequest result glhImporter user user2 |

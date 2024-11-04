@@ -1,47 +1,46 @@
 Class {
-	#name : 'JiraImporterMock',
-	#superclass : 'Object',
+	#name : #JiraImporterMock,
+	#superclass : #Object,
 	#instVars : [
 		'issues',
 		'model'
 	],
-	#category : 'GitLabHealth-Model-Analysis-Tests',
-	#package : 'GitLabHealth-Model-Analysis-Tests'
+	#category : 'GitLabHealth-Model-Analysis-Tests'
 }
 
-{ #category : 'api - import' }
+{ #category : #'api - import' }
 JiraImporterMock >> importAllCurrentAndPastIssuesOf: email [
 
 	model addAll: issues.
 	^ issues
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 JiraImporterMock >> initialize [
 
 	model := GLHModel new name: 'model'.
 	issues := {  }.
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JiraImporterMock >> issues [
 
 	^ issues
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JiraImporterMock >> issues: anObject [
 
 	issues := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JiraImporterMock >> model [
 
 	^ model
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JiraImporterMock >> model: anObject [
 
 	model := anObject

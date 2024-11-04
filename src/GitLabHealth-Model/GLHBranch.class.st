@@ -25,20 +25,18 @@ A git branch
 
 "
 Class {
-	#name : 'GLHBranch',
-	#superclass : 'GLHEntity',
+	#name : #GLHBranch,
+	#superclass : #GLHEntity,
 	#instVars : [
 		'#name => FMProperty',
 		'#repository => FMOne type: #GLHRepository opposite: #branches',
 		'#files => FMMany type: #GLHFile opposite: #branch',
 		'#commits => FMMany type: #GLHCommit opposite: #branch'
 	],
-	#category : 'GitLabHealth-Model-Entities',
-	#package : 'GitLabHealth-Model',
-	#tag : 'Entities'
+	#category : 'GitLabHealth-Model-Entities'
 }
 
-{ #category : 'meta' }
+{ #category : #meta }
 GLHBranch class >> annotation [
 
 	<FMClass: #Branch super: #GLHEntity>
@@ -47,19 +45,19 @@ GLHBranch class >> annotation [
 	^ self
 ]
 
-{ #category : 'adding' }
+{ #category : #adding }
 GLHBranch >> addCommit: anObject [
 	<generated>
 	^ self commits add: anObject
 ]
 
-{ #category : 'adding' }
+{ #category : #adding }
 GLHBranch >> addFile: anObject [
 	<generated>
 	^ self files add: anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHBranch >> commits [
 	"Relation named: #commits type: #GLHCommit opposite: #branch"
 
@@ -68,21 +66,21 @@ GLHBranch >> commits [
 	^ commits
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHBranch >> commits: anObject [
 
 	<generated>
 	commits value: anObject
 ]
 
-{ #category : 'navigation' }
+{ #category : #navigation }
 GLHBranch >> commitsGroup [
 	<generated>
 	<navigation: 'Commits'>
 	^ MooseSpecializedGroup withAll: self commits asSet
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHBranch >> files [
 	"Relation named: #files type: #GLHFile opposite: #branch"
 
@@ -91,21 +89,21 @@ GLHBranch >> files [
 	^ files
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHBranch >> files: anObject [
 
 	<generated>
 	files value: anObject
 ]
 
-{ #category : 'navigation' }
+{ #category : #navigation }
 GLHBranch >> filesGroup [
 	<generated>
 	<navigation: 'Files'>
 	^ MooseSpecializedGroup withAll: self files asSet
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHBranch >> name [
 
 	<FMProperty: #name type: #String>
@@ -113,13 +111,13 @@ GLHBranch >> name [
 	^ name
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHBranch >> name: anObject [
 	<generated>
 	name := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHBranch >> repository [
 	"Relation named: #repository type: #GLHRepository opposite: #branches"
 
@@ -128,14 +126,14 @@ GLHBranch >> repository [
 	^ repository
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHBranch >> repository: anObject [
 
 	<generated>
 	repository := anObject
 ]
 
-{ #category : 'navigation' }
+{ #category : #navigation }
 GLHBranch >> repositoryGroup [
 	<generated>
 	<navigation: 'Repository'>

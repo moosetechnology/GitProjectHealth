@@ -41,8 +41,8 @@ A GitLab Project
 
 "
 Class {
-	#name : 'GLHProject',
-	#superclass : 'GLHEntity',
+	#name : #GLHProject,
+	#superclass : #GLHEntity,
 	#traits : 'FamixTNamedEntity',
 	#classTraits : 'FamixTNamedEntity classTrait',
 	#instVars : [
@@ -61,12 +61,10 @@ Class {
 		'#topics => FMProperty',
 		'#web_url => FMProperty'
 	],
-	#category : 'GitLabHealth-Model-Entities',
-	#package : 'GitLabHealth-Model',
-	#tag : 'Entities'
+	#category : 'GitLabHealth-Model-Entities'
 }
 
-{ #category : 'meta' }
+{ #category : #meta }
 GLHProject class >> annotation [
 
 	<FMClass: #Project super: #GLHEntity>
@@ -75,25 +73,25 @@ GLHProject class >> annotation [
 	^ self
 ]
 
-{ #category : 'adding' }
+{ #category : #adding }
 GLHProject >> addContributor: anObject [
 	<generated>
 	^ self contributors add: anObject
 ]
 
-{ #category : 'adding' }
+{ #category : #adding }
 GLHProject >> addMergeRequest: anObject [
 	<generated>
 	^ self mergeRequests add: anObject
 ]
 
-{ #category : 'adding' }
+{ #category : #adding }
 GLHProject >> addPipeline: anObject [
 	<generated>
 	^ self pipelines add: anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHProject >> archived [
 
 	<FMProperty: #archived type: #Boolean>
@@ -101,13 +99,13 @@ GLHProject >> archived [
 	^ archived
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHProject >> archived: anObject [
 	<generated>
 	archived := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHProject >> avatar_url [
 
 	<FMProperty: #avatar_url type: #String>
@@ -115,13 +113,13 @@ GLHProject >> avatar_url [
 	^ avatar_url
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHProject >> avatar_url: anObject [
 	<generated>
 	avatar_url := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHProject >> contributors [
 	"Relation named: #contributors type: #GLHUser opposite: #contributedProjects"
 
@@ -130,14 +128,14 @@ GLHProject >> contributors [
 	^ contributors
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHProject >> contributors: anObject [
 
 	<generated>
 	contributors value: anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHProject >> creator [
 	"Relation named: #creator type: #GLHUser opposite: #createdProjects"
 
@@ -145,14 +143,14 @@ GLHProject >> creator [
 	^ creator
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHProject >> creator: anObject [
 
 	<generated>
 	creator := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHProject >> creator_id [
 
 	<FMProperty: #creator_id type: #Number>
@@ -160,13 +158,13 @@ GLHProject >> creator_id [
 	^ creator_id
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHProject >> creator_id: anObject [
 	<generated>
 	creator_id := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHProject >> description [
 
 	<FMProperty: #description type: #String>
@@ -174,13 +172,13 @@ GLHProject >> description [
 	^ description
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHProject >> description: anObject [
 	<generated>
 	description := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHProject >> group [
 	"Relation named: #group type: #GLHGroup opposite: #projects"
 
@@ -189,21 +187,21 @@ GLHProject >> group [
 	^ group
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHProject >> group: anObject [
 
 	<generated>
 	group := anObject
 ]
 
-{ #category : 'navigation' }
+{ #category : #navigation }
 GLHProject >> groupGroup [
 	<generated>
 	<navigation: 'Group'>
 	^ MooseSpecializedGroup with: self group
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHProject >> id [
 
 	<FMProperty: #id type: #Number>
@@ -211,13 +209,13 @@ GLHProject >> id [
 	^ id
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHProject >> id: anObject [
 	<generated>
 	id := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHProject >> mergeRequests [
 	"Relation named: #mergeRequests type: #GLHMergeRequest opposite: #project"
 
@@ -226,21 +224,21 @@ GLHProject >> mergeRequests [
 	^ mergeRequests
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHProject >> mergeRequests: anObject [
 
 	<generated>
 	mergeRequests value: anObject
 ]
 
-{ #category : 'navigation' }
+{ #category : #navigation }
 GLHProject >> mergeRequestsGroup [
 	<generated>
 	<navigation: 'MergeRequests'>
 	^ MooseSpecializedGroup withAll: self mergeRequests asSet
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHProject >> pipelines [
 	"Relation named: #pipelines type: #GLHPipeline opposite: #project"
 
@@ -249,21 +247,21 @@ GLHProject >> pipelines [
 	^ pipelines
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHProject >> pipelines: anObject [
 
 	<generated>
 	pipelines value: anObject
 ]
 
-{ #category : 'navigation' }
+{ #category : #navigation }
 GLHProject >> pipelinesGroup [
 	<generated>
 	<navigation: 'Pipelines'>
 	^ MooseSpecializedGroup withAll: self pipelines asSet
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHProject >> readme_url [
 
 	<FMProperty: #readme_url type: #String>
@@ -271,13 +269,13 @@ GLHProject >> readme_url [
 	^ readme_url
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHProject >> readme_url: anObject [
 	<generated>
 	readme_url := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHProject >> repository [
 	"Relation named: #repository type: #GLHRepository opposite: #project"
 
@@ -285,21 +283,21 @@ GLHProject >> repository [
 	^ repository
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHProject >> repository: anObject [
 
 	<generated>
 	repository := anObject
 ]
 
-{ #category : 'navigation' }
+{ #category : #navigation }
 GLHProject >> repositoryGroup [
 	<generated>
 	<navigation: 'Repository'>
 	^ MooseSpecializedGroup with: self repository
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHProject >> topics [
 
 	<FMProperty: #topics type: #Object>
@@ -307,13 +305,13 @@ GLHProject >> topics [
 	^ topics
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHProject >> topics: anObject [
 	<generated>
 	topics := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHProject >> web_url [
 
 	<FMProperty: #web_url type: #String>
@@ -321,7 +319,7 @@ GLHProject >> web_url [
 	^ web_url
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHProject >> web_url: anObject [
 	<generated>
 	web_url := anObject

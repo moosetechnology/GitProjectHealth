@@ -1,6 +1,6 @@
 Class {
-	#name : 'GitAnalyzerLocalTest',
-	#superclass : 'TestCase',
+	#name : #GitAnalyzerLocalTest,
+	#superclass : #TestCase,
 	#instVars : [
 		'glphModel',
 		'glphApi',
@@ -9,11 +9,10 @@ Class {
 		'gitAnalyzer',
 		'fromCommit'
 	],
-	#category : 'GitLabHealth-Model-Analysis-Tests',
-	#package : 'GitLabHealth-Model-Analysis-Tests'
+	#category : 'GitLabHealth-Model-Analysis-Tests'
 }
 
-{ #category : 'running' }
+{ #category : #running }
 GitAnalyzerLocalTest >> setUp [
 
 	super setUp.
@@ -28,7 +27,7 @@ GitAnalyzerLocalTest >> setUp [
 	gitAnalyzer fromCommit: fromCommit.
 ]
 
-{ #category : 'test' }
+{ #category : #test }
 GitAnalyzerLocalTest >> testAnalyseCommentContributionsJavaComment [
 
 	| diffA diffARange addition |
@@ -47,7 +46,7 @@ GitAnalyzerLocalTest >> testAnalyseCommentContributionsJavaComment [
 	self assert: gitAnalyzer analyseCommentContribution equals: 1
 ]
 
-{ #category : 'test' }
+{ #category : #test }
 GitAnalyzerLocalTest >> testAnalyseCommentContributionsJavaContinueComment [
 
 	| diffA diffARange addition |
@@ -66,7 +65,7 @@ GitAnalyzerLocalTest >> testAnalyseCommentContributionsJavaContinueComment [
 	self assert: gitAnalyzer analyseCommentContribution equals: 1
 ]
 
-{ #category : 'test' }
+{ #category : #test }
 GitAnalyzerLocalTest >> testAnalyseCommentContributionsJavaStopComment [
 
 	| diffA diffARange addition |
@@ -85,7 +84,7 @@ GitAnalyzerLocalTest >> testAnalyseCommentContributionsJavaStopComment [
 	self assert: gitAnalyzer analyseCommentContribution equals: 1
 ]
 
-{ #category : 'test' }
+{ #category : #test }
 GitAnalyzerLocalTest >> testAnalyseCommentContributionsMixedMultipleComments [
 
 	| diffA diffARange addition additionB additionC |
@@ -112,7 +111,7 @@ GitAnalyzerLocalTest >> testAnalyseCommentContributionsMixedMultipleComments [
 	self assert: gitAnalyzer analyseCommentContribution equals: 2
 ]
 
-{ #category : 'test' }
+{ #category : #test }
 GitAnalyzerLocalTest >> testAnalyseCommentContributionsMultipleComments [
 
 	| diffA diffARange addition additionB additionC |
@@ -139,7 +138,7 @@ GitAnalyzerLocalTest >> testAnalyseCommentContributionsMultipleComments [
 	self assert: gitAnalyzer analyseCommentContribution equals: 3
 ]
 
-{ #category : 'test' }
+{ #category : #test }
 GitAnalyzerLocalTest >> testAnalyseCommentContributionsPythonComment [
 
 	| diffA diffARange addition |
@@ -158,7 +157,7 @@ GitAnalyzerLocalTest >> testAnalyseCommentContributionsPythonComment [
 	self assert: gitAnalyzer analyseCommentContribution equals: 1
 ]
 
-{ #category : 'test' }
+{ #category : #test }
 GitAnalyzerLocalTest >> testAnalyseCommentContributionsShouldBe0 [
 
 	| diffA diffARange addition |
@@ -177,7 +176,7 @@ GitAnalyzerLocalTest >> testAnalyseCommentContributionsShouldBe0 [
 	self assert: gitAnalyzer analyseCommentContribution equals: 0
 ]
 
-{ #category : 'test' }
+{ #category : #test }
 GitAnalyzerLocalTest >> testAnalyseCommentInSomeAroundCode [
 
 	| diffA diffARange addition |
@@ -196,7 +195,7 @@ GitAnalyzerLocalTest >> testAnalyseCommentInSomeAroundCode [
 	self assert: gitAnalyzer analyseCommentContribution equals: 0
 ]
 
-{ #category : 'test' }
+{ #category : #test }
 GitAnalyzerLocalTest >> testAnalyseCommentNotAnAddition [
 
 	| diffA diffARange addition |
@@ -215,7 +214,7 @@ GitAnalyzerLocalTest >> testAnalyseCommentNotAnAddition [
 	self assert: gitAnalyzer analyseCommentContribution equals: 0
 ]
 
-{ #category : 'test' }
+{ #category : #test }
 GitAnalyzerLocalTest >> testArrangeCommitsByDate [
 
 	| commitA2 commitA3 commitB result |

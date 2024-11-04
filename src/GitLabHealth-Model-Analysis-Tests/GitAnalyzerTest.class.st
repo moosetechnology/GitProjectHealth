@@ -2,8 +2,8 @@
 A CodeChurnAnalyzerTest is a test class for testing the behavior of CodeChurnAnalyzer
 "
 Class {
-	#name : 'GitAnalyzerTest',
-	#superclass : 'TestCase',
+	#name : #GitAnalyzerTest,
+	#superclass : #TestCase,
 	#instVars : [
 		'glphModel',
 		'glphApi',
@@ -11,11 +11,10 @@ Class {
 		'projects',
 		'gitAnalyzer'
 	],
-	#category : 'GitLabHealth-Model-Analysis-Tests',
-	#package : 'GitLabHealth-Model-Analysis-Tests'
+	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
-{ #category : 'running' }
+{ #category : #running }
 GitAnalyzerTest >> setUp [
 
 	| since |
@@ -52,7 +51,7 @@ GitAnalyzerTest >> setUp [
 		               onModel: glphModel
 ]
 
-{ #category : 'test' }
+{ #category : #test }
 GitAnalyzerTest >> testAnalyseAmandment [
 
 	| myCommits res mondayCommit tuesdayCommit wednesdayCommit |
@@ -97,26 +96,22 @@ GitAnalyzerTest >> testAnalyseAmandment [
 	self assert: res equals: tuesdayCommit
 ]
 
-{ #category : 'test' }
+{ #category : #test }
 GitAnalyzerTest >> testAnalyseCommitFrequencySinceUntil [
 
 	| res from since |
-	
 	from := '13 May 2024'.
 	since := '16 May 2024'.
-	
+
 	res := gitAnalyzer
 		       onProject: projects first;
-		       analyseCommitFrequencySince: from asDate
-		       until: since asDate.
+		       analyseCommitFrequencySince: from asDate until: since asDate.
 
-	
-	
 	self assert: (res at: from) size equals: 1.
-	self assert: (res at: '14 May 2024') size equals: 4.
+	self assert: (res at: '14 May 2024') size equals: 4
 ]
 
-{ #category : 'test' }
+{ #category : #test }
 GitAnalyzerTest >> testAnalyseMergeResquestValidation [
 
 	| mergeResquest res |
@@ -133,7 +128,7 @@ GitAnalyzerTest >> testAnalyseMergeResquestValidation [
 		equals: (res at: #duration)
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 GitAnalyzerTest >> testChurnMetric [
 
 	| myCommits res wednesdayCommit mondayCommit tuesdayCommit codeJs churn4CodeJs |

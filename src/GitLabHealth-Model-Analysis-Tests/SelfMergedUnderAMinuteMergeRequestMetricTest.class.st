@@ -2,13 +2,12 @@
 A MergedMergeRequestWithoutReviewMetricTest is a test class for testing the behavior of MergedMergeRequestWithoutReviewMetric
 "
 Class {
-	#name : 'SelfMergedUnderAMinuteMergeRequestMetricTest',
-	#superclass : 'TestCase',
-	#category : 'GitLabHealth-Model-Analysis-Tests',
-	#package : 'GitLabHealth-Model-Analysis-Tests'
+	#name : #SelfMergedUnderAMinuteMergeRequestMetricTest,
+	#superclass : #TestCase,
+	#category : 'GitLabHealth-Model-Analysis-Tests'
 }
 
-{ #category : 'tests' }
+{ #category : #tests }
 SelfMergedUnderAMinuteMergeRequestMetricTest >> testCalculate [
 
 	| result glhImporter user mergedMergeRequestWithoutReview |
@@ -48,7 +47,7 @@ SelfMergedUnderAMinuteMergeRequestMetricTest >> testCalculate [
 	self assert: result equals: 1
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 SelfMergedUnderAMinuteMergeRequestMetricTest >> testCalculateMergeButNotCreated [
 
 	| result glhImporter user mergedMergeRequestWithoutReview user2 |
@@ -93,7 +92,7 @@ SelfMergedUnderAMinuteMergeRequestMetricTest >> testCalculateMergeButNotCreated 
 	self assert: result equals: 0
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 SelfMergedUnderAMinuteMergeRequestMetricTest >> testCalculateNoMergeRequests [
 
 	| result glhImporter user mergedMergeRequestWithoutReview |

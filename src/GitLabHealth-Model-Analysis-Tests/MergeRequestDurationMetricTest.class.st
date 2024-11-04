@@ -2,13 +2,12 @@
 A MergeRequestDurationMetricTest is a test class for testing the behavior of MergeRequestDurationMetric
 "
 Class {
-	#name : 'MergeRequestDurationMetricTest',
-	#superclass : 'TestCase',
-	#category : 'GitLabHealth-Model-Analysis-Tests',
-	#package : 'GitLabHealth-Model-Analysis-Tests'
+	#name : #MergeRequestDurationMetricTest,
+	#superclass : #TestCase,
+	#category : 'GitLabHealth-Model-Analysis-Tests'
 }
 
-{ #category : 'tests' }
+{ #category : #tests }
 MergeRequestDurationMetricTest >> testCalculate [
 
 	| result glhImporter user mergeRequestDuration |
@@ -44,7 +43,7 @@ MergeRequestDurationMetricTest >> testCalculate [
 	self assert: result equals: (10 * 60 * 60)
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 MergeRequestDurationMetricTest >> testCalculateNoMergeRequests [
 
 	| result glhImporter user mergeRequestDuration |

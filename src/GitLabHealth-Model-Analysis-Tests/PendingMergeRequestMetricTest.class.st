@@ -2,13 +2,12 @@
 A PendingMergeRequestMetricTest is a test class for testing the behavior of PendingMergeRequestMetric
 "
 Class {
-	#name : 'PendingMergeRequestMetricTest',
-	#superclass : 'TestCase',
-	#category : 'GitLabHealth-Model-Analysis-Tests',
-	#package : 'GitLabHealth-Model-Analysis-Tests'
+	#name : #PendingMergeRequestMetricTest,
+	#superclass : #TestCase,
+	#category : 'GitLabHealth-Model-Analysis-Tests'
 }
 
-{ #category : 'test' }
+{ #category : #test }
 PendingMergeRequestMetricTest >> testCalculate [
 
 	| result glhImporter user mergedMergeRequestPending|
@@ -44,7 +43,7 @@ PendingMergeRequestMetricTest >> testCalculate [
 	self assert: result equals: 1
 ]
 
-{ #category : 'test' }
+{ #category : #test }
 PendingMergeRequestMetricTest >> testCalculate1Pending1Closed [
 
 	| result glhImporter user mergedMergeRequestPending |
@@ -82,7 +81,7 @@ PendingMergeRequestMetricTest >> testCalculate1Pending1Closed [
 	self assert: result equals: 1
 ]
 
-{ #category : 'test' }
+{ #category : #test }
 PendingMergeRequestMetricTest >> testCalculate1PendingByUser [
 
 	| result glhImporter user mergedMergeRequestPending user2 |
@@ -126,7 +125,7 @@ PendingMergeRequestMetricTest >> testCalculate1PendingByUser [
 	self assert: result equals: 1
 ]
 
-{ #category : 'test' }
+{ #category : #test }
 PendingMergeRequestMetricTest >> testCalculate2Pending [
 
 	| result glhImporter user mergedMergeRequestPending user2 |

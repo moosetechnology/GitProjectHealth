@@ -21,8 +21,8 @@ a commit attached to a repository
 | Relation | Origin | Opposite | Type | Comment |
 |---|
 | `childCommits` | `GLHCommit` | `parentCommits` | `GLHCommit` | |
-| `commitedMergeRequest` | `GLHCommit` | `mergeRequestCommit` | `GLHMergeRequest` | |
 | `commitedMergeRequest` | `GLHCommit` | `mergedCommit` | `GLHMergeRequest` | |
+| `commitedMergeRequest` | `GLHCommit` | `mergeRequestCommit` | `GLHMergeRequest` | |
 | `parentCommits` | `GLHCommit` | `childCommits` | `GLHCommit` | |
 | `squashedMergeRequest` | `GLHCommit` | `squashCommit` | `GLHMergeRequest` | |
 
@@ -51,8 +51,8 @@ a commit attached to a repository
 
 "
 Class {
-	#name : 'GLHCommit',
-	#superclass : 'GLHEntity',
+	#name : #GLHCommit,
+	#superclass : #GLHEntity,
 	#traits : 'FamixTNamedEntity',
 	#classTraits : 'FamixTNamedEntity classTrait',
 	#instVars : [
@@ -81,12 +81,10 @@ Class {
 		'#title => FMProperty',
 		'#web_url => FMProperty'
 	],
-	#category : 'GitLabHealth-Model-Entities',
-	#package : 'GitLabHealth-Model',
-	#tag : 'Entities'
+	#category : #'GitLabHealth-Model-Entities'
 }
 
-{ #category : 'meta' }
+{ #category : #meta }
 GLHCommit class >> annotation [
 
 	<FMClass: #Commit super: #GLHEntity>
@@ -95,31 +93,31 @@ GLHCommit class >> annotation [
 	^ self
 ]
 
-{ #category : 'adding' }
+{ #category : #adding }
 GLHCommit >> addChildCommit: anObject [
 	<generated>
 	^ self childCommits add: anObject
 ]
 
-{ #category : 'adding' }
+{ #category : #adding }
 GLHCommit >> addDiff: anObject [
 	<generated>
 	^ self diffs add: anObject
 ]
 
-{ #category : 'adding' }
+{ #category : #adding }
 GLHCommit >> addJob: anObject [
 	<generated>
 	^ self jobs add: anObject
 ]
 
-{ #category : 'adding' }
+{ #category : #adding }
 GLHCommit >> addParentCommit: anObject [
 	<generated>
 	^ self parentCommits add: anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> additions [
 
 	<FMProperty: #additions type: #Number>
@@ -128,13 +126,13 @@ GLHCommit >> additions [
 	^ additions
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> additions: anObject [
 	<generated>
 	additions := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> author_email [
 
 	<FMProperty: #author_email type: #String>
@@ -142,13 +140,13 @@ GLHCommit >> author_email [
 	^ author_email
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> author_email: anObject [
 	<generated>
 	author_email := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> author_name [
 
 	<FMProperty: #author_name type: #String>
@@ -156,13 +154,13 @@ GLHCommit >> author_name [
 	^ author_name
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> author_name: anObject [
 	<generated>
 	author_name := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> authored_date [
 
 	<FMProperty: #authored_date type: #Object>
@@ -170,13 +168,13 @@ GLHCommit >> authored_date [
 	^ authored_date
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> authored_date: anObject [
 	<generated>
 	authored_date := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> branch [
 	"Relation named: #branch type: #GLHBranch opposite: #commits"
 
@@ -185,21 +183,21 @@ GLHCommit >> branch [
 	^ branch
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> branch: anObject [
 
 	<generated>
 	branch := anObject
 ]
 
-{ #category : 'navigation' }
+{ #category : #navigation }
 GLHCommit >> branchGroup [
 	<generated>
 	<navigation: 'Branch'>
 	^ MooseSpecializedGroup with: self branch
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> childCommits [
 	"Relation named: #childCommits type: #GLHCommit opposite: #parentCommits"
 
@@ -207,14 +205,14 @@ GLHCommit >> childCommits [
 	^ childCommits
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> childCommits: anObject [
 
 	<generated>
 	childCommits value: anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> commitCreator [
 	"Relation named: #commitCreator type: #GLHUser opposite: #commits"
 
@@ -223,21 +221,21 @@ GLHCommit >> commitCreator [
 	^ commitCreator
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> commitCreator: anObject [
 
 	<generated>
 	commitCreator := anObject
 ]
 
-{ #category : 'navigation' }
+{ #category : #navigation }
 GLHCommit >> commitCreatorGroup [
 	<generated>
 	<navigation: 'CommitCreator'>
 	^ MooseSpecializedGroup with: self commitCreator
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> commitedMergeRequest [
 	"Relation named: #commitedMergeRequest type: #GLHMergeRequest opposite: #mergedCommit"
 
@@ -246,14 +244,14 @@ GLHCommit >> commitedMergeRequest [
 	^ commitedMergeRequest
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> commitedMergeRequest: anObject [
 
 	<generated>
 	commitedMergeRequest := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> committed_date [
 
 	<FMProperty: #committed_date type: #Object>
@@ -261,13 +259,13 @@ GLHCommit >> committed_date [
 	^ committed_date
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> committed_date: anObject [
 	<generated>
 	committed_date := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> committer_email [
 
 	<FMProperty: #committer_email type: #String>
@@ -275,13 +273,13 @@ GLHCommit >> committer_email [
 	^ committer_email
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> committer_email: anObject [
 	<generated>
 	committer_email := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> committer_name [
 
 	<FMProperty: #committer_name type: #String>
@@ -289,13 +287,13 @@ GLHCommit >> committer_name [
 	^ committer_name
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> committer_name: anObject [
 	<generated>
 	committer_name := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> created_at [
 
 	<FMProperty: #created_at type: #Object>
@@ -303,13 +301,13 @@ GLHCommit >> created_at [
 	^ created_at
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> created_at: anObject [
 	<generated>
 	created_at := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> deletions [
 
 	<FMProperty: #deletions type: #Number>
@@ -318,13 +316,13 @@ GLHCommit >> deletions [
 	^ deletions
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> deletions: anObject [
 	<generated>
 	deletions := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> diffs [
 	"Relation named: #diffs type: #GLHDiff opposite: #commit"
 
@@ -333,21 +331,21 @@ GLHCommit >> diffs [
 	^ diffs
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> diffs: anObject [
 
 	<generated>
 	diffs value: anObject
 ]
 
-{ #category : 'navigation' }
+{ #category : #navigation }
 GLHCommit >> diffsGroup [
 	<generated>
 	<navigation: 'Diffs'>
 	^ MooseSpecializedGroup withAll: self diffs asSet
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> id [
 
 	<FMProperty: #id type: #String>
@@ -355,13 +353,13 @@ GLHCommit >> id [
 	^ id
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> id: anObject [
 	<generated>
 	id := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> jobs [
 	"Relation named: #jobs type: #GLHJob opposite: #commit"
 
@@ -370,21 +368,21 @@ GLHCommit >> jobs [
 	^ jobs
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> jobs: anObject [
 
 	<generated>
 	jobs value: anObject
 ]
 
-{ #category : 'navigation' }
+{ #category : #navigation }
 GLHCommit >> jobsGroup [
 	<generated>
 	<navigation: 'Jobs'>
 	^ MooseSpecializedGroup withAll: self jobs asSet
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> message [
 
 	<FMProperty: #message type: #String>
@@ -392,13 +390,13 @@ GLHCommit >> message [
 	^ message
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> message: anObject [
 	<generated>
 	message := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> parentCommits [
 	"Relation named: #parentCommits type: #GLHCommit opposite: #childCommits"
 
@@ -407,20 +405,20 @@ GLHCommit >> parentCommits [
 	^ parentCommits
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> parentCommits: anObject [
 
 	<generated>
 	parentCommits value: anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> parent_ids: anObject [
 	<generated>
 	parent_ids := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> repository [
 	"Relation named: #repository type: #GLHRepository opposite: #commits"
 
@@ -429,21 +427,21 @@ GLHCommit >> repository [
 	^ repository
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> repository: anObject [
 
 	<generated>
 	repository := anObject
 ]
 
-{ #category : 'navigation' }
+{ #category : #navigation }
 GLHCommit >> repositoryGroup [
 	<generated>
 	<navigation: 'Repository'>
 	^ MooseSpecializedGroup with: self repository
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> short_id [
 
 	<FMProperty: #short_id type: #String>
@@ -451,13 +449,13 @@ GLHCommit >> short_id [
 	^ short_id
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> short_id: anObject [
 	<generated>
 	short_id := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> squashedMergeRequest [
 	"Relation named: #squashedMergeRequest type: #GLHMergeRequest opposite: #squashCommit"
 
@@ -466,14 +464,14 @@ GLHCommit >> squashedMergeRequest [
 	^ squashedMergeRequest
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> squashedMergeRequest: anObject [
 
 	<generated>
 	squashedMergeRequest := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> title [
 
 	<FMProperty: #title type: #String>
@@ -481,13 +479,13 @@ GLHCommit >> title [
 	^ title
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> title: anObject [
 	<generated>
 	title := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> web_url [
 
 	<FMProperty: #web_url type: #String>
@@ -495,7 +493,7 @@ GLHCommit >> web_url [
 	^ web_url
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHCommit >> web_url: anObject [
 	<generated>
 	web_url := anObject
