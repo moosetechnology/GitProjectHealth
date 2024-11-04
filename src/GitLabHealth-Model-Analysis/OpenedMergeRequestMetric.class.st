@@ -1,10 +1,11 @@
 Class {
-	#name : #OpenedMergeRequestMetric,
-	#superclass : #UserMergeRequestMetric,
-	#category : 'GitLabHealth-Model-Analysis'
+	#name : 'OpenedMergeRequestMetric',
+	#superclass : 'UserMergeRequestMetric',
+	#category : 'GitLabHealth-Model-Analysis',
+	#package : 'GitLabHealth-Model-Analysis'
 }
 
-{ #category : #calculating }
+{ #category : 'calculating' }
 OpenedMergeRequestMetric >> calculate [
 
 	| groupedByDate dateOver |
@@ -24,13 +25,13 @@ OpenedMergeRequestMetric >> calculate [
 	^ groupedByDate average asFloat
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OpenedMergeRequestMetric >> description [
 
 	^'number of opened merge request'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 OpenedMergeRequestMetric >> name [
 
 	^'openedMergeRequest'

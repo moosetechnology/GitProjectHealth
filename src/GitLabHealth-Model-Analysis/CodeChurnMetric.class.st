@@ -1,13 +1,14 @@
 Class {
-	#name : #CodeChurnMetric,
-	#superclass : #UserCommitsMetric,
+	#name : 'CodeChurnMetric',
+	#superclass : 'UserCommitsMetric',
 	#instVars : [
 		'maxCommitWindow'
 	],
-	#category : 'GitLabHealth-Model-Analysis'
+	#category : 'GitLabHealth-Model-Analysis',
+	#package : 'GitLabHealth-Model-Analysis'
 }
 
-{ #category : #calculating }
+{ #category : 'calculating' }
 CodeChurnMetric >> calculate [
 
 	| commits res groupedByDate totalContributions gitAnalyzer |
@@ -65,13 +66,13 @@ CodeChurnMetric >> calculate [
 	^ (groupedByDate collect: [ :date | date at: #percentage ]) average
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 CodeChurnMetric >> description [
 
 	^ 'churn % (W=' , maxCommitWindow printString , ')'
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 CodeChurnMetric >> initialize [ 
 	maxCommitWindow := 3
 ]

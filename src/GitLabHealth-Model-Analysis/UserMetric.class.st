@@ -1,41 +1,42 @@
 Class {
-	#name : #UserMetric,
-	#superclass : #Metric,
+	#name : 'UserMetric',
+	#superclass : 'Metric',
 	#instVars : [
 		'user',
 		'userCommits',
 		'userMergeRequests',
 		'emailDomain'
 	],
-	#category : 'GitLabHealth-Model-Analysis'
+	#category : 'GitLabHealth-Model-Analysis',
+	#package : 'GitLabHealth-Model-Analysis'
 }
 
-{ #category : #utils }
+{ #category : 'utils' }
 UserMetric >> cacheSymbolFor: anEntityType since: since until: until [
 
 	^ (anEntityType printString , ' since ' , since printString , ' to '
 	   , until printString) asSymbol
 ]
 
-{ #category : #calculating }
+{ #category : 'calculating' }
 UserMetric >> calculate [
 
 	^ self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 UserMetric >> description [
 
 	^ self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 UserMetric >> emailDomain: anObject [
 
 	emailDomain := anObject
 ]
 
-{ #category : #churn }
+{ #category : 'churn' }
 UserMetric >> foundSuccessorOf: commits andCompleteImportForMax: commitLimit [
 
 	| analyzingCommits i size |
@@ -57,18 +58,18 @@ UserMetric >> foundSuccessorOf: commits andCompleteImportForMax: commitLimit [
 	^ analyzingCommits
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 UserMetric >> initialize [
 	over := Date
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 UserMetric >> load [
 
 	^ self subclassResponsibility
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 UserMetric >> loadCompleteMergeRequestsSince: since until: until [
 
 	| mergeRequests |
@@ -82,7 +83,7 @@ UserMetric >> loadCompleteMergeRequestsSince: since until: until [
 	^ mergeRequests
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 UserMetric >> loadMergeRequestsSince: since until: until [
 
 	| cacheSymbol mergeRequests |
@@ -110,7 +111,7 @@ UserMetric >> loadMergeRequestsSince: since until: until [
 		  mergeRequest author = user ]"
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 UserMetric >> loadMergeRequestsWithJiraIssueSince: since until: until [
 
 	| email mergeRequests |
@@ -130,7 +131,7 @@ UserMetric >> loadMergeRequestsWithJiraIssueSince: since until: until [
 		  mergeRequest jiraIssue isNotNil ]
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 UserMetric >> loadUserCommitsSince: since until: until [
 
 	| cacheSymbol allCommits |
@@ -161,7 +162,7 @@ UserMetric >> loadUserCommitsSince: since until: until [
 	^ allCommits reject: [ :commit | commit commitCreator ~= user ]
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 UserMetric >> loadUserCompleteCommitsSince: since until: until [
 
 	| commits |
@@ -170,7 +171,7 @@ UserMetric >> loadUserCompleteCommitsSince: since until: until [
 	^ commits
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 UserMetric >> loadUserCompleteMergeRequestsSince: since until: until [
 
 	| mergeRequests |
@@ -183,7 +184,7 @@ UserMetric >> loadUserCompleteMergeRequestsSince: since until: until [
 	^ mergeRequests
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 UserMetric >> loadUserCompleteMergeRequestsWithJiraIssueSince: since until: until [
 
 	| email mergeRequests |
@@ -204,7 +205,7 @@ UserMetric >> loadUserCompleteMergeRequestsWithJiraIssueSince: since until: unti
 		  mergeRequest jiraIssue isNotNil ]
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 UserMetric >> loadUserMergeRequestsSince: since until: until [
 
 	| mergeRequests |
@@ -213,7 +214,7 @@ UserMetric >> loadUserMergeRequestsSince: since until: until [
 	^ mergeRequests select: [ :mergeRequest | mergeRequest author = user ]
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 UserMetric >> loadUserMergeRequestsWithJiraIssueSince: since until: until [
 
 	| email mergeRequests |
@@ -232,19 +233,19 @@ UserMetric >> loadUserMergeRequestsWithJiraIssueSince: since until: until [
 		  mergeRequest jiraIssue isNotNil ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 UserMetric >> name [
 
 	^ self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 UserMetric >> user: anObject [
 
 	user := anObject
 ]
 
-{ #category : #email }
+{ #category : 'email' }
 UserMetric >> userEmail [
 
 	user public_email = '' ifFalse: [ ^ user public_email ].

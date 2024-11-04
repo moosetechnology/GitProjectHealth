@@ -1,10 +1,11 @@
 Class {
-	#name : #CodeAdditionByMRMetric,
-	#superclass : #UserMergeRequestMetric,
-	#category : 'GitLabHealth-Model-Analysis'
+	#name : 'CodeAdditionByMRMetric',
+	#superclass : 'UserMergeRequestMetric',
+	#category : 'GitLabHealth-Model-Analysis',
+	#package : 'GitLabHealth-Model-Analysis'
 }
 
-{ #category : #calculating }
+{ #category : 'calculating' }
 CodeAdditionByMRMetric >> calculate [
 
 	| groupedByDate dateOver |
@@ -29,13 +30,13 @@ CodeAdditionByMRMetric >> calculate [
 	^ groupedByDate average asFloat
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 CodeAdditionByMRMetric >> description [
 
 	^ 'average code addition by merge request'
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 CodeAdditionByMRMetric >> load [
 
 	userMergeRequests := self

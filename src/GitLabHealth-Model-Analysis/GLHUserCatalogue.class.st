@@ -1,14 +1,15 @@
 Class {
-	#name : #GLHUserCatalogue,
-	#superclass : #Dictionary,
+	#name : 'GLHUserCatalogue',
+	#superclass : 'Dictionary',
 	#instVars : [
 		'users',
 		'anImporter'
 	],
-	#category : 'GitLabHealth-Model-Analysis'
+	#category : 'GitLabHealth-Model-Analysis',
+	#package : 'GitLabHealth-Model-Analysis'
 }
 
-{ #category : #import }
+{ #category : 'import' }
 GLHUserCatalogue class >> loadFromJson: aString [
 
 	| catalogue dic |
@@ -32,7 +33,7 @@ GLHUserCatalogue class >> loadFromJson: aString [
 	^ catalogue
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GLHUserCatalogue class >> scrapeContributedProjectsForCommitAuthorsRelatedToUser: aGLHUser [
 	"get all "
 
@@ -63,7 +64,7 @@ GLHUserCatalogue class >> scrapeContributedProjectsForCommitAuthorsRelatedToUser
 	^ (aGLHUser commits collect: [ :commit | commit author_name ]) asSet
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GLHUserCatalogue class >> scrapeWithImporter: anImporter contributedProjectsForCommitAuthorsRelatedToUser: aGLHUser [
 	"get all "
 
@@ -87,13 +88,13 @@ GLHUserCatalogue class >> scrapeWithImporter: anImporter contributedProjectsForC
 	^ (aGLHUser commits collect: [ :commit | commit author_name ]) asSet
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 GLHUserCatalogue >> addUser: aGLHUser [
 
 	self at: aGLHUser ifAbsentPut: [ Set new add: (aGLHUser username); add:  (aGLHUser name) ; yourself ]. 
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 GLHUserCatalogue >> addUser: aGLHUser withName: name [
 
 	self
@@ -107,7 +108,7 @@ GLHUserCatalogue >> addUser: aGLHUser withName: name [
 				yourself ]
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 GLHUserCatalogue >> addUser: aGLHUser withNames: aCollectionOfNames [
 
 	self
@@ -121,20 +122,20 @@ GLHUserCatalogue >> addUser: aGLHUser withNames: aCollectionOfNames [
 				yourself ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GLHUserCatalogue >> anImporter: aGLHModelImporter [
 	anImporter := aGLHModelImporter
 	
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GLHUserCatalogue >> atWithId: anId [ 
 	|res |
 	res := self associations detect: [ :assoc | assoc key id = anId ] ifNone: [ nil ].
 	^ res ifNotNil: [ res value ].
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GLHUserCatalogue >> collectUsernames [
 
 	| username2User |
@@ -150,7 +151,7 @@ GLHUserCatalogue >> collectUsernames [
 	^ username2User
 ]
 
-{ #category : #completion }
+{ #category : 'completion' }
 GLHUserCatalogue >> completeAuthorNameOfUser: aGLHUser with: authorName [
 
 	self
@@ -162,7 +163,7 @@ GLHUserCatalogue >> completeAuthorNameOfUser: aGLHUser with: authorName [
 	self addUser: aGLHUser withName: authorName
 ]
 
-{ #category : #completion }
+{ #category : 'completion' }
 GLHUserCatalogue >> completeAuthorNameOfUser: aGLHUser withAll: authorNames [
 
 	self
@@ -175,7 +176,7 @@ GLHUserCatalogue >> completeAuthorNameOfUser: aGLHUser withAll: authorNames [
 	self addUser: aGLHUser withNames: authorNames
 ]
 
-{ #category : #export }
+{ #category : 'export' }
 GLHUserCatalogue >> exportToJson [
 
 	| tempDic |
@@ -196,13 +197,13 @@ GLHUserCatalogue >> exportToJson [
 	^ STONJSON toString: tempDic
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 GLHUserCatalogue >> initialize [
 
 	anImporter := GLHModelImporter importers anyOne.
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GLHUserCatalogue >> namesAt: aGLHUser [
 
 	| assoc |
@@ -210,7 +211,7 @@ GLHUserCatalogue >> namesAt: aGLHUser [
 	^ assoc value
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GLHUserCatalogue >> reImportAllUsers [
 	"use it after a catalogue import from JSON"
 
@@ -223,7 +224,7 @@ GLHUserCatalogue >> reImportAllUsers [
 		assoc key: user ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GLHUserCatalogue >> scrapeAuthorNameForAllUsers [
 
 	| currentUsers |
@@ -233,7 +234,7 @@ GLHUserCatalogue >> scrapeAuthorNameForAllUsers [
 				 scrapeWithImporter: anImporter  contributedProjectsForCommitAuthorsRelatedToUser: key) ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GLHUserCatalogue >> scrapeAuthorNameForUser: aGLHUser [
 
 	| assoc |
@@ -243,7 +244,7 @@ GLHUserCatalogue >> scrapeAuthorNameForUser: aGLHUser [
 				 contributedProjectsForCommitAuthorsRelatedToUser: aGLHUser)
 ]
 
-{ #category : #scrape }
+{ #category : 'scrape' }
 GLHUserCatalogue >> scrapeAuthorNamesForUsers: aUserCollection [ 
 	
 	aUserCollection do: [ :aGLHUser |
@@ -251,7 +252,7 @@ GLHUserCatalogue >> scrapeAuthorNamesForUsers: aUserCollection [
 		 ].
 ]
 
-{ #category : #completion }
+{ #category : 'completion' }
 GLHUserCatalogue >> searchModelForAuthorNamesOfUser: aGLHUser [ 
 	|assoc|
 	assoc := self associationAt: aGLHUser.
@@ -259,19 +260,19 @@ GLHUserCatalogue >> searchModelForAuthorNamesOfUser: aGLHUser [
 	
 ]
 
-{ #category : #search }
+{ #category : 'search' }
 GLHUserCatalogue >> searchName: aName [
 
 	^ self select: [ :collectionOfName |
 		  (' ' join: collectionOfName) asLowercase  includesSubstring: aName asLowercase ]
 ]
 
-{ #category : #search }
+{ #category : 'search' }
 GLHUserCatalogue >> searchUserWithName: aName [ 
 	^ (self searchName: aName) keys.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GLHUserCatalogue >> users [
 	^ self keys
 ]

@@ -1,10 +1,11 @@
 Class {
-	#name : #CodeAdditionMetric,
-	#superclass : #UserCommitsMetric,
-	#category : 'GitLabHealth-Model-Analysis'
+	#name : 'CodeAdditionMetric',
+	#superclass : 'UserCommitsMetric',
+	#category : 'GitLabHealth-Model-Analysis',
+	#package : 'GitLabHealth-Model-Analysis'
 }
 
-{ #category : #calculating }
+{ #category : 'calculating' }
 CodeAdditionMetric >> calculate [
 
 	| gitAnalyzer contributions groupedByDate |
@@ -36,7 +37,7 @@ CodeAdditionMetric >> calculate [
 	^ groupedByDate average asFloat
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 CodeAdditionMetric >> description [
 
 	^ 'code addition (avg)'
