@@ -2,13 +2,12 @@
 A JiraTimeMRTimeDifferenceMetricTest is a test class for testing the behavior of JiraTimeMRTimeDifferenceMetric
 "
 Class {
-	#name : 'JiraTimeMRTimeDifferenceMetricTest',
-	#superclass : 'TestCase',
-	#category : 'GitLabHealth-Model-Analysis-Tests',
-	#package : 'GitLabHealth-Model-Analysis-Tests'
+	#name : #JiraTimeMRTimeDifferenceMetricTest,
+	#superclass : #TestCase,
+	#category : 'GitLabHealth-Model-Analysis-Tests'
 }
 
-{ #category : 'tests' }
+{ #category : #tests }
 JiraTimeMRTimeDifferenceMetricTest >> testCalculate [
 
 	| result glhImporter user jiraImporter jiraMRDifference |
@@ -52,7 +51,7 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculate [
 	self assert: result equals: 1 hours asSeconds
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 JiraTimeMRTimeDifferenceMetricTest >> testCalculate2PeriodWith1EmptyPeriod [
 
 	| result glhImporter user jiraImporter jiraMRDifference |
@@ -96,7 +95,7 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculate2PeriodWith1EmptyPeriod [
 	self assert: result equals: 1 hours /2 asSeconds
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 JiraTimeMRTimeDifferenceMetricTest >> testCalculateNoMergeRequests [
 
 	| result glhImporter user jiraImporter jiraMRDifference |
@@ -126,7 +125,7 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculateNoMergeRequests [
 	self assert: result equals: nil
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 JiraTimeMRTimeDifferenceMetricTest >> testCalculateWithNoEstimatedTime [
 
 	| result glhImporter user jiraImporter jiraMRDifference |
@@ -168,7 +167,7 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculateWithNoEstimatedTime [
 	self assert: result equals: nil
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 JiraTimeMRTimeDifferenceMetricTest >> testCalculateWithTimeOriginalEstimateAndNoTimeEstimate [
 
 	| result glhImporter user jiraImporter jiraMRDifference |

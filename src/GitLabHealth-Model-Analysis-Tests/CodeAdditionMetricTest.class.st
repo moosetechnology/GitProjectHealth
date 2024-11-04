@@ -2,13 +2,12 @@
 A CodeAdditionMetricTest is a test class for testing the behavior of CodeAdditionMetric
 "
 Class {
-	#name : 'CodeAdditionMetricTest',
-	#superclass : 'TestCase',
-	#category : 'GitLabHealth-Model-Analysis-Tests',
-	#package : 'GitLabHealth-Model-Analysis-Tests'
+	#name : #CodeAdditionMetricTest,
+	#superclass : #TestCase,
+	#category : 'GitLabHealth-Model-Analysis-Tests'
 }
 
-{ #category : 'tests' }
+{ #category : #tests }
 CodeAdditionMetricTest >> testCalculate [
 
 	| user glhImporter codeAddition result |
@@ -45,7 +44,7 @@ CodeAdditionMetricTest >> testCalculate [
 	self assert: result equals: 10
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 CodeAdditionMetricTest >> testCalculateNoCommits [
 
 	| user glhImporter codeAddition result |

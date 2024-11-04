@@ -2,13 +2,12 @@
 A CommitFrequencyMetricTest is a test class for testing the behavior of CommitFrequencyMetric
 "
 Class {
-	#name : 'CommitFrequencyMetricTest',
-	#superclass : 'TestCase',
-	#category : 'GitLabHealth-Model-Analysis-Tests',
-	#package : 'GitLabHealth-Model-Analysis-Tests'
+	#name : #CommitFrequencyMetricTest,
+	#superclass : #TestCase,
+	#category : 'GitLabHealth-Model-Analysis-Tests'
 }
 
-{ #category : 'tests' }
+{ #category : #tests }
 CommitFrequencyMetricTest >> testCalculate [
 
 	| user glhImporter result commitFrequency |
@@ -34,7 +33,7 @@ CommitFrequencyMetricTest >> testCalculate [
 	self assert: result equals: 0
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 CommitFrequencyMetricTest >> testCalculateNoCommits [
 
 	| user glhImporter result commitFrequency |

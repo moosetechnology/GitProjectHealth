@@ -2,13 +2,12 @@
 A ReviewedByUserMergeRequestMetricTest is a test class for testing the behavior of ReviewedByUserMergeRequestMetric
 "
 Class {
-	#name : 'ReviewedByUserMergeRequestMetricTest',
-	#superclass : 'TestCase',
-	#category : 'GitLabHealth-Model-Analysis-Tests',
-	#package : 'GitLabHealth-Model-Analysis-Tests'
+	#name : #ReviewedByUserMergeRequestMetricTest,
+	#superclass : #TestCase,
+	#category : 'GitLabHealth-Model-Analysis-Tests'
 }
 
-{ #category : 'test' }
+{ #category : #test }
 ReviewedByUserMergeRequestMetricTest >> testCalculate [
 
 	| result glhImporter user mergeRequests user2 |
@@ -50,7 +49,7 @@ ReviewedByUserMergeRequestMetricTest >> testCalculate [
 	self assert: result equals: 1
 ]
 
-{ #category : 'test' }
+{ #category : #test }
 ReviewedByUserMergeRequestMetricTest >> testCalculateNoMergeRequests [ 
 
 	| result glhImporter user mergeRequests |
@@ -79,7 +78,7 @@ ReviewedByUserMergeRequestMetricTest >> testCalculateNoMergeRequests [
 	self assert: result equals: 0
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 ReviewedByUserMergeRequestMetricTest >> testCalculateReviewButNotCreated [
 
 	| result glhImporter user mergedMergeRequestWithoutReview user2 |
@@ -117,7 +116,7 @@ ReviewedByUserMergeRequestMetricTest >> testCalculateReviewButNotCreated [
 	self assert: result equals: 1
 ]
 
-{ #category : 'test' }
+{ #category : #test }
 ReviewedByUserMergeRequestMetricTest >> testCalculateReviewByOther [
 
 	| result glhImporter user mergedMergeRequestWithoutReview user2 |

@@ -1,21 +1,20 @@
 Class {
-	#name : 'GLHModelImporterTestResource',
-	#superclass : 'MooseModelTestResource',
+	#name : #GLHModelImporterTestResource,
+	#superclass : #MooseModelTestResource,
 	#instVars : [
 		'glphApi',
 		'glhImporter'
 	],
-	#category : 'GitLabHealth-Model-Importer-Tests',
-	#package : 'GitLabHealth-Model-Importer-Tests'
+	#category : #'GitLabHealth-Model-Importer-Tests'
 }
 
-{ #category : 'setup' }
+{ #category : #setup }
 GLHModelImporterTestResource >> glhImporter [
 
 	^ glhImporter
 ]
 
-{ #category : 'setup' }
+{ #category : #setup }
 GLHModelImporterTestResource >> importModel [
 
 	model := GLHModel new.
@@ -26,7 +25,7 @@ GLHModelImporterTestResource >> importModel [
 		           yourself.
 
 	glhImporter := GLHModelImporter new
-		               glhApi: glphApi;
+		               repoApi: glphApi;
 		               glhModel: model;
 		               withFiles: false;
 		               withCommitDiffs: true.

@@ -2,13 +2,12 @@
 A MergedMergeRequestMetricTest is a test class for testing the behavior of MergedMergeRequestMetric
 "
 Class {
-	#name : 'MergedMergeRequestMetricTest',
-	#superclass : 'TestCase',
-	#category : 'GitLabHealth-Model-Analysis-Tests',
-	#package : 'GitLabHealth-Model-Analysis-Tests'
+	#name : #MergedMergeRequestMetricTest,
+	#superclass : #TestCase,
+	#category : 'GitLabHealth-Model-Analysis-Tests'
 }
 
-{ #category : 'tests' }
+{ #category : #tests }
 MergedMergeRequestMetricTest >> testCalculate [
 
 	| result glhImporter user mergedMergeRequest |
@@ -42,7 +41,7 @@ MergedMergeRequestMetricTest >> testCalculate [
 	self assert: result equals: 1
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 MergedMergeRequestMetricTest >> testCalculate1MRInPeriod1Outside [
 
 	| result glhImporter user mergedMergeRequest |
@@ -84,7 +83,7 @@ MergedMergeRequestMetricTest >> testCalculate1MRInPeriod1Outside [
 	self assert: result equals: 1
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 MergedMergeRequestMetricTest >> testCalculate1MROpenedButNotMerged [
 
 	| result glhImporter user mergedMergeRequest |
@@ -122,7 +121,7 @@ MergedMergeRequestMetricTest >> testCalculate1MROpenedButNotMerged [
 	self assert: result equals: 1
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 MergedMergeRequestMetricTest >> testCalculate2MROneForEachUser [
 
 	| result glhImporter user1 mergedMergeRequest user2 |
@@ -169,7 +168,7 @@ MergedMergeRequestMetricTest >> testCalculate2MROneForEachUser [
 	self assert: result equals: 1
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 MergedMergeRequestMetricTest >> testCalculate3MROpenButMergedByOthers [
 
 	| result glhImporter user1 mergedMergeRequest user2 |
@@ -222,7 +221,7 @@ MergedMergeRequestMetricTest >> testCalculate3MROpenButMergedByOthers [
 	self assert: result equals: 0
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 MergedMergeRequestMetricTest >> testCalculate3MROpenByOther [
 
 	| result glhImporter user1 mergedMergeRequest user2 |
@@ -275,7 +274,7 @@ MergedMergeRequestMetricTest >> testCalculate3MROpenByOther [
 	self assert: result equals: 3
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 MergedMergeRequestMetricTest >> testCalculateNoMergeRequests [ 
 
 	| result glhImporter user mergedMergeRequest |
