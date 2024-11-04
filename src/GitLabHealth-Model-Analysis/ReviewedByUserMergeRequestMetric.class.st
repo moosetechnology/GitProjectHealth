@@ -1,11 +1,10 @@
 Class {
-	#name : 'ReviewedByUserMergeRequestMetric',
-	#superclass : 'UserMergeRequestMetric',
-	#category : 'GitLabHealth-Model-Analysis',
-	#package : 'GitLabHealth-Model-Analysis'
+	#name : #ReviewedByUserMergeRequestMetric,
+	#superclass : #UserMergeRequestMetric,
+	#category : 'GitLabHealth-Model-Analysis'
 }
 
-{ #category : 'calculating' }
+{ #category : #calculating }
 ReviewedByUserMergeRequestMetric >> calculate [
 
 	| groupedByDate mergedMergeRequest reviewedMergeRequests dateOver gitAnalyzer |
@@ -37,13 +36,13 @@ ReviewedByUserMergeRequestMetric >> calculate [
 	^ groupedByDate average asFloat
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ReviewedByUserMergeRequestMetric >> description [
 
 	^ 'number of merger request reviewed by the user'
 ]
 
-{ #category : 'loading' }
+{ #category : #loading }
 ReviewedByUserMergeRequestMetric >> load [
 
 	userMergeRequests := self
@@ -51,7 +50,7 @@ ReviewedByUserMergeRequestMetric >> load [
 		                     until: (period at: #until)
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ReviewedByUserMergeRequestMetric >> name [
 
 	^ 'reviewedMergeRequest'
