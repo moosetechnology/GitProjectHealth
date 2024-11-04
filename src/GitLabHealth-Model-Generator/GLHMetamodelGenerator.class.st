@@ -1,6 +1,6 @@
 Class {
-	#name : 'GLHMetamodelGenerator',
-	#superclass : 'FamixMetamodelGenerator',
+	#name : #GLHMetamodelGenerator,
+	#superclass : #FamixMetamodelGenerator,
 	#instVars : [
 		'project',
 		'group',
@@ -22,33 +22,32 @@ Class {
 		'deletion',
 		'lineOfCode'
 	],
-	#category : 'GitLabHealth-Model-Generator',
-	#package : 'GitLabHealth-Model-Generator'
+	#category : #'GitLabHealth-Model-Generator'
 }
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHMetamodelGenerator class >> packageName [
 	^ #'GitLabHealth-Model'
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHMetamodelGenerator class >> prefix [
 	^ #GLH
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHMetamodelGenerator class >> submetamodels [
 
 	^ { FamixMooseQueryGenerator . FamixGenerator }
 ]
 
-{ #category : 'definition' }
+{ #category : #definition }
 GLHMetamodelGenerator >> branchProperties [
 
 	branch property: #name type: #String
 ]
 
-{ #category : 'definition' }
+{ #category : #definition }
 GLHMetamodelGenerator >> changeProperties [
 
 	change property: #index type: #Number.
@@ -58,7 +57,7 @@ GLHMetamodelGenerator >> changeProperties [
 	deletion property: #delimiter type: #String defaultValue: '#-'
 ]
 
-{ #category : 'definition' }
+{ #category : #definition }
 GLHMetamodelGenerator >> commitProperties [
 
 	commit property: #parent_ids type: #Object defaultValue: 'OrderedCollection new'.
@@ -83,7 +82,7 @@ GLHMetamodelGenerator >> commitProperties [
 		'The number of line that git consider deleted'
 ]
 
-{ #category : 'definition' }
+{ #category : #definition }
 GLHMetamodelGenerator >> defineClasses [
 
 	super defineClasses.
@@ -141,7 +140,7 @@ GLHMetamodelGenerator >> defineClasses [
 		             'a indicate on which line of code are concerned by a diff (usually declared with @@ oldRange, newRange @@) '.
 ]
 
-{ #category : 'definition' }
+{ #category : #definition }
 GLHMetamodelGenerator >> defineHierarchy [
 
 	super defineHierarchy.
@@ -163,7 +162,7 @@ GLHMetamodelGenerator >> defineHierarchy [
 	mergeRequest --|> #TNamedEntity
 ]
 
-{ #category : 'definition' }
+{ #category : #definition }
 GLHMetamodelGenerator >> defineProperties [
 
 	super defineProperties.
@@ -205,7 +204,7 @@ GLHMetamodelGenerator >> defineProperties [
 	self diffRangeProperties
 ]
 
-{ #category : 'definition' }
+{ #category : #definition }
 GLHMetamodelGenerator >> defineRelations [
 
 	super defineRelations.
@@ -278,7 +277,7 @@ GLHMetamodelGenerator >> defineRelations [
 	(diffRange property: #changes) -* (change property: #diffRange)
 ]
 
-{ #category : 'definition' }
+{ #category : #definition }
 GLHMetamodelGenerator >> diffProperties [
 
 	(diff property: #diffString type: #String) comment:
@@ -301,7 +300,7 @@ GLHMetamodelGenerator >> diffProperties [
 		comment: 'Is the file of the diff has been removed'
 ]
 
-{ #category : 'definition' }
+{ #category : #definition }
 GLHMetamodelGenerator >> diffRangeProperties [
 "must parse the range. 
 	originalLineRange = '-120,5' --> change starts at line #120
@@ -311,13 +310,13 @@ GLHMetamodelGenerator >> diffRangeProperties [
 	diffRange property: #lineOfCode type: #String
 ]
 
-{ #category : 'definition' }
+{ #category : #definition }
 GLHMetamodelGenerator >> fileProperties [
 
 	file property: #name type: #String
 ]
 
-{ #category : 'definition' }
+{ #category : #definition }
 GLHMetamodelGenerator >> jobProperties [
 
 	job property: #id type: #Number.
@@ -327,7 +326,7 @@ GLHMetamodelGenerator >> jobProperties [
 	job property: #allow_failure type: #Boolean
 ]
 
-{ #category : 'definition' }
+{ #category : #definition }
 GLHMetamodelGenerator >> mergeRequestProperties [
 
 	mergeRequest property: #id type: #Number.
@@ -390,8 +389,9 @@ GLHMetamodelGenerator >> mergeRequestProperties [
 	mergeRequest property: #commits type: #Object
 ]
 
-{ #category : 'definition' }
+{ #category : #definition }
 GLHMetamodelGenerator >> userProperties [
+
 	user property: #id type: #Number.
 	user property: #username type: #String.
 	user property: #name type: #String.
@@ -402,6 +402,8 @@ GLHMetamodelGenerator >> userProperties [
 	user property: #bio type: #String.
 	user property: #location type: #String.
 	user property: #public_email type: #String.
+	user property: #email type: #String.
+	user property: #commit_email type: #String.
 	user property: #skype type: #String.
 	user property: #linkedin type: #String.
 	user property: #twitter type: #String.

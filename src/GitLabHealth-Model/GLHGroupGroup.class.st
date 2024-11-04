@@ -1,12 +1,10 @@
 Class {
-	#name : 'GLHGroupGroup',
-	#superclass : 'MooseSpecializedGroup',
-	#category : 'GitLabHealth-Model-Groups',
-	#package : 'GitLabHealth-Model',
-	#tag : 'Groups'
+	#name : #GLHGroupGroup,
+	#superclass : #MooseSpecializedGroup,
+	#category : 'GitLabHealth-Model-Groups'
 }
 
-{ #category : 'meta' }
+{ #category : #meta }
 GLHGroupGroup class >> annotation [
 
 	<FMClass: #GroupGroup super: #MooseSpecializedGroup>
@@ -15,28 +13,28 @@ GLHGroupGroup class >> annotation [
 	^ self
 ]
 
-{ #category : 'meta' }
+{ #category : #meta }
 GLHGroupGroup class >> metamodel [
 
 	<generated>
 	^ GLHModel metamodel
 ]
 
-{ #category : 'testing' }
+{ #category : #testing }
 GLHGroupGroup >> isAddition [
 
 	<generated>
 	^ false
 ]
 
-{ #category : 'testing' }
+{ #category : #testing }
 GLHGroupGroup >> isDeletion [
 
 	<generated>
 	^ false
 ]
 
-{ #category : 'testing' }
+{ #category : #testing }
 GLHGroupGroup >> isQueryable [
 
 	<generated>

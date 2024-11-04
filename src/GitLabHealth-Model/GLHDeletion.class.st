@@ -10,17 +10,15 @@ a detected deletion of a line, seen within a diff
 
 "
 Class {
-	#name : 'GLHDeletion',
-	#superclass : 'GLHChange',
+	#name : #GLHDeletion,
+	#superclass : #GLHChange,
 	#instVars : [
 		'#delimiter => FMProperty defaultValue: #-'
 	],
-	#category : 'GitLabHealth-Model-Entities',
-	#package : 'GitLabHealth-Model',
-	#tag : 'Entities'
+	#category : 'GitLabHealth-Model-Entities'
 }
 
-{ #category : 'meta' }
+{ #category : #meta }
 GLHDeletion class >> annotation [
 
 	<FMClass: #Deletion super: #GLHChange>
@@ -29,13 +27,13 @@ GLHDeletion class >> annotation [
 	^ self
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHDeletion >> delimiter: anObject [
 	<generated>
 	delimiter := anObject
 ]
 
-{ #category : 'testing' }
+{ #category : #testing }
 GLHDeletion >> isDeletion [
 
 	<generated>

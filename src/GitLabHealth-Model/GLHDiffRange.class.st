@@ -26,8 +26,8 @@ a indicate on which line of code are concerned by a diff (usually declared with 
 
 "
 Class {
-	#name : 'GLHDiffRange',
-	#superclass : 'GLHEntity',
+	#name : #GLHDiffRange,
+	#superclass : #GLHEntity,
 	#instVars : [
 		'#originalLineRange => FMProperty',
 		'#newLineRange => FMProperty',
@@ -35,12 +35,10 @@ Class {
 		'#diff => FMOne type: #GLHDiff opposite: #diffRanges',
 		'#changes => FMMany type: #GLHChange opposite: #diffRange'
 	],
-	#category : 'GitLabHealth-Model-Entities',
-	#package : 'GitLabHealth-Model',
-	#tag : 'Entities'
+	#category : 'GitLabHealth-Model-Entities'
 }
 
-{ #category : 'meta' }
+{ #category : #meta }
 GLHDiffRange class >> annotation [
 
 	<FMClass: #DiffRange super: #GLHEntity>
@@ -49,13 +47,13 @@ GLHDiffRange class >> annotation [
 	^ self
 ]
 
-{ #category : 'adding' }
+{ #category : #adding }
 GLHDiffRange >> addChange: anObject [
 	<generated>
 	^ self changes add: anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHDiffRange >> changes [
 	"Relation named: #changes type: #GLHChange opposite: #diffRange"
 
@@ -64,14 +62,14 @@ GLHDiffRange >> changes [
 	^ changes
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHDiffRange >> changes: anObject [
 
 	<generated>
 	changes value: anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHDiffRange >> diff [
 	"Relation named: #diff type: #GLHDiff opposite: #diffRanges"
 
@@ -80,21 +78,21 @@ GLHDiffRange >> diff [
 	^ diff
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHDiffRange >> diff: anObject [
 
 	<generated>
 	diff := anObject
 ]
 
-{ #category : 'navigation' }
+{ #category : #navigation }
 GLHDiffRange >> diffGroup [
 	<generated>
 	<navigation: 'Diff'>
 	^ MooseSpecializedGroup with: self diff
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHDiffRange >> lineOfCode [
 
 	<FMProperty: #lineOfCode type: #String>
@@ -102,13 +100,13 @@ GLHDiffRange >> lineOfCode [
 	^ lineOfCode
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHDiffRange >> lineOfCode: anObject [
 	<generated>
 	lineOfCode := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHDiffRange >> newLineRange [
 
 	<FMProperty: #newLineRange type: #String>
@@ -116,13 +114,13 @@ GLHDiffRange >> newLineRange [
 	^ newLineRange
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHDiffRange >> newLineRange: anObject [
 	<generated>
 	newLineRange := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHDiffRange >> originalLineRange [
 
 	<FMProperty: #originalLineRange type: #String>
@@ -130,7 +128,7 @@ GLHDiffRange >> originalLineRange [
 	^ originalLineRange
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHDiffRange >> originalLineRange: anObject [
 	<generated>
 	originalLineRange := anObject

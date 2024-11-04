@@ -4,14 +4,12 @@ a line of code in a diff comparaison
 
 "
 Class {
-	#name : 'GLHLineOfCode',
-	#superclass : 'GLHChange',
-	#category : 'GitLabHealth-Model-Entities',
-	#package : 'GitLabHealth-Model',
-	#tag : 'Entities'
+	#name : #GLHLineOfCode,
+	#superclass : #GLHChange,
+	#category : 'GitLabHealth-Model-Entities'
 }
 
-{ #category : 'meta' }
+{ #category : #meta }
 GLHLineOfCode class >> annotation [
 
 	<FMClass: #LineOfCode super: #GLHChange>

@@ -22,8 +22,8 @@ super class for addition and deletion
 
 "
 Class {
-	#name : 'GLHChange',
-	#superclass : 'GLHEntity',
+	#name : #GLHChange,
+	#superclass : #GLHEntity,
 	#traits : 'FamixTNamedEntity',
 	#classTraits : 'FamixTNamedEntity classTrait',
 	#instVars : [
@@ -32,12 +32,10 @@ Class {
 		'#sourceCode => FMProperty',
 		'#diffRange => FMOne type: #GLHDiffRange opposite: #changes'
 	],
-	#category : 'GitLabHealth-Model-Entities',
-	#package : 'GitLabHealth-Model',
-	#tag : 'Entities'
+	#category : 'GitLabHealth-Model-Entities'
 }
 
-{ #category : 'meta' }
+{ #category : #meta }
 GLHChange class >> annotation [
 
 	<FMClass: #Change super: #GLHEntity>
@@ -46,7 +44,7 @@ GLHChange class >> annotation [
 	^ self
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHChange >> diffRange [
 	"Relation named: #diffRange type: #GLHDiffRange opposite: #changes"
 
@@ -54,14 +52,14 @@ GLHChange >> diffRange [
 	^ diffRange
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHChange >> diffRange: anObject [
 
 	<generated>
 	diffRange := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHChange >> index [
 
 	<FMProperty: #index type: #Number>
@@ -69,13 +67,13 @@ GLHChange >> index [
 	^ index
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHChange >> index: anObject [
 	<generated>
 	index := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHChange >> relativeIndex [
 
 	<FMProperty: #relativeIndex type: #Number>
@@ -83,13 +81,13 @@ GLHChange >> relativeIndex [
 	^ relativeIndex
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHChange >> relativeIndex: anObject [
 	<generated>
 	relativeIndex := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHChange >> sourceCode [
 
 	<FMProperty: #sourceCode type: #String>
@@ -97,7 +95,7 @@ GLHChange >> sourceCode [
 	^ sourceCode
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHChange >> sourceCode: anObject [
 	<generated>
 	sourceCode := anObject
