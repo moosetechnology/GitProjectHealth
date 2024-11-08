@@ -8,7 +8,7 @@ Class {
 		'importer',
 		'model'
 	],
-	#category : 'GitLabHealth-Model-Importer-Tests'
+	#category : #'GitLabHealth-Model-Importer-Tests'
 }
 
 { #category : #running }
@@ -52,4 +52,16 @@ GLHModelImporterLocalTest >> testIsServerError [
 
 	self assert:
 		(importer isServerError: '{"message":"500 Internal Server Error"}')
+]
+
+{ #category : #tests }
+GLHModelImporterLocalTest >> testParseUserResult [
+
+	| user |
+	user := importer importUser: 123.
+	self assert: user id equals: 123.
+
+	self assert: user name equals:  'dupond jack'.
+	self assert: user email equals:  'jack.dupond@myCompany.com'.
+	self assert: user public_email equals:  'jack.dupond-public@myCompany.com'.
 ]
