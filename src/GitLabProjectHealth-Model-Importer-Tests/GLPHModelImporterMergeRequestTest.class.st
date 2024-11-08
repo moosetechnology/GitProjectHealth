@@ -17,8 +17,8 @@ GLPHModelImporterMergeRequestTest >> setUp [
 
 	super setUp.
 	glhImporter := GLPHModelImporter new.
-	glhImporter glhApi: GLPHApiMock new.
-	glhModel := GLPHEModel new.
+	glhImporter repoApi: GLPHApiMock new.
+	glhModel := GLHModel new.
 	glhImporter glhModel: glhModel.
 	gitlabMergeData := '[
 		{"id":46074,

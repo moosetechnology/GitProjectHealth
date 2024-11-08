@@ -33,7 +33,7 @@ Class {
 		'#files => FMMany type: #GLHFile opposite: #branch',
 		'#commits => FMMany type: #GLHCommit opposite: #branch'
 	],
-	#category : #'GitLabHealth-Model-Entities'
+	#category : 'GitLabHealth-Model-Entities'
 }
 
 { #category : #meta }

@@ -5,7 +5,7 @@ Class {
 		'issues',
 		'model'
 	],
-	#category : #'GitLabHealth-Model-Analysis-Tests'
+	#category : 'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #'api - import' }
@@ -18,7 +18,7 @@ JiraImporterMock >> importAllCurrentAndPastIssuesOf: email [
 { #category : #initialization }
 JiraImporterMock >> initialize [
 
-	model := GLPHEModel new name: 'model'.
+	model := GLHModel new name: 'model'.
 	issues := {  }.
 ]
 

@@ -17,9 +17,9 @@ GLHModelImporterLocalTest >> setUp [
 	super setUp.
 
 	importer := GLHModelImporter new.
-	model := GLPHEModel new.
+	model := GLHModel new.
 	importer glhModel: model.
-	importer glhApi: GLHApiMock new
+	importer repoApi: GLHApiMock new
 ]
 
 { #category : #tests }
@@ -52,4 +52,16 @@ GLHModelImporterLocalTest >> testIsServerError [
 
 	self assert:
 		(importer isServerError: '{"message":"500 Internal Server Error"}')
+]
+
+{ #category : #tests }
+GLHModelImporterLocalTest >> testParseUserResult [
+
+	| user |
+	user := importer importUser: 123.
+	self assert: user id equals: 123.
+
+	self assert: user name equals:  'dupond jack'.
+	self assert: user email equals:  'jack.dupond@myCompany.com'.
+	self assert: user public_email equals:  'jack.dupond-public@myCompany.com'.
 ]

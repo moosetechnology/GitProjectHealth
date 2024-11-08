@@ -2,16 +2,17 @@
 You can use me to extract query [GitHub REST Api](https://docs.github.com/en/rest)
 "
 Class {
-	#name : #GHApi,
-	#superclass : #Object,
+	#name : 'GHApi',
+	#superclass : 'Object',
 	#instVars : [
 		'baseAPIUrl',
 		'client'
 	],
-	#category : #'GitHubHealth-Model-Importer'
+	#category : 'GitHubHealth-Model-Importer',
+	#package : 'GitHubHealth-Model-Importer'
 }
 
-{ #category : #api }
+{ #category : 'api' }
 GHApi >> actionsRunOfRepo: aRepoName ofOrganization: anOrganizationName [
 
 	^ self client get:
@@ -19,19 +20,19 @@ GHApi >> actionsRunOfRepo: aRepoName ofOrganization: anOrganizationName [
 		  , '/actions/runs'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GHApi >> baseAPIUrl [
 
 	^ baseAPIUrl
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GHApi >> baseAPIUrl: anObject [
 
 	baseAPIUrl := anObject
 ]
 
-{ #category : #api }
+{ #category : 'api' }
 GHApi >> branchesOfRepo: aRepoName ofOrganization: anOrganizationName [
 
 	self client url:
@@ -40,19 +41,19 @@ GHApi >> branchesOfRepo: aRepoName ofOrganization: anOrganizationName [
 	^ self client get
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GHApi >> client [
 
 	^ client
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GHApi >> client: anObject [
 
 	client := anObject
 ]
 
-{ #category : #'api - commits' }
+{ #category : 'api - commits' }
 GHApi >> commit: commitSHA ofOrganisation: anOrganisation ofProject: aProjectId [
 
 	self client path: (String streamContents: [ :str |
@@ -71,7 +72,7 @@ GHApi >> commit: commitSHA ofOrganisation: anOrganisation ofProject: aProjectId 
 	^ (NeoJSONReader on: (self client get) readStream) next
 ]
 
-{ #category : #'api - commits' }
+{ #category : 'api - commits' }
 GHApi >> commitDiff: commitSHA ofProject: aProjectId unidiff: unidiff [ 
 		self client path: (String streamContents: [ :str |
 			 str
@@ -89,7 +90,7 @@ GHApi >> commitDiff: commitSHA ofProject: aProjectId unidiff: unidiff [
 	^ self client get
 ]
 
-{ #category : #'api - commits' }
+{ #category : 'api - commits' }
 GHApi >> commitsOfProject: aProjectId ofOrganization: organisationName [
 
 	^ self
@@ -100,7 +101,7 @@ GHApi >> commitsOfProject: aProjectId ofOrganization: organisationName [
 		  page: nil
 ]
 
-{ #category : #'api - commits' }
+{ #category : 'api - commits' }
 GHApi >> commitsOfProject: aProjectId ofOrganization: organisationName since: aSinceDate perPage: itemPerPage page: pageNumber [
 
 	self client url:
@@ -113,7 +114,7 @@ GHApi >> commitsOfProject: aProjectId ofOrganization: organisationName since: aS
 	^ self client get
 ]
 
-{ #category : #api }
+{ #category : 'api' }
 GHApi >> contentsOfRepo: aRepoName ofOrganization: anOrganizationName inBranch: aBranchRef withPath: aPath [
 
 	self client url:
@@ -123,7 +124,7 @@ GHApi >> contentsOfRepo: aRepoName ofOrganization: anOrganizationName inBranch: 
 	^ self client get
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 GHApi >> initialize [
 
 	self baseAPIUrl: 'https://api.github.com'.
@@ -132,7 +133,7 @@ GHApi >> initialize [
 			 yourself)
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GHApi >> mergeRequestsOfRepo: aRepoName ofProject: aProjectName [
 
 	^ self
@@ -147,7 +148,7 @@ GHApi >> mergeRequestsOfRepo: aRepoName ofProject: aProjectName [
 		  page: nil
 ]
 
-{ #category : #'merge request' }
+{ #category : 'merge request' }
 GHApi >> mergeRequestsOfRepo: organisationName ofProject: projectName state: state head: head base: base sort: sort direction: direction per_page: per_page page: page [ 
 	self client url:
 		self baseAPIUrl , '/repos/' , organisationName , '/' , projectName
@@ -168,38 +169,38 @@ GHApi >> mergeRequestsOfRepo: organisationName ofProject: projectName state: sta
 	
 ]
 
-{ #category : #api }
+{ #category : 'api' }
 GHApi >> organization: anOrganizationName [
 
 	^ self client get: self baseAPIUrl , '/orgs/' , anOrganizationName
 ]
 
-{ #category : #api }
+{ #category : 'api' }
 GHApi >> organization: aGroupName repo: aRepoName [
 
 	^ self client get:
 		  self baseAPIUrl , '/repos/' , aGroupName , '/' , aRepoName
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GHApi >> privateToken [
 
 		^ self client request headers at: #'Authorization'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GHApi >> privateToken: anObject [
 
 	self client headerAt: #'Authorization' add: ('token ', anObject)
 ]
 
-{ #category : #'api - repositories' }
+{ #category : 'api - repositories' }
 GHApi >> reposOfOrganization: anOrganizationName [
 
 	^ self reposOfOrganization: anOrganizationName perPage: nil page: nil
 ]
 
-{ #category : #'api - repositories' }
+{ #category : 'api - repositories' }
 GHApi >> reposOfOrganization: anOrganizationName perPage: itemPerPage page: pageNumber [
 
 	self client url:
@@ -210,7 +211,7 @@ GHApi >> reposOfOrganization: anOrganizationName perPage: itemPerPage page: page
 	^ self client get
 ]
 
-{ #category : #'api - users' }
+{ #category : 'api - users' }
 GHApi >> user: aUserID [
 
 	^ self client get: self baseAPIUrl , '/user/' , aUserID asString

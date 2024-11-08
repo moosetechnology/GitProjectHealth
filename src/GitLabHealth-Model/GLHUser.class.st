@@ -13,8 +13,16 @@ A GitLab User
 ### Other
 | Relation | Origin | Opposite | Type | Comment |
 |---|
+| `approcheMergeRequests` | `GLHUser` | `approved_by` | `GLHMergeRequest` | |
+| `assignedMergeRequests` | `GLHUser` | `assignees` | `GLHMergeRequest` | |
+| `closedMergeRequests` | `GLHUser` | `closed_by` | `GLHMergeRequest` | |
 | `contributedProjects` | `GLHUser` | `contributors` | `GLHProject` | |
+| `createdMergeRequests` | `GLHUser` | `author` | `GLHMergeRequest` | |
 | `createdProjects` | `GLHUser` | `creator` | `GLHProject` | |
+| `currentlyAssignedMergeRequest` | `GLHUser` | `assignee` | `GLHMergeRequest` | |
+| `mergerOfMergeRequests` | `GLHUser` | `merged_by` | `GLHMergeRequest` | |
+| `reviewedMergeResquest` | `GLHUser` | `reviewers` | `GLHMergeRequest` | |
+| `usedMerges` | `GLHUser` | `merge_user` | `GLHMergeRequest` | |
 
 
 ## Properties
@@ -25,7 +33,9 @@ A GitLab User
 | `avatar_url` | `String` | nil | |
 | `bio` | `String` | nil | |
 | `bot` | `String` | nil | |
+| `commit_email` | `String` | nil | |
 | `created_at` | `String` | nil | |
+| `email` | `String` | nil | |
 | `followers` | `String` | nil | |
 | `following` | `String` | nil | |
 | `id` | `Number` | nil | |
@@ -52,13 +62,20 @@ Class {
 	#traits : 'FamixTNamedEntity',
 	#classTraits : 'FamixTNamedEntity classTrait',
 	#instVars : [
+		'#approcheMergeRequests => FMMany type: #GLHMergeRequest opposite: #approved_by',
+		'#assignedMergeRequests => FMMany type: #GLHMergeRequest opposite: #assignees',
 		'#avatar_url => FMProperty',
 		'#bio => FMProperty',
 		'#bot => FMProperty',
+		'#closedMergeRequests => FMMany type: #GLHMergeRequest opposite: #closed_by',
+		'#commit_email => FMProperty',
 		'#commits => FMMany type: #GLHCommit opposite: #commitCreator',
 		'#contributedProjects => FMMany type: #GLHProject opposite: #contributors',
+		'#createdMergeRequests => FMMany type: #GLHMergeRequest opposite: #author',
 		'#createdProjects => FMMany type: #GLHProject opposite: #creator',
 		'#created_at => FMProperty',
+		'#currentlyAssignedMergeRequest => FMMany type: #GLHMergeRequest opposite: #assignee',
+		'#email => FMProperty',
 		'#followers => FMProperty',
 		'#following => FMProperty',
 		'#id => FMProperty',
@@ -66,13 +83,16 @@ Class {
 		'#jobs => FMMany type: #GLHJob opposite: #user',
 		'#linkedin => FMProperty',
 		'#location => FMProperty',
+		'#mergerOfMergeRequests => FMMany type: #GLHMergeRequest opposite: #merged_by',
 		'#name => FMProperty',
 		'#organization => FMProperty',
 		'#pronouns => FMProperty',
 		'#public_email => FMProperty',
+		'#reviewedMergeResquest => FMMany type: #GLHMergeRequest opposite: #reviewers',
 		'#skype => FMProperty',
 		'#state => FMProperty',
 		'#twitter => FMProperty',
+		'#usedMerges => FMMany type: #GLHMergeRequest opposite: #merge_user',
 		'#username => FMProperty',
 		'#web_url => FMProperty',
 		'#website_url => FMProperty',
@@ -91,6 +111,24 @@ GLHUser class >> annotation [
 ]
 
 { #category : #adding }
+GLHUser >> addApprocheMergeRequest: anObject [
+	<generated>
+	^ self approcheMergeRequests add: anObject
+]
+
+{ #category : #adding }
+GLHUser >> addAssignedMergeRequest: anObject [
+	<generated>
+	^ self assignedMergeRequests add: anObject
+]
+
+{ #category : #adding }
+GLHUser >> addClosedMergeRequest: anObject [
+	<generated>
+	^ self closedMergeRequests add: anObject
+]
+
+{ #category : #adding }
 GLHUser >> addCommit: anObject [
 	<generated>
 	^ self commits add: anObject
@@ -103,15 +141,75 @@ GLHUser >> addContributedProject: anObject [
 ]
 
 { #category : #adding }
+GLHUser >> addCreatedMergeRequest: anObject [
+	<generated>
+	^ self createdMergeRequests add: anObject
+]
+
+{ #category : #adding }
 GLHUser >> addCreatedProject: anObject [
 	<generated>
 	^ self createdProjects add: anObject
 ]
 
 { #category : #adding }
+GLHUser >> addCurrentlyAssignedMergeRequest: anObject [
+	<generated>
+	^ self currentlyAssignedMergeRequest add: anObject
+]
+
+{ #category : #adding }
 GLHUser >> addJob: anObject [
 	<generated>
 	^ self jobs add: anObject
+]
+
+{ #category : #adding }
+GLHUser >> addMergerOfMergeRequest: anObject [
+	<generated>
+	^ self mergerOfMergeRequests add: anObject
+]
+
+{ #category : #adding }
+GLHUser >> addReviewedMergeResquest: anObject [
+	<generated>
+	^ self reviewedMergeResquest add: anObject
+]
+
+{ #category : #adding }
+GLHUser >> addUsedMerge: anObject [
+	<generated>
+	^ self usedMerges add: anObject
+]
+
+{ #category : #accessing }
+GLHUser >> approcheMergeRequests [
+	"Relation named: #approcheMergeRequests type: #GLHMergeRequest opposite: #approved_by"
+
+	<generated>
+	^ approcheMergeRequests
+]
+
+{ #category : #accessing }
+GLHUser >> approcheMergeRequests: anObject [
+
+	<generated>
+	approcheMergeRequests value: anObject
+]
+
+{ #category : #accessing }
+GLHUser >> assignedMergeRequests [
+	"Relation named: #assignedMergeRequests type: #GLHMergeRequest opposite: #assignees"
+
+	<generated>
+	^ assignedMergeRequests
+]
+
+{ #category : #accessing }
+GLHUser >> assignedMergeRequests: anObject [
+
+	<generated>
+	assignedMergeRequests value: anObject
 ]
 
 { #category : #accessing }
@@ -157,6 +255,36 @@ GLHUser >> bot: anObject [
 ]
 
 { #category : #accessing }
+GLHUser >> closedMergeRequests [
+	"Relation named: #closedMergeRequests type: #GLHMergeRequest opposite: #closed_by"
+
+	<generated>
+	<derived>
+	^ closedMergeRequests
+]
+
+{ #category : #accessing }
+GLHUser >> closedMergeRequests: anObject [
+
+	<generated>
+	closedMergeRequests value: anObject
+]
+
+{ #category : #accessing }
+GLHUser >> commit_email [
+
+	<FMProperty: #commit_email type: #String>
+	<generated>
+	^ commit_email
+]
+
+{ #category : #accessing }
+GLHUser >> commit_email: anObject [
+	<generated>
+	commit_email := anObject
+]
+
+{ #category : #accessing }
 GLHUser >> commits [
 	"Relation named: #commits type: #GLHCommit opposite: #commitCreator"
 
@@ -195,6 +323,22 @@ GLHUser >> contributedProjects: anObject [
 ]
 
 { #category : #accessing }
+GLHUser >> createdMergeRequests [
+	"Relation named: #createdMergeRequests type: #GLHMergeRequest opposite: #author"
+
+	<generated>
+	<derived>
+	^ createdMergeRequests
+]
+
+{ #category : #accessing }
+GLHUser >> createdMergeRequests: anObject [
+
+	<generated>
+	createdMergeRequests value: anObject
+]
+
+{ #category : #accessing }
 GLHUser >> createdProjects [
 	"Relation named: #createdProjects type: #GLHProject opposite: #creator"
 
@@ -222,6 +366,36 @@ GLHUser >> created_at [
 GLHUser >> created_at: anObject [
 	<generated>
 	created_at := anObject
+]
+
+{ #category : #accessing }
+GLHUser >> currentlyAssignedMergeRequest [
+	"Relation named: #currentlyAssignedMergeRequest type: #GLHMergeRequest opposite: #assignee"
+
+	<generated>
+	<derived>
+	^ currentlyAssignedMergeRequest
+]
+
+{ #category : #accessing }
+GLHUser >> currentlyAssignedMergeRequest: anObject [
+
+	<generated>
+	currentlyAssignedMergeRequest value: anObject
+]
+
+{ #category : #accessing }
+GLHUser >> email [
+
+	<FMProperty: #email type: #String>
+	<generated>
+	^ email
+]
+
+{ #category : #accessing }
+GLHUser >> email: anObject [
+	<generated>
+	email := anObject
 ]
 
 { #category : #accessing }
@@ -332,11 +506,27 @@ GLHUser >> location: anObject [
 ]
 
 { #category : #accessing }
+GLHUser >> mergerOfMergeRequests [
+	"Relation named: #mergerOfMergeRequests type: #GLHMergeRequest opposite: #merged_by"
+
+	<generated>
+	<derived>
+	^ mergerOfMergeRequests
+]
+
+{ #category : #accessing }
+GLHUser >> mergerOfMergeRequests: anObject [
+
+	<generated>
+	mergerOfMergeRequests value: anObject
+]
+
+{ #category : #accessing }
 GLHUser >> name [
 
 	<FMProperty: #name type: #String>
 	<generated>
-	^ name 
+	^ name
 ]
 
 { #category : #accessing }
@@ -388,6 +578,21 @@ GLHUser >> public_email: anObject [
 ]
 
 { #category : #accessing }
+GLHUser >> reviewedMergeResquest [
+	"Relation named: #reviewedMergeResquest type: #GLHMergeRequest opposite: #reviewers"
+
+	<generated>
+	^ reviewedMergeResquest
+]
+
+{ #category : #accessing }
+GLHUser >> reviewedMergeResquest: anObject [
+
+	<generated>
+	reviewedMergeResquest value: anObject
+]
+
+{ #category : #accessing }
 GLHUser >> skype [
 
 	<FMProperty: #skype type: #String>
@@ -427,6 +632,22 @@ GLHUser >> twitter [
 GLHUser >> twitter: anObject [
 	<generated>
 	twitter := anObject
+]
+
+{ #category : #accessing }
+GLHUser >> usedMerges [
+	"Relation named: #usedMerges type: #GLHMergeRequest opposite: #merge_user"
+
+	<generated>
+	<derived>
+	^ usedMerges
+]
+
+{ #category : #accessing }
+GLHUser >> usedMerges: anObject [
+
+	<generated>
+	usedMerges value: anObject
 ]
 
 { #category : #accessing }

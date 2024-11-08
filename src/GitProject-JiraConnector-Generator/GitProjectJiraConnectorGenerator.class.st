@@ -1,47 +1,47 @@
 Class {
-	#name : #GitProjectJiraConnectorGenerator,
-	#superclass : #FamixMetamodelGenerator,
+	#name : 'GitProjectJiraConnectorGenerator',
+	#superclass : 'FamixMetamodelGenerator',
 	#instVars : [
 		'glhMergeRequest',
 		'glhCommit',
 		'jiraIssue'
 	],
-	#category : #'GitProject-JiraConnector-Generator'
+	#category : 'GitProject-JiraConnector-Generator',
+	#package : 'GitProject-JiraConnector-Generator'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GitProjectJiraConnectorGenerator class >> packageName [
 
 	^ #'GitProject-JiraConnector-Model'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GitProjectJiraConnectorGenerator class >> prefix [
 
 	^ #GPJC
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GitProjectJiraConnectorGenerator class >> submetamodels [
 
 	^ {
 		  GLHMetamodelGenerator.
-		  GLPHMetamodelGenerator.
 		  JPMetamodelGenerator }
 ]
 
-{ #category : #definition }
+{ #category : 'definition' }
 GitProjectJiraConnectorGenerator >> defineClasses [
 
 	super defineClasses.
 	glhMergeRequest := self
 		                   remoteEntity: #MergeRequest
-		                   withPrefix: #GLPHE.
+		                   withPrefix: #GLH.
 	glhCommit := self remoteEntity: #Commit withPrefix: #GLH.
 	jiraIssue := self remoteEntity: #Issue withPrefix: #JP
 ]
 
-{ #category : #definition }
+{ #category : 'definition' }
 GitProjectJiraConnectorGenerator >> defineRelations [
 
 	super defineRelations.

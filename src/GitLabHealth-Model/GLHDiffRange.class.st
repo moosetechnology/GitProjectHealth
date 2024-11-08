@@ -7,12 +7,12 @@ a indicate on which line of code are concerned by a diff (usually declared with 
 ### Parents
 | Relation | Origin | Opposite | Type | Comment |
 |---|
-| `diff` | `GLPHEDiffRange` | `diffRanges` | `GLHDiff` | |
+| `diff` | `GLHDiffRange` | `diffRanges` | `GLHDiff` | |
 
 ### Other
 | Relation | Origin | Opposite | Type | Comment |
 |---|
-| `changes` | `GLPHEDiffRange` | `diffRange` | `GLPHEChange` | |
+| `changes` | `GLHDiffRange` | `diffRange` | `GLHChange` | |
 
 
 ## Properties
@@ -26,35 +26,36 @@ a indicate on which line of code are concerned by a diff (usually declared with 
 
 "
 Class {
-	#name : #GLPHEDiffRange,
-	#superclass : #GLPHEEntity,
+	#name : #GLHDiffRange,
+	#superclass : #GLHEntity,
 	#instVars : [
 		'#originalLineRange => FMProperty',
 		'#newLineRange => FMProperty',
 		'#lineOfCode => FMProperty',
-		'#changes => FMMany type: #GLPHEChange opposite: #diffRange'
+		'#diff => FMOne type: #GLHDiff opposite: #diffRanges',
+		'#changes => FMMany type: #GLHChange opposite: #diffRange'
 	],
-	#category : #'GLPHExtended-Model-Entities'
+	#category : 'GitLabHealth-Model-Entities'
 }
 
 { #category : #meta }
-GLPHEDiffRange class >> annotation [
+GLHDiffRange class >> annotation [
 
-	<FMClass: #DiffRange super: #GLPHEEntity>
-	<package: #'GLPHExtended-Model'>
+	<FMClass: #DiffRange super: #GLHEntity>
+	<package: #'GitLabHealth-Model'>
 	<generated>
 	^ self
 ]
 
 { #category : #adding }
-GLPHEDiffRange >> addChange: anObject [
+GLHDiffRange >> addChange: anObject [
 	<generated>
 	^ self changes add: anObject
 ]
 
 { #category : #accessing }
-GLPHEDiffRange >> changes [
-	"Relation named: #changes type: #GLPHEChange opposite: #diffRange"
+GLHDiffRange >> changes [
+	"Relation named: #changes type: #GLHChange opposite: #diffRange"
 
 	<generated>
 	<derived>
@@ -62,38 +63,37 @@ GLPHEDiffRange >> changes [
 ]
 
 { #category : #accessing }
-GLPHEDiffRange >> changes: anObject [
+GLHDiffRange >> changes: anObject [
 
 	<generated>
 	changes value: anObject
 ]
 
 { #category : #accessing }
-GLPHEDiffRange >> diff [
+GLHDiffRange >> diff [
 	"Relation named: #diff type: #GLHDiff opposite: #diffRanges"
 
 	<generated>
 	<container>
-	<FMProperty: #diff type: #GLHDiff opposite: #diffRanges>
-	^ self attributeAt: #diff ifAbsent: [ nil ]
+	^ diff
 ]
 
 { #category : #accessing }
-GLPHEDiffRange >> diff: anObject [
+GLHDiffRange >> diff: anObject [
 
 	<generated>
-	self attributeAt: #diff put: (FMMultivalueLink on: self update: #diffRanges from: self diff to: anObject).
+	diff := anObject
 ]
 
 { #category : #navigation }
-GLPHEDiffRange >> diffGroup [
+GLHDiffRange >> diffGroup [
 	<generated>
 	<navigation: 'Diff'>
 	^ MooseSpecializedGroup with: self diff
 ]
 
 { #category : #accessing }
-GLPHEDiffRange >> lineOfCode [
+GLHDiffRange >> lineOfCode [
 
 	<FMProperty: #lineOfCode type: #String>
 	<generated>
@@ -101,13 +101,13 @@ GLPHEDiffRange >> lineOfCode [
 ]
 
 { #category : #accessing }
-GLPHEDiffRange >> lineOfCode: anObject [
+GLHDiffRange >> lineOfCode: anObject [
 	<generated>
 	lineOfCode := anObject
 ]
 
 { #category : #accessing }
-GLPHEDiffRange >> newLineRange [
+GLHDiffRange >> newLineRange [
 
 	<FMProperty: #newLineRange type: #String>
 	<generated>
@@ -115,13 +115,13 @@ GLPHEDiffRange >> newLineRange [
 ]
 
 { #category : #accessing }
-GLPHEDiffRange >> newLineRange: anObject [
+GLHDiffRange >> newLineRange: anObject [
 	<generated>
 	newLineRange := anObject
 ]
 
 { #category : #accessing }
-GLPHEDiffRange >> originalLineRange [
+GLHDiffRange >> originalLineRange [
 
 	<FMProperty: #originalLineRange type: #String>
 	<generated>
@@ -129,7 +129,7 @@ GLPHEDiffRange >> originalLineRange [
 ]
 
 { #category : #accessing }
-GLPHEDiffRange >> originalLineRange: anObject [
+GLHDiffRange >> originalLineRange: anObject [
 	<generated>
 	originalLineRange := anObject
 ]

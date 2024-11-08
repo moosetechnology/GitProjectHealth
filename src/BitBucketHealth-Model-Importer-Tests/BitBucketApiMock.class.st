@@ -415,6 +415,37 @@ BitBucketApiMock >> diffs: anObject [
 	diffs := anObject
 ]
 
+{ #category : #accessing }
+BitBucketApiMock >> diffsNohunks [
+
+	| diffs1 |
+	diffs1 := '{
+  "fromHash": null,
+  "toHash": "123",
+  "contextLines": 10,
+  "whitespace": "SHOW",
+  "diffs": [
+      {
+      "source": null,
+      "destination": {
+        "components": [
+          "api",
+          "api.xlsx"
+        ],
+        "parent": "api",
+        "name": "api.xlsx",
+        "extension": "xlsx",
+        "toString": "api/api.xlsx"
+      },
+      "binary": true
+    }
+  ],
+  "truncated": false
+}'.
+
+	^ diffs1 := (NeoJSONReader on: diffs1 readStream) next
+]
+
 { #category : #'api - commits' }
 BitBucketApiMock >> diffsOfCommit: commitID inRepoProjectId: repositorySlug inProjectGroupId: projectKey [
 	^diffs 

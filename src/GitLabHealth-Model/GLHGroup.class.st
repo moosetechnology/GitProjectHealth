@@ -44,7 +44,7 @@ Class {
 		'#subGroups => FMMany type: #GLHGroup opposite: #group',
 		'#group => FMOne type: #GLHGroup opposite: #subGroups'
 	],
-	#category : #'GitLabHealth-Model-Entities'
+	#category : 'GitLabHealth-Model-Entities'
 }
 
 { #category : #meta }

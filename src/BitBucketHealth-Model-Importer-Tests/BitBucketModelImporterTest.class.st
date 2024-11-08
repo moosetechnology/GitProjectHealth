@@ -13,14 +13,14 @@ BitBucketModelImporterTest >> testCompleteImportProject [
 
 	| glphModel project bitBucketApi bitBucketImporter |
 		bitBucketApi := BitBucketApiMock new.
-	glphModel := GLPHEModel new name: 'test'.
+	glphModel := GLHModel new name: 'test'.
 
 	project := GLHProject new.
 
 	glphModel add: project.
 
 	bitBucketImporter := BitBucketModelImporter new
-		                     bitBucketApi: bitBucketApi;
+		                     repoApi: bitBucketApi;
 		                     glhModel: glphModel.
 
 	"When"
@@ -34,16 +34,73 @@ BitBucketModelImporterTest >> testCompleteImportProject [
 ]
 
 { #category : #tests }
+BitBucketModelImporterTest >> testConvertBitBucketDiffToGitDiff [
+
+	"Given"
+		| bitBucketApi glhModel bitBucketImporter diffs glhDiffs |
+	bitBucketApi := BitBucketApiMock new.
+	
+	glhModel := GLHModel new name: 'test'.
+	
+	bitBucketImporter := BitBucketModelImporter new
+		                     bitBucketApi: bitBucketApi;
+		                     glhModel: glhModel.
+	
+	diffs := bitBucketApi diffs.
+	
+	"When"
+	glhDiffs := bitBucketImporter convertBitBucketDiffToGitDiff: diffs.
+	
+	"Then"
+	self assert: glhDiffs size equals: 1.
+	diffs := glhDiffs first.
+	self assert: diffs diffString equals: '--- a/build.gradle
++++ b/build.gradle
+@@ -1,14 +1,14 @@
+ line
+-line4
++line5
+
+'
+]
+
+{ #category : #tests }
+BitBucketModelImporterTest >> testConvertBitBucketDiffToGitDiffNoHunks [
+
+	"Given"
+		| bitBucketApi glhModel bitBucketImporter diffs glhDiffs |
+	bitBucketApi := BitBucketApiMock new.
+	
+	glhModel := GLHModel new name: 'test'.
+	
+	bitBucketImporter := BitBucketModelImporter new
+		                     bitBucketApi: bitBucketApi;
+		                     glhModel: glhModel.
+	
+	diffs := bitBucketApi diffsNohunks.
+	
+	"When"
+	glhDiffs := bitBucketImporter convertBitBucketDiffToGitDiff: diffs.
+	
+	"Then"
+	self assert: glhDiffs size equals: 1.
+	diffs := glhDiffs first.
+	self assert: diffs diffString equals: '--- a/
++++ b/api/api.xlsx
+'
+]
+
+{ #category : #tests }
 BitBucketModelImporterTest >> testGetContributionFromDiffs [
 	"Given"
 
 	| bitBucketApi glphModel bitBucketImporter diffs contribution |
 	bitBucketApi := BitBucketApiMock new.
 
-	glphModel := GLPHEModel new name: 'test'.
+	glphModel := GLHModel new name: 'test'.
 
 	bitBucketImporter := BitBucketModelImporter new
-		                     bitBucketApi: bitBucketApi;
+		                     repoApi: bitBucketApi;
 		                     glhModel: glphModel.
 
 	diffs := bitBucketApi diffs.
@@ -63,10 +120,10 @@ BitBucketModelImporterTest >> testGetContributionFromDiffsWithoutAdded [
 	| bitBucketApi glphModel bitBucketImporter diffs contribution |
 	bitBucketApi := BitBucketApiMock new.
 
-	glphModel := GLPHEModel new name: 'test'.
+	glphModel := GLHModel new name: 'test'.
 
 	bitBucketImporter := BitBucketModelImporter new
-		                     bitBucketApi: bitBucketApi;
+		                     repoApi: bitBucketApi;
 		                     glhModel: glphModel.
 
 	diffs := bitBucketApi diffsWithoutAdded.
@@ -88,10 +145,10 @@ BitBucketModelImporterTest >> testGetContributionFromDiffsWithoutHunks [
 	| bitBucketApi glphModel bitBucketImporter diffs contribution |
 	bitBucketApi := BitBucketApiMock new.
 
-	glphModel := GLPHEModel new name: 'test'.
+	glphModel := GLHModel new name: 'test'.
 
 	bitBucketImporter := BitBucketModelImporter new
-		                     bitBucketApi: bitBucketApi;
+		                     repoApi: bitBucketApi;
 		                     glhModel: glphModel.
 
 	diffs := bitBucketApi diffsWithoutHunks.
@@ -113,10 +170,10 @@ BitBucketModelImporterTest >> testGetContributionFromDiffsWithoutRemoved [
 	| bitBucketApi glphModel bitBucketImporter diffs contribution |
 	bitBucketApi := BitBucketApiMock new.
 
-	glphModel := GLPHEModel new name: 'test'.
+	glphModel := GLHModel new name: 'test'.
 
 	bitBucketImporter := BitBucketModelImporter new
-		                     bitBucketApi: bitBucketApi;
+		                     repoApi: bitBucketApi;
 		                     glhModel: glphModel.
 
 	diffs := bitBucketApi diffsWithoutRemoved.
@@ -138,10 +195,10 @@ BitBucketModelImporterTest >> testImportAndLoadLatestsCommitsOfProject [
 	"Given"
 	bitBucketApi := BitBucketApiMock new.
 
-	glphModel := GLPHEModel new name: 'test'.
+	glphModel := GLHModel new name: 'test'.
 
 	bitBucketImporter := BitBucketModelImporter new
-		                     bitBucketApi: bitBucketApi;
+		                     repoApi: bitBucketApi;
 		                     glhModel: glphModel;
 		                     withCommitDiffs: true.
 
@@ -186,10 +243,10 @@ BitBucketModelImporterTest >> testImportCommitsOfProjectSinceUntil [
 	"Given"
 	bitBucketApi := BitBucketApiMock new.
 
-	glphModel := GLPHEModel new name: 'test'.
+	glphModel := GLHModel new name: 'test'.
 
 	bitBucketImporter := BitBucketModelImporter new
-		                     bitBucketApi: bitBucketApi;
+		                     repoApi: bitBucketApi;
 		                     glhModel: glphModel.
 
 	group := GLHGroup new id: 1.
@@ -220,10 +277,10 @@ BitBucketModelImporterTest >> testImportContributedProjectsOfUser [
 	| bitBucketApi glphModel bitBucketImporter user projects commits yesterdayAsTimestamp |
 	bitBucketApi := BitBucketApiMock new.
 
-	glphModel := GLPHEModel new name: 'test'.
+	glphModel := GLHModel new name: 'test'.
 
 	bitBucketImporter := BitBucketModelImporter new
-		                     bitBucketApi: bitBucketApi;
+		                     repoApi: bitBucketApi;
 		                     glhModel: glphModel.
 
 	user := GLHUser new
@@ -260,10 +317,10 @@ BitBucketModelImporterTest >> testImportCreatorOfCommit [
 	"Given"
 	bitBucketApi := BitBucketApiMock new.
 
-	glphModel := GLPHEModel new name: 'test'.
+	glphModel := GLHModel new name: 'test'.
 
 	bitBucketImporter := BitBucketModelImporter new
-		                     bitBucketApi: bitBucketApi;
+		                     repoApi: bitBucketApi;
 		                     glhModel: glphModel.
 
 	commit := GLHCommit new author_name: 'test'.
@@ -287,10 +344,10 @@ BitBucketModelImporterTest >> testImportCreatorOfCommitIfAlreadyExist [
 	"Given"
 	bitBucketApi := BitBucketApiMock new.
 
-	glphModel := GLPHEModel new name: 'test'.
+	glphModel := GLHModel new name: 'test'.
 
 	bitBucketImporter := BitBucketModelImporter new
-		                     bitBucketApi: bitBucketApi;
+		                     repoApi: bitBucketApi;
 		                     glhModel: glphModel.
 		
 	glphModel add: (bitBucketImporter parseUserIntoGLHUser: bitBucketApi userMock).
@@ -316,10 +373,10 @@ BitBucketModelImporterTest >> testImportMergeRequestCommits [
 	"Given"
 	bitBucketApi := BitBucketApiMock new.
 
-	glphModel := GLPHEModel new name: 'test'.
+	glphModel := GLHModel new name: 'test'.
 
 	bitBucketImporter := BitBucketModelImporter new
-		                     bitBucketApi: bitBucketApi;
+		                     repoApi: bitBucketApi;
 		                     glhModel: glphModel.
 
 	mergeRequest := bitBucketImporter
@@ -343,10 +400,10 @@ BitBucketModelImporterTest >> testImportMergeRequestsSinceUntil [
 	"Given"
 	bitBucketApi := BitBucketApiMock new.
 
-	glphModel := GLPHEModel new name: 'test'.
+	glphModel := GLHModel new name: 'test'.
 
 	bitBucketImporter := BitBucketModelImporter new
-		                     bitBucketApi: bitBucketApi;
+		                     repoApi: bitBucketApi;
 		                     glhModel: glphModel.
 
 	group := GLHGroup new id: 1.
@@ -364,7 +421,7 @@ BitBucketModelImporterTest >> testImportMergeRequestsSinceUntil [
 	"Then"
 	self
 		assert:
-		(bitBucketImporter glhModel allWithType: GLPHEMergeRequest) size
+		(bitBucketImporter glhModel allWithType: GLHMergeRequest) size
 		equals: 1.
 
 	self assert: mergeRequests size equals: 1.
@@ -381,10 +438,10 @@ BitBucketModelImporterTest >> testImportMergeRequestsSinceUntilClosedMR [
 	"Given"
 	bitBucketApi := BitBucketApiMock new.
 
-	glphModel := GLPHEModel new name: 'test'.
+	glphModel := GLHModel new name: 'test'.
 
 	bitBucketImporter := BitBucketModelImporter new
-		                     bitBucketApi: bitBucketApi;
+		                     repoApi: bitBucketApi;
 		                     glhModel: glphModel.
 
 	bitBucketApi mergeRequests: { bitBucketApi mergedMergeRequest }.
@@ -404,7 +461,7 @@ BitBucketModelImporterTest >> testImportMergeRequestsSinceUntilClosedMR [
 	"Then"
 	self
 		assert:
-		(bitBucketImporter glhModel allWithType: GLPHEMergeRequest) size
+		(bitBucketImporter glhModel allWithType: GLHMergeRequest) size
 		equals: 1.
 
 	self assert: mergeRequests size equals: 1.
@@ -422,10 +479,10 @@ BitBucketModelImporterTest >> testImportMergeRequestsSinceUntilDeclinedMR [
 	"Given"
 	bitBucketApi := BitBucketApiMock new.
 
-	glphModel := GLPHEModel new name: 'test'.
+	glphModel := GLHModel new name: 'test'.
 
 	bitBucketImporter := BitBucketModelImporter new
-		                     bitBucketApi: bitBucketApi;
+		                     repoApi: bitBucketApi;
 		                     glhModel: glphModel.
 
 	bitBucketApi mergeRequests: { bitBucketApi declinedMergeRequest }.
@@ -445,7 +502,7 @@ BitBucketModelImporterTest >> testImportMergeRequestsSinceUntilDeclinedMR [
 	"Then"
 	self
 		assert:
-		(bitBucketImporter glhModel allWithType: GLPHEMergeRequest) size
+		(bitBucketImporter glhModel allWithType: GLHMergeRequest) size
 		equals: 1.
 
 	self assert: mergeRequests size equals: 1.
@@ -463,10 +520,10 @@ BitBucketModelImporterTest >> testImportMergeResquestMerger [
 	"Given"
 	bitBucketApi := BitBucketApiMock new.
 
-	glphModel := GLPHEModel new name: 'test'.
+	glphModel := GLHModel new name: 'test'.
 
 	bitBucketImporter := BitBucketModelImporter new
-		                     bitBucketApi: bitBucketApi;
+		                     repoApi: bitBucketApi;
 		                     glhModel: glphModel.
 
 	mergeRequest := bitBucketImporter
@@ -490,10 +547,10 @@ BitBucketModelImporterTest >> testImportUserByUsername [
 	| bitBucketApi glphModel bitBucketImporter user |
 	bitBucketApi := BitBucketApiMock new.
 
-	glphModel := GLPHEModel new name: 'test'.
+	glphModel := GLHModel new name: 'test'.
 
 	bitBucketImporter := BitBucketModelImporter new
-		                     bitBucketApi: bitBucketApi;
+		                     repoApi: bitBucketApi;
 		                     glhModel: glphModel.
 		
 	"When"
@@ -513,10 +570,10 @@ BitBucketModelImporterTest >> testImportUserByUsernameWithoutUsers [
 	| bitBucketApi glphModel bitBucketImporter user |
 	bitBucketApi := BitBucketApiMock new.
 
-	glphModel := GLPHEModel new name: 'test'.
+	glphModel := GLHModel new name: 'test'.
 
 	bitBucketImporter := BitBucketModelImporter new
-		                     bitBucketApi: bitBucketApi;
+		                     repoApi: bitBucketApi;
 		                     glhModel: glphModel.
 		
 	bitBucketApi userMock: nil.

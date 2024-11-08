@@ -5,7 +5,7 @@ Class {
 		'glphApi',
 		'glhImporter'
 	],
-	#category : 'GitLabHealth-Model-Importer-Tests'
+	#category : #'GitLabHealth-Model-Importer-Tests'
 }
 
 { #category : #setup }
@@ -17,7 +17,7 @@ GLHModelImporterTestResource >> glhImporter [
 { #category : #setup }
 GLHModelImporterTestResource >> importModel [
 
-	model := GLPHEModel new.
+	model := GLHModel new.
 
 	glphApi := GLPHApi new
 		           privateToken: '';
@@ -25,7 +25,7 @@ GLHModelImporterTestResource >> importModel [
 		           yourself.
 
 	glhImporter := GLHModelImporter new
-		               glhApi: glphApi;
+		               repoApi: glphApi;
 		               glhModel: model;
 		               withFiles: false;
 		               withCommitDiffs: true.

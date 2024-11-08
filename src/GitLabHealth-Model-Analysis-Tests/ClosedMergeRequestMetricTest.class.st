@@ -4,7 +4,7 @@ A ClosedMergeRequestMetricTest is a test class for testing the behavior of Close
 Class {
 	#name : #ClosedMergeRequestMetricTest,
 	#superclass : #TestCase,
-	#category : #'GitLabHealth-Model-Analysis-Tests'
+	#category : 'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }
@@ -19,12 +19,12 @@ ClosedMergeRequestMetricTest >> testCalculate [
 
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: {
-			(GLPHEMergeRequest new
+			(GLHMergeRequest new
 				 author: user;
 				 created_at: '09-05-2024';
 				 merged_at: '09-05-2024';
 				 state: 'closed').
-			(GLPHEMergeRequest new
+			(GLHMergeRequest new
 				 author: user;
 				 created_at: '09-05-2024';
 				 merged_at: nil;
@@ -57,17 +57,17 @@ ClosedMergeRequestMetricTest >> testCalculate1MRinPeriod2Outside [
 
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: {
-			(GLPHEMergeRequest new
+			(GLHMergeRequest new
 				 author: user;
 				 created_at: '09-05-2024';
 				 merged_at: '09-05-2024';
 				 state: 'closed').
-			(GLPHEMergeRequest new
+			(GLHMergeRequest new
 				 author: user;
 				 created_at: '09-05-2024';
 				 merged_at: nil;
 				 state: 'closed').
-			(GLPHEMergeRequest new
+			(GLHMergeRequest new
 				 author: user;
 				 created_at: '08-01-2024';
 				 merged_at: nil;
@@ -100,17 +100,17 @@ ClosedMergeRequestMetricTest >> testCalculate3MR [
 
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: {
-			(GLPHEMergeRequest new
+			(GLHMergeRequest new
 				 author: user;
 				 created_at: '09-05-2024';
 				 merged_at: '09-05-2024';
 				 state: 'closed').
-			(GLPHEMergeRequest new
+			(GLHMergeRequest new
 				 author: user;
 				 created_at: '09-05-2024';
 				 merged_at: nil;
 				 state: 'closed').
-				(GLPHEMergeRequest new
+			(GLHMergeRequest new
 				 author: user;
 				 created_at: '09-05-2024';
 				 merged_at: nil;
@@ -143,27 +143,27 @@ ClosedMergeRequestMetricTest >> testCalculate3MRClosed2Opened [
 
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: {
-			(GLPHEMergeRequest new
+			(GLHMergeRequest new
 				 author: user;
 				 created_at: '09-05-2024';
 				 merged_at: '09-05-2024';
 				 state: 'closed').
-			(GLPHEMergeRequest new
+			(GLHMergeRequest new
 				 author: user;
 				 created_at: '09-05-2024';
 				 merged_at: nil;
 				 state: 'closed').
-				(GLPHEMergeRequest new
+			(GLHMergeRequest new
 				 author: user;
 				 created_at: '09-05-2024';
 				 merged_at: nil;
 				 state: 'closed').
-				(GLPHEMergeRequest new
+			(GLHMergeRequest new
 				 author: user;
 				 created_at: '09-05-2024';
 				 merged_at: nil;
 				 state: 'opened').
-				(GLPHEMergeRequest new
+			(GLHMergeRequest new
 				 author: user;
 				 created_at: '09-05-2024';
 				 merged_at: nil;
@@ -196,27 +196,27 @@ ClosedMergeRequestMetricTest >> testCalculateNoClosedMR [
 
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: {
-			(GLPHEMergeRequest new
+			(GLHMergeRequest new
 				 author: user;
 				 created_at: '09-05-2024';
 				 merged_at: '09-05-2024';
 				 state: 'opened').
-			(GLPHEMergeRequest new
+			(GLHMergeRequest new
 				 author: user;
 				 created_at: '09-05-2024';
 				 merged_at: nil;
 				 state: 'opened').
-				(GLPHEMergeRequest new
+			(GLHMergeRequest new
 				 author: user;
 				 created_at: '09-05-2024';
 				 merged_at: nil;
 				 state: 'opened').
-				(GLPHEMergeRequest new
+			(GLHMergeRequest new
 				 author: user;
 				 created_at: '09-05-2024';
 				 merged_at: nil;
 				 state: 'opened').
-				(GLPHEMergeRequest new
+			(GLHMergeRequest new
 				 author: user;
 				 created_at: '09-05-2024';
 				 merged_at: nil;
@@ -275,12 +275,12 @@ ClosedMergeRequestMetricTest >> testCalculateOutSidePeriod [
 
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: {
-			(GLPHEMergeRequest new
+			(GLHMergeRequest new
 				 author: user;
 				 created_at: '09-05-2024';
 				 merged_at: '09-05-2024';
 				 state: 'closed').
-			(GLPHEMergeRequest new
+			(GLHMergeRequest new
 				 author: user;
 				 created_at: '09-05-2024';
 				 merged_at: nil;

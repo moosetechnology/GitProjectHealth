@@ -3,7 +3,7 @@ Class {
 	#superclass : #MooseEntity,
 	#traits : 'TEntityMetaLevelDependency',
 	#classTraits : 'TEntityMetaLevelDependency classTrait',
-	#category : #'GitLabHealth-Model-Entities'
+	#category : 'GitLabHealth-Model-Entities'
 }
 
 { #category : #meta }
@@ -28,4 +28,18 @@ GLHEntity class >> metamodel [
 
 	<generated>
 	^ GLHModel metamodel
+]
+
+{ #category : #testing }
+GLHEntity >> isAddition [
+
+	<generated>
+	^ false
+]
+
+{ #category : #testing }
+GLHEntity >> isDeletion [
+
+	<generated>
+	^ false
 ]

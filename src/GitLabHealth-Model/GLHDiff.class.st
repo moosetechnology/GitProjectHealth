@@ -9,6 +9,17 @@ The diff of a commit
 |---|
 | `commit` | `GLHDiff` | `diffs` | `GLHCommit` | |
 
+### Children
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `diffRanges` | `GLHDiff` | `diff` | `GLHDiffRange` | |
+| `file` | `GLHDiff` | `diffs` | `GLHFile` | |
+
+### Other
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `mergeRequest` | `GLHDiff` | `diffs` | `GLHMergeRequest` | |
+
 
 ## Properties
 ======================
@@ -32,13 +43,16 @@ Class {
 	#instVars : [
 		'#commit => FMOne type: #GLHCommit opposite: #diffs',
 		'#deleted_file => FMProperty defaultValue: false',
+		'#diffRanges => FMMany type: #GLHDiffRange opposite: #diff',
 		'#diffString => FMProperty',
+		'#file => FMMany type: #GLHFile opposite: #diffs',
+		'#mergeRequest => FMOne type: #GLHMergeRequest opposite: #diffs',
 		'#new_file => FMProperty defaultValue: false',
 		'#new_path => FMProperty',
 		'#old_path => FMProperty',
 		'#renamed_file => FMProperty defaultValue: false'
 	],
-	#category : #'GitLabHealth-Model-Entities'
+	#category : 'GitLabHealth-Model-Entities'
 }
 
 { #category : #meta }
@@ -48,6 +62,18 @@ GLHDiff class >> annotation [
 	<package: #'GitLabHealth-Model'>
 	<generated>
 	^ self
+]
+
+{ #category : #adding }
+GLHDiff >> addDiffRange: anObject [
+	<generated>
+	^ self diffRanges add: anObject
+]
+
+{ #category : #adding }
+GLHDiff >> addFile: anObject [
+	<generated>
+	^ self file add: anObject
 ]
 
 { #category : #accessing }
@@ -89,6 +115,29 @@ GLHDiff >> deleted_file: anObject [
 ]
 
 { #category : #accessing }
+GLHDiff >> diffRanges [
+	"Relation named: #diffRanges type: #GLHDiffRange opposite: #diff"
+
+	<generated>
+	<derived>
+	^ diffRanges
+]
+
+{ #category : #accessing }
+GLHDiff >> diffRanges: anObject [
+
+	<generated>
+	diffRanges value: anObject
+]
+
+{ #category : #navigation }
+GLHDiff >> diffRangesGroup [
+	<generated>
+	<navigation: 'DiffRanges'>
+	^ MooseSpecializedGroup withAll: self diffRanges asSet
+]
+
+{ #category : #accessing }
 GLHDiff >> diffString [
 
 	<FMProperty: #diffString type: #String>
@@ -103,6 +152,29 @@ GLHDiff >> diffString: anObject [
 	diffString := anObject
 ]
 
+{ #category : #accessing }
+GLHDiff >> file [
+	"Relation named: #file type: #GLHFile opposite: #diffs"
+
+	<generated>
+	<derived>
+	^ file
+]
+
+{ #category : #accessing }
+GLHDiff >> file: anObject [
+
+	<generated>
+	file value: anObject
+]
+
+{ #category : #navigation }
+GLHDiff >> fileGroup [
+	<generated>
+	<navigation: 'File'>
+	^ MooseSpecializedGroup withAll: self file asSet
+]
+
 { #category : #'as yet unclassified' }
 GLHDiff >> inspectionGLHDiff [
 
@@ -111,6 +183,21 @@ GLHDiff >> inspectionGLHDiff [
 	canvas := RSCommitDiff canvasFor: self.
 
 	^ canvas asPresenter
+]
+
+{ #category : #accessing }
+GLHDiff >> mergeRequest [
+	"Relation named: #mergeRequest type: #GLHMergeRequest opposite: #diffs"
+
+	<generated>
+	^ mergeRequest
+]
+
+{ #category : #accessing }
+GLHDiff >> mergeRequest: anObject [
+
+	<generated>
+	mergeRequest := anObject
 ]
 
 { #category : #accessing }

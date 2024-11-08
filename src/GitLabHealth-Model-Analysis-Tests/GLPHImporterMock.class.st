@@ -7,7 +7,7 @@ Class {
 		'mergeRequests',
 		'glhModel'
 	],
-	#category : #'GitLabHealth-Model-Analysis-Tests'
+	#category : 'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #commit }
@@ -86,8 +86,8 @@ GLPHImporterMock >> initialize [
 
 	commits := OrderedCollection new.
 	mergeRequests := OrderedCollection new.
-	
-glhModel := GLPHEModel new name: 'model'
+
+	glhModel := GLHModel new name: 'model'
 ]
 
 { #category : #accessing }

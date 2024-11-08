@@ -26,7 +26,7 @@ Class {
 		'#branches => FMMany type: #GLHBranch opposite: #repository',
 		'#commits => FMMany type: #GLHCommit opposite: #repository'
 	],
-	#category : #'GitLabHealth-Model-Entities'
+	#category : 'GitLabHealth-Model-Entities'
 }
 
 { #category : #meta }

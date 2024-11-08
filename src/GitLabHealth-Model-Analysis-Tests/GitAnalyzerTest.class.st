@@ -21,7 +21,7 @@ GitAnalyzerTest >> setUp [
 	super setUp.
 
 	"Put here a common initialization logic for tests"
-	glphModel := GLPHEModel new.
+	glphModel := GLHModel new.
 
 	glphApi := GLPHApi new
 		           privateToken: '';
@@ -31,7 +31,7 @@ GitAnalyzerTest >> setUp [
 	since := Date today - 2 day.
 
 	glhImporter := GLPHModelImporter new
-		               glhApi: glphApi;
+		               repoApi: glphApi;
 		               glhModel: glphModel;
 		               withFiles: false;
 		              
@@ -100,19 +100,15 @@ GitAnalyzerTest >> testAnalyseAmandment [
 GitAnalyzerTest >> testAnalyseCommitFrequencySinceUntil [
 
 	| res from since |
-	
 	from := '13 May 2024'.
 	since := '16 May 2024'.
-	
+
 	res := gitAnalyzer
 		       onProject: projects first;
-		       analyseCommitFrequencySince: from asDate
-		       until: since asDate.
+		       analyseCommitFrequencySince: from asDate until: since asDate.
 
-	
-	
 	self assert: (res at: from) size equals: 1.
-	self assert: (res at: '14 May 2024') size equals: 4.
+	self assert: (res at: '14 May 2024') size equals: 4
 ]
 
 { #category : #test }
@@ -120,7 +116,7 @@ GitAnalyzerTest >> testAnalyseMergeResquestValidation [
 
 	| mergeResquest res |
 	glhImporter importMergeRequests: projects anyOne.
-	mergeResquest := (glhImporter glhModel allWithType: GLPHEMergeRequest)
+	mergeResquest := (glhImporter glhModel allWithType: GLHMergeRequest)
 		                 detect: [ :mr | mr iid = 1 ].
 
 

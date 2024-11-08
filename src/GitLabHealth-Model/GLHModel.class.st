@@ -3,7 +3,7 @@ Class {
 	#superclass : #MooseModel,
 	#traits : 'GLHTEntityCreator',
 	#classTraits : 'GLHTEntityCreator classTrait',
-	#category : #'GitLabHealth-Model-Model'
+	#category : 'GitLabHealth-Model-Model'
 }
 
 { #category : #accessing }

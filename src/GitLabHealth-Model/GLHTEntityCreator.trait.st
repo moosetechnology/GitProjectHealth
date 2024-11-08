@@ -6,7 +6,7 @@ It provides an API for creating entities and adding them to the model.
 "
 Trait {
 	#name : #GLHTEntityCreator,
-	#category : #'GitLabHealth-Model-Model'
+	#category : 'GitLabHealth-Model-Model'
 }
 
 { #category : #meta }
@@ -19,10 +19,31 @@ GLHTEntityCreator classSide >> annotation [
 ]
 
 { #category : #'entity creation' }
+GLHTEntityCreator >> newAddition [
+
+	<generated>
+	^ self add: GLHAddition new
+]
+
+{ #category : #'entity creation' }
 GLHTEntityCreator >> newBranch [
 
 	<generated>
 	^ self add: GLHBranch new
+]
+
+{ #category : #'entity creation' }
+GLHTEntityCreator >> newChange [
+
+	<generated>
+	^ self add: GLHChange new
+]
+
+{ #category : #'entity creation' }
+GLHTEntityCreator >> newChangeNamed: aName [
+
+	<generated>
+	^ self add: (GLHChange named: aName)
 ]
 
 { #category : #'entity creation' }
@@ -40,6 +61,13 @@ GLHTEntityCreator >> newCommitNamed: aName [
 ]
 
 { #category : #'entity creation' }
+GLHTEntityCreator >> newDeletion [
+
+	<generated>
+	^ self add: GLHDeletion new
+]
+
+{ #category : #'entity creation' }
 GLHTEntityCreator >> newDiff [
 
 	<generated>
@@ -51,6 +79,13 @@ GLHTEntityCreator >> newDiffNamed: aName [
 
 	<generated>
 	^ self add: (GLHDiff named: aName)
+]
+
+{ #category : #'entity creation' }
+GLHTEntityCreator >> newDiffRange [
+
+	<generated>
+	^ self add: GLHDiffRange new
 ]
 
 { #category : #'entity creation' }
@@ -100,6 +135,27 @@ GLHTEntityCreator >> newJobNamed: aName [
 
 	<generated>
 	^ self add: (GLHJob named: aName)
+]
+
+{ #category : #'entity creation' }
+GLHTEntityCreator >> newLineOfCode [
+
+	<generated>
+	^ self add: GLHLineOfCode new
+]
+
+{ #category : #'entity creation' }
+GLHTEntityCreator >> newMergeRequest [
+
+	<generated>
+	^ self add: GLHMergeRequest new
+]
+
+{ #category : #'entity creation' }
+GLHTEntityCreator >> newMergeRequestNamed: aName [
+
+	<generated>
+	^ self add: (GLHMergeRequest named: aName)
 ]
 
 { #category : #'entity creation' }

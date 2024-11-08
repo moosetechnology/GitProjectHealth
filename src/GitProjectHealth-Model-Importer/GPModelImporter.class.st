@@ -192,13 +192,14 @@ GPModelImporter >> parseDiffString: aDiff [
 
 	lines ifEmpty: [ ^ aDiff diffRanges ].
 	lines := self filterCommitChanges: lines.
+	lines ifEmpty: [ ^ aDiff diffRanges ].
 	(lines first beginsWith: '@@') ifFalse: [ ^ aDiff diffRanges ].
 
 	lines do: [ :line |
 		| aChange |
 		firstChangeRange := false.
 		(line trim beginsWith: #'@@') ifTrue: [
-			range := GLPHEDiffRange newFrom: line.
+			range := GLHDiffRange newFrom: line.
 			firstChangeRange := true.
 			range := aDiff diffRanges add: range unless: [ :existing :new |
 				         existing originalLineRange = new originalLineRange and: [
@@ -206,7 +207,7 @@ GPModelImporter >> parseDiffString: aDiff [
 
 		self withCommitDiffs ifTrue: [
 			firstChangeRange ifFalse: [
-				aChange := GLPHEChange newFrom: line.
+				aChange := GLHChange newFrom: line.
 				aChange relativeIndex: index.
 				aChange := range changes add: aChange unless: [ :existing :new |
 					           existing sourceCode = new sourceCode and: [

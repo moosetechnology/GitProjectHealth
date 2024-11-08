@@ -9,7 +9,7 @@ Class {
 		'gitAnalyzer',
 		'fromCommit'
 	],
-	#category : #'GitLabHealth-Model-Analysis-Tests'
+	#category : 'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #running }
@@ -17,7 +17,7 @@ GitAnalyzerLocalTest >> setUp [
 
 	super setUp.
 
-	glphModel := GLPHEModel new.
+	glphModel := GLHModel new.
 	gitAnalyzer := GitAnalyzer new onModel: glphModel.
 	fromCommit := GLHCommit new.
 	fromCommit short_id: 'testFromCommit'.

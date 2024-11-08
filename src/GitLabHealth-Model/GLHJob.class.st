@@ -39,7 +39,7 @@ Class {
 		'#user => FMOne type: #GLHUser opposite: #jobs',
 		'#web_url => FMProperty'
 	],
-	#category : #'GitLabHealth-Model-Entities'
+	#category : 'GitLabHealth-Model-Entities'
 }
 
 { #category : #meta }

@@ -4,7 +4,7 @@ An OpenedMergeRequestMetricTest is a test class for testing the behavior of Open
 Class {
 	#name : #OpenedMergeRequestMetricTest,
 	#superclass : #TestCase,
-	#category : #'GitLabHealth-Model-Analysis-Tests'
+	#category : 'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }
@@ -25,7 +25,7 @@ OpenedMergeRequestMetricTest >> testCalculate [
 			        { (GLHProject new repository: GLHRepository new) }.
 
 	glhImporter := GLPHImporterMock new.
-	glhImporter mergeRequests: { (GLPHEMergeRequest new
+	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
 			 created_at: '09-05-2024') }.
 
@@ -47,32 +47,31 @@ OpenedMergeRequestMetricTest >> testCalculate [
 { #category : #tests }
 OpenedMergeRequestMetricTest >> testCalculate1OpenedAnd2NotOpenedByUser [
 
-	| openedMergeRequest result glhImporter user user2|
+	| openedMergeRequest result glhImporter user user2 |
 	"Given"
 	user := GLHUser new
 		        username: 'user';
-				  name: 'user';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
-			
-	user2 := GLHUser new
-		        username: 'user2';
-				  name: 'user2';
+		        name: 'user';
 		        contributedProjects:
 			        { (GLHProject new repository: GLHRepository new) }.
 
+	user2 := GLHUser new
+		         username: 'user2';
+		         name: 'user2';
+		         contributedProjects:
+			         { (GLHProject new repository: GLHRepository new) }.
+
 	glhImporter := GLPHImporterMock new.
-	glhImporter mergeRequests: { 
-			(GLPHEMergeRequest new
-			 author: user2;
-			 created_at: '09-02-2024').
-			(GLPHEMergeRequest new
-			 author: user2;
-			 created_at: '09-03-2024').
-			(GLPHEMergeRequest new
-			 author: user;
-			 created_at: '09-03-2024')
-			 }.
+	glhImporter mergeRequests: {
+			(GLHMergeRequest new
+				 author: user2;
+				 created_at: '09-02-2024').
+			(GLHMergeRequest new
+				 author: user2;
+				 created_at: '09-03-2024').
+			(GLHMergeRequest new
+				 author: user;
+				 created_at: '09-03-2024') }.
 
 
 	openedMergeRequest := OpenedMergeRequestMetric new
@@ -119,29 +118,28 @@ OpenedMergeRequestMetricTest >> testCalculateNoMergeRequests [
 { #category : #tests }
 OpenedMergeRequestMetricTest >> testCalculateNotOpenedByUser [
 
-	| openedMergeRequest result glhImporter user user2|
+	| openedMergeRequest result glhImporter user user2 |
 	"Given"
 	user := GLHUser new
 		        username: 'user';
-				  name: 'user';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
-			
-	user2 := GLHUser new
-		        username: 'user2';
-				  name: 'user2';
+		        name: 'user';
 		        contributedProjects:
 			        { (GLHProject new repository: GLHRepository new) }.
 
+	user2 := GLHUser new
+		         username: 'user2';
+		         name: 'user2';
+		         contributedProjects:
+			         { (GLHProject new repository: GLHRepository new) }.
+
 	glhImporter := GLPHImporterMock new.
-	glhImporter mergeRequests: { 
-			(GLPHEMergeRequest new
-			 author: user2;
-			 created_at: '09-02-2024').
-			(GLPHEMergeRequest new
-			 author: user2;
-			 created_at: '09-03-2024')
-			 }.
+	glhImporter mergeRequests: {
+			(GLHMergeRequest new
+				 author: user2;
+				 created_at: '09-02-2024').
+			(GLHMergeRequest new
+				 author: user2;
+				 created_at: '09-03-2024') }.
 
 
 	openedMergeRequest := OpenedMergeRequestMetric new

@@ -4,7 +4,7 @@ A MergedMergeRequestWithoutReviewMetricTest is a test class for testing the beha
 Class {
 	#name : #SelfMergedUnderAMinuteMergeRequestMetricTest,
 	#superclass : #TestCase,
-	#category : #'GitLabHealth-Model-Analysis-Tests'
+	#category : 'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }
@@ -19,15 +19,15 @@ SelfMergedUnderAMinuteMergeRequestMetricTest >> testCalculate [
 
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: {
-			(GLPHEMergeRequest new
+			(GLHMergeRequest new
 				 author: user;
 				 merge_user: user;
 				 reviewers: { user };
 				 created_at: '09-05-2024:00-00-00' asDateAndTime;
 				 merged_at: '09-05-2024:00-00-01' asDateAndTime).
-			(GLPHEMergeRequest new
+			(GLHMergeRequest new
 				 author: user;
-				merge_user: nil;
+				 merge_user: nil;
 				 created_at: '09-05-2024:00-00-00' asDateAndTime;
 				 merged_at: '09-05-2024:00-00-01' asDateAndTime) }.
 
@@ -64,13 +64,13 @@ SelfMergedUnderAMinuteMergeRequestMetricTest >> testCalculateMergeButNotCreated 
 
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: {
-			(GLPHEMergeRequest new
+			(GLHMergeRequest new
 				 author: user2;
 				 merge_user: user;
 				 reviewers: { user };
 				 created_at: '09-05-2024:00-00-00' asDateAndTime;
 				 merged_at: '09-05-2024:00-00-01' asDateAndTime).
-			(GLPHEMergeRequest new
+			(GLHMergeRequest new
 				 author: user;
 				 merge_user: nil;
 				 created_at: '09-05-2024:00-00-00' asDateAndTime;

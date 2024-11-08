@@ -4,7 +4,7 @@ A CodeDeletionByMRMetricTest is a test class for testing the behavior of CodeDel
 Class {
 	#name : #CodeDeletionByMRMetricTest,
 	#superclass : #TestCase,
-	#category : #'GitLabHealth-Model-Analysis-Tests'
+	#category : 'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }
@@ -18,7 +18,7 @@ CodeDeletionByMRMetricTest >> testCalculate [
 			        { (GLHProject new repository: GLHRepository new) }.
 
 	glhImporter := GLPHImporterMock new.
-	glhImporter mergeRequests: { (GLPHEMergeRequest new
+	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
 			 created_at: '09-05-2024';
 			 merged_at: '09-06-2024' asDate;
@@ -62,7 +62,7 @@ CodeDeletionByMRMetricTest >> testCalculateNoCommits [
 			        { (GLHProject new repository: GLHRepository new) }.
 
 	glhImporter := GLPHImporterMock new.
-	glhImporter mergeRequests: { (GLPHEMergeRequest new
+	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
 			 created_at: '09-05-2024';
 			 merged_at: '09-06-2024' asDate;
@@ -92,7 +92,7 @@ CodeDeletionByMRMetricTest >> testCalculateNoMergeRequests [
 			        { (GLHProject new repository: GLHRepository new) }.
 
 	glhImporter := GLPHImporterMock new.
-	glhImporter mergeRequests: { (GLPHEMergeRequest new
+	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
 			 created_at: '09-05-2024';
 			 merged_at: '09-06-2024' asDate;

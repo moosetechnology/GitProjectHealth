@@ -4,7 +4,7 @@ A CommitsNumberByJiraTicketsMetricTest is a test class for testing the behavior 
 Class {
 	#name : #CommitsNumberByJiraTicketsMetricTest,
 	#superclass : #TestCase,
-	#category : #'GitLabHealth-Model-Analysis-Tests'
+	#category : 'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }
@@ -18,7 +18,7 @@ CommitsNumberByJiraTicketsMetricTest >> testCalculate [
 			        { (GLHProject new repository: GLHRepository new) }.
 
 	glhImporter := GLPHImporterMock new.
-	glhImporter mergeRequests: { (GLPHEMergeRequest new
+	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
 			 created_at: '09-05-2024';
 			 merged_at: '09-06-2024' asDate;
@@ -61,7 +61,7 @@ CommitsNumberByJiraTicketsMetricTest >> testCalculateNoCommits [
 			        { (GLHProject new repository: GLHRepository new) }.
 
 	glhImporter := GLPHImporterMock new.
-	glhImporter mergeRequests: { (GLPHEMergeRequest new
+	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
 			 created_at: '09-05-2024';
 			 merged_at: '09-06-2024' asDate;

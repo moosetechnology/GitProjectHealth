@@ -4,7 +4,7 @@ A TimeBetweenCommitMetricTest is a test class for testing the behavior of TimeBe
 Class {
 	#name : #TimeBetweenCommitMetricTest,
 	#superclass : #TestCase,
-	#category : #'GitLabHealth-Model-Analysis-Tests'
+	#category : 'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }

@@ -21,7 +21,10 @@ a commit attached to a repository
 | Relation | Origin | Opposite | Type | Comment |
 |---|
 | `childCommits` | `GLHCommit` | `parentCommits` | `GLHCommit` | |
+| `commitedMergeRequest` | `GLHCommit` | `mergedCommit` | `GLHMergeRequest` | |
+| `commitedMergeRequest` | `GLHCommit` | `mergeRequestCommit` | `GLHMergeRequest` | |
 | `parentCommits` | `GLHCommit` | `childCommits` | `GLHCommit` | |
+| `squashedMergeRequest` | `GLHCommit` | `squashCommit` | `GLHMergeRequest` | |
 
 
 ## Properties
@@ -60,6 +63,7 @@ Class {
 		'#branch => FMOne type: #GLHBranch opposite: #commits',
 		'#childCommits => FMMany type: #GLHCommit opposite: #parentCommits',
 		'#commitCreator => FMOne type: #GLHUser opposite: #commits',
+		'#commitedMergeRequest => FMOne type: #GLHMergeRequest opposite: #mergedCommit',
 		'#committed_date => FMProperty',
 		'#committer_email => FMProperty',
 		'#committer_name => FMProperty',
@@ -73,6 +77,7 @@ Class {
 		'#parent_ids => FMProperty defaultValue: ((OrderedCollection new))',
 		'#repository => FMOne type: #GLHRepository opposite: #commits',
 		'#short_id => FMProperty',
+		'#squashedMergeRequest => FMOne type: #GLHMergeRequest opposite: #squashCommit',
 		'#title => FMProperty',
 		'#web_url => FMProperty'
 	],
@@ -228,6 +233,22 @@ GLHCommit >> commitCreatorGroup [
 	<generated>
 	<navigation: 'CommitCreator'>
 	^ MooseSpecializedGroup with: self commitCreator
+]
+
+{ #category : #accessing }
+GLHCommit >> commitedMergeRequest [
+	"Relation named: #commitedMergeRequest type: #GLHMergeRequest opposite: #mergedCommit"
+
+	<generated>
+	<derived>
+	^ commitedMergeRequest
+]
+
+{ #category : #accessing }
+GLHCommit >> commitedMergeRequest: anObject [
+
+	<generated>
+	commitedMergeRequest := anObject
 ]
 
 { #category : #accessing }
@@ -432,6 +453,22 @@ GLHCommit >> short_id [
 GLHCommit >> short_id: anObject [
 	<generated>
 	short_id := anObject
+]
+
+{ #category : #accessing }
+GLHCommit >> squashedMergeRequest [
+	"Relation named: #squashedMergeRequest type: #GLHMergeRequest opposite: #squashCommit"
+
+	<generated>
+	<derived>
+	^ squashedMergeRequest
+]
+
+{ #category : #accessing }
+GLHCommit >> squashedMergeRequest: anObject [
+
+	<generated>
+	squashedMergeRequest := anObject
 ]
 
 { #category : #accessing }

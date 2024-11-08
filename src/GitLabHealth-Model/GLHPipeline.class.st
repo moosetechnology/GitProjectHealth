@@ -14,6 +14,11 @@ A GitLab Pipeline execution
 |---|
 | `jobs` | `GLHPipeline` | `pipeline` | `GLHJob` | |
 
+### Other
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `mergeResquest` | `GLHPipeline` | `pipeline` | `GLHMergeRequest` | |
+
 
 ## Properties
 ======================
@@ -31,11 +36,12 @@ Class {
 	#instVars : [
 		'#id => FMProperty',
 		'#jobs => FMMany type: #GLHJob opposite: #pipeline',
+		'#mergeResquest => FMOne type: #GLHMergeRequest opposite: #pipeline',
 		'#project => FMOne type: #GLHProject opposite: #pipelines',
 		'#runDate => FMProperty',
 		'#status => FMProperty'
 	],
-	#category : #'GitLabHealth-Model-Entities'
+	#category : 'GitLabHealth-Model-Entities'
 }
 
 { #category : #meta }
@@ -89,6 +95,22 @@ GLHPipeline >> jobsGroup [
 	<generated>
 	<navigation: 'Jobs'>
 	^ MooseSpecializedGroup withAll: self jobs asSet
+]
+
+{ #category : #accessing }
+GLHPipeline >> mergeResquest [
+	"Relation named: #mergeResquest type: #GLHMergeRequest opposite: #pipeline"
+
+	<generated>
+	<derived>
+	^ mergeResquest
+]
+
+{ #category : #accessing }
+GLHPipeline >> mergeResquest: anObject [
+
+	<generated>
+	mergeResquest := anObject
 ]
 
 { #category : #accessing }

@@ -6,7 +6,7 @@ A file blob
 Class {
 	#name : #GLHFileBlob,
 	#superclass : #GLHFile,
-	#category : #'GitLabHealth-Model-Entities'
+	#category : 'GitLabHealth-Model-Entities'
 }
 
 { #category : #meta }

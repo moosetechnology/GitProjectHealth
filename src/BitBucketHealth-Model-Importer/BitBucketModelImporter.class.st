@@ -65,7 +65,7 @@ BitBucketModelImporter >> convertBitBucketDiffToGitDiff: response [
 
 	"Iterate over each diff in 'diffs'"
 	result := (response at: #diffs) collect: [ :diff | "Extract file path, hashes"
-		          | gitDiff |
+		          | gitDiff hunks|
 		          gitDiff := ''.
 		          filePathSource := (diff at: 'source')
 			                            ifNil: ''
@@ -84,7 +84,8 @@ BitBucketModelImporter >> convertBitBucketDiffToGitDiff: response [
 		                     , String cr.
 
 		          "Iterate over hunks"
-		          (diff at: 'hunks') do: [ :hunk |
+					 hunks := diff at: #hunks ifPresent: [ :value | value ]  ifAbsent: [ { } ]. 
+		          hunks do: [ :hunk |
 			          sourceLine := hunk at: 'sourceLine'.
 			          sourceSpan := hunk at: 'sourceSpan'.
 			          destinationLine := hunk at: 'destinationLine'.
@@ -474,7 +475,7 @@ BitBucketModelImporter >> parsePullRequestIntoGLPHEMergeRequest: pullRequestDict
 			          ((author at: #user) at: #displayName) ].
 
 
-	glpheMergeRequest := GLPHEMergeRequest new
+	glpheMergeRequest := GLHMergeRequest new
 		                     name: (pullRequestDictionary at: #title);
 		                     title: (pullRequestDictionary at: #title);
 		                     id: (pullRequestDictionary at: #id);

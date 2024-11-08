@@ -12,6 +12,7 @@ A GitLab Project
 ### Children
 | Relation | Origin | Opposite | Type | Comment |
 |---|
+| `mergeRequests` | `GLHProject` | `project` | `GLHMergeRequest` | |
 | `pipelines` | `GLHProject` | `project` | `GLHPipeline` | |
 | `repository` | `GLHProject` | `project` | `GLHRepository` | |
 
@@ -53,13 +54,14 @@ Class {
 		'#description => FMProperty',
 		'#group => FMOne type: #GLHGroup opposite: #projects',
 		'#id => FMProperty',
+		'#mergeRequests => FMMany type: #GLHMergeRequest opposite: #project',
 		'#pipelines => FMMany type: #GLHPipeline opposite: #project',
 		'#readme_url => FMProperty',
 		'#repository => FMOne type: #GLHRepository opposite: #project',
 		'#topics => FMProperty',
 		'#web_url => FMProperty'
 	],
-	#category : #'GitLabHealth-Model-Entities'
+	#category : 'GitLabHealth-Model-Entities'
 }
 
 { #category : #meta }
@@ -75,6 +77,12 @@ GLHProject class >> annotation [
 GLHProject >> addContributor: anObject [
 	<generated>
 	^ self contributors add: anObject
+]
+
+{ #category : #adding }
+GLHProject >> addMergeRequest: anObject [
+	<generated>
+	^ self mergeRequests add: anObject
 ]
 
 { #category : #adding }
@@ -205,6 +213,29 @@ GLHProject >> id [
 GLHProject >> id: anObject [
 	<generated>
 	id := anObject
+]
+
+{ #category : #accessing }
+GLHProject >> mergeRequests [
+	"Relation named: #mergeRequests type: #GLHMergeRequest opposite: #project"
+
+	<generated>
+	<derived>
+	^ mergeRequests
+]
+
+{ #category : #accessing }
+GLHProject >> mergeRequests: anObject [
+
+	<generated>
+	mergeRequests value: anObject
+]
+
+{ #category : #navigation }
+GLHProject >> mergeRequestsGroup [
+	<generated>
+	<navigation: 'MergeRequests'>
+	^ MooseSpecializedGroup withAll: self mergeRequests asSet
 ]
 
 { #category : #accessing }

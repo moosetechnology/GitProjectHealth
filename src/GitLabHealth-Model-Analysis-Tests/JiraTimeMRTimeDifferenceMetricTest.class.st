@@ -4,7 +4,7 @@ A JiraTimeMRTimeDifferenceMetricTest is a test class for testing the behavior of
 Class {
 	#name : #JiraTimeMRTimeDifferenceMetricTest,
 	#superclass : #TestCase,
-	#category : #'GitLabHealth-Model-Analysis-Tests'
+	#category : 'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }
@@ -18,7 +18,7 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculate [
 			        { (GLHProject new repository: GLHRepository new) }.
 
 	glhImporter := GLPHImporterMock new.
-	glhImporter mergeRequests: { (GLPHEMergeRequest new
+	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
 			 created_at: '09-05-2024';
 			 merged_at: '09-06-2024' asDate;
@@ -62,7 +62,7 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculate2PeriodWith1EmptyPeriod [
 			        { (GLHProject new repository: GLHRepository new) }.
 
 	glhImporter := GLPHImporterMock new.
-	glhImporter mergeRequests: { (GLPHEMergeRequest new
+	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
 			 created_at: '09-05-2024';
 			 merged_at: '09-06-2024' asDate;
@@ -136,7 +136,7 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculateWithNoEstimatedTime [
 			        { (GLHProject new repository: GLHRepository new) }.
 
 	glhImporter := GLPHImporterMock new.
-	glhImporter mergeRequests: { (GLPHEMergeRequest new
+	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
 			 created_at: '09-05-2024';
 			 merged_at: '09-06-2024' asDate;
@@ -178,7 +178,7 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculateWithTimeOriginalEstimateAndNo
 			        { (GLHProject new repository: GLHRepository new) }.
 
 	glhImporter := GLPHImporterMock new.
-	glhImporter mergeRequests: { (GLPHEMergeRequest new
+	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
 			 created_at: '09-05-2024';
 			 merged_at: '09-06-2024' asDate;

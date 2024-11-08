@@ -4,7 +4,7 @@ A CommentContributionMetricTest is a test class for testing the behavior of Comm
 Class {
 	#name : #CommentContributionMetricTest,
 	#superclass : #TestCase,
-	#category : #'GitLabHealth-Model-Analysis-Tests'
+	#category : 'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }
@@ -17,8 +17,8 @@ CommentContributionMetricTest >> testCalculate [
 		        contributedProjects:
 			        { (GLHProject new repository: GLHRepository new) }.
 
-	commitDiff := GLHDiff new diffRanges: { (GLPHEDiffRange new changes:
-			               { (GLPHEAddition new sourceCode: '// test') }) }.
+	commitDiff := GLHDiff new diffRanges: { (GLHDiffRange new changes:
+			               { (GLHAddition new sourceCode: '// test') }) }.
 
 	glhImporter := GLPHImporterMock new.
 	glhImporter commits: { (GLHCommit new

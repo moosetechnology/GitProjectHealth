@@ -10,25 +10,32 @@ a detected addition of a line, seen within a diff
 
 "
 Class {
-	#name : #GLPHEAddition,
-	#superclass : #GLPHEChange,
+	#name : #GLHAddition,
+	#superclass : #GLHChange,
 	#instVars : [
 		'#delimiter => FMProperty defaultValue: #+'
 	],
-	#category : #'GLPHExtended-Model-Entities'
+	#category : 'GitLabHealth-Model-Entities'
 }
 
 { #category : #meta }
-GLPHEAddition class >> annotation [
+GLHAddition class >> annotation [
 
-	<FMClass: #Addition super: #GLPHEChange>
-	<package: #'GLPHExtended-Model'>
+	<FMClass: #Addition super: #GLHChange>
+	<package: #'GitLabHealth-Model'>
 	<generated>
 	^ self
 ]
 
 { #category : #accessing }
-GLPHEAddition >> delimiter: anObject [
+GLHAddition >> delimiter: anObject [
 	<generated>
 	delimiter := anObject
+]
+
+{ #category : #testing }
+GLHAddition >> isAddition [
+
+	<generated>
+	^ true
 ]

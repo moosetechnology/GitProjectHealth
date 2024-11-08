@@ -10,7 +10,7 @@ Class {
 		'since',
 		'glhImporter'
 	],
-	#category : #'GitLabHealth-Model-Importer-Tests'
+	#category : 'GitLabHealth-Model-Importer-Tests'
 }
 
 { #category : #accessing }

@@ -4,7 +4,7 @@ A PendingMergeRequestMetricTest is a test class for testing the behavior of Pend
 Class {
 	#name : #PendingMergeRequestMetricTest,
 	#superclass : #TestCase,
-	#category : #'GitLabHealth-Model-Analysis-Tests'
+	#category : 'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #test }
@@ -19,7 +19,7 @@ PendingMergeRequestMetricTest >> testCalculate [
 
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: {
-			(GLPHEMergeRequest new
+			(GLHMergeRequest new
 				 author: user;
 				 merge_user: user;
 				 created_at: '09-05-2024:00-00-00' asDateAndTime;
@@ -46,7 +46,7 @@ PendingMergeRequestMetricTest >> testCalculate [
 { #category : #test }
 PendingMergeRequestMetricTest >> testCalculate1Pending1Closed [
 
-	| result glhImporter user mergedMergeRequestPending|
+	| result glhImporter user mergedMergeRequestPending |
 	"Given"
 	user := GLHUser new
 		        username: 'test';
@@ -55,26 +55,24 @@ PendingMergeRequestMetricTest >> testCalculate1Pending1Closed [
 
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: {
-			(GLPHEMergeRequest new
+			(GLHMergeRequest new
 				 author: user;
 				 created_at: '09-05-2024:00-00-00' asDateAndTime;
-				 state: 'opened'; 
+				 state: 'opened';
 				 merged_at: nil).
-				(GLPHEMergeRequest new
+			(GLHMergeRequest new
 				 author: user;
 				 created_at: '09-01-2024:00-00-00' asDateAndTime;
-				 state: 'closed'; 
-				 merged_at: '09-02-2024:00-00-00' asDateAndTime).
-			 }.
+				 state: 'closed';
+				 merged_at: '09-02-2024:00-00-00' asDateAndTime) }.
 
 
-	mergedMergeRequestPending := PendingMergeRequestMetric 
-		                                   new
-		                                   user: user;
-		                                   glhImporter: glhImporter;
-		                                   setPeriodSince: '09-01-2024'
-		                                   until: '09-07-2024';
-		                                   over: Week.
+	mergedMergeRequestPending := PendingMergeRequestMetric new
+		                             user: user;
+		                             glhImporter: glhImporter;
+		                             setPeriodSince: '09-01-2024'
+		                             until: '09-07-2024';
+		                             over: Week.
 
 	"When"
 	result := mergedMergeRequestPending calculate.
@@ -86,41 +84,39 @@ PendingMergeRequestMetricTest >> testCalculate1Pending1Closed [
 { #category : #test }
 PendingMergeRequestMetricTest >> testCalculate1PendingByUser [
 
-	| result glhImporter user mergedMergeRequestPending user2|
+	| result glhImporter user mergedMergeRequestPending user2 |
 	"Given"
 	user := GLHUser new
 		        username: 'user';
-				  name: 'user';
+		        name: 'user';
 		        contributedProjects:
 			        { (GLHProject new repository: GLHRepository new) }.
-			
+
 	user2 := GLHUser new
-		        username: 'user2';
-				  name: 'user2';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
+		         username: 'user2';
+		         name: 'user2';
+		         contributedProjects:
+			         { (GLHProject new repository: GLHRepository new) }.
 
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: {
-			(GLPHEMergeRequest new
+			(GLHMergeRequest new
 				 author: user;
 				 created_at: '09-05-2024:00-00-00' asDateAndTime;
-				 state: 'opened'; 
+				 state: 'opened';
 				 merged_at: nil).
-				(GLPHEMergeRequest new
+			(GLHMergeRequest new
 				 author: user2;
 				 created_at: '09-01-2024:00-00-00' asDateAndTime;
-				 state: 'opened'; 
-				 merged_at: nil).
-			 }.
+				 state: 'opened';
+				 merged_at: nil) }.
 
-	mergedMergeRequestPending := PendingMergeRequestMetric 
-		                                   new
-		                                   user: user;
-		                                   glhImporter: glhImporter;
-		                                   setPeriodSince: '09-01-2024'
-		                                   until: '09-07-2024';
-		                                   over: Week.
+	mergedMergeRequestPending := PendingMergeRequestMetric new
+		                             user: user;
+		                             glhImporter: glhImporter;
+		                             setPeriodSince: '09-01-2024'
+		                             until: '09-07-2024';
+		                             over: Week.
 
 	"When"
 	result := mergedMergeRequestPending calculate.
@@ -132,41 +128,39 @@ PendingMergeRequestMetricTest >> testCalculate1PendingByUser [
 { #category : #test }
 PendingMergeRequestMetricTest >> testCalculate2Pending [
 
-	| result glhImporter user mergedMergeRequestPending user2|
+	| result glhImporter user mergedMergeRequestPending user2 |
 	"Given"
 	user := GLHUser new
 		        username: 'user';
-				  name: 'user';
+		        name: 'user';
 		        contributedProjects:
 			        { (GLHProject new repository: GLHRepository new) }.
-			
+
 	user2 := GLHUser new
-		        username: 'user2';
-				  name: 'user2';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
+		         username: 'user2';
+		         name: 'user2';
+		         contributedProjects:
+			         { (GLHProject new repository: GLHRepository new) }.
 
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: {
-			(GLPHEMergeRequest new
+			(GLHMergeRequest new
 				 author: user;
 				 created_at: '09-05-2024:00-00-00' asDateAndTime;
-				 state: 'opened'; 
+				 state: 'opened';
 				 merged_at: nil).
-				(GLPHEMergeRequest new
+			(GLHMergeRequest new
 				 author: user;
 				 created_at: '09-02-2024:00-00-00' asDateAndTime;
-				 state: 'opened'; 
-				 merged_at: nil).
-			 }.
+				 state: 'opened';
+				 merged_at: nil) }.
 
-	mergedMergeRequestPending := PendingMergeRequestMetric 
-		                                   new
-		                                   user: user;
-		                                   glhImporter: glhImporter;
-		                                   setPeriodSince: '09-01-2024'
-		                                   until: '09-07-2024';
-		                                   over: Week.
+	mergedMergeRequestPending := PendingMergeRequestMetric new
+		                             user: user;
+		                             glhImporter: glhImporter;
+		                             setPeriodSince: '09-01-2024'
+		                             until: '09-07-2024';
+		                             over: Week.
 
 	"When"
 	result := mergedMergeRequestPending calculate.

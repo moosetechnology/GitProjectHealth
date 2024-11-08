@@ -9,7 +9,7 @@ Class {
 		'apiToken',
 		'username'
 	],
-	#category : #'BitBucketHealth-Model-Importer'
+	#category : 'BitBucketHealth-Model-Importer'
 }
 
 { #category : #'api - pull-requests' }
