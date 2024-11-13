@@ -1,11 +1,10 @@
 Class {
-	#name : 'TimeBetweenCommitMetric',
-	#superclass : 'UserCommitsMetric',
-	#category : 'GitLabHealth-Model-Analysis',
-	#package : 'GitLabHealth-Model-Analysis'
+	#name : #TimeBetweenCommitMetric,
+	#superclass : #UserCommitsMetric,
+	#category : #'GitLabHealth-Model-Analysis'
 }
 
-{ #category : 'calculating' }
+{ #category : #calculating }
 TimeBetweenCommitMetric >> calculate [
 
 	| commitSortedByDate commits1 commits2 differences groupedByDate dateOver average |
@@ -45,7 +44,7 @@ TimeBetweenCommitMetric >> calculate [
 	^ average 
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 TimeBetweenCommitMetric >> description [
 
 	^ 'average time between commits (in seconds)'

@@ -1,11 +1,10 @@
 Class {
-	#name : 'CommitFrequencyMetric',
-	#superclass : 'UserCommitsMetric',
-	#category : 'GitLabHealth-Model-Analysis',
-	#package : 'GitLabHealth-Model-Analysis'
+	#name : #CommitFrequencyMetric,
+	#superclass : #UserCommitsMetric,
+	#category : #'GitLabHealth-Model-Analysis'
 }
 
-{ #category : 'calculating' }
+{ #category : #calculating }
 CommitFrequencyMetric >> calculate [
 
 	| groupedByDate |
@@ -22,7 +21,7 @@ CommitFrequencyMetric >> calculate [
 	^ groupedByDate average asFloat
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 CommitFrequencyMetric >> description [
 
 	^'commits frequency (avg)'

@@ -1,14 +1,13 @@
 Class {
-	#name : 'DelayUntilFirstChurnMetric',
-	#superclass : 'UserCommitsMetric',
+	#name : #DelayUntilFirstChurnMetric,
+	#superclass : #UserCommitsMetric,
 	#instVars : [
 		'maxCommitWindow'
 	],
-	#category : 'GitLabHealth-Model-Analysis',
-	#package : 'GitLabHealth-Model-Analysis'
+	#category : #'GitLabHealth-Model-Analysis'
 }
 
-{ #category : 'calculating' }
+{ #category : #calculating }
 DelayUntilFirstChurnMetric >> calculate [
 
 	| commits groupedByDate res average |
@@ -70,14 +69,14 @@ DelayUntilFirstChurnMetric >> calculate [
 	^ average
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 DelayUntilFirstChurnMetric >> description [
 
 	^ 'delay Until First Churn (W=' , maxCommitWindow printString
 			   , ')'
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 DelayUntilFirstChurnMetric >> initialize [
 	super initialize.
 	maxCommitWindow := 3
