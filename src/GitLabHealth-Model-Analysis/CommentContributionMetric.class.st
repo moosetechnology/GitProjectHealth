@@ -1,11 +1,10 @@
 Class {
-	#name : 'CommentContributionMetric',
-	#superclass : 'UserCommitsMetric',
-	#category : 'GitLabHealth-Model-Analysis',
-	#package : 'GitLabHealth-Model-Analysis'
+	#name : #CommentContributionMetric,
+	#superclass : #UserCommitsMetric,
+	#category : 'GitLabHealth-Model-Analysis'
 }
 
-{ #category : 'calculating' }
+{ #category : #calculating }
 CommentContributionMetric >> calculate [
 
 	| groupedByDate gitAnalyzer contributions |
@@ -40,13 +39,13 @@ CommentContributionMetric >> calculate [
 	^ groupedByDate average asFloat
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 CommentContributionMetric >> description [
 
 	^ 'comment contribution (avg)'
 ]
 
-{ #category : 'loading' }
+{ #category : #loading }
 CommentContributionMetric >> load [
 
 	userCommits := self
