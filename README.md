@@ -3,6 +3,7 @@
 [![CI Moose 11](https://github.com/moosetechnology/GitProjectHealth/actions/workflows/ci-moose11.yml/badge.svg)](https://github.com/moosetechnology/GitProjectHealth/actions/workflows/ci-moose11.yml)
 [![Coverage Status](https://coveralls.io/repos/github/moosetechnology/GitProjectHealth/badge.svg?branch=main)](https://coveralls.io/github/moosetechnology/GitProjectHealth?branch=main)
 
+[![DOI](https://zenodo.org/badge/494355126.svg)](https://doi.org/10.5281/zenodo.13886504)
 
 This project includes a model, an importer, and some visulization to evaluate the health of a GitLab or GitHub group.
 

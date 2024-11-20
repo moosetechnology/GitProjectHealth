@@ -1,11 +1,10 @@
 Class {
-	#name : 'PendingMergeRequestMetric',
-	#superclass : 'UserMergeRequestMetric',
-	#category : 'GitLabHealth-Model-Analysis',
-	#package : 'GitLabHealth-Model-Analysis'
+	#name : #PendingMergeRequestMetric,
+	#superclass : #UserMergeRequestMetric,
+	#category : 'GitLabHealth-Model-Analysis'
 }
 
-{ #category : 'calculating' }
+{ #category : #calculating }
 PendingMergeRequestMetric >> calculate [
 
 	| groupedByDate userMergedMergeRequests dateOver |
@@ -27,13 +26,13 @@ PendingMergeRequestMetric >> calculate [
 	^ groupedByDate average asFloat
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 PendingMergeRequestMetric >> description [
 
 	^ 'number of merge request opened during a period and left opened at the end of it'
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 PendingMergeRequestMetric >> name [ 
 	^'pendingMergeRequest'
 ]

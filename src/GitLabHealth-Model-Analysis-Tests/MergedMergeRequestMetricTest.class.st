@@ -4,7 +4,7 @@ A MergedMergeRequestMetricTest is a test class for testing the behavior of Merge
 Class {
 	#name : #MergedMergeRequestMetricTest,
 	#superclass : #TestCase,
-	#category : 'GitLabHealth-Model-Analysis-Tests'
+	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }
@@ -23,7 +23,13 @@ MergedMergeRequestMetricTest >> testCalculate [
 			 author: user;
 		    merge_user: user;
 			 created_at: '09-05-2024';
-			 merged_at: '09-05-2024')
+			 merged_at: '09-05-2024').
+			
+			(GLHMergeRequest new
+				author: user;
+				merge_user: user;
+				created_at: '09-02-2024';
+			 	merged_at: nil)
 			}.
 
 

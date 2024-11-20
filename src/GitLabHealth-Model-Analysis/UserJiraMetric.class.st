@@ -1,23 +1,22 @@
 Class {
-	#name : 'UserJiraMetric',
-	#superclass : 'UserMetric',
-	#category : 'GitLabHealth-Model-Analysis',
-	#package : 'GitLabHealth-Model-Analysis'
+	#name : #UserJiraMetric,
+	#superclass : #UserMetric,
+	#category : 'GitLabHealth-Model-Analysis'
 }
 
-{ #category : 'calculating' }
+{ #category : #calculating }
 UserJiraMetric >> calculate [
 
 	^ self subclassResponsibility
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 UserJiraMetric >> description [
 
 	^ self subclassResponsibility
 ]
 
-{ #category : 'loading' }
+{ #category : #loading }
 UserJiraMetric >> load [
 
 	userMergeRequests := self
@@ -25,7 +24,7 @@ UserJiraMetric >> load [
 		                     until: (period at: #until)
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 UserJiraMetric >> name [
 
 	^ self class name asString

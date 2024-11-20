@@ -1,10 +1,9 @@
 documentor := FamixUMLDocumentor new.
 documentor
-	model: GLPHEModel color: Color white;
-	model: GLHModel  color: Color white;
-    excludeClasses: { GLHModel. TEntityMetaLevelDependency. Object . GLHEntity . GLPHEEntity . GLPHEModel . GLPHETEntityCreator . GLHTEntityCreator . GLHGroupGroup };
+	model: GLHModel color: Color white;
+    excludeClasses: { GLHModel. TEntityMetaLevelDependency. Object . GLHEntity . GLHTEntityCreator . GLHGroupGroup };
     generate.
-    
+
 'gitproject.puml' asFileReference writeStreamDo: [ :stream |
     FamixUMLPlantUMLBackend new
         outputStream:  stream;

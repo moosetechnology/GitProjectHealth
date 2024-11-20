@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Verhaeghe"
+  given-names: "Benoit"
+  orcid: "https://orcid.org/0000-0002-4588-2698"
+- family-names: "Hlad"
+  given-names: "Nicolas"
+  orcid: "https://orcid.org/0000-0003-4989-2508"
+- family-names: "Bauvent"
+  given-names: "Kilian"
+- family-names: "Anquetil"
+  given-names: "Nicolas"
+  orcid: "https://orcid.org/0000-0003-1486-8399"
+title: "GitProjectHealth"
+version: v1.1.0
+doi: 10.5281/zenodo.13886504
+date-released: 2024-10-24
+url: "https://github.com/moosetechnology/GitProjectHealth"
