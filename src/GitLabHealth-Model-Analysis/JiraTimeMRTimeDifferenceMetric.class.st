@@ -1,11 +1,10 @@
 Class {
-	#name : 'JiraTimeMRTimeDifferenceMetric',
-	#superclass : 'UserJiraMetric',
-	#category : 'GitLabHealth-Model-Analysis',
-	#package : 'GitLabHealth-Model-Analysis'
+	#name : #JiraTimeMRTimeDifferenceMetric,
+	#superclass : #UserJiraMetric,
+	#category : 'GitLabHealth-Model-Analysis'
 }
 
-{ #category : 'calculating' }
+{ #category : #calculating }
 JiraTimeMRTimeDifferenceMetric >> calculate [
 
 	| groupedByDate dateOver |
@@ -52,13 +51,13 @@ JiraTimeMRTimeDifferenceMetric >> calculate [
 	 ^ groupedByDate average asFloat
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JiraTimeMRTimeDifferenceMetric >> description [
 
 	^ 'average difference in seconds between jira estimate time and associated merge request time (time between first commit and merge date)'
 ]
 
-{ #category : 'loading' }
+{ #category : #loading }
 JiraTimeMRTimeDifferenceMetric >> load [
 
 	userMergeRequests := self

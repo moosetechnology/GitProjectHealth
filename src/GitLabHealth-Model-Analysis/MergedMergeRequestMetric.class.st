@@ -1,11 +1,10 @@
 Class {
-	#name : 'MergedMergeRequestMetric',
-	#superclass : 'UserMergeRequestMetric',
-	#category : 'GitLabHealth-Model-Analysis',
-	#package : 'GitLabHealth-Model-Analysis'
+	#name : #MergedMergeRequestMetric,
+	#superclass : #UserMergeRequestMetric,
+	#category : #'GitLabHealth-Model-Analysis'
 }
 
-{ #category : 'calculating' }
+{ #category : #calculating }
 MergedMergeRequestMetric >> calculate [
 
 	| groupedByDate userMergedMergeRequests dateOver |
@@ -13,11 +12,15 @@ MergedMergeRequestMetric >> calculate [
 
 	groupedByDate := self setupGroupedDate.
 
+	"filter to see the MR associated to one user"
 	userMergedMergeRequests := userMergeRequests select: [
 		                           :userMergeRequest |
 		                           userMergeRequest merge_user isNotNil 
 												and: [ userMergeRequest merge_user id = user id ] ].
-
+											
+	"filter to reject MR that are not merge"
+	userMergedMergeRequests := userMergedMergeRequests reject: [ :mr | mr merged_at isNil ].
+	
 	userMergedMergeRequests do: [ :userMergeRequest |
 		"here we look at the specific date of its merged"
 		dateOver := self transformDate: userMergeRequest merged_at to: over.
@@ -29,13 +32,13 @@ MergedMergeRequestMetric >> calculate [
 	^ groupedByDate average asFloat
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 MergedMergeRequestMetric >> description [
 
 	^ 'number of merge request merged by this user'
 ]
 
-{ #category : 'loading' }
+{ #category : #loading }
 MergedMergeRequestMetric >> load [
 
 	userMergeRequests := self
@@ -43,7 +46,7 @@ MergedMergeRequestMetric >> load [
 		                     until: (period at: #until)
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 MergedMergeRequestMetric >> name [
 
 	^ 'mergedMergeRequest'

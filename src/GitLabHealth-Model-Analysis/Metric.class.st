@@ -1,63 +1,62 @@
 Class {
-	#name : 'Metric',
-	#superclass : 'Object',
+	#name : #Metric,
+	#superclass : #Object,
 	#instVars : [
 		'period',
 		'over',
 		'glhImporter',
 		'jiraImporter'
 	],
-	#category : 'GitLabHealth-Model-Analysis',
-	#package : 'GitLabHealth-Model-Analysis'
+	#category : 'GitLabHealth-Model-Analysis'
 }
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 Metric >> accronym [
 	^ (self name first uppercase asString), (self name select: #isUppercase) 
 ]
 
-{ #category : 'calculating' }
+{ #category : #calculating }
 Metric >> calculate [
 
 	^self subclassResponsibility
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 Metric >> description [
 
 	^ self subclassResponsibility
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 Metric >> glhImporter: anObject [
 
 	glhImporter := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 Metric >> jiraImporter: anObject [
 
 	jiraImporter := anObject
 ]
 
-{ #category : 'loading' }
+{ #category : #loading }
 Metric >> load [
 	^self subclassResponsibility
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 Metric >> name [
 
 	^ self subclassResponsibility
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 Metric >> over: anObject [
 
 	over := anObject
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 Metric >> setPeriodSince: since until: until [
 
 	period :=  {
@@ -65,7 +64,7 @@ Metric >> setPeriodSince: since until: until [
 			(#until -> until asDate) } asDictionary
 ]
 
-{ #category : 'utils - date' }
+{ #category : #'utils - date' }
 Metric >> setupGroupedDate [
 
 	| groupedByDate start end increment overSymbol |
@@ -111,7 +110,7 @@ Metric >> setupGroupedDate [
 	^ groupedByDate
 ]
 
-{ #category : 'utils - date' }
+{ #category : #'utils - date' }
 Metric >> transformDate: date to: aWeekOrMonthOrYear [
 
 	aWeekOrMonthOrYear = Month ifTrue: [ ^ date asDate month asDate ].

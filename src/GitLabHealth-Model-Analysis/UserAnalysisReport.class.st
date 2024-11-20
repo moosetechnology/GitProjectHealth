@@ -1,33 +1,32 @@
 Class {
-	#name : 'UserAnalysisReport',
-	#superclass : 'AnalysisReport',
+	#name : #UserAnalysisReport,
+	#superclass : #AnalysisReport,
 	#instVars : [
 		'username',
 		'email'
 	],
-	#category : 'GitLabHealth-Model-Analysis',
-	#package : 'GitLabHealth-Model-Analysis'
+	#category : 'GitLabHealth-Model-Analysis'
 }
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 UserAnalysisReport >> email [
 
 	^ email
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 UserAnalysisReport >> email: anObject [
 
 	email := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 UserAnalysisReport >> username [
 
 	^ username
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 UserAnalysisReport >> username: anObject [
 
 	username := anObject
