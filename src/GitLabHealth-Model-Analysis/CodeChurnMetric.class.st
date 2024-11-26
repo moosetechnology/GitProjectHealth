@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'maxCommitWindow'
 	],
-	#category : 'GitLabHealth-Model-Analysis'
+	#category : #'GitLabHealth-Model-Analysis'
 }
 
 { #category : #calculating }

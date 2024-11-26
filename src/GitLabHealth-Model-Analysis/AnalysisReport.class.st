@@ -6,7 +6,7 @@ Class {
 		'over',
 		'metrics'
 	],
-	#category : 'GitLabHealth-Model-Analysis'
+	#category : #'GitLabHealth-Model-Analysis'
 }
 
 { #category : #initialization }

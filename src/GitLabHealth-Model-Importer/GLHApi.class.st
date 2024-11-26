@@ -2,8 +2,8 @@
 This is the API. I do not perform any kinds of JSON transformation
 "
 Class {
-	#name : 'GLHApi',
-	#superclass : 'Object',
+	#name : #GLHApi,
+	#superclass : #Object,
 	#instVars : [
 		'baseAPIUrl',
 		'client'
@@ -11,29 +11,28 @@ Class {
 	#classVars : [
 		'currentAPI'
 	],
-	#category : 'GitLabHealth-Model-Importer',
-	#package : 'GitLabHealth-Model-Importer'
+	#category : #'GitLabHealth-Model-Importer'
 }
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHApi class >> current [
 
 	^ currentAPI
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHApi >> baseAPIUrl [
 
 	^ baseAPIUrl
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHApi >> baseAPIUrl: anObject [
 
 	baseAPIUrl := anObject
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 GLHApi >> blamesOfProject: aProjectId forFile: filePath onBranch: branchRef onStartRange: start toEndRange: end [
 
 	self client path:
@@ -47,7 +46,7 @@ GLHApi >> blamesOfProject: aProjectId forFile: filePath onBranch: branchRef onSt
 	^ self client get
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 GLHApi >> blamesOfProject: aProjectId forFile: filePath onStartRange: start toEndRange: end [
 
 	self client path:
@@ -60,7 +59,7 @@ GLHApi >> blamesOfProject: aProjectId forFile: filePath onStartRange: start toEn
 	^ self client get
 ]
 
-{ #category : 'api' }
+{ #category : #api }
 GLHApi >> branchesOfRepository: aProjectID [
 
 	^ self client get:
@@ -68,19 +67,19 @@ GLHApi >> branchesOfRepository: aProjectID [
 		  , '/repository/branches'
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHApi >> client [
 
 	^ client
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHApi >> client: anObject [
 
 	client := anObject
 ]
 
-{ #category : 'api - commits' }
+{ #category : #'api - commits' }
 GLHApi >> commit: commitSHA ofProject: aProjectId [
 
 	self client path: (String streamContents: [ :str |
@@ -95,7 +94,7 @@ GLHApi >> commit: commitSHA ofProject: aProjectId [
 	^ self client get
 ]
 
-{ #category : 'api - commits' }
+{ #category : #'api - commits' }
 GLHApi >> commit: commitSHA ofProject: aProjectId withStat: stats [
 
 	self client path: (String streamContents: [ :str |
@@ -113,7 +112,7 @@ GLHApi >> commit: commitSHA ofProject: aProjectId withStat: stats [
 	^ self client get
 ]
 
-{ #category : 'api - commits' }
+{ #category : #'api - commits' }
 GLHApi >> commitDiff: commitSHA ofProject: aProjectId unidiff: unidiff [
 
 	self client path: (String streamContents: [ :str |
@@ -132,7 +131,7 @@ GLHApi >> commitDiff: commitSHA ofProject: aProjectId unidiff: unidiff [
 	^ self client get
 ]
 
-{ #category : 'api - commits' }
+{ #category : #'api - commits' }
 GLHApi >> commitsOfProject: aProjectId [
 
 	^ self
@@ -151,7 +150,7 @@ GLHApi >> commitsOfProject: aProjectId [
 		  page: nil
 ]
 
-{ #category : 'commits' }
+{ #category : #commits }
 GLHApi >> commitsOfProject: anInteger forRefName: refName since: since [ 
 
 	^ self commitsOfProject: anInteger
@@ -169,7 +168,7 @@ GLHApi >> commitsOfProject: anInteger forRefName: refName since: since [
 		  page: nil.
 ]
 
-{ #category : 'api - commits' }
+{ #category : #'api - commits' }
 GLHApi >> commitsOfProject: aProjectId forRefName: refName since: since until: until path: aPath author: author all: aAllBoolean with_stats: withStateBoolean firstParent: firstParent order: orderString trailers: trailers perPage: aPerPageNumber page: aPageNumber [
 	"https://docs.gitlab.com/ee/api/commits.html#list-repository-commits"
 
@@ -195,7 +194,7 @@ GLHApi >> commitsOfProject: aProjectId forRefName: refName since: since until: u
 	^ self client get
 ]
 
-{ #category : 'commits' }
+{ #category : #commits }
 GLHApi >> commitsOfUser: aUserName inProject: anInteger [
 
 	| name |
@@ -222,7 +221,7 @@ GLHApi >> commitsOfUser: aUserName inProject: anInteger [
 	^ client get. "
 ]
 
-{ #category : 'commits' }
+{ #category : #commits }
 GLHApi >> commitsOfUser: aUserName inProject: anInteger since: since until: until [
 
 	| name |
@@ -249,7 +248,7 @@ GLHApi >> commitsOfUser: aUserName inProject: anInteger since: since until: unti
 	^ client get. "
 ]
 
-{ #category : 'api - repositories' }
+{ #category : #'api - repositories' }
 GLHApi >> compareProject: aProjectID from: fromSha to: toSha fromProject: fromProjectID straight: straight unidiff: unidiff [
 
 	self client path:
@@ -267,7 +266,7 @@ GLHApi >> compareProject: aProjectID from: fromSha to: toSha fromProject: fromPr
 	^ self client get
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 GLHApi >> contributedProjectsOfUserId: anUserID orderBy: orderByAttribute simple: simpleBoolean sort: AscOrDesc perPage: perPageNumber page: pageIndex [ 
 	
 	self client path: self baseAPIUrl , '/users/', anUserID printString, '/contributed_projects'.
@@ -283,7 +282,7 @@ GLHApi >> contributedProjectsOfUserId: anUserID orderBy: orderByAttribute simple
 	^ self client get.
 ]
 
-{ #category : 'api - branches' }
+{ #category : #'api - branches' }
 GLHApi >> createBranch: newBranchName forProject: aProjectID fromBranch: refBranchName [
 
 	self client url:
@@ -294,7 +293,7 @@ GLHApi >> createBranch: newBranchName forProject: aProjectID fromBranch: refBran
 	^ self client post
 ]
 
-{ #category : 'api - branches' }
+{ #category : #'api - branches' }
 GLHApi >> deleteBranch: branchName forProject: aProjectID [
 
 	self client url:
@@ -303,7 +302,7 @@ GLHApi >> deleteBranch: branchName forProject: aProjectID [
 	^ self client delete
 ]
 
-{ #category : 'api - projects' }
+{ #category : #'api - projects' }
 GLHApi >> editProject: aProjectID changeDefaultBranchTo: refBranchName [
 
 	self client url:
@@ -312,7 +311,7 @@ GLHApi >> editProject: aProjectID changeDefaultBranchTo: refBranchName [
 	^ self client put
 ]
 
-{ #category : 'api - projects' }
+{ #category : #'api - projects' }
 GLHApi >> editProject: aProjectID usingDictionary: aDictionaryOfNewParam [
 
 	self client url:
@@ -323,7 +322,7 @@ GLHApi >> editProject: aProjectID usingDictionary: aDictionaryOfNewParam [
 	^ self client put
 ]
 
-{ #category : 'api - repository files' }
+{ #category : #'api - repository files' }
 GLHApi >> getFileBlameForProject: aProjectId andFilePath: aFilePath inRef: aRef fromLine: rangeStart toLine: rangeEnd [
 	"filePath is converted here. So give a path such as ""path/to/file.md"""
 
@@ -340,13 +339,13 @@ GLHApi >> getFileBlameForProject: aProjectId andFilePath: aFilePath inRef: aRef 
 	^ self client get
 ]
 
-{ #category : 'api' }
+{ #category : #api }
 GLHApi >> group: aGroupID [
 
 	^ self client get: self baseAPIUrl , '/groups/' , aGroupID printString
 ]
 
-{ #category : 'projects' }
+{ #category : #projects }
 GLHApi >> importProjects: first after: after [ 
 	 | request query variables body response |
 
@@ -388,7 +387,7 @@ GLHApi >> importProjects: first after: after [
         ^ response contents
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 GLHApi >> initialize [
 
 	self client: (ZnClient new
@@ -397,7 +396,7 @@ GLHApi >> initialize [
 
 ]
 
-{ #category : 'api - jobs' }
+{ #category : #'api - jobs' }
 GLHApi >> jobsOfProject: aProjectID ofPipelines: aPipelineID [
 
 	^ self client get:
@@ -405,7 +404,7 @@ GLHApi >> jobsOfProject: aProjectID ofPipelines: aPipelineID [
 		  , '/pipelines/' , aPipelineID printString , '/jobs'
 ]
 
-{ #category : 'api - groups' }
+{ #category : #'api - groups' }
 GLHApi >> listGroupsWithTopLevelOnly: topLevelOnly page: aPageNumber [
 	"https://docs.gitlab.com/ee/api/groups.html#list-groups"
 
@@ -417,29 +416,29 @@ GLHApi >> listGroupsWithTopLevelOnly: topLevelOnly page: aPageNumber [
 	^ self client get
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 GLHApi >> makeGlobal [ 
 		currentAPI := self
 ]
 
-{ #category : 'api' }
+{ #category : #api }
 GLHApi >> pipelinesOfProject: aProjectID [
 	^ self client get: self baseAPIUrl , '/projects/' , aProjectID printString, '/pipelines'
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHApi >> privateToken [
 
 	^ self client request headers at: #'PRIVATE-TOKEN'
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHApi >> privateToken: anObject [
 
 	self client headerAt: #'PRIVATE-TOKEN' add: anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLHApi >> projects [
 	"use GraphQL"
 	
@@ -468,13 +467,13 @@ GLHApi >> projects [
         ^ projectIds
 ]
 
-{ #category : 'projects' }
+{ #category : #projects }
 GLHApi >> projects: aPerPageNumber page: aPageNumber [
 
 	self projects: aPerPageNumber since: nil page: aPageNumber
 ]
 
-{ #category : 'projects' }
+{ #category : #projects }
 GLHApi >> projects: aPerPageNumber since: since page: aPageNumber [
 
 	self client path: self baseAPIUrl , '/projects/'.
@@ -486,7 +485,7 @@ GLHApi >> projects: aPerPageNumber since: since page: aPageNumber [
 	^ self client get
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 GLHApi >> resetClient [
 
 	| token |
@@ -496,14 +495,14 @@ GLHApi >> resetClient [
 	self client accept: ZnMimeType applicationJson
 ]
 
-{ #category : 'api - groups' }
+{ #category : #'api - groups' }
 GLHApi >> subgroupsOfGroup: aGroupID [
 
 	^ self client get:
 		  self baseAPIUrl , '/groups/' , aGroupID printString , '/subgroups'
 ]
 
-{ #category : 'api - groups' }
+{ #category : #'api - groups' }
 GLHApi >> subgroupsOfGroup: aGroupID page: aPageNumber [
 
 	self client url:
@@ -512,7 +511,7 @@ GLHApi >> subgroupsOfGroup: aGroupID page: aPageNumber [
 	^ self client get
 ]
 
-{ #category : 'api' }
+{ #category : #api }
 GLHApi >> treeOfRepository: aProjectID ofBranch: aBranchRef andPath: aPath [
 
 	| result |
@@ -526,19 +525,19 @@ GLHApi >> treeOfRepository: aProjectID ofBranch: aBranchRef andPath: aPath [
 	^ result
 ]
 
-{ #category : 'api' }
+{ #category : #api }
 GLHApi >> user: aUserID [
 
 	^ self client get: self baseAPIUrl , '/users/' , aUserID printString
 ]
 
-{ #category : 'api' }
+{ #category : #api }
 GLHApi >> userWithUsername: anUsername [
 
 	^ self client get: self baseAPIUrl , '/users?username=' , anUsername
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 GLHApi >> usersHuman: humans active: active withoutProjectBots: withoutBot perPage: perPage page: page [
 
 	self client path: self baseAPIUrl , '/users/'.
@@ -552,7 +551,7 @@ GLHApi >> usersHuman: humans active: active withoutProjectBots: withoutBot perPa
 	^ self client get
 ]
 
-{ #category : 'user' }
+{ #category : #user }
 GLHApi >> usersPerPage: perPage page: page [
 
 	self client path: self baseAPIUrl , '/users/'.

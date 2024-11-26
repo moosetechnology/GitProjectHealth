@@ -15,7 +15,7 @@ Class {
 		'metrics',
 		'analyses'
 	],
-	#category : 'GitLabHealth-Model-Analysis'
+	#category : #'GitLabHealth-Model-Analysis'
 }
 
 { #category : #'as yet unclassified' }
@@ -322,7 +322,7 @@ GitMetricExporter >> findParticipationOfCommitAuthorNamed: username amongProject
 		               response := glhImporter repoApi
 			                           commitsOfUser: username
 			                           inProject: project id
-			                           since: '01 january 2023' asDateAndTime
+			                           since: '01 january 2023' asDate asDateAndTime
 			                           until: Date today asDateAndTime.
 		               response := glhImporter parseCommitsResult: response.
 		               response isNotEmpty
@@ -433,7 +433,7 @@ GitMetricExporter >> initialize [
 
 	entities := OrderedCollection new.
 	"set up the minimal date from which we are looking for the commits a particular user in projects"
-	sinceTimeLimit := '2024-01-01' asDateAndTime.
+	sinceTimeLimit := '2024-01-01' asDate asDateAndTime.
 	runningPeriods := OrderedCollection new.
 	maxCommitWindow := 3.
 	over := Date.
