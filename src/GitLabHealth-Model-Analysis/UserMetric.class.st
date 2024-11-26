@@ -7,7 +7,7 @@ Class {
 		'userMergeRequests',
 		'emailDomain'
 	],
-	#category : 'GitLabHealth-Model-Analysis'
+	#category : #'GitLabHealth-Model-Analysis'
 }
 
 { #category : #utils }

@@ -1,11 +1,10 @@
 Class {
-	#name : 'GLPHApi',
-	#superclass : 'GLHApi',
-	#category : 'GitLabProjectHealth-Model-Importer',
-	#package : 'GitLabProjectHealth-Model-Importer'
+	#name : #GLPHApi,
+	#superclass : #GLHApi,
+	#category : #'GitLabProjectHealth-Model-Importer'
 }
 
-{ #category : 'mergeRequest' }
+{ #category : #mergeRequest }
 GLPHApi >> approvalsOfMergeQuest: aMergeRequestIID ofProject: aProjectId [
 
 	self client path:
@@ -14,7 +13,7 @@ GLPHApi >> approvalsOfMergeQuest: aMergeRequestIID ofProject: aProjectId [
 	^ self client get
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 GLPHApi >> commitsOfMergeRequest: mergeRequestIID ofProject: projectId page: page perPage: perPage [ 
 
 	self client path:
@@ -29,7 +28,7 @@ GLPHApi >> commitsOfMergeRequest: mergeRequestIID ofProject: projectId page: pag
 	^ self client get
 ]
 
-{ #category : 'commit' }
+{ #category : #commit }
 GLPHApi >> commitsOfProject: anInteger forRefName: refName [
 
 	self
@@ -54,7 +53,7 @@ GLPHApi >> commitsOfProject: anInteger forRefName: refName [
 		  page: nil
 ]
 
-{ #category : 'commits' }
+{ #category : #commits }
 GLPHApi >> commitsOfProject: anInteger forRefName: refName since: since [
 
 	self
@@ -79,7 +78,7 @@ GLPHApi >> commitsOfProject: anInteger forRefName: refName since: since [
 		  page: nil
 ]
 
-{ #category : 'commit' }
+{ #category : #commit }
 GLPHApi >> commitsOfProject: aGLHProject forRefName: refName until: toDate [
 
 	| newlyFoundCommit page |
@@ -124,7 +123,7 @@ GLPHApi >> commitsOfProject: aGLHProject forRefName: refName until: toDate [
 			self importDiffOfCommit: commit ] ]
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 GLPHApi >> diffsMergeRequestOfProject: aProjectID withId: anMRiid [
 
 	^ self client get:
@@ -132,13 +131,13 @@ GLPHApi >> diffsMergeRequestOfProject: aProjectID withId: anMRiid [
 		  , '/merge_requests/' , anMRiid printString , '/diffs/'
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 GLPHApi >> initialize [
 
 	super initialize
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 GLPHApi >> mergeRequestOfProject: aProjectID [
 	
 	^ self client get:
@@ -146,7 +145,7 @@ GLPHApi >> mergeRequestOfProject: aProjectID [
 		  , '/merge_requests/'
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 GLPHApi >> mergeRequestOfProject: aProjectID withId: anMRiid [
 
 	^ self client get:
@@ -154,7 +153,7 @@ GLPHApi >> mergeRequestOfProject: aProjectID withId: anMRiid [
 		  , '/merge_requests/' , anMRiid printString
 ]
 
-{ #category : 'mergeRequest' }
+{ #category : #mergeRequest }
 GLPHApi >> mergeRequestsOfProject: aProjectId createdAfter: createdAfter createdBefore: createdBefore authorId: authorId authorUsername: authorUsername scope: scope orderBy: orderBy page: page [
 
 	self client path:
@@ -175,14 +174,14 @@ GLPHApi >> mergeRequestsOfProject: aProjectId createdAfter: createdAfter created
 	^ self client get
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GLPHApi >> project: aProjectID [
 
 	^ self client get:
 		  self baseAPIUrl , '/projects/' , aProjectID printString
 ]
 
-{ #category : 'user' }
+{ #category : #user }
 GLPHApi >> usersSearchByUsername: aUserName [ 
 	|name|
 	

@@ -1,7 +1,7 @@
 Class {
 	#name : #UserCommitsMetric,
 	#superclass : #UserMetric,
-	#category : 'GitLabHealth-Model-Analysis'
+	#category : #'GitLabHealth-Model-Analysis'
 }
 
 { #category : #calculating }

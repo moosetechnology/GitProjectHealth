@@ -7,7 +7,7 @@ Class {
 		'glhImporter',
 		'jiraImporter'
 	],
-	#category : 'GitLabHealth-Model-Analysis'
+	#category : #'GitLabHealth-Model-Analysis'
 }
 
 { #category : #'as yet unclassified' }
