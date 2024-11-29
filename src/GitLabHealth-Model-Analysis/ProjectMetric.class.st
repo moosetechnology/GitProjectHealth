@@ -2,7 +2,74 @@ Class {
 	#name : #ProjectMetric,
 	#superclass : #Metric,
 	#instVars : [
-		'project'
+		'project',
+		'projectCommits'
 	],
-	#category : 'GitLabHealth-Model-Analysis'
+	#category : #'GitLabHealth-Model-Analysis'
 }
+
+{ #category : #loading }
+ProjectMetric >> loadCommitsSince: since until: until [
+
+	| cacheSymbol allCommits |
+	glhImporter withCommitDiffs: false.
+
+	cacheSymbol := self
+		               cacheSymbolFor: GLHCommit
+		               since: since
+		               until: until.
+
+	"download commits unless project cache is not empty"
+	allCommits := project repository
+			              cacheAt: cacheSymbol
+			              ifAbsentPut: [
+				              | foundCommits |
+				              foundCommits := glhImporter
+					                              importCommitsOfProject: project
+					                              since: since
+					                              until: until.
+				              foundCommits ].
+
+	allCommits do: [ :commit | glhImporter importCreatorOfCommit: commit ].
+	glhImporter chainsCommitsFrom: allCommits.
+	glhImporter withCommitDiffs: true.
+
+	^ allCommits
+]
+
+{ #category : #loading }
+ProjectMetric >> loadMergeRequestsSince: since until: until [
+
+	| cacheSymbol mergeRequests |
+	glhImporter withCommitDiffs: false.
+	cacheSymbol := self
+		               cacheSymbolFor: GLHMergeRequest
+		               since: since
+		               until: until.
+
+	mergeRequests := project cacheAt: cacheSymbol ifAbsentPut: [
+			                 glhImporter
+				                       importMergeRequests: project
+				                       since: since
+				                       until: until].
+			                 .
+
+	mergeRequests := mergeRequests flattened.
+	glhImporter withCommitDiffs: true.
+
+	mergeRequests do: [ :mr | glhImporter importMergeResquestAuthor: mr ].
+
+	^ mergeRequests
+]
+
+{ #category : #accessing }
+ProjectMetric >> project [
+
+	^ project
+]
+
+{ #category : #accessing }
+ProjectMetric >> project: anObject [
+
+	project := anObject
+]

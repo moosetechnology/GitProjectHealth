@@ -1,7 +1,7 @@
 Class {
 	#name : #UserJiraMetric,
 	#superclass : #UserMetric,
-	#category : 'GitLabHealth-Model-Analysis'
+	#category : #'GitLabHealth-Model-Analysis'
 }
 
 { #category : #calculating }
@@ -22,10 +22,4 @@ UserJiraMetric >> load [
 	userMergeRequests := self
 		                     loadUserMergeRequestsWithJiraIssueSince: (period at: #since)
 		                     until: (period at: #until)
-]
-
-{ #category : #accessing }
-UserJiraMetric >> name [
-
-	^ self class name asString
 ]
