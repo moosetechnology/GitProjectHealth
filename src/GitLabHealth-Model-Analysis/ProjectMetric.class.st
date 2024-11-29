@@ -37,31 +37,6 @@ ProjectMetric >> loadCommitsSince: since until: until [
 	^ allCommits
 ]
 
-{ #category : #loading }
-ProjectMetric >> loadMergeRequestsSince: since until: until [
-
-	| cacheSymbol mergeRequests |
-	glhImporter withCommitDiffs: false.
-	cacheSymbol := self
-		               cacheSymbolFor: GLHMergeRequest
-		               since: since
-		               until: until.
-
-	mergeRequests := project cacheAt: cacheSymbol ifAbsentPut: [
-			                 glhImporter
-				                       importMergeRequests: project
-				                       since: since
-				                       until: until].
-			                 .
-
-	mergeRequests := mergeRequests flattened.
-	glhImporter withCommitDiffs: true.
-
-	mergeRequests do: [ :mr | glhImporter importMergeResquestAuthor: mr ].
-
-	^ mergeRequests
-]
-
 { #category : #accessing }
 ProjectMetric >> project [
 
