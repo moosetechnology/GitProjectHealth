@@ -15,7 +15,7 @@ Class {
 		'metrics',
 		'analyses'
 	],
-	#category : 'GitLabHealth-Model-Analysis'
+	#category : #'GitLabHealth-Model-Analysis'
 }
 
 { #category : #'as yet unclassified' }
@@ -356,10 +356,28 @@ GitMetricExporter >> generateAnalysesOver: aDateWeekMonthOrYear [
 GitMetricExporter >> generateProjectsAnalysesDuringPeriod: period over: aDateWeekMonthOrYear [
 
 	^self projectEntities collect: [ :project |
-		ProjectAnalysisReport new
+		| projectAnalysisReport |
+		projectAnalysisReport := ProjectAnalysisReport new
 			projectName: project name;
 			period: period;
-			over: aDateWeekMonthOrYear ]
+			over: aDateWeekMonthOrYear.
+			
+		
+		  self projectMetrics do: [ :metric |
+				|newMetric result|
+			   newMetric := metric new
+				               glhImporter: glhImporter;
+				               jiraImporter: jiraImporter;
+				               setPeriodSince: (period at: #since)
+				               until: (period at: #until);
+				               over: aDateWeekMonthOrYear;
+				               project: project.
+
+
+			  result := newMetric calculate.
+			  projectAnalysisReport metrics at: newMetric name put: result ]. 
+		
+			projectAnalysisReport]
 ]
 
 { #category : #analysis }
@@ -373,7 +391,7 @@ GitMetricExporter >> generateUsersAnalysesDuringPeriod: period over: aDateWeekMo
 			                        period: period;
 			                        over: aDateWeekMonthOrYear.
 
-		  metrics do: [ :metric |
+		  self userMetrics do: [ :metric |
 			  newMetric := metric new
 				               glhImporter: glhImporter;
 				               jiraImporter: jiraImporter;
@@ -449,8 +467,8 @@ GitMetricExporter >> initialize [
 		           DelayUntilFirstChurnMetric.
 		           TimeBetweenCommitMetric.
 		           ContributedProjectMetric.
-		CodeAdditionByMRMetric .
-		CodeDeletionByMRMetric .
+					  CodeAdditionByMRMetric .
+		           CodeDeletionByMRMetric .
 		           MergeRequestDurationMetric.
 		           OpenedMergeRequestMetric.
 		           ClosedMergeRequestMetric.
@@ -458,7 +476,12 @@ GitMetricExporter >> initialize [
 		           SelfMergedUnderAMinuteMergeRequestMetric.
 		           ClosedTicketsMetric.
 		           JiraTimeMRTimeDifferenceMetric.
-		           CommitsNumberByJiraTicketsMetric }
+		           CommitsNumberByJiraTicketsMetric.
+		
+		
+				"Project Metrics"
+				CommitFrequencyProjectMetric
+		 }.
 ]
 
 { #category : #accessing }
@@ -475,6 +498,12 @@ GitMetricExporter >> label: aString [
 { #category : #accessing }
 GitMetricExporter >> maxCommitWindow: anInteger [
 	maxCommitWindow := anInteger abs
+]
+
+{ #category : #accessing }
+GitMetricExporter >> metrics [
+
+	^ metrics
 ]
 
 { #category : #accessing }

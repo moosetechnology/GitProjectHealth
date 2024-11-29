@@ -1,7 +1,7 @@
 Class {
 	#name : #UserMergeRequestMetric,
 	#superclass : #UserMetric,
-	#category : 'GitLabHealth-Model-Analysis'
+	#category : #'GitLabHealth-Model-Analysis'
 }
 
 { #category : #calculating }
@@ -22,10 +22,4 @@ UserMergeRequestMetric >> load [
 	userMergeRequests := self
 		                     loadUserMergeRequestsSince: (period at: #since)
 		                     until: (period at: #until).
-]
-
-{ #category : #accessing }
-UserMergeRequestMetric >> name [
-
-	^ self class name asString
 ]
