@@ -1,7 +1,7 @@
 Class {
 	#name : #UserCommitsMetric,
 	#superclass : #UserMetric,
-	#category : 'GitLabHealth-Model-Analysis'
+	#category : #'GitLabHealth-Model-Analysis'
 }
 
 { #category : #calculating }
@@ -22,10 +22,4 @@ UserCommitsMetric >> load [
 	userCommits := self
 		               loadUserCommitsSince: (period at: #since)
 		               until: (period at: #until)
-]
-
-{ #category : #accessing }
-UserCommitsMetric >> name [
-
-	^ self class name asString
 ]

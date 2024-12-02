@@ -7,12 +7,19 @@ Class {
 		'glhImporter',
 		'jiraImporter'
 	],
-	#category : 'GitLabHealth-Model-Analysis'
+	#category : #'GitLabHealth-Model-Analysis'
 }
 
 { #category : #'as yet unclassified' }
 Metric >> accronym [
 	^ (self name first uppercase asString), (self name select: #isUppercase) 
+]
+
+{ #category : #'as yet unclassified' }
+Metric >> cacheSymbolFor: anEntityType since: since until: until [
+
+	^ (anEntityType printString , ' since ' , since printString , ' to '
+	   , until printString) asSymbol
 ]
 
 { #category : #calculating }
@@ -47,7 +54,7 @@ Metric >> load [
 { #category : #accessing }
 Metric >> name [
 
-	^ self subclassResponsibility
+	^ self class name asString
 ]
 
 { #category : #accessing }
