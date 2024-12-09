@@ -1,11 +1,11 @@
 Class {
-	#name : #CommitNumberLinkWithTicket,
+	#name : #CommitsLinkWithTicketMetric,
 	#superclass : #UserJiraMetric,
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
 { #category : #calculating }
-CommitNumberLinkWithTicket >> calculate [
+CommitsLinkWithTicketMetric >> calculate [
 
 	| groupedByDate |
 	userCommits ifNil: [ self load ].
@@ -22,13 +22,13 @@ CommitNumberLinkWithTicket >> calculate [
 ]
 
 { #category : #accessing }
-CommitNumberLinkWithTicket >> description [
+CommitsLinkWithTicketMetric >> description [
 
 	^ 'number of commits link a jira ticket'
 ]
 
 { #category : #loading }
-CommitNumberLinkWithTicket >> load [
+CommitsLinkWithTicketMetric >> load [
 
 	| email |
 	userCommits := self
