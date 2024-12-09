@@ -50,4 +50,7 @@ CommitsLinkWithTicketMetricTest >> testCalculate [
 		
 	"When"
 	result := commitLinkWithTicket calculate.
+	
+	"Then"
+	self assert: result equals: 1.
 ]
