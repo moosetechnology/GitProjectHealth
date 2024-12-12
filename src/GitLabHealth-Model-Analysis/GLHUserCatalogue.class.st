@@ -5,7 +5,7 @@ Class {
 		'users',
 		'anImporter'
 	],
-	#category : 'GitLabHealth-Model-Analysis'
+	#category : #'GitLabHealth-Model-Analysis'
 }
 
 { #category : #import }

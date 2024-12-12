@@ -1,7 +1,7 @@
 Class {
 	#name : #SelfMergedUnderAMinuteMergeRequestMetric,
 	#superclass : #UserMergeRequestMetric,
-	#category : 'GitLabHealth-Model-Analysis'
+	#category : #'GitLabHealth-Model-Analysis'
 }
 
 { #category : #calculating }

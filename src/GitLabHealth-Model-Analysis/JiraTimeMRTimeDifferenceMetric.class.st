@@ -1,7 +1,7 @@
 Class {
 	#name : #JiraTimeMRTimeDifferenceMetric,
 	#superclass : #UserJiraMetric,
-	#category : 'GitLabHealth-Model-Analysis'
+	#category : #'GitLabHealth-Model-Analysis'
 }
 
 { #category : #calculating }

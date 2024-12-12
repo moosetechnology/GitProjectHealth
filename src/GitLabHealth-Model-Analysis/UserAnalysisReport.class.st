@@ -5,7 +5,7 @@ Class {
 		'username',
 		'email'
 	],
-	#category : 'GitLabHealth-Model-Analysis'
+	#category : #'GitLabHealth-Model-Analysis'
 }
 
 { #category : #accessing }
