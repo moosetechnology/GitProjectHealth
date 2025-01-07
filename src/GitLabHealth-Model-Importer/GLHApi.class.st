@@ -45,21 +45,6 @@ GLHApi >> client: anObject [
 ]
 
 { #category : #'api - commits' }
-GLHApi >> commit: commitSHA ofProject: aProjectId [
-
-	self client path: (String streamContents: [ :str |
-			 str
-				 << self baseAPIUrl;
-				 << '/projects/';
-				 << aProjectId asString;
-				 << '/repository/commits/';
-				 << commitSHA asString;
-				 << '' ]).
-
-	^ self client get
-]
-
-{ #category : #'api - commits' }
 GLHApi >> commit: commitSHA ofProject: aProjectId withStat: stats [
 
 	self client path: (String streamContents: [ :str |
