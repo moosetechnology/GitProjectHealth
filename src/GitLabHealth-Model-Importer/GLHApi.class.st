@@ -45,24 +45,6 @@ GLHApi >> client: anObject [
 ]
 
 { #category : #'api - commits' }
-GLHApi >> commit: commitSHA ofProject: aProjectId withStat: stats [
-
-	self client path: (String streamContents: [ :str |
-			 str
-				 << self baseAPIUrl;
-				 << '/projects/';
-				 << aProjectId asString;
-				 << '/repository/commits/';
-				 << commitSHA asString;
-				 << '' ]).
-			
-
-	stats ifNotNil: [ self client queryAt: #stats put: stats ].
-
-	^ self client get
-]
-
-{ #category : #'api - commits' }
 GLHApi >> commitDiff: commitSHA ofProject: aProjectId unidiff: unidiff [
 
 	self client path: (String streamContents: [ :str |

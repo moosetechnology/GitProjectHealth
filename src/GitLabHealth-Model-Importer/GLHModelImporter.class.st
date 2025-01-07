@@ -279,25 +279,24 @@ GLHModelImporter >> importAndLoadLatestsCommitsOfProject: aGLHProject [
 	^ commits
 ]
 
-{ #category : #'private - api' }
+{ #category : #commits }
 GLHModelImporter >> importCommit: aCommitID ofProject: aGLHProject [
 
 	| result parsedResult |
 	(self glhModel allWithType: GLHCommit) asOrderedCollection
 		detect: [ :commit | commit id = aCommitID ]
 		ifFound: [ :commit | ^ commit ].
-	result := self repoApi
-		          commit: aCommitID
-		          ofProject: aGLHProject id
-		          withStat: true.
+	result := self repoApi commits get: aCommitID inProject: aGLHProject id.
+	
 	parsedResult := self parseCommitResult: result.
+	
 	self
 		addCommits: { parsedResult }
 		toRepository: aGLHProject repository.
 	^ parsedResult
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #commits }
 GLHModelImporter >> importCommitOfProject: anProject withId: anID [
 
 	| commit result |
@@ -310,7 +309,7 @@ GLHModelImporter >> importCommitOfProject: anProject withId: anID [
 		           detectEntityType: GLHCommit
 		           overAttribut: #id
 		           equalTo: anID) ifNil: [
-		          result := self repoApi commit: anID ofProject: anProject id.
+		          result := self repoApi commits get: anID inProject: anProject id.
 		          commit := (self parseCommitsResult: '[' , result , ']')
 			                    first.
 
