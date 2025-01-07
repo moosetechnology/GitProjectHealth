@@ -578,10 +578,9 @@ GLHModelImporter >> importDiffOfCommit: aCommit [
 		'Diff already importer: ' , aCommit short_id printString recordInfo.
 		^ aCommit diffs ].
 	('Import diff of commit: ' , aCommit short_id printString) recordInfo.
-	result := self repoApi
-		          commitDiff: aCommit id
-		          ofProject: aCommit repository project id
-		          unidiff: true.
+	
+	result := self repoApi commits diffOf: aCommit id inProject: aCommit repository project id  uniDiff: true.
+	
 	(self isServerError: result) ifTrue: [ ^ {  } ].
 	diffsResult := self newParseDiffResult: result.
 

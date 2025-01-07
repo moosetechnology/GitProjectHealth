@@ -4,11 +4,9 @@ Class {
 	#category : #'GitLabHealth-Model-Importer-Tests'
 }
 
-{ #category : #'api - commits' }
-GLHApiMock >> commitDiff: aCommitID ofProject: aProjectId unidiff: aBoolean [
-
-	aCommitID = 'createError' ifTrue: [
-		^ '{"message":"500 Internal Server Error"}' ]
+{ #category : #accessing }
+GLHApiMock >> commits [
+	^GitlabCommitsMock new.
 ]
 
 { #category : #api }
