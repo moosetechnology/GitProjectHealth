@@ -32,14 +32,6 @@ GLHApi >> baseAPIUrl: anObject [
 	baseAPIUrl := anObject
 ]
 
-{ #category : #api }
-GLHApi >> branchesOfRepository: aProjectID [
-
-	^ self client get:
-		  self baseAPIUrl , '/projects/' , aProjectID printString
-		  , '/repository/branches'
-]
-
 { #category : #accessing }
 GLHApi >> client [
 

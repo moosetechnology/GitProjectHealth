@@ -6,7 +6,7 @@ Class {
 		'withInitialMergeRequest',
 		'generalReader'
 	],
-	#category : 'GitLabHealth-Model-Importer'
+	#category : #'GitLabHealth-Model-Importer'
 }
 
 { #category : #'private - api' }
@@ -786,7 +786,7 @@ GLHModelImporter >> importProjectsSince: since [
 	^ foundProject
 ]
 
-{ #category : #'private - api' }
+{ #category : #repository }
 GLHModelImporter >> importRepository: aGLHRepository [
 
 	| resultBranches branches |
@@ -794,8 +794,8 @@ GLHModelImporter >> importRepository: aGLHRepository [
 	('import the repository of project ' , aGLHRepository project name)
 		recordInfo.
 
-	resultBranches := self repoApi branchesOfRepository:
-		                  aGLHRepository project id.
+	resultBranches := self repoApi branches getAllFromProject: aGLHRepository project id.
+	
 	branches := self parseBranchesResult: resultBranches.
 
 	'import the branches of project ' recordInfo.
