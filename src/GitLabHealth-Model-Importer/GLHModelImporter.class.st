@@ -796,7 +796,7 @@ GLHModelImporter >> importRepository: aGLHRepository [
 
 	resultBranches := self repoApi branches getAllFromProject: aGLHRepository project id.
 	
-	branches := self parseBranchesResult: resultBranches.
+	branches := (resultBranches collect: [ :branchesJson | self parseBranchesResult: branchesJson ]) flattened.
 
 	'import the branches of project ' recordInfo.
 
