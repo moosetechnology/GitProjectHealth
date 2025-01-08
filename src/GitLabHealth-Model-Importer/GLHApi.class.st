@@ -95,18 +95,6 @@ GLHApi >> initialize [
 
 ]
 
-{ #category : #'api - groups' }
-GLHApi >> listGroupsWithTopLevelOnly: topLevelOnly page: aPageNumber [
-	"https://docs.gitlab.com/ee/api/groups.html#list-groups"
-
-	self client url: self baseAPIUrl , '/groups'.
-	topLevelOnly ifNotNil: [
-		self client queryAt: #top_level_only put: topLevelOnly ].
-	aPageNumber ifNotNil: [ self client queryAt: #page put: aPageNumber ].
-	self client queryAt: #per_page put: 100.
-	^ self client get
-]
-
 { #category : #'as yet unclassified' }
 GLHApi >> makeGlobal [ 
 		currentAPI := self

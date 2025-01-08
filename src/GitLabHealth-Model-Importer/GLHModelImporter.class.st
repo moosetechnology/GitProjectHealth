@@ -252,20 +252,17 @@ GLHModelImporter >> importActiveHumanUsers [
 { #category : #api }
 GLHModelImporter >> importAllGroups [
 
-	| page foundGroups newlyFoundGroups |
-	page := 0.
-	foundGroups := OrderedCollection new.
-	newlyFoundGroups := { true }.
-	[ newlyFoundGroups isNotEmpty ] whileTrue: [
-		| results |
-		page := page + 1.
-		results := self repoApi listGroupsWithTopLevelOnly: true page: page.
-
-		newlyFoundGroups := generalReader
-			                    on: results readStream;
-			                    nextAs: #ArrayOfGroups.
-		foundGroups addAll: newlyFoundGroups ].
-	^ foundGroups
+	| params results groups |
+	
+	params := { 
+			#top_level_only -> 'true'
+	} asDictionary.
+	results := self repoApi groups getAllWithParams: params.
+	
+	groups := (results collect: [ :groupsJson | generalReader
+			                    on: groupsJson readStream;
+			                    nextAs: #ArrayOfGroups. ]) flattened.
+	^ groups
 ]
 
 { #category : #'as yet unclassified' }
