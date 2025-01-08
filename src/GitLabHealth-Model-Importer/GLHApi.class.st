@@ -44,12 +44,6 @@ GLHApi >> client: anObject [
 	client := anObject
 ]
 
-{ #category : #api }
-GLHApi >> group: aGroupID [
-
-	^ self client get: self baseAPIUrl , '/groups/' , aGroupID printString
-]
-
 { #category : #projects }
 GLHApi >> importProjects: first after: after [ 
 	 | request query variables body response |
