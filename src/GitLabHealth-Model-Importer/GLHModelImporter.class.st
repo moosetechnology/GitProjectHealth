@@ -1092,19 +1092,12 @@ GLHModelImporter >> selectEntityType: aType overAttribut: aSelector equalTo: val
 { #category : #'private - api' }
 GLHModelImporter >> subGroupsOf: aGroupID [
 
-	| results parsedResult result page |
+	| results subgroups |
 	('Search subgroup of: ' , aGroupID printString) recordInfo.
-	results := OrderedCollection new.
-	page := 0.
+	results := self repoApi groups subgroupsOf: aGroupID.
+	subgroups := (results collect: [ :subgroupsJson | self parseSubGroupResult: subgroupsJson ]) flattened.
 	
-	parsedResult := { true }.
-	[ parsedResult size > 0 ] whileTrue: [ 
-		result := self repoApi subgroupsOfGroup: aGroupID page: page.
-		parsedResult := self parseSubGroupResult: result.
-		results addAll: parsedResult.
-				page := page + 1. ].
-	
-	^ results
+	^ subgroups
 ]
 
 { #category : #accessing }

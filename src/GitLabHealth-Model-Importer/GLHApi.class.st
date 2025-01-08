@@ -181,15 +181,6 @@ GLHApi >> resetClient [
 	self client accept: ZnMimeType applicationJson
 ]
 
-{ #category : #'api - groups' }
-GLHApi >> subgroupsOfGroup: aGroupID page: aPageNumber [
-
-	self client url:
-		self baseAPIUrl , '/groups/' , aGroupID printString , '/subgroups'.
-	aPageNumber ifNotNil: [ self client queryAt: #page put: aPageNumber ].
-	^ self client get
-]
-
 { #category : #api }
 GLHApi >> treeOfRepository: aProjectID ofBranch: aBranchRef andPath: aPath [
 
