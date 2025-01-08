@@ -44,22 +44,6 @@ GLHApi >> client: anObject [
 	client := anObject
 ]
 
-{ #category : #'as yet unclassified' }
-GLHApi >> contributedProjectsOfUserId: anUserID orderBy: orderByAttribute simple: simpleBoolean sort: AscOrDesc perPage: perPageNumber page: pageIndex [ 
-	
-	self client path: self baseAPIUrl , '/users/', anUserID printString, '/contributed_projects'.
-
-	orderByAttribute ifNotNil: [
-		self client queryAt: #order_by put: orderByAttribute ].
-	simpleBoolean ifNotNil: [ self client queryAt: #simple put: simpleBoolean ].
-	AscOrDesc ifNotNil: [ self client queryAt: #sort put: AscOrDesc ].
-	perPageNumber ifNotNil: [ self client queryAt: #per_page put: perPageNumber ].
-	pageIndex ifNotNil: [ self client queryAt: #page put: pageIndex ].
-	
-	
-	^ self client get.
-]
-
 { #category : #api }
 GLHApi >> group: aGroupID [
 
@@ -115,14 +99,6 @@ GLHApi >> initialize [
 			 accept: ZnMimeType applicationJson;
 			 yourself).
 
-]
-
-{ #category : #'api - jobs' }
-GLHApi >> jobsOfProject: aProjectID ofPipelines: aPipelineID [
-
-	^ self client get:
-		  self baseAPIUrl , '/projects/' , aProjectID printString
-		  , '/pipelines/' , aPipelineID printString , '/jobs'
 ]
 
 { #category : #'api - groups' }

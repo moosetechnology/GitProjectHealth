@@ -423,46 +423,36 @@ GLHModelImporter >> importCommitsOfProject: aProject since: fromDate until: toDa
 	^ self glhModel addAll: allCommits unless: self blockOnIdEquality
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #projects }
 GLHModelImporter >> importContributedProjectsOfUser: aGLHUser [
 
-	| newlyFoundElmts page foundElmts remaningProjects |
-	page := 0.
-	foundElmts := OrderedCollection new.
-	newlyFoundElmts := { true }.
-	[ newlyFoundElmts isNotEmpty ] whileTrue: [
-		| results |
-		page := page + 1.
-		('import contributed project of user ' , aGLHUser name , ' page '
-		 , page printString) recordInfo.
-		results := self repoApi
-			           contributedProjectsOfUserId: aGLHUser id
-			           orderBy: 'last_activity_at'
-			           simple: true
-			           sort: 'desc'
-			           perPage: 100
-			           page: page.
-
-		newlyFoundElmts := self parseArrayOfProject: results.
-
-		foundElmts addAll:
-			(self glhModel
-				 addAll: newlyFoundElmts
-				 unless: self blockOnIdEquality) ].
+	| remaningProjects params results projects |
+	params := { 
+		#order_by -> 'last_activity_at'.
+		#simple -> 'true'.
+	} asDictionary.
+	results := self repoApi projects contributedProjectsOfUser: aGLHUser id withParams: params.
+	
+	projects := (results collect: [ :projectsJson | self parseArrayOfProject: projectsJson ]) flattened.
+	
+	self glhModel
+				 addAll: projects
+				 unless: self blockOnIdEquality.				
+	
 	remaningProjects := self importProjects:
-		                    ((foundElmts collect: #id) difference:
+		                    ((projects collect: #id) difference:
 			                     ((self userCatalogue atId: aGLHUser id) at:
 				                      #contributedProjects)).
 
 	aGLHUser contributedProjects
-		addAll: foundElmts , remaningProjects
+		addAll: projects , remaningProjects
 		unless: self blockOnIdEquality.
 
 	self userCatalogue
 		addUser: aGLHUser
 		withProjects: (aGLHUser contributedProjects collect: #id).
 
-	^ foundElmts
+	^ projects
 ]
 
 { #category : #'as yet unclassified' }
@@ -540,7 +530,9 @@ GLHModelImporter >> importGroup: aGroupID [
 	| result groupResult |
 	('Import group: ' , aGroupID printString) recordInfo.
 
-	result := self repoApi group: aGroupID.
+	result := self repoApi groups get: aGroupID.
+	
+	"group: aGroupID."
 	groupResult := self parseGroupResult: result.
 	groupResult := self addGroupResultToModel: groupResult.
 
@@ -558,13 +550,15 @@ GLHModelImporter >> importGroup: aGroupID [
 { #category : #api }
 GLHModelImporter >> importJobsOf: aPipeline [
 
-	| result jobs |
-	result := self repoApi
-		          jobsOfProject: aPipeline project id
-		          ofPipelines: aPipeline id.
-	jobs := self parseJobsResult: result ofProject: aPipeline project.
+	| jobs results |
+	results := self repoApi jobs allForPipeline: aPipeline id inProject: aPipeline project id.
+		          "jobsOfProject: aPipeline project id
+		          ofPipelines: aPipeline id."
+	jobs := (results collect: [ :jobsJson | self parseJobsResult: jobsJson ofProject: aPipeline project ]) flattened.
 	jobs do: [ :job | aPipeline addJob: job ].
-	self glhModel addAll: jobs
+	self glhModel addAll: jobs.
+	
+	^jobs
 
 ]
 
@@ -716,8 +710,10 @@ GLHModelImporter >> importUser: aUserID [
 		detect: [ :user | user id = aUserID ]
 		ifFound: [ :user | ^ user ].
 	('Import user: ' , aUserID printString) recordInfo.
-	result := self repoApi user: aUserID.
+	
+	result := self repoApi users get: aUserID.
 	userResult := self parseUserResult: result.
+	
 	^ self glhModel add: userResult unless: self blockOnIdEquality
 ]
 
