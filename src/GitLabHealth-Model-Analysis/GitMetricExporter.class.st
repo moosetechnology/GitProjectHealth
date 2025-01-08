@@ -304,7 +304,7 @@ GitMetricExporter >> exportUserAnalysesInCSV [
 { #category : #projects }
 GitMetricExporter >> findParticipationOfCommitAuthorNamed: username amongProjects: aCollectionOfProjects [
 
-	| response itsProjects i size |
+	| response itsProjects i size params |
 	i := 1.
 	size := aCollectionOfProjects size.
 	itsProjects := aCollectionOfProjects select: [ :project |
@@ -319,12 +319,13 @@ GitMetricExporter >> findParticipationOfCommitAuthorNamed: username amongProject
 				                size.
 				                ']' }) recordInfo.
 
-		               response := glhImporter repoApi
-			                           commitsOfUser: username
-			                           inProject: project id
-			                           since: '01 january 2023' asDateAndTime
-			                           until: Date today asDateAndTime.
-		               response := glhImporter parseCommitsResult: response.
+							params := { 
+								#author -> username.
+								#since -> '01 january 2023' asDateAndTime asString.
+								#until -> Date today asDateAndTime asString
+							} asDictionary.
+		               response := glhImporter repoApi commits getAllInProject: project id withParams: params.
+		               response := (response collect: [ :commitsJson | glhImporter parseCommitsResult: commitsJson]) flattened.
 		               response isNotEmpty
 		 ].
 

@@ -44,59 +44,6 @@ GLHApi >> client: anObject [
 	client := anObject
 ]
 
-{ #category : #'api - commits' }
-GLHApi >> commitsOfProject: aProjectId forRefName: refName since: since until: until path: aPath author: author all: aAllBoolean with_stats: withStateBoolean firstParent: firstParent order: orderString trailers: trailers perPage: aPerPageNumber page: aPageNumber [
-	"https://docs.gitlab.com/ee/api/commits.html#list-repository-commits"
-
-	self client path:
-		self baseAPIUrl , '/projects/' , aProjectId printString
-		, '/repository/commits'.
-	refName ifNotNil: [ self client queryAt: #ref_name put: refName ].
-	since ifNotNil: [ self client queryAt: #since put: since ].
-	until ifNotNil: [ self client queryAt: #until put: until ].
-	aPath ifNotNil: [ self client queryAt: #path put: aPath ].
-	author ifNotNil: [ self client queryAt: #author put: author ].
-	aAllBoolean ifNotNil: [ self client queryAt: #all put: aAllBoolean ].
-	withStateBoolean ifNotNil: [
-		self client queryAt: #with_stats put: withStateBoolean ].
-	firstParent ifNotNil: [
-		self client queryAt: #first_parent put: firstParent ].
-	orderString ifNotNil: [ self client queryAt: #order put: orderString ].
-	trailers ifNotNil: [ self client queryAt: #trailers put: trailers ].
-	aPerPageNumber ifNotNil: [
-		self client queryAt: #per_page put: aPerPageNumber ].
-	aPageNumber ifNotNil: [ self client queryAt: #page put: aPageNumber ].
-
-	^ self client get
-]
-
-{ #category : #commits }
-GLHApi >> commitsOfUser: aUserName inProject: anInteger since: since until: until [
-
-	| name |
-	name := (aUserName splitOn: ' ') collect: [ :part | part urlEncoded ].
-	name := ' ' join: name.
-
-	^ self
-		  commitsOfProject: anInteger
-		  forRefName: nil
-		  since: since
-		  until: until
-		  path: nil
-		  author: name
-		  all: nil
-		  with_stats: nil
-		  firstParent: nil
-		  order: nil
-		  trailers: nil
-		  perPage: 1
-		  page: 1
-
-	"client path: self baseAPIUrl, '/projects/',anInteger printString,'/repository/commits/'. 
-	client queryAt: #author put: name. 
-	^ client get. "
-]
-
 { #category : #'as yet unclassified' }
 GLHApi >> contributedProjectsOfUserId: anUserID orderBy: orderByAttribute simple: simpleBoolean sort: AscOrDesc perPage: perPageNumber page: pageIndex [ 
 	

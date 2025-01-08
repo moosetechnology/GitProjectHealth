@@ -1,47 +1,29 @@
 Class {
 	#name : #GLPHModelImporter,
 	#superclass : #GLHModelImporter,
-	#category : 'GitLabProjectHealth-Model-Importer'
+	#category : #'GitLabProjectHealth-Model-Importer'
 }
 
-{ #category : #commit }
+{ #category : #commits }
 GLPHModelImporter >> commitsOfProject: aGLHProject forRefName: refName until: toDate [
 
-	| newlyFoundCommit page |
-	page := 0.
-	newlyFoundCommit := { true }.
-	[ newlyFoundCommit isNotEmpty ] whileTrue: [
-		| results parsedResults existingCommits |
-		page := page + 1.
-		('import commit page ' , page printString) recordInfo.
-		results := self repoApi
-			           commitsOfProject: aGLHProject id
-			           forRefName: refName
-			           since: nil
-			           until: nil
-			           path: nil
-			           author: nil
-			           all: nil
-			           with_stats: nil
-			           firstParent: nil
-			           order: nil
-			           trailers: nil
-			           perPage: 100
-			           page: page.
-		parsedResults := self parseCommitsResult: results.
-		existingCommits := aGLHProject mooseModel allWithType: GLHCommit.
+	| params results allCommits |
+	
+	params := { 
+		#ref_name -> refName.
+		#until -> (toDate ifNotNil: [ toDate asDateAndTime asString ] ifNil: [ '' ]) 
+	} asDictionary.
+	results := self repoApi commits getAllInProject: aGLHProject id withParams: params.
+	allCommits := (results collect: [ :commitsJson | self parseCommitsResult: commitsJson ]) flattened.
+	
+	self glhModel addAll: allCommits unless: self blockOnIdEquality.
+	aGLHProject repository commits addAll: allCommits unless: self blockOnIdEquality.
 
-		newlyFoundCommit := parsedResults reject: [ :commitParsed |
-			                    (toDate isNil or: [
-				                     commitParsed committed_date
-				                     < toDate asDateAndTime ]) or: [
-				                    existingCommits anySatisfy: [ :existingCommit |
-					                    existingCommit id = commitParsed id ] ] ].
-		self glhModel addAll: newlyFoundCommit unless: self blockOnIdEquality.
-		aGLHProject repository commits addAll: newlyFoundCommit unless: self blockOnIdEquality  ].
 	self withCommitDiffs ifTrue: [
 		aGLHProject repository commits do: [ :commit |
-			self importDiffOfCommit: commit ] ]
+			self importDiffOfCommit: commit ] ].
+	
+	^allCommits
 ]
 
 { #category : #'private - api' }

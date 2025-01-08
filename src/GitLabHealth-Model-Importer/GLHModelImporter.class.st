@@ -323,25 +323,16 @@ GLHModelImporter >> importCommitOfProject: anProject withId: anID [
 	^ commit
 ]
 
-{ #category : #'private - api' }
+{ #category : #commits }
 GLHModelImporter >> importCommits: aGLHProject [
 	"limited to the last 20 commits"
 
-	| results parsedResults |
-	results := self repoApi
-		           commitsOfProject: aGLHProject id
-		           forRefName: nil
-		           since: nil
-		           until: nil
-		           path: nil
-		           author: nil
-		           all: nil
-		           with_stats: true
-		           firstParent: nil
-		           order: nil
-		           trailers: nil
-		           perPage: nil
-		           page: nil.
+	| results parsedResults params |
+	params := { 
+	 #with_stats -> 'true'
+	} asDictionary.
+	results := self repoApi commits getByPage: 1 perPage: 20 inProject: aGLHProject id withParams: params.
+	
 	parsedResults := self parseCommitsResult: results.
 	self glhModel addAll: parsedResults unless: self blockOnIdEquality.
 
@@ -370,51 +361,6 @@ GLHModelImporter >> importCommitsFollowing: aCommit upToDays: aNumberOfDay [
 ]
 
 { #category : #commit }
-GLHModelImporter >> importCommitsOf: aGLHProject withStats: aBoolean until: toDate [
-
-	| newlyFoundCommit page |
-	
-	self deprecated: [  ] .
-	
-	page := 0.
-	newlyFoundCommit := { true }.
-	[ newlyFoundCommit isNotEmpty ] whileTrue: [
-		| results parsedResults existingCommits |
-		page := page + 1.
-		('import commit page ' , page printString) recordInfo.
-		results := self repoApi
-			           commitsOfProject: aGLHProject id
-			           forRefName: nil
-			           since: nil
-			           until: nil
-			           path: nil
-			           author: nil
-			           all: nil
-			           with_stats: aBoolean
-			           firstParent: nil
-			           order: nil
-			           trailers: nil
-			           perPage: 100
-			           page: page.
-		parsedResults := self parseCommitsResult: results.
-		existingCommits := aGLHProject mooseModel allWithType: GLHCommit.
-
-		newlyFoundCommit := parsedResults reject: [ :commitParsed |
-			                    (toDate isNil or: [
-				                     commitParsed committed_date
-				                     < toDate asDateAndTime ]) or: [
-				                    existingCommits anySatisfy: [ :existingCommit |
-					                    existingCommit id = commitParsed id ] ] ].
-		aGLHProject mooseModel addAll: newlyFoundCommit.
-		aGLHProject repository commits addAll: newlyFoundCommit ].
-
-
-	self withCommitDiffs ifTrue: [
-		aGLHProject repository commits do: [ :commit |
-			self importDiffOfCommit: commit ] ]
-]
-
-{ #category : #commit }
 GLHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName since: fromDate [
 
 	^ self
@@ -424,49 +370,28 @@ GLHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName since:
 		  until: nil
 ]
 
-{ #category : #commit }
+{ #category : #commits }
 GLHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName since: fromDate until: toDate [
 
-	| newlyFoundCommit page foundCommit|
-	page := 0.
-	foundCommit := OrderedCollection new. 
-	newlyFoundCommit := { true }.
-	[ newlyFoundCommit isNotEmpty ] whileTrue: [
-		| results |
-		page := page + 1.
-		('import commit page ' , page printString) recordInfo.
-		results := self repoApi
-			           commitsOfProject: aGLHBranch repository project id
-			           forRefName: aGLHBranch name
-			           since:
-			           (fromDate ifNotNil: [ fromDate asDateAndTime asString ])
-			           until:
-			           (toDate ifNotNil: [ toDate asDateAndTime asString ])
-			           path: nil
-			           author: nil
-			           all: nil
-			           with_stats: nil
-			           firstParent: nil
-			           order: nil
-			           trailers: nil
-			           perPage: 100
-			           page: page.
-
-		newlyFoundCommit := self parseCommitsResult: results.
+	| params result allCommits |
+	params := { 
+	  #ref_name -> aGLHBranch name.
+	  #since ->  (fromDate ifNotNil: [ fromDate asDateAndTime asString ] ifNil: [ '' ]).
+	  #until -> (toDate ifNotNil: [ toDate asDateAndTime asString ] ifNil: [ '' ]). 
+	} asDictionary.
+	result := self repoApi commits getAllInProject: aGLHBranch repository project id withParams: params.
+	
+	allCommits := (result collect: [ :commitsJson | self parseCommitsResult: commitsJson ]) flattened.
+	
 	aGLHBranch commits
-			addAll: newlyFoundCommit
+			addAll: allCommits
 			unless: self blockOnIdEquality.
-	foundCommit addAll: newlyFoundCommit.  
-			].
 
 	self glhModel
 		addAll: aGLHBranch commits
 		unless: self blockOnIdEquality.
 
-	"self withCommitDiffs ifTrue: [
-		aGLHBranch commits: [ :commit | self importDiffOfCommit: commit ] ]."
-
-	^ foundCommit
+	^ allCommits
 ]
 
 { #category : #commit }
@@ -479,43 +404,23 @@ GLHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName until:
 		  until: toDate
 ]
 
-{ #category : #commit }
+{ #category : #commits }
 GLHModelImporter >> importCommitsOfProject: aProject since: fromDate until: toDate [
 
-	| newlyFoundCommit page foundCommit |
-	page := 0.
-	foundCommit := OrderedCollection new.
-	newlyFoundCommit := { true }.
-	[ newlyFoundCommit isNotEmpty ] whileTrue: [
-		| results |
-		page := page + 1.
-		('import commit page ' , page printString) recordInfo.
-		results := self repoApi
-			           commitsOfProject: aProject id
-			           forRefName: nil
-			           since:
-			           (fromDate ifNotNil: [ fromDate asDateAndTime asString ])
-			           until:
-			           (toDate ifNotNil: [ toDate asDateAndTime asString ])
-			           path: nil
-			           author: nil
-			           all: true
-			           with_stats: true
-			           firstParent: nil
-			           order: nil
-			           trailers: nil
-			           perPage: 100
-			           page: page.
+	| params results allCommits |
+	params := { 
+		#since -> (fromDate ifNotNil: [ fromDate asDateAndTime asString ] ifNil: ['']).
+		#until -> (toDate ifNotNil: [ toDate asDateAndTime asString ] ifNil: ['']).
+		#with_stats -> 'true'.
+		#all -> 'true'
+	} asDictionary.
+	results := self repoApi commits getAllInProject: aProject id withParams: params.
+	
+	allCommits := (results collect: [ :commitsJson | self parseCommitsResult: commitsJson ]) flattened.
+	
+	(aProject repository commits) addAll: allCommits unless: self blockOnIdEquality.
 
-		newlyFoundCommit := self parseCommitsResult: results.
-		"newlyFoundCommit do: [ :c | c repository: aProject repository ]."
-
-		foundCommit addAll: (aProject repository commits
-			addAll: newlyFoundCommit
-			unless: self blockOnIdEquality). ].
-
-
-	^ self glhModel addAll: foundCommit unless: self blockOnIdEquality
+	^ self glhModel addAll: allCommits unless: self blockOnIdEquality
 ]
 
 { #category : #'as yet unclassified' }
@@ -663,25 +568,17 @@ GLHModelImporter >> importJobsOf: aPipeline [
 
 ]
 
-{ #category : #'private - api' }
+{ #category : #commits }
 GLHModelImporter >> importLastestCommitsOfProject: aGLHProject [
 	"limited to the last 50 commits"
 
-	| results parsedResults |
-	results := self repoApi
-		           commitsOfProject: aGLHProject id
-		           forRefName: nil
-		           since: nil
-		           until: nil
-		           path: nil
-		           author: nil
-		           all: true
-		           with_stats: true
-		           firstParent: nil
-		           order: nil
-		           trailers: nil
-		           perPage: 50
-		           page: nil.
+	| results parsedResults params |
+	params := { 
+		#with_stats -> 'true'.
+		#all -> true
+	 } asDictionary.
+	results := self repoApi commits getByPage: 1 perPage: 50 inProject: aGLHProject id withParams: params.
+
 	parsedResults := self parseCommitsResult: results.
 	parsedResults := self glhModel
 		                 addAll: parsedResults
@@ -690,8 +587,6 @@ GLHModelImporter >> importLastestCommitsOfProject: aGLHProject [
 	aGLHProject repository commits
 		addAll: parsedResults
 		unless: self blockOnIdEquality.
-	"parsedResults do: [ :commit |
-		commit repository: aGLHProject repository ]."
 
 	self withCommitDiffs ifTrue: [
 		parsedResults do: [ :commit | self importDiffOfCommit: commit ] ].
