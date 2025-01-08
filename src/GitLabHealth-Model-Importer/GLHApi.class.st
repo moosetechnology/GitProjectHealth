@@ -118,11 +118,6 @@ GLHApi >> makeGlobal [
 		currentAPI := self
 ]
 
-{ #category : #api }
-GLHApi >> pipelinesOfProject: aProjectID [
-	^ self client get: self baseAPIUrl , '/projects/' , aProjectID printString, '/pipelines'
-]
-
 { #category : #accessing }
 GLHApi >> privateToken [
 

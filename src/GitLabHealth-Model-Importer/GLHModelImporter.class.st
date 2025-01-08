@@ -1077,8 +1077,9 @@ GLHModelImporter >> pipelinesOf: aProjectID [
 
 	| result |
 	('Search pipelines of: ' , aProjectID printString) recordInfo.
-	result := self repoApi pipelinesOfProject: aProjectID.
-	^ self parsePipelinesResult: result .
+	result := self repoApi pipelines getAllInProject: aProjectID.
+	"pipelinesOfProject: aProjectID."
+	^ (result collect: [ :pipelinesJson | self parsePipelinesResult: pipelinesJson ]) flattened
 ]
 
 { #category : #'as yet unclassified' }
