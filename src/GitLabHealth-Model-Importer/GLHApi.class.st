@@ -164,20 +164,6 @@ GLHApi >> resetClient [
 ]
 
 { #category : #api }
-GLHApi >> treeOfRepository: aProjectID ofBranch: aBranchRef andPath: aPath [
-
-	| result |
-	self client url:
-		self baseAPIUrl , '/projects/' , aProjectID printString
-		, '/repository/tree'.
-	aBranchRef ifNotNil: [ self client queryAt: #ref put: aBranchRef ].
-	aPath ifNotNil: [ self client queryAt: #path put: aPath ].
-	result := self client get.
-	self resetClient.
-	^ result
-]
-
-{ #category : #api }
 GLHApi >> user: aUserID [
 
 	^ self client get: self baseAPIUrl , '/users/' , aUserID printString

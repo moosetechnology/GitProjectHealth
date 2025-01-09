@@ -483,18 +483,23 @@ GLHModelImporter >> importDiffOfCommit: aCommit [
 { #category : #'private - api' }
 GLHModelImporter >> importDirectoryFiles: aDirectoryFile OfBranch: aBranch [
 
-	| result files apiFiles |
-	result := self repoApi
-		          treeOfRepository: aBranch repository project id
+	| result files apiFiles params |
+	params := { 
+		#ref -> aBranch name.
+		#path -> (aDirectoryFile path , '/')
+	} asDictionary.
+	result := self repoApi repositories repositoryTreeOfProject: aBranch repository project id withParams: params.
+		         " treeOfRepository: aBranch repository project id
 		          ofBranch: aBranch name
-		          andPath: aDirectoryFile path , '/'.
-	apiFiles := self parseFileTreeResult: result.
+		          andPath: aDirectoryFile path , '/'."
+	apiFiles := (result collect: [ :treeJson | self parseFileTreeResult: treeJson ]) flattened.
 	files := apiFiles collect: [ :apiFile |
 		         self convertApiFileAsFile: apiFile ].
+	
 	files do: [ :file |
-		
 		self glhModel add: file.
 		aDirectoryFile addFile: file ].
+	
 	files
 		select: [ :file | file isKindOf: GLHFileDirectory ]
 		thenCollect: [ :file |
@@ -504,12 +509,17 @@ GLHModelImporter >> importDirectoryFiles: aDirectoryFile OfBranch: aBranch [
 { #category : #'private - api' }
 GLHModelImporter >> importFilesOfBranch: aBranch [
 
-	| result files apiFiles |
-	result := self repoApi
-		          treeOfRepository: aBranch repository project id
+	| result files apiFiles params |
+	params := { 
+		#ref -> aBranch name.
+	} asDictionary.
+	
+	result := self repoApi repositories repositoryTreeOfProject: aBranch repository project id withParams: params.
+	
+		          "treeOfRepository: aBranch repository project id
 		          ofBranch: aBranch name
-		          andPath: nil.
-	apiFiles := self parseFileTreeResult: result.
+		          andPath: nil."
+	apiFiles := (result collect: [ :filesJson | self parseFileTreeResult: filesJson  ]) flattened.
 	files := apiFiles collect: [ :apiFile | 
 		         self convertApiFileAsFile: apiFile ].
 	files do: [ :file | 
