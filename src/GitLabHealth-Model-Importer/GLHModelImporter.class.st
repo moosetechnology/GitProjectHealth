@@ -622,7 +622,7 @@ GLHModelImporter >> importProject: aProjectID [
 	| result projectResult |
 	('Import project with id: ' , aProjectID printString) recordInfo.
 
-	result := self repoApi project: aProjectID.
+	result := self repoApi projects get: aProjectID.
 	projectResult := self parseProjectResult: result.
 
 	^ self completeImportProject: projectResult
@@ -705,12 +705,14 @@ GLHModelImporter >> importUserByUsername: anUsername [
 	resultUser := dicUsername
 		              at: anUsername
 		              ifAbsent: [ "thus we have to import this new user"
-			              | result userId searchResult |
+			              | result userId searchResult params |
 			              ('Import user with username: '
 			               , anUsername printString) recordInfo.
-			              result := self repoApi usersSearchByUsername:
-				                        anUsername.
-			              searchResult := NeoJSONReader fromString: result.
+			              params := { (#search -> anUsername) } asDictionary.
+			              result := self repoApi users allWithParams: params.
+			              searchResult := (result collect: [ :usersJson |
+				                               NeoJSONReader fromString: usersJson ])
+				                              first.
 
 			              (searchResult class = Dictionary and: [
 				               (searchResult at: #message) includesSubstring:

@@ -328,13 +328,13 @@ GLPHModelImporter >> importMergeResquestMerger: aGLPHEMergeRequest [
 	^aGLPHEMergeRequest merge_user: (self importUser: authorID)
 ]
 
-{ #category : #'private - api' }
+{ #category : #projects }
 GLPHModelImporter >> importProject: aProjectID [
 
 	| result projectResult |
 	('Import project with id:  ' , aProjectID printString) recordInfo.
 
-	result := self repoApi project: aProjectID.
+	result := self repoApi projects get: aProjectID.
 	projectResult := self parseProjectResult: result.
 
 	^ self completeImportProject: projectResult
