@@ -50,7 +50,7 @@ GitAnalyzerTest >> setUp [
 		               onModel: glphModel
 ]
 
-{ #category : #test }
+{ #category : #tests }
 GitAnalyzerTest >> testAnalyseAmandment [
 
 	| myCommits res mondayCommit tuesdayCommit wednesdayCommit |
@@ -95,7 +95,7 @@ GitAnalyzerTest >> testAnalyseAmandment [
 	self assert: res equals: tuesdayCommit
 ]
 
-{ #category : #test }
+{ #category : #tests }
 GitAnalyzerTest >> testAnalyseCommitFrequencySinceUntil [
 
 	| res from since |
@@ -110,7 +110,7 @@ GitAnalyzerTest >> testAnalyseCommitFrequencySinceUntil [
 	self assert: (res at: '14 May 2024') size equals: 4
 ]
 
-{ #category : #test }
+{ #category : #tests }
 GitAnalyzerTest >> testAnalyseMergeResquestValidation [
 
 	| mergeResquest res |

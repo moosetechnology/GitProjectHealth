@@ -716,7 +716,7 @@ GLHModelImporter >> importUserByUsername: anUsername [
 			              result := self repoApi users allWithParams: params.
 							
 							 "when result is an error"
-							 (result isCollection not and: result isEmpty) ifTrue: [ result := { result } ].
+							 (result isString) ifTrue: [ result := { result } ].
 							
 			              searchResult := result ifEmpty: [ result ] ifNotEmpty: [(result collect: [ :usersJson |
 				                               NeoJSONReader fromString: usersJson ]) first].
