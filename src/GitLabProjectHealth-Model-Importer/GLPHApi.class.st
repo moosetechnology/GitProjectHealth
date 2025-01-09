@@ -11,14 +11,6 @@ GLPHApi >> initialize [
 ]
 
 { #category : #'as yet unclassified' }
-GLPHApi >> mergeRequestOfProject: aProjectID [
-	
-	^ self client get:
-		  self baseAPIUrl , '/projects/' , aProjectID printString
-		  , '/merge_requests/'
-]
-
-{ #category : #'as yet unclassified' }
 GLPHApi >> mergeRequestOfProject: aProjectID withId: anMRiid [
 
 	^ self client get:

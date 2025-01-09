@@ -203,8 +203,8 @@ GLPHModelImporter >> importMergeRequests: aGLHProject [
 	('Import merge request of Project: ' , aGLHProject id printString)
 		recordInfo.
 
-	results := self repoApi mergeRequestOfProject: aGLHProject id.
-	parsedResults := self parseMergeRequestResult: results.
+	results := self repoApi mergeRequests allOfProject: aGLHProject id.
+	parsedResults := (results collect: [ :projectsJson | self parseMergeRequestResult: projectsJson ]) flattened. 
 
 	aGLHProject mergeRequests
 		addAll: parsedResults
