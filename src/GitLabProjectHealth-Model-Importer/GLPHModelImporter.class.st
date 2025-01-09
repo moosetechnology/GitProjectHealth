@@ -4,7 +4,7 @@ Class {
 	#category : #'GitLabProjectHealth-Model-Importer'
 }
 
-{ #category : #commits }
+{ #category : #'import - commits' }
 GLPHModelImporter >> commitsOfProject: aGLHProject forRefName: refName until: toDate [
 
 	| params results allCommits |
@@ -90,7 +90,7 @@ GLPHModelImporter >> configureReaderForMergeRequest: reader [
 			string ifNil: [ nil ] ifNotNil: [ DateAndTime fromString: string ] ] ]
 ]
 
-{ #category : #import }
+{ #category : #'import - commits' }
 GLPHModelImporter >> importCommitsOfBranch: aGLHBranch [
 
 	| commits |
@@ -110,7 +110,7 @@ GLPHModelImporter >> importCommitsOfBranch: aGLHBranch [
 		 ]
 ]
 
-{ #category : #api }
+{ #category : #'import - commits' }
 GLPHModelImporter >> importDiffOfCommit: aCommit [
 
 	super importDiffOfCommit: aCommit.
@@ -164,7 +164,7 @@ GLPHModelImporter >> importMergeRequestCommits: aGLPHEMergeRequest [
 	^ commits
 ]
 
-{ #category : #import }
+{ #category : #'import - merge request' }
 GLPHModelImporter >> importMergeRequestMergeCommits: aGLPHEMergeRequest [
 
 	| foundCommits |
@@ -329,7 +329,7 @@ GLPHModelImporter >> importMergeResquestMerger: aGLPHEMergeRequest [
 	^aGLPHEMergeRequest merge_user: (self importUser: authorID)
 ]
 
-{ #category : #projects }
+{ #category : #'import -projects' }
 GLPHModelImporter >> importProject: aProjectID [
 
 	| result projectResult |
@@ -365,14 +365,14 @@ GLPHModelImporter >> initialize [
 	withCommitDiffs := true
 ]
 
-{ #category : #parsing }
+{ #category : #'private - parsing' }
 GLPHModelImporter >> parseMergeRequestResult: result [
 
 	generalReader on: result readStream.
 	^ generalReader nextAs: #ArrayOfMergeRequest
 ]
 
-{ #category : #parsing }
+{ #category : #'private - parsing' }
 GLPHModelImporter >> parseProjectResult: aResult [ 
 		| reader |
 	reader := NeoJSONReader on: aResult readStream.

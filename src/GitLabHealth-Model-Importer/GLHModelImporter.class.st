@@ -9,7 +9,7 @@ Class {
 	#category : #'GitLabHealth-Model-Importer'
 }
 
-{ #category : #'private - api' }
+{ #category : #private }
 GLHModelImporter >> addCommits: commitsList toRepository: aProjectRepository [
 	"I take a list of GLHCommit. But some might have been parsed but are already on the model..."
 
@@ -36,7 +36,7 @@ GLHModelImporter >> addGroupResultToModel: groupResult [
 	^ group 
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #private }
 GLHModelImporter >> chainsCommitsFrom: commitsCollection [
 
 	| dic |
@@ -58,7 +58,7 @@ GLHModelImporter >> chainsCommitsFrom: commitsCollection [
 	^ commitsCollection
 ]
 
-{ #category : #'private - api' }
+{ #category : #'import -projects' }
 GLHModelImporter >> completeImportProject: aGLHProject [
 
 	| importedProject |
@@ -85,7 +85,7 @@ GLHModelImporter >> completeImportProject: aGLHProject [
 	^ importedProject
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'import - commits' }
 GLHModelImporter >> completeImportedCommit: aCommit [
 
 	('completing commit: ' , aCommit short_id printString) recordInfo.
@@ -176,7 +176,7 @@ GLHModelImporter >> convertApiFileAsFile: aAPIFile [
 		  yourself
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #private }
 GLHModelImporter >> detectEntityType: aType overAttribut: aSelector equalTo: value [
 
 	^ (self glhModel allWithType: aType) detect: [ :entity |
@@ -219,7 +219,7 @@ GLHModelImporter >> glhModel: anObject [
 	glhModel := anObject
 ]
 
-{ #category : #users }
+{ #category : #'import - users' }
 GLHModelImporter >> importActiveHumanUsers [
 
 	| params result users |
@@ -238,7 +238,7 @@ GLHModelImporter >> importActiveHumanUsers [
 	^ users
 ]
 
-{ #category : #api }
+{ #category : #'import - groups' }
 GLHModelImporter >> importAllGroups [
 
 	| params results groups |
@@ -254,7 +254,7 @@ GLHModelImporter >> importAllGroups [
 	^ groups
 ]
 
-{ #category : #commits }
+{ #category : #'import - commits' }
 GLHModelImporter >> importAndLoadLatestsCommitsOfProject: aGLHProject [
 
 	| commits completedProject |
@@ -265,7 +265,7 @@ GLHModelImporter >> importAndLoadLatestsCommitsOfProject: aGLHProject [
 	^ commits
 ]
 
-{ #category : #commits }
+{ #category : #'import - commits' }
 GLHModelImporter >> importCommit: aCommitID ofProject: aGLHProject [
 
 	| result parsedResult |
@@ -282,7 +282,7 @@ GLHModelImporter >> importCommit: aCommitID ofProject: aGLHProject [
 	^ parsedResult
 ]
 
-{ #category : #commits }
+{ #category : #'import - commits' }
 GLHModelImporter >> importCommitOfProject: anProject withId: anID [
 
 	| commit result |
@@ -309,7 +309,7 @@ GLHModelImporter >> importCommitOfProject: anProject withId: anID [
 	^ commit
 ]
 
-{ #category : #commits }
+{ #category : #'import - commits' }
 GLHModelImporter >> importCommits: aGLHProject [
 	"limited to the last 20 commits"
 
@@ -331,7 +331,7 @@ GLHModelImporter >> importCommits: aGLHProject [
 	^ parsedResults. 
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'import - commits' }
 GLHModelImporter >> importCommitsFollowing: aCommit upToDays: aNumberOfDay [
 	"import the 'n' commits of a project starting from an initial 'aCommit' commit. 
 	Lazy import does not import the entities inside the model"
@@ -346,7 +346,7 @@ GLHModelImporter >> importCommitsFollowing: aCommit upToDays: aNumberOfDay [
 		  until: (date + aNumberOfDay day)
 ]
 
-{ #category : #commit }
+{ #category : #'import - commits' }
 GLHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName since: fromDate [
 
 	^ self
@@ -356,7 +356,7 @@ GLHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName since:
 		  until: nil
 ]
 
-{ #category : #commits }
+{ #category : #'import - commits' }
 GLHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName since: fromDate until: toDate [
 
 	| params result allCommits |
@@ -380,7 +380,7 @@ GLHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName since:
 	^ allCommits
 ]
 
-{ #category : #commit }
+{ #category : #'import - commits' }
 GLHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName until: toDate [
 
 	^ self
@@ -390,7 +390,7 @@ GLHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName until:
 		  until: toDate
 ]
 
-{ #category : #commits }
+{ #category : #'import - commits' }
 GLHModelImporter >> importCommitsOfProject: aProject since: fromDate until: toDate [
 
 	| params results allCommits |
@@ -421,7 +421,7 @@ GLHModelImporter >> importCommitsOfProject: aProject since: fromDate until: toDa
 	^ self glhModel addAll: allCommits unless: self blockOnIdEquality
 ]
 
-{ #category : #projects }
+{ #category : #'import -projects' }
 GLHModelImporter >> importContributedProjectsOfUser: aGLHUser [
 
 	| remaningProjects params results projects |
@@ -455,7 +455,7 @@ GLHModelImporter >> importContributedProjectsOfUser: aGLHUser [
 	^ projects
 ]
 
-{ #category : #commits }
+{ #category : #'import - commits' }
 GLHModelImporter >> importCreatorOfCommit: aCommit [
 
 	aCommit commitCreator ifNil: [
@@ -467,7 +467,7 @@ GLHModelImporter >> importCreatorOfCommit: aCommit [
 	^ aCommit commitCreator
 ]
 
-{ #category : #api }
+{ #category : #'import - commits' }
 GLHModelImporter >> importDiffOfCommit: aCommit [
 
 	| result diffsResult |
@@ -485,7 +485,7 @@ GLHModelImporter >> importDiffOfCommit: aCommit [
 
 ]
 
-{ #category : #'private - api' }
+{ #category : #'import - repositories' }
 GLHModelImporter >> importDirectoryFiles: aDirectoryFile OfBranch: aBranch [
 
 	| result files apiFiles params |
@@ -511,7 +511,7 @@ GLHModelImporter >> importDirectoryFiles: aDirectoryFile OfBranch: aBranch [
 		self importDirectoryFiles: file OfBranch: aBranch ]
 ]
 
-{ #category : #'private - api' }
+{ #category : #'import - repositories' }
 GLHModelImporter >> importFilesOfBranch: aBranch [
 
 	| result files apiFiles params |
@@ -536,7 +536,7 @@ GLHModelImporter >> importFilesOfBranch: aBranch [
 		self importDirectoryFiles: file OfBranch: aBranch ]
 ]
 
-{ #category : #api }
+{ #category : #'import - groups' }
 GLHModelImporter >> importGroup: aGroupID [
 
 	| result groupResult |
@@ -559,7 +559,7 @@ GLHModelImporter >> importGroup: aGroupID [
 	^ groupResult
 ]
 
-{ #category : #api }
+{ #category : #'import - jobs' }
 GLHModelImporter >> importJobsOf: aPipeline [
 
 	| jobs results |
@@ -574,7 +574,7 @@ GLHModelImporter >> importJobsOf: aPipeline [
 
 ]
 
-{ #category : #commits }
+{ #category : #'import - commits' }
 GLHModelImporter >> importLastestCommitsOfProject: aGLHProject [
 	"limited to the last 50 commits"
 
@@ -600,7 +600,7 @@ GLHModelImporter >> importLastestCommitsOfProject: aGLHProject [
 	^ parsedResults
 ]
 
-{ #category : #commit }
+{ #category : #'import - commits' }
 GLHModelImporter >> importParentCommitsOfCommit: aGLHCommit since: aDate [
 
 	| parentsIds commits |
@@ -624,7 +624,7 @@ GLHModelImporter >> importParentCommitsOfCommit: aGLHCommit since: aDate [
 		  flatten
 ]
 
-{ #category : #'private - api' }
+{ #category : #'imports - pipelines' }
 GLHModelImporter >> importPipelinesOfProject: aGLHProject [
 
 	(self pipelinesOf: aGLHProject id) do: [ :pipeline |
@@ -632,7 +632,7 @@ GLHModelImporter >> importPipelinesOfProject: aGLHProject [
 		aGLHProject pipelines add: pipeline unless: self blockOnIdEquality]
 ]
 
-{ #category : #projects }
+{ #category : #'import -projects' }
 GLHModelImporter >> importProject: aProjectID [
 
 	| result projectResult |
@@ -644,7 +644,7 @@ GLHModelImporter >> importProject: aProjectID [
 	^ self completeImportProject: projectResult
 ]
 
-{ #category : #imports }
+{ #category : #'import -projects' }
 GLHModelImporter >> importProjects [
 
 	| result projects |
@@ -658,13 +658,13 @@ GLHModelImporter >> importProjects [
 	^ projects
 ]
 
-{ #category : #projects }
+{ #category : #'import -projects' }
 GLHModelImporter >> importProjects: aCollectionOfProjectID [
 
 	^ aCollectionOfProjectID collect: [ :id | self importProject: id ]
 ]
 
-{ #category : #repository }
+{ #category : #'import - repositories' }
 GLHModelImporter >> importRepository: aGLHRepository [
 
 	| resultBranches branches |
@@ -693,7 +693,7 @@ GLHModelImporter >> importRepository: aGLHRepository [
 		self inform: aGLHRepository project name , ' has no repository' ]
 ]
 
-{ #category : #'private - api' }
+{ #category : #'import - users' }
 GLHModelImporter >> importUser: aUserID [
 
 	| result userResult |
@@ -708,7 +708,7 @@ GLHModelImporter >> importUser: aUserID [
 	^ self glhModel add: userResult unless: self blockOnIdEquality
 ]
 
-{ #category : #user }
+{ #category : #'import - users' }
 GLHModelImporter >> importUserByUsername: anUsername [
 
 	| dicUsername resultUser |
@@ -786,12 +786,12 @@ GLHModelImporter >> initialize [
 
 ]
 
-{ #category : #api }
+{ #category : #private }
 GLHModelImporter >> isServerError: aString [
 	^ aString = '{"message":"500 Internal Server Error"}'
 ]
 
-{ #category : #importer }
+{ #category : #'import -projects' }
 GLHModelImporter >> loadAllProjectsFromRepositorySoftware [
 	"heavy import that load all the active project inside the model. Only import the project entities"
 	|projects|
@@ -799,7 +799,7 @@ GLHModelImporter >> loadAllProjectsFromRepositorySoftware [
 	projects := self repoApi projects. 
 ]
 
-{ #category : #private }
+{ #category : #'private - parsing' }
 GLHModelImporter >> newParseCommitResult: result [
 
 	generalReader  on: result readStream.
@@ -807,14 +807,14 @@ GLHModelImporter >> newParseCommitResult: result [
 	^ generalReader nextAs: GLHCommit
 ]
 
-{ #category : #private }
+{ #category : #'private - parsing' }
 GLHModelImporter >> newParseDiffResult: result [
 
 	generalReader on: result readStream.
 	^ generalReader nextAs: #ArrayOfDiffs
 ]
 
-{ #category : #parsing }
+{ #category : #'private - parsing' }
 GLHModelImporter >> parseArrayOfProject: arrayOfProjects [
 
 	| reader |
@@ -833,7 +833,7 @@ GLHModelImporter >> parseArrayOfProject: arrayOfProjects [
 	^ reader nextAs: #ArrayOfProjects
 ]
 
-{ #category : #private }
+{ #category : #'private - parsing' }
 GLHModelImporter >> parseBranchesResult: result [
 
 	| reader |
@@ -846,7 +846,7 @@ GLHModelImporter >> parseBranchesResult: result [
 	^ reader nextAs: #ArrayOfBranch
 ]
 
-{ #category : #private }
+{ #category : #'private - parsing' }
 GLHModelImporter >> parseCommitResult: result [
 
 	| reader |
@@ -878,7 +878,7 @@ GLHModelImporter >> parseCommitResult: result [
 	^ reader nextAs: GLHCommit
 ]
 
-{ #category : #private }
+{ #category : #'private - parsing' }
 GLHModelImporter >> parseCommitsResult: result [
 
 	| reader |
@@ -936,7 +936,7 @@ GLHModelImporter >> parseDiffResult: result [
 	^ reader nextAs: #ArrayOfDiffs
 ]
 
-{ #category : #private }
+{ #category : #'private - parsing' }
 GLHModelImporter >> parseFileTreeResult: aResult [
 
 	| reader |
@@ -949,7 +949,7 @@ GLHModelImporter >> parseFileTreeResult: aResult [
 	^ reader nextAs: #ArrayOfFile
 ]
 
-{ #category : #private }
+{ #category : #'private - parsing' }
 GLHModelImporter >> parseGroupResult: aResult [
 
 	| reader |
@@ -966,7 +966,7 @@ GLHModelImporter >> parseGroupResult: aResult [
 	^ reader nextAs: GLHGroup
 ]
 
-{ #category : #private }
+{ #category : #'private - parsing' }
 GLHModelImporter >> parseJobsResult: result ofProject: aProject [
 
 	| reader |
@@ -1001,7 +1001,7 @@ GLHModelImporter >> parseJobsResult: result ofProject: aProject [
 	^ reader nextAs: #ArrayOfGLHJob
 ]
 
-{ #category : #private }
+{ #category : #'private - parsing' }
 GLHModelImporter >> parsePipelinesResult: result [
 
 	| reader |
@@ -1023,7 +1023,7 @@ GLHModelImporter >> parsePipelinesResult: result [
 	^ reader nextAs: #ArrayOfPipelines
 ]
 
-{ #category : #parsing }
+{ #category : #'private - parsing' }
 GLHModelImporter >> parseProjectResult: aResult [ 
 		| reader |
 	reader := NeoJSONReader on: aResult readStream.
@@ -1034,7 +1034,7 @@ GLHModelImporter >> parseProjectResult: aResult [
 	^ reader nextAs: GLHProject
 ]
 
-{ #category : #private }
+{ #category : #'private - parsing' }
 GLHModelImporter >> parseSubGroupResult: aResult [
 
 	| reader |
@@ -1043,7 +1043,7 @@ GLHModelImporter >> parseSubGroupResult: aResult [
 	^ reader nextAs: #ArrayOfGroups
 ]
 
-{ #category : #private }
+{ #category : #'private - parsing' }
 GLHModelImporter >> parseUserResult: result [
 
 	| reader |
@@ -1052,7 +1052,7 @@ GLHModelImporter >> parseUserResult: result [
 	^ reader nextAs: GLHUser
 ]
 
-{ #category : #private }
+{ #category : #'private - parsing' }
 GLHModelImporter >> parseUsersResult: result [
 
 	| reader |
@@ -1068,7 +1068,7 @@ GLHModelImporter >> parseUsersResult: result [
 	^ reader nextAs: #ArrayOfUser
 ]
 
-{ #category : #'private - api' }
+{ #category : #'imports - pipelines' }
 GLHModelImporter >> pipelinesOf: aProjectID [
 
 	| result |
@@ -1078,14 +1078,14 @@ GLHModelImporter >> pipelinesOf: aProjectID [
 	^ (result collect: [ :pipelinesJson | self parsePipelinesResult: pipelinesJson ]) flattened
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #private }
 GLHModelImporter >> selectEntityType: aType overAttribut: aSelector equalTo: value [
 
 	^ (self glhModel allWithType: aType)
 		select: [ :entity | (entity perform: aSelector) = value ]
 ]
 
-{ #category : #'private - api' }
+{ #category : #'import - groups' }
 GLHModelImporter >> subGroupsOf: aGroupID [
 
 	| results subgroups |
