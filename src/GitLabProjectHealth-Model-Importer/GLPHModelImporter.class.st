@@ -294,9 +294,7 @@ GLPHModelImporter >> importMergeResquestApprovals: aGLPHEMergeRequest [
 	(String streamContents: [ :str |
 		 str << 'Check approvals of '.
 		 aGLPHEMergeRequest printOn: str ]) recordInfo.
-	results := self repoApi
-		           approvalsOfMergeQuest: aGLPHEMergeRequest iid
-		           ofProject: aGLPHEMergeRequest project id.
+	results := self repoApi mergeRequests approvalsOf: aGLPHEMergeRequest iid inProject: aGLPHEMergeRequest project id.
 
 	parsedResult := generalReader
 		                on: results readStream;

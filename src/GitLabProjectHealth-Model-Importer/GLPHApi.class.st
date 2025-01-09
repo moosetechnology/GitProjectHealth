@@ -4,15 +4,6 @@ Class {
 	#category : #'GitLabProjectHealth-Model-Importer'
 }
 
-{ #category : #mergeRequest }
-GLPHApi >> approvalsOfMergeQuest: aMergeRequestIID ofProject: aProjectId [
-
-	self client path:
-		self baseAPIUrl , '/projects/' , aProjectId printString
-		, '/merge_requests/' , aMergeRequestIID printString , '/approvals'.
-	^ self client get
-]
-
 { #category : #'as yet unclassified' }
 GLPHApi >> commitsOfMergeRequest: mergeRequestIID ofProject: projectId page: page perPage: perPage [ 
 
