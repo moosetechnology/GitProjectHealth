@@ -441,13 +441,15 @@ GLHModelImporter >> importContributedProjectsOfUser: aGLHUser [
 	^ projects
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #commits }
 GLHModelImporter >> importCreatorOfCommit: aCommit [
 
-	aCommit commitCreator ifNil: [		
+	aCommit commitCreator ifNil: [
 		aCommit commitCreator:
 			(self importUserByUsername: aCommit author_name) ].
-	self userCatalogue addUser: aCommit commitCreator withProject: aCommit repository project id.
+	self userCatalogue
+		addUser: aCommit commitCreator
+		withProject: aCommit repository project id.
 	^ aCommit commitCreator
 ]
 
@@ -710,7 +712,11 @@ GLHModelImporter >> importUserByUsername: anUsername [
 			               , anUsername printString) recordInfo.
 			              params := { (#search -> anUsername) } asDictionary.
 			              result := self repoApi users allWithParams: params.
-			              searchResult := (result collect: [ :usersJson |
+							
+							 "when result is an error"
+							 result isArray ifFalse: [ result := { result } ].
+							
+			              searchResult :=  (result collect: [ :usersJson |
 				                               NeoJSONReader fromString: usersJson ])
 				                              first.
 

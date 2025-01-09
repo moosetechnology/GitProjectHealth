@@ -23,10 +23,10 @@ GitAnalyzerTest >> setUp [
 	"Put here a common initialization logic for tests"
 	glphModel := GLHModel new.
 
-	glphApi := GLPHApi new
+	glphApi := GitlabApi new
 		           privateToken: '';
-		           baseAPIUrl: 'https://gitlab.com/api/v4';
-		           yourself.
+		           hostUrl: 'https://gitlab.com/api/v4';
+		           output: 'json'.
 
 	since := Date today - 2 day.
 
@@ -34,7 +34,6 @@ GitAnalyzerTest >> setUp [
 		               repoApi: glphApi;
 		               glhModel: glphModel;
 		               withFiles: false;
-		              
 		               withCommitDiffs: true.
 
 	glhImporter importProject: 57841283.
