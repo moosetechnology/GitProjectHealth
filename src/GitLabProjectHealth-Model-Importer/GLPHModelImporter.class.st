@@ -230,34 +230,31 @@ GLPHModelImporter >> importMergeRequests: aGLHProject [
 { #category : #'import - merge request' }
 GLPHModelImporter >> importMergeRequests: aGLHProject since: fromDate until: toDate [
 
-	| newlyFoundMR page foundMR |
+	| params result mergeRequests |
 	('import MR of Project ' , aGLHProject name) recordInfo.
+	params := {
+		          (#created_after
+		           ->
+		           (fromDate
+			            ifNotNil: [ fromDate asDateAndTime asString ]
+			            ifNil: [ '' ])).
+		          (#created_before
+		           ->
+		           (toDate
+			            ifNotNil: [ toDate asDateAndTime asString ]
+			            ifNil: [ '' ])).
+		          (#scope -> 'all') } asDictionary.
 
-	page := 0.
-	foundMR := OrderedCollection new.
-	newlyFoundMR := { true }.
-	[ newlyFoundMR isNotEmpty ] whileTrue: [
-		| results |
-		page := page + 1.
-		('import MR page ' , page printString) recordInfo.
-		results := self repoApi
-			           mergeRequestsOfProject: aGLHProject id
-			           createdAfter:
-			           (fromDate ifNotNil: [ fromDate asDateAndTime asString ])
-			           createdBefore:
-			           (toDate ifNotNil: [ toDate asDateAndTime asString ])
-			           authorId: nil
-			           authorUsername: nil
-			           scope: 'all'
-			           orderBy: 'created_at'
-			           page: page.
+	result := self repoApi mergeRequests
+		          allOfProject: aGLHProject id
+		          withParams: params.
+	mergeRequests := (result collect: [ :mergeRequestsJson |
+		                  self parseMergeRequestResult: mergeRequestsJson ])
+		                 flattened.
 
-
-		newlyFoundMR := aGLHProject mergeRequests
-			                addAll: (self parseMergeRequestResult: results)
-			                unless: self blockOnIdEquality.
-		foundMR addAll: newlyFoundMR ].
-
+	aGLHProject mergeRequests
+		addAll: mergeRequests
+		unless: self blockOnIdEquality.
 
 	"gets it related commits"
 	aGLHProject mergeRequests do: [ :mr |
@@ -267,9 +264,11 @@ GLPHModelImporter >> importMergeRequests: aGLHProject since: fromDate until: toD
 		aGLHProject mergeRequests do: [ :mr |
 			self importDiffOfMergeRequest: mr ] ].
 
-	self glhModel addAll: foundMR unless: (self blockEqualityOn: #iid).
+	self glhModel
+		addAll: mergeRequests
+		unless: (self blockEqualityOn: #iid).
 
-	^ foundMR
+	^ mergeRequests
 ]
 
 { #category : #'import - merge request' }
