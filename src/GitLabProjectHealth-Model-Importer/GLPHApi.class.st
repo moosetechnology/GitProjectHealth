@@ -5,21 +5,6 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
-GLPHApi >> commitsOfMergeRequest: mergeRequestIID ofProject: projectId page: page perPage: perPage [ 
-
-	self client path:
-		  self baseAPIUrl , '/projects/' , projectId printString
-		  , '/merge_requests/' , mergeRequestIID printString, '/commits'.
-		
-		
-	perPage ifNotNil: [
-		self client queryAt: #per_page put: perPage ].	
-	page ifNotNil: [ self client queryAt: #page put: page ].
-	
-	^ self client get
-]
-
-{ #category : #'as yet unclassified' }
 GLPHApi >> diffsMergeRequestOfProject: aProjectID withId: anMRiid [
 
 	^ self client get:

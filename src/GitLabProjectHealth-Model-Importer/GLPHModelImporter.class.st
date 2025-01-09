@@ -152,25 +152,12 @@ GLPHModelImporter >> importDiffOfMergeRequest: aMergeRequest [
 { #category : #'import - merge request' }
 GLPHModelImporter >> importMergeRequestCommits: aGLPHEMergeRequest [
 
-	| results page commits parseResult |
+	| commits result |
 	aGLPHEMergeRequest commits ifNotNil: [ ^ aGLPHEMergeRequest commits ].
-	page := 1.
-
-	parseResult := { nil }.
-	commits := OrderedCollection new.
-
-	[
-	results := repoApi
-		           commitsOfMergeRequest: aGLPHEMergeRequest iid
-		           ofProject: aGLPHEMergeRequest project id
-		           page: page
-		           perPage: 100.
-	parseResult := self parseCommitsResult: results.
-
-	commits addAll: parseResult.
-	page := page + 1 ] doWhileTrue: [ parseResult isNotEmpty ].
-
-
+	
+	result := self repoApi mergeRequests commitsOf: aGLPHEMergeRequest iid inProject: aGLPHEMergeRequest project id.
+	
+	commits := (result collect: [ :commitsJson | self parseCommitsResult: commitsJson ]) flattened.
 	commits := commits collect: [ :commit | self importCommit: commit id ofProject: aGLPHEMergeRequest project ].
 	aGLPHEMergeRequest commits: commits.
 
