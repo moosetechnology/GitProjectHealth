@@ -298,13 +298,15 @@ GLPHModelImporter >> importMergeResquestAuthor: aGLPHEMergeRequest [
 	| authorID |
 	aGLPHEMergeRequest author ifNotNil: [ ^ aGLPHEMergeRequest author ].
 	authorID := aGLPHEMergeRequest cacheAt: #authorID ifAbsent: [
+		            | result |
+		            result := self repoApi mergeRequests
+			                      get: aGLPHEMergeRequest iid
+			                      inProject: aGLPHEMergeRequest project_id.
+
 		            (generalReader
-			             on: (self repoApi
-					              mergeRequestOfProject:
-						              aGLPHEMergeRequest project_id
-					              withId: aGLPHEMergeRequest iid) readStream;
+			             on: result readStream;
 			             next) at: #author at: #id ].
-	aGLPHEMergeRequest author: (self importUser: authorID)
+	^aGLPHEMergeRequest author: (self importUser: authorID)
 ]
 
 { #category : #'import - merge request' }
@@ -314,16 +316,17 @@ GLPHModelImporter >> importMergeResquestMerger: aGLPHEMergeRequest [
 	aGLPHEMergeRequest merge_user ifNotNil: [
 		^ aGLPHEMergeRequest merge_user ].
 	authorID := aGLPHEMergeRequest cacheAt: #mergeUserID ifAbsent: [
+		            | result |
+		            result := self repoApi mergeRequests
+			                      get: aGLPHEMergeRequest iid
+			                      inProject: aGLPHEMergeRequest project_id.
 		            (generalReader
-			             on: (self repoApi
-					              mergeRequestOfProject:
-						              aGLPHEMergeRequest project_id
-					              withId: aGLPHEMergeRequest iid) readStream;
+			             on: result readStream;
 			             next)
 			            at: #merge_user
 			            ifPresent: [ :mergeUser |
 			            mergeUser ifNotNil: [ :mruser | mruser at: #id ] ] ].
-	aGLPHEMergeRequest merge_user: (self importUser: authorID)
+	^aGLPHEMergeRequest merge_user: (self importUser: authorID)
 ]
 
 { #category : #'private - api' }

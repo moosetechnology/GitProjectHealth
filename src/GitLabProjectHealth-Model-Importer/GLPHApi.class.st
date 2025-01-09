@@ -10,14 +10,6 @@ GLPHApi >> initialize [
 	super initialize
 ]
 
-{ #category : #'as yet unclassified' }
-GLPHApi >> mergeRequestOfProject: aProjectID withId: anMRiid [
-
-	^ self client get:
-		  self baseAPIUrl , '/projects/' , aProjectID printString
-		  , '/merge_requests/' , anMRiid printString
-]
-
 { #category : #mergeRequest }
 GLPHApi >> mergeRequestsOfProject: aProjectId createdAfter: createdAfter createdBefore: createdBefore authorId: authorId authorUsername: authorUsername scope: scope orderBy: orderBy page: page [
 
