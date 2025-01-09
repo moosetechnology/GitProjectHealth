@@ -394,17 +394,29 @@ GLHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName until:
 GLHModelImporter >> importCommitsOfProject: aProject since: fromDate until: toDate [
 
 	| params results allCommits |
-	params := { 
-		#since -> (fromDate ifNotNil: [ fromDate asDateAndTime asString ] ifNil: ['']).
-		#until -> (toDate ifNotNil: [ toDate asDateAndTime asString ] ifNil: ['']).
-		#with_stats -> 'true'.
-		#all -> 'true'
-	} asDictionary.
-	results := self repoApi commits getAllInProject: aProject id withParams: params.
-	
-	allCommits := (results collect: [ :commitsJson | self parseCommitsResult: commitsJson ]) flattened.
-	
-	(aProject repository commits) addAll: allCommits unless: self blockOnIdEquality.
+	params := {
+		          (#since
+		           ->
+		           (fromDate
+			            ifNotNil: [ fromDate asDateAndTime asString ]
+			            ifNil: [ '' ])).
+		          (#until
+		           ->
+		           (toDate
+			            ifNotNil: [ toDate asDateAndTime asString ]
+			            ifNil: [ '' ])).
+		          (#with_stats -> 'true').
+		          (#all -> 'true') } asDictionary.
+	results := self repoApi commits
+		           getAllInProject: aProject id
+		           withParams: params.
+
+	allCommits := (results collect: [ :commitsJson |
+		               self parseCommitsResult: commitsJson ]) flattened.
+
+	allCommits:= aProject repository commits
+		addAll: allCommits
+		unless: self blockOnIdEquality.
 
 	^ self glhModel addAll: allCommits unless: self blockOnIdEquality
 ]
