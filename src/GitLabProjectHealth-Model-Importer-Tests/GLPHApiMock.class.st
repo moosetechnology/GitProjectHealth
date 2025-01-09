@@ -1,6 +1,6 @@
 Class {
 	#name : #GLPHApiMock,
-	#superclass : #GLPHApi,
+	#superclass : #Object,
 	#category : #'GitLabProjectHealth-Model-Importer-Tests'
 }
 
