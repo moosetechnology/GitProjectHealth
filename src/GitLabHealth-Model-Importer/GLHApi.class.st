@@ -141,18 +141,6 @@ GLHApi >> projects [
         ^ projectIds
 ]
 
-{ #category : #projects }
-GLHApi >> projects: aPerPageNumber since: since page: aPageNumber [
-
-	self client path: self baseAPIUrl , '/projects/'.
-
-	aPerPageNumber ifNotNil: [
-		self client queryAt: #per_page put: aPerPageNumber ].
-	aPageNumber ifNotNil: [ self client queryAt: #page put: aPageNumber ].
-
-	^ self client get
-]
-
 { #category : #private }
 GLHApi >> resetClient [
 

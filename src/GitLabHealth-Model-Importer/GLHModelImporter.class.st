@@ -631,42 +631,21 @@ GLHModelImporter >> importProject: aProjectID [
 { #category : #imports }
 GLHModelImporter >> importProjects [
 
-	^ self importProjectsSince: nil
+	| result projects |
+	('import all Projects') recordInfo.
+
+	result := self repoApi projects all.
+	projects := (result collect: [ :projectsJson | self parseArrayOfProject: projectsJson ]) flattened.
+	
+	self glhModel addAll: projects unless: self blockOnIdEquality.
+
+	^ projects
 ]
 
 { #category : #projects }
 GLHModelImporter >> importProjects: aCollectionOfProjectID [
 
 	^ aCollectionOfProjectID collect: [ :id | self importProject: id ]
-]
-
-{ #category : #imports }
-GLHModelImporter >> importProjectsSince: since [
-	"heavy import of all projects"
-
-	"copy import from commits"
-
-	| newlyFoundProjects page foundProject amount |
-	('import all Projects since: ' , since printString) recordInfo.
-
-	"number of projects per page"
-	amount := 100.
-	page := 0.
-	foundProject := OrderedCollection new.
-	newlyFoundProjects := { true }.
-	[ newlyFoundProjects isNotEmpty ] whileTrue: [
-		| results |
-		page := page + 1.
-		('import projects page #' , page printString) recordInfo.
-
-		results := self repoApi projects: amount since: since page: page.
-
-		newlyFoundProjects := self glhModel
-			                      addAll: (self parseArrayOfProject: results)
-			                      unless: self blockOnIdEquality.
-		foundProject addAll: newlyFoundProjects ].
-
-	^ foundProject
 ]
 
 { #category : #repository }
