@@ -219,34 +219,23 @@ GLHModelImporter >> glhModel: anObject [
 	glhModel := anObject
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #users }
 GLHModelImporter >> importActiveHumanUsers [
 
-	| newlyFoundUser page foundUsers |
-	page := 0.
-	foundUsers := OrderedCollection new.
-	newlyFoundUser := { true }.
-	[ newlyFoundUser isNotEmpty ] whileTrue: [
-		| results |
-		page := page + 1.
-		('import users page ' , page printString) recordInfo.
-		results := self repoApi
-			           usersHuman: true
-			           active: true
-			           withoutProjectBots: true
-			           perPage: 100
-			           page: page.
+	| params result users |
+	params := { 
+		#humans -> 'true'.
+		#active -> 'true'.
+		#without_project_bots -> 'true'
+	} asDictionary.
+	result := self repoApi users allWithParams: params.
+	users := (result collect: [ :usersJson | self parseUsersResult: usersJson ]) flattened.
+	
+	self glhModel
+				 addAll: users
+				 unless: self blockOnIdEquality.
 
-		newlyFoundUser := self parseUsersResult: results.
-		"newlyFoundCommit do: [ :c | c repository: aProject repository ]."
-
-		foundUsers addAll:
-			(self glhModel
-				 addAll: newlyFoundUser
-				 unless: self blockOnIdEquality) ].
-
-
-	^ foundUsers
+	^ users
 ]
 
 { #category : #api }

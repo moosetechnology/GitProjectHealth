@@ -162,17 +162,3 @@ GLHApi >> resetClient [
 	self privateToken: token.
 	self client accept: ZnMimeType applicationJson
 ]
-
-{ #category : #'as yet unclassified' }
-GLHApi >> usersHuman: humans active: active withoutProjectBots: withoutBot perPage: perPage page: page [
-
-	self client path: self baseAPIUrl , '/users/'.
-
-	withoutBot ifNotNil: [
-		self client queryAt: #without_project_bots put: withoutBot ].
-	active ifNotNil: [ self client queryAt: #active put: active ].
-	humans ifNotNil: [ self client queryAt: #humans put: humans ].
-	perPage ifNotNil: [ self client queryAt: #per_page put: perPage ].
-	page ifNotNil: [ self client queryAt: #page put: page ].
-	^ self client get
-]
