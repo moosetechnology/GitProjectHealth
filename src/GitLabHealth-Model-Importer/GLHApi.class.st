@@ -163,12 +163,6 @@ GLHApi >> resetClient [
 	self client accept: ZnMimeType applicationJson
 ]
 
-{ #category : #api }
-GLHApi >> user: aUserID [
-
-	^ self client get: self baseAPIUrl , '/users/' , aUserID printString
-]
-
 { #category : #'as yet unclassified' }
 GLHApi >> usersHuman: humans active: active withoutProjectBots: withoutBot perPage: perPage page: page [
 
