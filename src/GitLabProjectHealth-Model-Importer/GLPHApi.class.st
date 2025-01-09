@@ -4,14 +4,6 @@ Class {
 	#category : #'GitLabProjectHealth-Model-Importer'
 }
 
-{ #category : #'as yet unclassified' }
-GLPHApi >> diffsMergeRequestOfProject: aProjectID withId: anMRiid [
-
-	^ self client get:
-		  self baseAPIUrl , '/projects/' , aProjectID printString
-		  , '/merge_requests/' , anMRiid printString , '/diffs/'
-]
-
 { #category : #initialization }
 GLPHApi >> initialize [
 

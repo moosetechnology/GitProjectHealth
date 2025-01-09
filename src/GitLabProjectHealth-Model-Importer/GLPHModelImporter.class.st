@@ -120,7 +120,7 @@ GLPHModelImporter >> importDiffOfCommit: aCommit [
 	^ aCommit diffs
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'import - merge request' }
 GLPHModelImporter >> importDiffOfMergeRequest: aMergeRequest [
 
 	| result diffsResult |
@@ -130,9 +130,7 @@ GLPHModelImporter >> importDiffOfMergeRequest: aMergeRequest [
 		^ aMergeRequest diffs ].
 	('Import diff commits of MR ' , aMergeRequest iid printString)
 		recordInfo.
-	result := self repoApi
-		          diffsMergeRequestOfProject: aMergeRequest project_id
-		          withId: aMergeRequest iid.
+	result := self repoApi mergeRequests diffsOf: aMergeRequest iid inProject: aMergeRequest project_id.
 
 	diffsResult := self newParseDiffResult: result.
 
