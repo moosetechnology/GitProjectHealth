@@ -254,12 +254,12 @@ GLHModelImporter >> importAllGroups [
 	^ groups
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #commits }
 GLHModelImporter >> importAndLoadLatestsCommitsOfProject: aGLHProject [
 
-	| commits |
-	self completeImportProject: aGLHProject.
-	commits := self importLastestCommitsOfProject: aGLHProject.
+	| commits completedProject |
+	completedProject := self completeImportProject: aGLHProject.
+	commits := self importLastestCommitsOfProject: completedProject.
 	commits do: [ :commit | self completeImportedCommit: commit ].
 	self chainsCommitsFrom: commits.
 	^ commits
@@ -413,22 +413,24 @@ GLHModelImporter >> importCommitsOfProject: aProject since: fromDate until: toDa
 GLHModelImporter >> importContributedProjectsOfUser: aGLHUser [
 
 	| remaningProjects params results projects |
-	params := { 
-		#order_by -> 'last_activity_at'.
-		#simple -> 'true'.
-	} asDictionary.
-	results := self repoApi projects contributedProjectsOfUser: aGLHUser id withParams: params.
-	
-	projects := (results collect: [ :projectsJson | self parseArrayOfProject: projectsJson ]) flattened.
-	
-	self glhModel
-				 addAll: projects
-				 unless: self blockOnIdEquality.				
-	
+	params := {
+		          (#order_by -> 'last_activity_at').
+		          (#simple -> 'true') } asDictionary.
+	results := self repoApi projects
+		           contributedProjectsOfUser: aGLHUser id
+		           withParams: params.
+
+	projects := (results collect: [ :projectsJson |
+		             self parseArrayOfProject: projectsJson ]) flattened.
+	projects := self glhModel
+		            addAll: projects
+		            unless: self blockOnIdEquality.
+
 	remaningProjects := self importProjects:
 		                    ((projects collect: #id) difference:
 			                     ((self userCatalogue atId: aGLHUser id) at:
 				                      #contributedProjects)).
+
 
 	aGLHUser contributedProjects
 		addAll: projects , remaningProjects
@@ -714,12 +716,11 @@ GLHModelImporter >> importUserByUsername: anUsername [
 			              result := self repoApi users allWithParams: params.
 							
 							 "when result is an error"
-							 result isArray ifFalse: [ result := { result } ].
+							 (result isCollection not and: result isEmpty) ifTrue: [ result := { result } ].
 							
-			              searchResult :=  (result collect: [ :usersJson |
-				                               NeoJSONReader fromString: usersJson ])
-				                              first.
-
+			              searchResult := result ifEmpty: [ result ] ifNotEmpty: [(result collect: [ :usersJson |
+				                               NeoJSONReader fromString: usersJson ]) first].
+							 
 			              (searchResult class = Dictionary and: [
 				               (searchResult at: #message) includesSubstring:
 					               '403 Forbidden' ])
