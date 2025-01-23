@@ -459,6 +459,7 @@ GitMetricExporter >> initialize [
 	analyses := OrderedCollection new.
 
 	metrics := {
+					"User Metrics"
 		           CodeAdditionMetric.
 		           CodeDeletionMetric.
 		           CommentContributionMetric.
@@ -477,6 +478,7 @@ GitMetricExporter >> initialize [
 		           ClosedTicketsMetric.
 		           JiraTimeMRTimeDifferenceMetric.
 		           CommitsNumberByJiraTicketsMetric.
+					  CommitsLinkWithTicketMetric.
 		
 		
 				"Project Metrics"
