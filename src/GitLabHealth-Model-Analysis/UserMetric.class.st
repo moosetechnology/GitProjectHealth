@@ -7,15 +7,8 @@ Class {
 		'userMergeRequests',
 		'emailDomain'
 	],
-	#category : 'GitLabHealth-Model-Analysis'
+	#category : #'GitLabHealth-Model-Analysis'
 }
-
-{ #category : #utils }
-UserMetric >> cacheSymbolFor: anEntityType since: since until: until [
-
-	^ (anEntityType printString , ' since ' , since printString , ' to '
-	   , until printString) asSymbol
-]
 
 { #category : #calculating }
 UserMetric >> calculate [
@@ -230,12 +223,6 @@ UserMetric >> loadUserMergeRequestsWithJiraIssueSince: since until: until [
 
 	^ mergeRequests select: [ :mergeRequest |
 		  mergeRequest jiraIssue isNotNil ]
-]
-
-{ #category : #accessing }
-UserMetric >> name [
-
-	^ self subclassResponsibility
 ]
 
 { #category : #accessing }

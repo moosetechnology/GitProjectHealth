@@ -15,7 +15,7 @@ Class {
 		'metrics',
 		'analyses'
 	],
-	#category : 'GitLabHealth-Model-Analysis'
+	#category : #'GitLabHealth-Model-Analysis'
 }
 
 { #category : #'as yet unclassified' }
@@ -304,7 +304,7 @@ GitMetricExporter >> exportUserAnalysesInCSV [
 { #category : #projects }
 GitMetricExporter >> findParticipationOfCommitAuthorNamed: username amongProjects: aCollectionOfProjects [
 
-	| response itsProjects i size |
+	| response itsProjects i size params |
 	i := 1.
 	size := aCollectionOfProjects size.
 	itsProjects := aCollectionOfProjects select: [ :project |
@@ -319,12 +319,13 @@ GitMetricExporter >> findParticipationOfCommitAuthorNamed: username amongProject
 				                size.
 				                ']' }) recordInfo.
 
-		               response := glhImporter repoApi
-			                           commitsOfUser: username
-			                           inProject: project id
-			                           since: '01 january 2023' asDateAndTime
-			                           until: Date today asDateAndTime.
-		               response := glhImporter parseCommitsResult: response.
+							params := { 
+								#author -> username.
+								#since -> '01 january 2023' asDateAndTime asString.
+								#until -> Date today asDateAndTime asString
+							} asDictionary.
+		               response := glhImporter repoApi commits getAllInProject: project id withParams: params.
+		               response := (response collect: [ :commitsJson | glhImporter parseCommitsResult: commitsJson]) flattened.
 		               response isNotEmpty
 		 ].
 
@@ -356,10 +357,28 @@ GitMetricExporter >> generateAnalysesOver: aDateWeekMonthOrYear [
 GitMetricExporter >> generateProjectsAnalysesDuringPeriod: period over: aDateWeekMonthOrYear [
 
 	^self projectEntities collect: [ :project |
-		ProjectAnalysisReport new
+		| projectAnalysisReport |
+		projectAnalysisReport := ProjectAnalysisReport new
 			projectName: project name;
 			period: period;
-			over: aDateWeekMonthOrYear ]
+			over: aDateWeekMonthOrYear.
+			
+		
+		  self projectMetrics do: [ :metric |
+				|newMetric result|
+			   newMetric := metric new
+				               glhImporter: glhImporter;
+				               jiraImporter: jiraImporter;
+				               setPeriodSince: (period at: #since)
+				               until: (period at: #until);
+				               over: aDateWeekMonthOrYear;
+				               project: project.
+
+
+			  result := newMetric calculate.
+			  projectAnalysisReport metrics at: newMetric name put: result ]. 
+		
+			projectAnalysisReport]
 ]
 
 { #category : #analysis }
@@ -373,7 +392,7 @@ GitMetricExporter >> generateUsersAnalysesDuringPeriod: period over: aDateWeekMo
 			                        period: period;
 			                        over: aDateWeekMonthOrYear.
 
-		  metrics do: [ :metric |
+		  self userMetrics do: [ :metric |
 			  newMetric := metric new
 				               glhImporter: glhImporter;
 				               jiraImporter: jiraImporter;
@@ -449,8 +468,8 @@ GitMetricExporter >> initialize [
 		           DelayUntilFirstChurnMetric.
 		           TimeBetweenCommitMetric.
 		           ContributedProjectMetric.
-		CodeAdditionByMRMetric .
-		CodeDeletionByMRMetric .
+					  CodeAdditionByMRMetric .
+		           CodeDeletionByMRMetric .
 		           MergeRequestDurationMetric.
 		           OpenedMergeRequestMetric.
 		           ClosedMergeRequestMetric.
@@ -458,7 +477,12 @@ GitMetricExporter >> initialize [
 		           SelfMergedUnderAMinuteMergeRequestMetric.
 		           ClosedTicketsMetric.
 		           JiraTimeMRTimeDifferenceMetric.
-		           CommitsNumberByJiraTicketsMetric }
+		           CommitsNumberByJiraTicketsMetric.
+		
+		
+				"Project Metrics"
+				CommitFrequencyProjectMetric
+		 }.
 ]
 
 { #category : #accessing }
@@ -475,6 +499,12 @@ GitMetricExporter >> label: aString [
 { #category : #accessing }
 GitMetricExporter >> maxCommitWindow: anInteger [
 	maxCommitWindow := anInteger abs
+]
+
+{ #category : #accessing }
+GitMetricExporter >> metrics [
+
+	^ metrics
 ]
 
 { #category : #accessing }
