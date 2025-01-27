@@ -112,12 +112,13 @@ GitMetricExporter >> addEntitiesFromUserNamesAndProjects: usersWithProjects [
 ]
 
 { #category : #utilities }
-GitMetricExporter >> constructFilePath: runningOver [
+GitMetricExporter >> constructFilePathFor: runningOver andEntities: entitiesName [
 
 	| file |
 	file := (FileLocator home
 	         /
-		         ('GitlabHealth-' , label printString , '-' , runningOver printString
+		         ('GitlabHealth-' , label printString , '-'
+		          , runningOver printString , '-' , entitiesName printString
 		          , '-'
 		          , (DateAndTime now printString replaceAll: $: with: $-)
 		          , '.csv')) asFileReference.
@@ -253,7 +254,7 @@ GitMetricExporter >> exportProjectAnalysesInCSV [
 					addColumnForQuery: association value
 					withName: association key ] ].
 
-		file := self constructFilePath: groupOver.
+		file := self constructFilePathFor: groupOver andEntities: 'projects'.
 		file writeStreamDo: [ :aStream |
 			exportBrowserModel writeCSVOn: aStream ] ]
 ]
@@ -278,10 +279,9 @@ GitMetricExporter >> exportUserAnalysesInCSV [
 			addColumnForQuery: [ :groupAnalyses |
 			(groupAnalyses at: 1) username ]
 			withName: #'User name'.
-			
+
 		exportBrowserModel
-			addColumnForQuery: [ :groupAnalyses |
-			(groupAnalyses at: 1) email ]
+			addColumnForQuery: [ :groupAnalyses | (groupAnalyses at: 1) email ]
 			withName: #'User email'.
 
 		periods := (group groupedBy: #period) keys.
@@ -295,7 +295,9 @@ GitMetricExporter >> exportUserAnalysesInCSV [
 					withName: association key ] ].
 
 
-		file := self constructFilePath: groupOver.
+		file := self
+			        constructFilePathFor: groupOver
+			        andEntities: 'users'.
 
 		file writeStreamDo: [ :aStream |
 			exportBrowserModel writeCSVOn: aStream ] ]
