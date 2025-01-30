@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'projectName'
 	],
-	#category : 'GitLabHealth-Model-Analysis'
+	#category : #'GitLabHealth-Model-Analysis'
 }
 
 { #category : #accessing }
