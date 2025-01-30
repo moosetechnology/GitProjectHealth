@@ -424,7 +424,7 @@ GLHModelImporter >> importCommitsOfProject: aProject since: fromDate until: toDa
 { #category : #'import -projects' }
 GLHModelImporter >> importContributedProjectsOfUser: aGLHUser [
 
-	| remaningProjects params results projects |
+	| remaningProjects params results projects projectsIds |
 	params := {
 		          (#order_by -> 'last_activity_at').
 		          (#simple -> 'true') } asDictionary.
@@ -432,12 +432,10 @@ GLHModelImporter >> importContributedProjectsOfUser: aGLHUser [
 		           contributedProjectsOfUser: aGLHUser id
 		           withParams: params.
 
-	projects := (results collect: [ :projectsJson |
-		             self parseArrayOfProject: projectsJson ]) flattened.
-	projects := self glhModel
-		            addAll: projects
-		            unless: self blockOnIdEquality.
-
+	projectsIds := (results collect: [ :projectsJson |
+		             (NeoJSONReader fromString: projectsJson) collect: [:projectJson | projectJson at: #id ] ]) flattened.
+	
+	projects := self importProjects: projectsIds.
 	remaningProjects := self importProjects:
 		                    ((projects collect: #id) difference:
 			                     ((self userCatalogue atId: aGLHUser id) at:

@@ -1,7 +1,7 @@
 Class {
 	#name : #ClosedTicketsMetric,
 	#superclass : #UserJiraMetric,
-	#category : 'GitLabHealth-Model-Analysis'
+	#category : #'GitLabHealth-Model-Analysis'
 }
 
 { #category : #calculating }

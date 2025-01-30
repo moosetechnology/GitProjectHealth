@@ -8,7 +8,7 @@ Class {
 		'onProject',
 		'maxChildCommits'
 	],
-	#category : 'GitLabHealth-Model-Analysis'
+	#category : #'GitLabHealth-Model-Analysis'
 }
 
 { #category : #analyze }
