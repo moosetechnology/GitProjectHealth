@@ -332,11 +332,12 @@ GLPHModelImporter >> importMergeResquestMerger: aGLPHEMergeRequest [
 { #category : #'import -projects' }
 GLPHModelImporter >> importProject: aProjectID [
 
-	| result projectResult isProjectExist |
+	| result projectResult |
 	('Import project with id:  ' , aProjectID printString) recordInfo.
-	
-	isProjectExist :=  (glhModel allWithType: GLHProject) detect: [ :project | project id = aProjectID ] ifNone: [ nil ].
-	isProjectExist ifNotNil: [ ^isProjectExist ]. 
+
+	(glhModel allWithType: GLHProject)
+		detect: [ :project | project id = aProjectID ]
+		ifOne: [ :project | ^ project ].
 
 	result := self repoApi projects get: aProjectID.
 	projectResult := self parseProjectResult: result.
