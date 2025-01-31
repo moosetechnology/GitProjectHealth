@@ -705,18 +705,6 @@ GLHModelImporter >> importProjects [
 	^ projects
 ]
 
-{ #category : #'import - projects' }
-GLHModelImporter >> importProjects: aCollectionOfProjectID [
-
-
-	result := self repoApi projects all.
-	projects := (result collect: [ :projectsJson | self parseArrayOfProject: projectsJson ]) flattened.
-	
-	self glhModel addAll: projects unless: self blockOnIdEquality.
-
-	^ projects
-]
-
 { #category : #imports }
 GLHModelImporter >> importProjectsSince: since [
 	"heavy import of all projects"
@@ -743,7 +731,7 @@ GLHModelImporter >> importProjectsSince: since [
 			                      unless: self blockOnIdEquality.
 		foundProject addAll: newlyFoundProjects ].
 
-{ #category : #'import -projects' }
+{ #category : #'import - projects' }
 GLHModelImporter >> importProjects: aCollectionOfProjectID [
 
 
