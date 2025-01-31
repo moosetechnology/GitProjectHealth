@@ -17,15 +17,18 @@ GLHModelImporterTestResource >> glhImporter [
 { #category : #setup }
 GLHModelImporterTestResource >> importModel [
 
+	| gitlabApi |
 	model := GLHModel new.
 
-	glphApi := GLPHApi new
+	gitlabApi := GitlabApi new privateToken: ''; hostUrl: 'https://gitlab.com/api/v4'; output: 'json'.
+	
+	"GLPHApi new
 		           privateToken: '';
 		           baseAPIUrl: 'https://gitlab.com/api/v4';
-		           yourself.
+		           yourself."
 
 	glhImporter := GLHModelImporter new
-		               repoApi: glphApi;
+		               repoApi: gitlabApi;
 		               glhModel: model;
 		               withFiles: false;
 		               withCommitDiffs: true.

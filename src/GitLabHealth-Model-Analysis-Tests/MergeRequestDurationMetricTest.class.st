@@ -21,8 +21,8 @@ MergeRequestDurationMetricTest >> testCalculate [
 	glhImporter mergeRequests: {
 			(GLHMergeRequest new
 				 author: user;
-				 created_at: '09-05-2024:00:00:00' asDateAndTime;
-				 merged_at: '09-05-2024:10:00:00' asDateAndTime).
+				 created_at: (DateAndTime year: 2024 month: 09 day: 05 hour: 00 minute: 0 second: 0);
+				 merged_at: (DateAndTime year: 2024 month: 09 day: 05 hour: 10 minute: 0 second: 0)).
 			(GLHMergeRequest new
 				 author: user;
 				 created_at: '09-05-2024' asDate;

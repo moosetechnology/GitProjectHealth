@@ -23,10 +23,10 @@ GitAnalyzerTest >> setUp [
 	"Put here a common initialization logic for tests"
 	glphModel := GLHModel new.
 
-	glphApi := GLPHApi new
+	glphApi := GitlabApi new
 		           privateToken: '';
-		           baseAPIUrl: 'https://gitlab.com/api/v4';
-		           yourself.
+		           hostUrl: 'https://gitlab.com/api/v4';
+		           output: 'json'.
 
 	since := Date today - 2 day.
 
@@ -34,7 +34,6 @@ GitAnalyzerTest >> setUp [
 		               repoApi: glphApi;
 		               glhModel: glphModel;
 		               withFiles: false;
-		              
 		               withCommitDiffs: true.
 
 	glhImporter importProject: 57841283.
@@ -51,7 +50,7 @@ GitAnalyzerTest >> setUp [
 		               onModel: glphModel
 ]
 
-{ #category : #test }
+{ #category : #tests }
 GitAnalyzerTest >> testAnalyseAmandment [
 
 	| myCommits res mondayCommit tuesdayCommit wednesdayCommit |
@@ -96,7 +95,7 @@ GitAnalyzerTest >> testAnalyseAmandment [
 	self assert: res equals: tuesdayCommit
 ]
 
-{ #category : #test }
+{ #category : #tests }
 GitAnalyzerTest >> testAnalyseCommitFrequencySinceUntil [
 
 	| res from since |
@@ -111,7 +110,7 @@ GitAnalyzerTest >> testAnalyseCommitFrequencySinceUntil [
 	self assert: (res at: '14 May 2024') size equals: 4
 ]
 
-{ #category : #test }
+{ #category : #tests }
 GitAnalyzerTest >> testAnalyseMergeResquestValidation [
 
 	| mergeResquest res |
