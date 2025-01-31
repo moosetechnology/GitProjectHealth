@@ -730,6 +730,7 @@ GLHModelImporter >> importProjectsSince: since [
 			                      addAll: (self parseArrayOfProject: results)
 			                      unless: self blockOnIdEquality.
 		foundProject addAll: newlyFoundProjects ].
+]
 
 { #category : #'import - projects' }
 GLHModelImporter >> importProjects: aCollectionOfProjectID [
