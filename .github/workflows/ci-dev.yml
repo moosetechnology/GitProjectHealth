@@ -30,6 +30,7 @@ jobs:
         timeout-minutes: 15
 
       - name: Coveralls
+        if: ${{ matrix.smalltalk }} == 'Moose64-12'
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
