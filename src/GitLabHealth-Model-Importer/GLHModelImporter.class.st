@@ -58,7 +58,8 @@ GLHModelImporter >> chainsCommitsFrom: commitsCollection [
 	^ commitsCollection
 ]
 
-{ #category : #'import -projects' }
+
+{ #category : #'import - projects' }
 GLHModelImporter >> completeImportProject: aGLHProject [
 
 	| importedProject |
@@ -346,6 +347,51 @@ GLHModelImporter >> importCommitsFollowing: aCommit upToDays: aNumberOfDay [
 		  until: (date + aNumberOfDay day)
 ]
 
+{ #category : #commit }
+GLHModelImporter >> importCommitsOf: aGLHProject withStats: aBoolean until: toDate [
+
+	| newlyFoundCommit page |
+	
+	self deprecated: [  ] .
+	
+	page := 0.
+	newlyFoundCommit := { true }.
+	[ newlyFoundCommit isNotEmpty ] whileTrue: [
+		| results parsedResults existingCommits |
+		page := page + 1.
+		('import commit page ' , page printString) recordInfo.
+		results := self repoApi
+			           commitsOfProject: aGLHProject id
+			           forRefName: nil
+			           since: nil
+			           until: nil
+			           path: nil
+			           author: nil
+			           all: nil
+			           with_stats: aBoolean
+			           firstParent: nil
+			           order: nil
+			           trailers: nil
+			           perPage: 100
+			           page: page.
+		parsedResults := self parseCommitsResult: results.
+		existingCommits := aGLHProject mooseModel allWithType: GLHCommit.
+
+		newlyFoundCommit := parsedResults reject: [ :commitParsed |
+			                    (toDate isNil or: [
+				                     commitParsed committed_date
+				                     < toDate asDateAndTime ]) or: [
+				                    existingCommits anySatisfy: [ :existingCommit |
+					                    existingCommit id = commitParsed id ] ] ].
+		aGLHProject mooseModel addAll: newlyFoundCommit.
+		aGLHProject repository commits addAll: newlyFoundCommit ].
+
+
+	self withCommitDiffs ifTrue: [
+		aGLHProject repository commits do: [ :commit |
+			self importDiffOfCommit: commit ] ]
+]
+
 { #category : #'import - commits' }
 GLHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName since: fromDate [
 
@@ -362,8 +408,9 @@ GLHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName since:
 	| params result allCommits |
 	params := { 
 	  #ref_name -> aGLHBranch name.
-	  #since ->  (fromDate ifNotNil: [ fromDate asDateAndTime asString ] ifNil: [ '' ]).
-	  #until -> (toDate ifNotNil: [ toDate asDateAndTime asString ] ifNil: [ '' ]). 
+	  #since ->  (fromDate ifNotNil: [ fromDate asDate asDateAndTime asString ] ifNil: [ '' ]).
+	  #until -> (toDate ifNotNil: [ toDate asDate asDateAndTime asString ] ifNil: [ '' ]). 
+
 	} asDictionary.
 	result := self repoApi commits getAllInProject: aGLHBranch repository project id withParams: params.
 	
@@ -398,12 +445,12 @@ GLHModelImporter >> importCommitsOfProject: aProject since: fromDate until: toDa
 		          (#since
 		           ->
 		           (fromDate
-			            ifNotNil: [ fromDate asDateAndTime asString ]
+			            ifNotNil: [ fromDate asDate asDateAndTime asString ]
 			            ifNil: [ '' ])).
 		          (#until
 		           ->
 		           (toDate
-			            ifNotNil: [ toDate asDateAndTime asString ]
+			            ifNotNil: [ toDate asDate asDateAndTime asString ]
 			            ifNil: [ '' ])).
 		          (#with_stats -> 'true').
 		          (#all -> 'true') } asDictionary.
@@ -421,7 +468,8 @@ GLHModelImporter >> importCommitsOfProject: aProject since: fromDate until: toDa
 	^ self glhModel addAll: allCommits unless: self blockOnIdEquality
 ]
 
-{ #category : #'import -projects' }
+
+{ #category : #'import - projects' }
 GLHModelImporter >> importContributedProjectsOfUser: aGLHUser [
 
 	| remaningProjects params results projects projectsIds |
@@ -630,7 +678,7 @@ GLHModelImporter >> importPipelinesOfProject: aGLHProject [
 		aGLHProject pipelines add: pipeline unless: self blockOnIdEquality]
 ]
 
-{ #category : #'import -projects' }
+{ #category : #'import - projects' }
 GLHModelImporter >> importProject: aProjectID [
 
 	| result projectResult |
@@ -642,11 +690,12 @@ GLHModelImporter >> importProject: aProjectID [
 	^ self completeImportProject: projectResult
 ]
 
-{ #category : #'import -projects' }
+{ #category : #'import - projects' }
 GLHModelImporter >> importProjects [
 
 	| result projects |
 	('import all Projects') recordInfo.
+
 
 	result := self repoApi projects all.
 	projects := (result collect: [ :projectsJson | self parseArrayOfProject: projectsJson ]) flattened.
@@ -656,8 +705,36 @@ GLHModelImporter >> importProjects [
 	^ projects
 ]
 
-{ #category : #'import -projects' }
+{ #category : #imports }
+GLHModelImporter >> importProjectsSince: since [
+	"heavy import of all projects"
+
+	"copy import from commits"
+
+	| newlyFoundProjects page foundProject amount |
+	('import all Projects since: ' , since printString) recordInfo.
+
+	"number of projects per page"
+	amount := 100.
+	page := 0.
+	foundProject := OrderedCollection new.
+	newlyFoundProjects := { true }.
+	[ newlyFoundProjects isNotEmpty ] whileTrue: [
+		| results |
+		page := page + 1.
+		('import projects page #' , page printString) recordInfo.
+
+		results := self repoApi projects: amount since: since page: page.
+
+		newlyFoundProjects := self glhModel
+			                      addAll: (self parseArrayOfProject: results)
+			                      unless: self blockOnIdEquality.
+		foundProject addAll: newlyFoundProjects ].
+]
+
+{ #category : #'import - projects' }
 GLHModelImporter >> importProjects: aCollectionOfProjectID [
+
 
 	^ aCollectionOfProjectID collect: [ :id | self importProject: id ]
 ]
@@ -789,7 +866,7 @@ GLHModelImporter >> isServerError: aString [
 	^ aString = '{"message":"500 Internal Server Error"}'
 ]
 
-{ #category : #'import -projects' }
+{ #category : #'import - projects' }
 GLHModelImporter >> loadAllProjectsFromRepositorySoftware [
 	"heavy import that load all the active project inside the model. Only import the project entities"
 	|projects|

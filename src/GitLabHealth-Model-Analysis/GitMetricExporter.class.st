@@ -323,7 +323,7 @@ GitMetricExporter >> findParticipationOfCommitAuthorNamed: username amongProject
 
 							params := { 
 								#author -> username.
-								#since -> '01 january 2023' asDateAndTime asString.
+								#since -> '01 january 2023' asDate asDateAndTime asString.
 								#until -> Date today asDateAndTime asString
 							} asDictionary.
 		               response := glhImporter repoApi commits getAllInProject: project id withParams: params.
@@ -454,7 +454,7 @@ GitMetricExporter >> initialize [
 
 	entities := OrderedCollection new.
 	"set up the minimal date from which we are looking for the commits a particular user in projects"
-	sinceTimeLimit := '2024-01-01' asDateAndTime.
+	sinceTimeLimit := '2024-01-01' asDate asDateAndTime.
 	runningPeriods := OrderedCollection new.
 	maxCommitWindow := 3.
 	over := Date.

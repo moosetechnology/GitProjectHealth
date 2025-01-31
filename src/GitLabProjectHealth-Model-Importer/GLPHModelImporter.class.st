@@ -329,7 +329,7 @@ GLPHModelImporter >> importMergeResquestMerger: aGLPHEMergeRequest [
 	^aGLPHEMergeRequest merge_user: (self importUser: authorID)
 ]
 
-{ #category : #'import -projects' }
+{ #category : #'import - projects' }
 GLPHModelImporter >> importProject: aProjectID [
 
 	| result projectResult |
@@ -398,5 +398,5 @@ GLPHModelImporter >> withCommitsSince: someDays [
 	(someDays isKindOf: DateAndTime)
 		ifTrue: [ withCommitsSince := someDays ]
 		ifFalse: [
-		withCommitsSince := (Date today - someDays) asDateAndTime ]
+		withCommitsSince := (Date today - someDays) asDate asDateAndTime ]
 ]
