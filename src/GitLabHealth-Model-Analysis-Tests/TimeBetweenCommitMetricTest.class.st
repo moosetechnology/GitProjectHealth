@@ -21,8 +21,8 @@ TimeBetweenCommitMetricTest >> testCalculate [
 	glhImporter commits: {
 			(GLHCommit new
 				 id: 1;
-				 created_at: '09-04-2024:01:00:00';
-				 committed_date: '09-04-2024:01:00:00' asDateAndTime;
+				 created_at: (DateAndTime year: 2024 month: 09 day: 04 hour: 01 minute: 0 second: 0);
+				 committed_date: (DateAndTime year: 2024 month: 09 day: 04 hour: 01 minute: 0 second: 0);;
 				 commitCreator: user;
 				 additions: 5).
 			(GLHCommit new

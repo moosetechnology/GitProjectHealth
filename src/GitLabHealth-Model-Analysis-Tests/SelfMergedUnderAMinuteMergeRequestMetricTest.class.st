@@ -23,13 +23,13 @@ SelfMergedUnderAMinuteMergeRequestMetricTest >> testCalculate [
 				 author: user;
 				 merge_user: user;
 				 reviewers: { user };
-				 created_at: '09-05-2024:00-00-00' asDateAndTime;
-				 merged_at: '09-05-2024:00-00-01' asDateAndTime).
+				 created_at: (DateAndTime year: 2024 month: 09 day: 05 hour: 00 minute: 0 second: 0);
+				 merged_at: (DateAndTime year: 2024 month: 09 day: 05 hour: 00 minute: 0 second: 1)).
 			(GLHMergeRequest new
 				 author: user;
 				 merge_user: nil;
-				 created_at: '09-05-2024:00-00-00' asDateAndTime;
-				 merged_at: '09-05-2024:00-00-01' asDateAndTime) }.
+				 created_at: (DateAndTime year: 2024 month: 09 day: 05 hour: 00 minute: 0 second: 0);
+				 merged_at: (DateAndTime year: 2024 month: 09 day: 05 hour: 00 minute: 0 second: 1)) }.
 
 
 	mergedMergeRequestWithoutReview := SelfMergedUnderAMinuteMergeRequestMetric
@@ -68,13 +68,13 @@ SelfMergedUnderAMinuteMergeRequestMetricTest >> testCalculateMergeButNotCreated 
 				 author: user2;
 				 merge_user: user;
 				 reviewers: { user };
-				 created_at: '09-05-2024:00-00-00' asDateAndTime;
-				 merged_at: '09-05-2024:00-00-01' asDateAndTime).
+				 created_at: (DateAndTime year: 2024 month: 09 day: 05 hour: 00 minute: 0 second: 0);
+				 merged_at: (DateAndTime year: 2024 month: 09 day: 05 hour: 00 minute: 0 second: 1)).
 			(GLHMergeRequest new
 				 author: user;
 				 merge_user: nil;
-				 created_at: '09-05-2024:00-00-00' asDateAndTime;
-				 merged_at: '09-05-2024:00-00-01' asDateAndTime) }.
+				 created_at: (DateAndTime year: 2024 month: 09 day: 05 hour: 00 minute: 0 second: 0);
+				 merged_at: (DateAndTime year: 2024 month: 09 day: 05 hour: 00 minute: 0 second: 1)) }.
 
 
 	mergedMergeRequestWithoutReview := SelfMergedUnderAMinuteMergeRequestMetric
