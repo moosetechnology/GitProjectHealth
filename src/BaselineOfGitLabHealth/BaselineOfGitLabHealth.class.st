@@ -1,11 +1,10 @@
 Class {
-	#name : 'BaselineOfGitLabHealth',
-	#superclass : 'BaselineOf',
-	#category : 'BaselineOfGitLabHealth',
-	#package : 'BaselineOfGitLabHealth'
+	#name : #BaselineOfGitLabHealth,
+	#superclass : #BaselineOf,
+	#category : #BaselineOfGitLabHealth
 }
 
-{ #category : 'baselines' }
+{ #category : #baselines }
 BaselineOfGitLabHealth >> baseline: spec [
 
 	<baseline>
@@ -24,14 +23,14 @@ BaselineOfGitLabHealth >> baseline: spec [
 			spec package: 'GitLabHealth-Model' with: [ spec requires: #( 'Moose' ) ] ] ]
 ]
 
-{ #category : 'baselines' }
+{ #category : #baselines }
 BaselineOfGitLabHealth >> customProjectAttributes [
     self class environment at: #MooseEntity ifAbsent: [ ^ #(#WithoutFamix) ].
 
     ^ #()
 ]
 
-{ #category : 'baselines' }
+{ #category : #baselines }
 BaselineOfGitLabHealth >> defineDependencies: spec [
 
 	spec
@@ -40,19 +39,21 @@ BaselineOfGitLabHealth >> defineDependencies: spec [
 	spec
 		baseline: 'MoreLogger'
 		with: [ spec repository: 'github://badetitou/MoreLogger:main/src' ].
-	spec
-		baseline: 'Voyage'
-		with: [ spec
-			loads: #('mongo'); 
+	spec baseline: 'Voyage' with: [
+		spec
+			loads: #( 'mongo' );
 			repository: 'github://pharo-nosql/voyage/mc' ].
-	spec
-		baseline: 'AWS'
-		with: [ 
-			  spec repository: 'github://Evref-BL/aws-sdk-smalltalk:master/pharo-repository'
-		]
+	spec baseline: 'AWS' with: [
+		spec repository:
+			'github://Evref-BL/aws-sdk-smalltalk:master/pharo-repository' ].
+		
+  spec 		baseline: 'GitlabAPI' with: [
+		spec
+			repository: 'github://Evref-BL/Gitlab-Pharo-API:develop'].
+
 ]
 
-{ #category : 'baselines' }
+{ #category : #baselines }
 BaselineOfGitLabHealth >> defineFamixConnector: spec [
 
 	spec
@@ -65,7 +66,7 @@ BaselineOfGitLabHealth >> defineFamixConnector: spec [
 		with: [ spec requires: #( 'GitProject-FamixConnector' ) ]
 ]
 
-{ #category : 'baselines' }
+{ #category : #baselines }
 BaselineOfGitLabHealth >> defineGroups: spec [
 
 	spec
@@ -96,7 +97,7 @@ BaselineOfGitLabHealth >> defineGroups: spec [
 	spec group: 'default' with: #( 'Core' )
 ]
 
-{ #category : 'baselines' }
+{ #category : #baselines }
 BaselineOfGitLabHealth >> defineJiraConnector: spec [
 
 	spec
@@ -117,11 +118,13 @@ BaselineOfGitLabHealth >> defineJiraConnector: spec [
 		spec repository: 'github://Evref-BL/Jira-Pharo-API:main/src' ]
 ]
 
-{ #category : 'baselines' }
+{ #category : #baselines }
 BaselineOfGitLabHealth >> definePackages: spec [
 	"generic"
 
-	spec package: 'GitProjectHealth-Model-Importer'.
+	spec
+		package: 'GitProjectHealth-Model-Importer'
+		with: [ spec requires: #( 'GitlabAPI' ) ].
 	spec
 		package: 'GitProjectHealth-Model-Importer-Tests'
 		with: [ spec requires: #( 'GitProjectHealth-Model-Importer' ) ].

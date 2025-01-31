@@ -112,12 +112,13 @@ GitMetricExporter >> addEntitiesFromUserNamesAndProjects: usersWithProjects [
 ]
 
 { #category : #utilities }
-GitMetricExporter >> constructFilePath: runningOver [
+GitMetricExporter >> constructFilePathFor: runningOver andEntities: entitiesName [
 
 	| file |
 	file := (FileLocator home
 	         /
-		         ('GitlabHealth-' , label printString , '-' , runningOver printString
+		         ('GitlabHealth-' , label printString , '-'
+		          , runningOver printString , '-' , entitiesName printString
 		          , '-'
 		          , (DateAndTime now printString replaceAll: $: with: $-)
 		          , '.csv')) asFileReference.
@@ -253,7 +254,7 @@ GitMetricExporter >> exportProjectAnalysesInCSV [
 					addColumnForQuery: association value
 					withName: association key ] ].
 
-		file := self constructFilePath: groupOver.
+		file := self constructFilePathFor: groupOver andEntities: 'projects'.
 		file writeStreamDo: [ :aStream |
 			exportBrowserModel writeCSVOn: aStream ] ]
 ]
@@ -278,10 +279,9 @@ GitMetricExporter >> exportUserAnalysesInCSV [
 			addColumnForQuery: [ :groupAnalyses |
 			(groupAnalyses at: 1) username ]
 			withName: #'User name'.
-			
+
 		exportBrowserModel
-			addColumnForQuery: [ :groupAnalyses |
-			(groupAnalyses at: 1) email ]
+			addColumnForQuery: [ :groupAnalyses | (groupAnalyses at: 1) email ]
 			withName: #'User email'.
 
 		periods := (group groupedBy: #period) keys.
@@ -295,7 +295,9 @@ GitMetricExporter >> exportUserAnalysesInCSV [
 					withName: association key ] ].
 
 
-		file := self constructFilePath: groupOver.
+		file := self
+			        constructFilePathFor: groupOver
+			        andEntities: 'users'.
 
 		file writeStreamDo: [ :aStream |
 			exportBrowserModel writeCSVOn: aStream ] ]
@@ -304,7 +306,7 @@ GitMetricExporter >> exportUserAnalysesInCSV [
 { #category : #projects }
 GitMetricExporter >> findParticipationOfCommitAuthorNamed: username amongProjects: aCollectionOfProjects [
 
-	| response itsProjects i size |
+	| response itsProjects i size params |
 	i := 1.
 	size := aCollectionOfProjects size.
 	itsProjects := aCollectionOfProjects select: [ :project |
@@ -319,12 +321,13 @@ GitMetricExporter >> findParticipationOfCommitAuthorNamed: username amongProject
 				                size.
 				                ']' }) recordInfo.
 
-		               response := glhImporter repoApi
-			                           commitsOfUser: username
-			                           inProject: project id
-			                           since: '01 january 2023' asDate asDateAndTime
-			                           until: Date today asDateAndTime.
-		               response := glhImporter parseCommitsResult: response.
+							params := { 
+								#author -> username.
+								#since -> '01 january 2023' asDate asDateAndTime asString.
+								#until -> Date today asDateAndTime asString
+							} asDictionary.
+		               response := glhImporter repoApi commits getAllInProject: project id withParams: params.
+		               response := (response collect: [ :commitsJson | glhImporter parseCommitsResult: commitsJson]) flattened.
 		               response isNotEmpty
 		 ].
 

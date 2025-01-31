@@ -4,56 +4,39 @@ Class {
 	#category : #'GitLabProjectHealth-Model-Importer'
 }
 
-{ #category : #commit }
+{ #category : #'import - commits' }
 GLPHModelImporter >> commitsOfProject: aGLHProject forRefName: refName until: toDate [
 
-	| newlyFoundCommit page |
-	page := 0.
-	newlyFoundCommit := { true }.
-	[ newlyFoundCommit isNotEmpty ] whileTrue: [
-		| results parsedResults existingCommits |
-		page := page + 1.
-		('import commit page ' , page printString) recordInfo.
-		results := self repoApi
-			           commitsOfProject: aGLHProject id
-			           forRefName: refName
-			           since: nil
-			           until: nil
-			           path: nil
-			           author: nil
-			           all: nil
-			           with_stats: nil
-			           firstParent: nil
-			           order: nil
-			           trailers: nil
-			           perPage: 100
-			           page: page.
-		parsedResults := self parseCommitsResult: results.
-		existingCommits := aGLHProject mooseModel allWithType: GLHCommit.
+	| params results allCommits |
+	
+	params := { 
+		#ref_name -> refName.
+		#until -> (toDate ifNotNil: [ toDate asDateAndTime asString ] ifNil: [ '' ]) 
+	} asDictionary.
+	results := self repoApi commits getAllInProject: aGLHProject id withParams: params.
+	allCommits := (results collect: [ :commitsJson | self parseCommitsResult: commitsJson ]) flattened.
+	
+	self glhModel addAll: allCommits unless: self blockOnIdEquality.
+	aGLHProject repository commits addAll: allCommits unless: self blockOnIdEquality.
 
-		newlyFoundCommit := parsedResults reject: [ :commitParsed |
-			                    (toDate isNil or: [
-				                     commitParsed committed_date
-				                     < toDate asDate asDateAndTime ]) or: [
-				                    existingCommits anySatisfy: [ :existingCommit |
-					                    existingCommit id = commitParsed id ] ] ].
-		self glhModel addAll: newlyFoundCommit unless: self blockOnIdEquality.
-		aGLHProject repository commits addAll: newlyFoundCommit unless: self blockOnIdEquality  ].
 	self withCommitDiffs ifTrue: [
 		aGLHProject repository commits do: [ :commit |
-			self importDiffOfCommit: commit ] ]
+			self importDiffOfCommit: commit ] ].
+	
+	^allCommits
 ]
 
 { #category : #'private - api' }
 GLPHModelImporter >> completeImportProject: aGLHProject [
-	|completedProject|
-	completedProject := super completeImportProject: aGLHProject.
 
+	| completedProject |
+	completedProject := super completeImportProject: aGLHProject.
 	"for this initial import, with only look at some but not all MR"
-	withInitialMergeRequest ifTrue: [ self
-		importMergeRequests: completedProject
-		since: DateAndTime today
-		until: DateAndTime now. ].
+	withInitialMergeRequest ifTrue: [
+		self
+			importMergeRequests: completedProject
+			since: DateAndTime today
+			until: DateAndTime now ].
 
 	^ completedProject
 ]
@@ -107,7 +90,7 @@ GLPHModelImporter >> configureReaderForMergeRequest: reader [
 			string ifNil: [ nil ] ifNotNil: [ DateAndTime fromString: string ] ] ]
 ]
 
-{ #category : #import }
+{ #category : #'import - commits' }
 GLPHModelImporter >> importCommitsOfBranch: aGLHBranch [
 
 	| commits |
@@ -127,7 +110,7 @@ GLPHModelImporter >> importCommitsOfBranch: aGLHBranch [
 		 ]
 ]
 
-{ #category : #api }
+{ #category : #'import - commits' }
 GLPHModelImporter >> importDiffOfCommit: aCommit [
 
 	super importDiffOfCommit: aCommit.
@@ -138,7 +121,7 @@ GLPHModelImporter >> importDiffOfCommit: aCommit [
 	^ aCommit diffs
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'import - merge request' }
 GLPHModelImporter >> importDiffOfMergeRequest: aMergeRequest [
 
 	| result diffsResult |
@@ -148,9 +131,7 @@ GLPHModelImporter >> importDiffOfMergeRequest: aMergeRequest [
 		^ aMergeRequest diffs ].
 	('Import diff commits of MR ' , aMergeRequest iid printString)
 		recordInfo.
-	result := self repoApi
-		          diffsMergeRequestOfProject: aMergeRequest project_id
-		          withId: aMergeRequest iid.
+	result := self repoApi mergeRequests diffsOf: aMergeRequest iid inProject: aMergeRequest project_id.
 
 	diffsResult := self newParseDiffResult: result.
 
@@ -170,25 +151,12 @@ GLPHModelImporter >> importDiffOfMergeRequest: aMergeRequest [
 { #category : #'import - merge request' }
 GLPHModelImporter >> importMergeRequestCommits: aGLPHEMergeRequest [
 
-	| results page commits parseResult |
+	| commits result |
 	aGLPHEMergeRequest commits ifNotNil: [ ^ aGLPHEMergeRequest commits ].
-	page := 1.
-
-	parseResult := { nil }.
-	commits := OrderedCollection new.
-
-	[
-	results := repoApi
-		           commitsOfMergeRequest: aGLPHEMergeRequest iid
-		           ofProject: aGLPHEMergeRequest project id
-		           page: page
-		           perPage: 100.
-	parseResult := self parseCommitsResult: results.
-
-	commits addAll: parseResult.
-	page := page + 1 ] doWhileTrue: [ parseResult isNotEmpty ].
-
-
+	
+	result := self repoApi mergeRequests commitsOf: aGLPHEMergeRequest iid inProject: aGLPHEMergeRequest project id.
+	
+	commits := (result collect: [ :commitsJson | self parseCommitsResult: commitsJson ]) flattened.
 	commits := commits collect: [ :commit | self importCommit: commit id ofProject: aGLPHEMergeRequest project ].
 	aGLPHEMergeRequest commits: commits.
 
@@ -196,7 +164,7 @@ GLPHModelImporter >> importMergeRequestCommits: aGLPHEMergeRequest [
 	^ commits
 ]
 
-{ #category : #import }
+{ #category : #'import - merge request' }
 GLPHModelImporter >> importMergeRequestMergeCommits: aGLPHEMergeRequest [
 
 	| foundCommits |
@@ -236,8 +204,8 @@ GLPHModelImporter >> importMergeRequests: aGLHProject [
 	('Import merge request of Project: ' , aGLHProject id printString)
 		recordInfo.
 
-	results := self repoApi mergeRequestOfProject: aGLHProject id.
-	parsedResults := self parseMergeRequestResult: results.
+	results := self repoApi mergeRequests allOfProject: aGLHProject id.
+	parsedResults := (results collect: [ :projectsJson | self parseMergeRequestResult: projectsJson ]) flattened. 
 
 	aGLHProject mergeRequests
 		addAll: parsedResults
@@ -263,34 +231,31 @@ GLPHModelImporter >> importMergeRequests: aGLHProject [
 { #category : #'import - merge request' }
 GLPHModelImporter >> importMergeRequests: aGLHProject since: fromDate until: toDate [
 
-	| newlyFoundMR page foundMR |
+	| params result mergeRequests |
 	('import MR of Project ' , aGLHProject name) recordInfo.
+	params := {
+		          (#created_after
+		           ->
+		           (fromDate
+			            ifNotNil: [ fromDate asDateAndTime asString ]
+			            ifNil: [ '' ])).
+		          (#created_before
+		           ->
+		           (toDate
+			            ifNotNil: [ toDate asDateAndTime asString ]
+			            ifNil: [ '' ])).
+		          (#scope -> 'all') } asDictionary.
 
-	page := 0.
-	foundMR := OrderedCollection new.
-	newlyFoundMR := { true }.
-	[ newlyFoundMR isNotEmpty ] whileTrue: [
-		| results |
-		page := page + 1.
-		('import MR page ' , page printString) recordInfo.
-		results := self repoApi
-			           mergeRequestsOfProject: aGLHProject id
-			           createdAfter:
-			           (fromDate ifNotNil: [ fromDate asDate asDateAndTime asString ])
-			           createdBefore:
-			           (toDate ifNotNil: [ toDate asDate asDateAndTime asString ])
-			           authorId: nil
-			           authorUsername: nil
-			           scope: 'all'
-			           orderBy: 'created_at'
-			           page: page.
+	result := self repoApi mergeRequests
+		          allOfProject: aGLHProject id
+		          withParams: params.
+	mergeRequests := (result collect: [ :mergeRequestsJson |
+		                  self parseMergeRequestResult: mergeRequestsJson ])
+		                 flattened.
 
-
-		newlyFoundMR := aGLHProject mergeRequests
-			                addAll: (self parseMergeRequestResult: results)
-			                unless: self blockOnIdEquality.
-		foundMR addAll: newlyFoundMR ].
-
+	aGLHProject mergeRequests
+		addAll: mergeRequests
+		unless: self blockOnIdEquality.
 
 	"gets it related commits"
 	aGLHProject mergeRequests do: [ :mr |
@@ -300,9 +265,11 @@ GLPHModelImporter >> importMergeRequests: aGLHProject since: fromDate until: toD
 		aGLHProject mergeRequests do: [ :mr |
 			self importDiffOfMergeRequest: mr ] ].
 
-	self glhModel addAll: foundMR unless: (self blockEqualityOn: #iid).
+	self glhModel
+		addAll: mergeRequests
+		unless: (self blockEqualityOn: #iid).
 
-	^ foundMR
+	^ mergeRequests
 ]
 
 { #category : #'import - merge request' }
@@ -312,9 +279,7 @@ GLPHModelImporter >> importMergeResquestApprovals: aGLPHEMergeRequest [
 	(String streamContents: [ :str |
 		 str << 'Check approvals of '.
 		 aGLPHEMergeRequest printOn: str ]) recordInfo.
-	results := self repoApi
-		           approvalsOfMergeQuest: aGLPHEMergeRequest iid
-		           ofProject: aGLPHEMergeRequest project id.
+	results := self repoApi mergeRequests approvalsOf: aGLPHEMergeRequest iid inProject: aGLPHEMergeRequest project id.
 
 	parsedResult := generalReader
 		                on: results readStream;
@@ -333,13 +298,15 @@ GLPHModelImporter >> importMergeResquestAuthor: aGLPHEMergeRequest [
 	| authorID |
 	aGLPHEMergeRequest author ifNotNil: [ ^ aGLPHEMergeRequest author ].
 	authorID := aGLPHEMergeRequest cacheAt: #authorID ifAbsent: [
+		            | result |
+		            result := self repoApi mergeRequests
+			                      get: aGLPHEMergeRequest iid
+			                      inProject: aGLPHEMergeRequest project_id.
+
 		            (generalReader
-			             on: (self repoApi
-					              mergeRequestOfProject:
-						              aGLPHEMergeRequest project_id
-					              withId: aGLPHEMergeRequest iid) readStream;
+			             on: result readStream;
 			             next) at: #author at: #id ].
-	aGLPHEMergeRequest author: (self importUser: authorID)
+	^aGLPHEMergeRequest author: (self importUser: authorID)
 ]
 
 { #category : #'import - merge request' }
@@ -349,25 +316,30 @@ GLPHModelImporter >> importMergeResquestMerger: aGLPHEMergeRequest [
 	aGLPHEMergeRequest merge_user ifNotNil: [
 		^ aGLPHEMergeRequest merge_user ].
 	authorID := aGLPHEMergeRequest cacheAt: #mergeUserID ifAbsent: [
+		            | result |
+		            result := self repoApi mergeRequests
+			                      get: aGLPHEMergeRequest iid
+			                      inProject: aGLPHEMergeRequest project_id.
 		            (generalReader
-			             on: (self repoApi
-					              mergeRequestOfProject:
-						              aGLPHEMergeRequest project_id
-					              withId: aGLPHEMergeRequest iid) readStream;
+			             on: result readStream;
 			             next)
 			            at: #merge_user
 			            ifPresent: [ :mergeUser |
 			            mergeUser ifNotNil: [ :mruser | mruser at: #id ] ] ].
-	aGLPHEMergeRequest merge_user: (self importUser: authorID)
+	^aGLPHEMergeRequest merge_user: (self importUser: authorID)
 ]
 
-{ #category : #'private - api' }
+{ #category : #'import - projects' }
 GLPHModelImporter >> importProject: aProjectID [
 
 	| result projectResult |
 	('Import project with id:  ' , aProjectID printString) recordInfo.
 
-	result := self repoApi project: aProjectID.
+	(glhModel allWithType: GLHProject)
+		detect: [ :project | project id = aProjectID ]
+		ifOne: [ :project | ^ project ].
+
+	result := self repoApi projects get: aProjectID.
 	projectResult := self parseProjectResult: result.
 
 	^ self completeImportProject: projectResult
@@ -397,14 +369,14 @@ GLPHModelImporter >> initialize [
 	withCommitDiffs := true
 ]
 
-{ #category : #parsing }
+{ #category : #'private - parsing' }
 GLPHModelImporter >> parseMergeRequestResult: result [
 
 	generalReader on: result readStream.
 	^ generalReader nextAs: #ArrayOfMergeRequest
 ]
 
-{ #category : #parsing }
+{ #category : #'private - parsing' }
 GLPHModelImporter >> parseProjectResult: aResult [ 
 		| reader |
 	reader := NeoJSONReader on: aResult readStream.
