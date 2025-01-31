@@ -58,6 +58,7 @@ GLHModelImporter >> chainsCommitsFrom: commitsCollection [
 	^ commitsCollection
 ]
 
+
 { #category : #'import - projects' }
 GLHModelImporter >> completeImportProject: aGLHProject [
 
@@ -409,6 +410,7 @@ GLHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName since:
 	  #ref_name -> aGLHBranch name.
 	  #since ->  (fromDate ifNotNil: [ fromDate asDate asDateAndTime asString ] ifNil: [ '' ]).
 	  #until -> (toDate ifNotNil: [ toDate asDate asDateAndTime asString ] ifNil: [ '' ]). 
+
 	} asDictionary.
 	result := self repoApi commits getAllInProject: aGLHBranch repository project id withParams: params.
 	
@@ -465,6 +467,7 @@ GLHModelImporter >> importCommitsOfProject: aProject since: fromDate until: toDa
 
 	^ self glhModel addAll: allCommits unless: self blockOnIdEquality
 ]
+
 
 { #category : #'import - projects' }
 GLHModelImporter >> importContributedProjectsOfUser: aGLHUser [
@@ -693,6 +696,7 @@ GLHModelImporter >> importProjects [
 	| result projects |
 	('import all Projects') recordInfo.
 
+
 	result := self repoApi projects all.
 	projects := (result collect: [ :projectsJson | self parseArrayOfProject: projectsJson ]) flattened.
 	
@@ -704,7 +708,13 @@ GLHModelImporter >> importProjects [
 { #category : #'import - projects' }
 GLHModelImporter >> importProjects: aCollectionOfProjectID [
 
-	^ aCollectionOfProjectID collect: [ :id | self importProject: id ]
+
+	result := self repoApi projects all.
+	projects := (result collect: [ :projectsJson | self parseArrayOfProject: projectsJson ]) flattened.
+	
+	self glhModel addAll: projects unless: self blockOnIdEquality.
+
+	^ projects
 ]
 
 { #category : #imports }
@@ -733,7 +743,11 @@ GLHModelImporter >> importProjectsSince: since [
 			                      unless: self blockOnIdEquality.
 		foundProject addAll: newlyFoundProjects ].
 
-	^ foundProject
+{ #category : #'import -projects' }
+GLHModelImporter >> importProjects: aCollectionOfProjectID [
+
+
+	^ aCollectionOfProjectID collect: [ :id | self importProject: id ]
 ]
 
 { #category : #'import - repositories' }
