@@ -5,7 +5,7 @@ Class {
 		'user',
 		'names'
 	],
-	#category : 'GitLabHealth-Model-Analysis'
+	#category : #'GitLabHealth-Model-Analysis'
 }
 
 { #category : #initialization }

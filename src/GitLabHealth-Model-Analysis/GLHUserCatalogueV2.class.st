@@ -1,7 +1,7 @@
 Class {
 	#name : #GLHUserCatalogueV2,
 	#superclass : #GLHUserCatalogue,
-	#category : 'GitLabHealth-Model-Analysis'
+	#category : #'GitLabHealth-Model-Analysis'
 }
 
 { #category : #import }
