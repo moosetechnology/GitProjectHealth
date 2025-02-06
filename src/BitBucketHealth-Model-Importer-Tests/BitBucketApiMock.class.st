@@ -1,5 +1,5 @@
 Class {
-	#name : #BitbucketApiMock,
+	#name : #BitBucketApiMock,
 	#superclass : #Object,
 	#instVars : [
 		'userMock',
@@ -11,7 +11,7 @@ Class {
 }
 
 { #category : #'mock - commits' }
-BitbucketApiMock >> commit2 [
+BitBucketApiMock >> commit2 [
 
 	| commits2 |
 	commits2 := '
@@ -43,13 +43,13 @@ BitbucketApiMock >> commit2 [
 ]
 
 { #category : #ressources }
-BitbucketApiMock >> commits [
+BitBucketApiMock >> commits [
 
 	^ BitBucketCommitsMock new commitsMock: commitsMock; diffs: diffs.
 ]
 
 { #category : #'mock - commits' }
-BitbucketApiMock >> commits1 [
+BitBucketApiMock >> commits1 [
 
 	| commits1 |
 	commits1 := '[
@@ -81,19 +81,19 @@ BitbucketApiMock >> commits1 [
 ]
 
 { #category : #'mock - commits' }
-BitbucketApiMock >> commitsMock [
+BitBucketApiMock >> commitsMock [
 
 	^ commitsMock
 ]
 
 { #category : #'mock - commits' }
-BitbucketApiMock >> commitsMock: anObject [
+BitBucketApiMock >> commitsMock: anObject [
 
 	commitsMock := anObject
 ]
 
 { #category : #'mock - mergeRequests' }
-BitbucketApiMock >> declinedMergeRequest [
+BitBucketApiMock >> declinedMergeRequest [
 
 	| pullRequest |
 	pullRequest := '{
@@ -289,13 +289,13 @@ BitbucketApiMock >> declinedMergeRequest [
 ]
 
 { #category : #'mock - diffs' }
-BitbucketApiMock >> diffs [
+BitBucketApiMock >> diffs [
 
 	^ diffs
 ]
 
 { #category : #'mock - diffs' }
-BitbucketApiMock >> diffs1 [
+BitBucketApiMock >> diffs1 [
 
 	| diffs1 |
 	diffs1 := '{
@@ -392,13 +392,13 @@ BitbucketApiMock >> diffs1 [
 ]
 
 { #category : #'mock - diffs' }
-BitbucketApiMock >> diffs: anObject [
+BitBucketApiMock >> diffs: anObject [
 
 	diffs := anObject
 ]
 
 { #category : #'mock - diffs' }
-BitbucketApiMock >> diffsNohunks [
+BitBucketApiMock >> diffsNohunks [
 
 	| diffs1 |
 	diffs1 := '{
@@ -429,7 +429,7 @@ BitbucketApiMock >> diffsNohunks [
 ]
 
 { #category : #'mock - diffs' }
-BitbucketApiMock >> diffsWithoutAdded [
+BitBucketApiMock >> diffsWithoutAdded [
 
 	| diffsWithoutAdded |
 	diffsWithoutAdded := '{
@@ -527,7 +527,7 @@ BitbucketApiMock >> diffsWithoutAdded [
 ]
 
 { #category : #'mock - diffs' }
-BitbucketApiMock >> diffsWithoutHunks [
+BitBucketApiMock >> diffsWithoutHunks [
 
 	| diffsWithoutHunks |
 	diffsWithoutHunks := '{
@@ -567,7 +567,7 @@ BitbucketApiMock >> diffsWithoutHunks [
 ]
 
 { #category : #'mock - diffs' }
-BitbucketApiMock >> diffsWithoutRemoved [
+BitBucketApiMock >> diffsWithoutRemoved [
 
 	| diffsWithoutRemoved |
 	diffsWithoutRemoved := '{
@@ -653,7 +653,7 @@ BitbucketApiMock >> diffsWithoutRemoved [
 ]
 
 { #category : #initialization }
-BitbucketApiMock >> initialize [
+BitBucketApiMock >> initialize [
 
 	commitsMock := self commits1.
 	diffs := self diffs1.
@@ -662,19 +662,19 @@ BitbucketApiMock >> initialize [
 ]
 
 { #category : #'mock - mergeRequests' }
-BitbucketApiMock >> mergeRequests [
+BitBucketApiMock >> mergeRequests [
 
 	^ mergeRequests
 ]
 
 { #category : #'mock - mergeRequests' }
-BitbucketApiMock >> mergeRequests: anObject [
+BitBucketApiMock >> mergeRequests: anObject [
 
 	mergeRequests := anObject
 ]
 
 { #category : #'mock - mergeRequests' }
-BitbucketApiMock >> mergedMergeRequest [
+BitBucketApiMock >> mergedMergeRequest [
 
 	| pullRequest |
 	pullRequest := '{
@@ -870,7 +870,7 @@ BitbucketApiMock >> mergedMergeRequest [
 ]
 
 { #category : #'mock - mergeRequests' }
-BitbucketApiMock >> openedMergeRequest [
+BitBucketApiMock >> openedMergeRequest [
 
 	| pullRequest |
 	pullRequest := '{
@@ -1065,13 +1065,13 @@ BitbucketApiMock >> openedMergeRequest [
 ]
 
 { #category : #ressources }
-BitbucketApiMock >> projects [
+BitBucketApiMock >> projects [
 
 	^BitBucketProjectsMock new
 ]
 
 { #category : #'mock - projects' }
-BitbucketApiMock >> projectsMock [
+BitBucketApiMock >> projectsMock [
 
 	| projects |
 	projects := '[
@@ -1095,7 +1095,7 @@ BitbucketApiMock >> projectsMock [
 ]
 
 { #category : #'mock - mergeRequests' }
-BitbucketApiMock >> pullRequestActivities [
+BitBucketApiMock >> pullRequestActivities [
 
 	| pullRequestActivities |
 	pullRequestActivities := '
@@ -1126,18 +1126,18 @@ BitbucketApiMock >> pullRequestActivities [
 ]
 
 { #category : #ressources }
-BitbucketApiMock >> pullRequests [
+BitBucketApiMock >> pullRequests [
 
 	^ BitbucketPullRequestsMock new mergeRequests: mergeRequests.
 ]
 
 { #category : #ressources }
-BitbucketApiMock >> repositories [
+BitBucketApiMock >> repositories [
 	^BitbucketRepositoriesMock new.
 ]
 
 { #category : #'mock - repositories' }
-BitbucketApiMock >> repositoriesMock [
+BitBucketApiMock >> repositoriesMock [
 
 	| repos |
 	repos := '[
@@ -1177,7 +1177,7 @@ BitbucketApiMock >> repositoriesMock [
 ]
 
 { #category : #'mock - users' }
-BitbucketApiMock >> user1 [
+BitBucketApiMock >> user1 [
 
 	| user1 |
 	user1 := '
@@ -1209,7 +1209,7 @@ BitbucketApiMock >> user1 [
 ]
 
 { #category : #'mock - users' }
-BitbucketApiMock >> user: accountId [
+BitBucketApiMock >> user: accountId [
 
 	| user |
 	user := '{
@@ -1224,19 +1224,19 @@ BitbucketApiMock >> user: accountId [
 ]
 
 { #category : #'mock - users' }
-BitbucketApiMock >> userMock [
+BitBucketApiMock >> userMock [
 
 	^ userMock
 ]
 
 { #category : #'mock - users' }
-BitbucketApiMock >> userMock: anObject [
+BitBucketApiMock >> userMock: anObject [
 
 	userMock := anObject
 ]
 
 { #category : #ressources }
-BitbucketApiMock >> users [
+BitBucketApiMock >> users [
 
 	^ BitbucketUsersMock new userMock: userMock.
 ]
