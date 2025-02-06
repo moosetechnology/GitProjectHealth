@@ -1,11 +1,11 @@
 Class {
-	#name : #BitBucketUsersMock,
+	#name : #BitbucketUsersMock,
 	#superclass : #BitBucketApiMock,
 	#category : #'BitBucketHealth-Model-Importer-Tests'
 }
 
 { #category : #api }
-BitBucketUsersMock >> allWithParams: paramsDict [
+BitbucketUsersMock >> allWithParams: paramsDict [
 
 	userMock ifNil: [ ^Array new ] ifNotNil: [ ^{ userMock }]
 ]

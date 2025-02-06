@@ -1238,5 +1238,5 @@ BitBucketApiMock >> userMock: anObject [
 { #category : #ressources }
 BitBucketApiMock >> users [
 
-	^ BitBucketUsersMock new userMock: userMock.
+	^ BitbucketUsersMock new userMock: userMock.
 ]
