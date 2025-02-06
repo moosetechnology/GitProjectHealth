@@ -1,11 +1,11 @@
 Class {
-	#name : #BitbucketProjectsMock,
+	#name : #BitBucketProjectsMock,
 	#superclass : #BitbucketApiMock,
 	#category : #'BitBucketHealth-Model-Importer-Tests'
 }
 
 { #category : #accessing }
-BitbucketProjectsMock >> all [
+BitBucketProjectsMock >> all [
 
 	^self projectsMock
 ]

@@ -1067,7 +1067,7 @@ BitbucketApiMock >> openedMergeRequest [
 { #category : #ressources }
 BitbucketApiMock >> projects [
 
-	^BitbucketProjectsMock new
+	^BitBucketProjectsMock new
 ]
 
 { #category : #'mock - projects' }
