@@ -1,23 +1,23 @@
 Class {
-	#name : #BitBucketPullRequestsMock,
-	#superclass : #BitBucketApiMock,
+	#name : #BitbucketPullRequestsMock,
+	#superclass : #BitbucketApiMock,
 	#category : #'BitBucketHealth-Model-Importer-Tests'
 }
 
 { #category : #'api - get' }
-BitBucketPullRequestsMock >> activitiesOf: pullRequestId inRepository: repositorySlug ofProject: projectKey [
+BitbucketPullRequestsMock >> activitiesOf: pullRequestId inRepository: repositorySlug ofProject: projectKey [
 
 		^ self pullRequestActivities
 ]
 
 { #category : #'api - get' }
-BitBucketPullRequestsMock >> allSince: since until: until withParams: paramsDictionary inRepository: repositorySlug ofProject: projectKey [
+BitbucketPullRequestsMock >> allSince: since until: until withParams: paramsDictionary inRepository: repositorySlug ofProject: projectKey [
 
 	^ mergeRequests
 ]
 
 { #category : #'api - get' }
-BitBucketPullRequestsMock >> commitsOf: pullRequestId inRepository: repositorySlug ofProject: projectKey [
+BitbucketPullRequestsMock >> commitsOf: pullRequestId inRepository: repositorySlug ofProject: projectKey [
 
 		^ commitsMock
 ]

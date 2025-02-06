@@ -1,6 +1,6 @@
 Class {
 	#name : #BitbucketUsersMock,
-	#superclass : #BitBucketApiMock,
+	#superclass : #BitbucketApiMock,
 	#category : #'BitBucketHealth-Model-Importer-Tests'
 }
 

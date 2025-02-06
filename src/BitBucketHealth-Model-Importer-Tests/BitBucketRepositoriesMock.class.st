@@ -1,11 +1,11 @@
 Class {
-	#name : #BitBucketRepositoriesMock,
-	#superclass : #BitBucketApiMock,
+	#name : #BitbucketRepositoriesMock,
+	#superclass : #BitbucketApiMock,
 	#category : #'BitBucketHealth-Model-Importer-Tests'
 }
 
 { #category : #'api - get' }
-BitBucketRepositoriesMock >> allInProject: projectKey [
+BitbucketRepositoriesMock >> allInProject: projectKey [
 
 	^self repositoriesMock.
 ]
