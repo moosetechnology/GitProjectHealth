@@ -178,8 +178,12 @@ BitBucketModelImporter >> importAndLoadLatestsCommitsOfProject: aGLHProject [
 BitBucketModelImporter >> importCommitsOfProject: aGLHProject since: since until: until [
 
 	| commits |
-	commits := self repoApi commits allSince: since until: until inRepository: aGLHProject id ofProject: aGLHProject group id.
-	
+	commits := self repoApi commits
+		           allSince: since
+		           until: until
+		           inRepository: aGLHProject id
+		           ofProject: aGLHProject group id.
+		
 	commits := commits collect: [ :commit |
 		           self
 			           parseCommitIntoGLHCommit: commit
