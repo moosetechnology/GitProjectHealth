@@ -178,17 +178,12 @@ BitBucketModelImporter >> importAndLoadLatestsCommitsOfProject: aGLHProject [
 BitBucketModelImporter >> importCommitsOfProject: aGLHProject since: since until: until [
 
 	| commits |
-	commits := self repoApi
-		           commitsOfRepoProjectId: aGLHProject id
-		           inProjectGroupId: aGLHProject group id
-		           since: since
-		           until: until.
-
+	commits := self repoApi commits allSince: since until: until inRepository: aGLHProject id ofProject: aGLHProject group id.
+	
 	commits := commits collect: [ :commit |
-		     
-		           self parseCommitIntoGLHCommit: commit ofProject: aGLHProject.
-
-		         ].
+		           self
+			           parseCommitIntoGLHCommit: commit
+			           ofProject: aGLHProject ].
 
 
 	commits := self glhModel
@@ -204,22 +199,18 @@ BitBucketModelImporter >> importContributedProjectsOfUser: aGLHUser [
 
 	| projects repositories repositoriesCommits userRepositories userProjects |
 	"get all projects"
-	projects := self repoApi projects.
+	projects := self repoApi projects all.
 
 	"get all repos of projects"
 	repositories := projects flatCollect: [ :project |
-		                self repoApi repositoryProjectsOfProjectGroupId:
+		                self repoApi repositories allInProject:
 			                (project at: #key) ].
 
 
 	"get all commits of repo"
 	repositoriesCommits := repositories collect: [ :repository |
-		                       repository -> (self repoApi
-			                        commitsOfRepoProjectId: (repository at: #slug)
-			                        inProjectGroupId:
-			                        ((repository at: #project) at: #key)
-			                        since: DateAndTime now - 10 days
-			                        until: DateAndTime now) ].
+		                       repository -> (self repoApi commits allSince: DateAndTime now - 10 days until: DateAndTime now inRepository: (repository at: #slug) ofProject:  ((repository at: #project) at: #key))
+			                         ].
 
 
 	"look if user is author of min one commit"

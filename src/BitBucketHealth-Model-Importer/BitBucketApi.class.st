@@ -81,43 +81,6 @@ BitBucketApi >> client: anObject [
 	client := anObject
 ]
 
-{ #category : #'api - commits' }
-BitBucketApi >> commitsOfRepoProjectId: repositorySlug inProjectGroupId: projectKey since: since until: until [
-	"/rest/api/1.0/projects/{projectKey}/repos/{repositorySlug}/commits"
-
-	| results lastDate lastCommitterTimestamp commits |
-	self prepareZnClient.
-	self client path:
-		self basePath , '/projects/' , projectKey , '/repos/'
-		, repositorySlug , '/commits'.
-	"self client queryAt: 'merges' put: 'exclude'."
-
-	commits := OrderedCollection new.
-
-	[
-	results := self client get.
-	results := (NeoJSONReader on: results readStream) next.
-	commits addAll: (results at: #values).
-	results
-		at: #nextPageStart
-		ifPresent: [
-		client queryAt: #start put: (results at: #nextPageStart) ].
-
-	(results at: #isLastPage)
-		ifTrue: [ false ]
-		ifFalse: [
-			lastCommitterTimestamp := commits last at: #authorTimestamp.
-			lastDate := DateAndTime fromUnixTime: lastCommitterTimestamp / 1000.
-			since asDate <= lastDate ] ] whileTrue.
-
-	^ commits select: [ :commit |
-		  | commitDate |
-		  commitDate := DateAndTime fromUnixTime:
-			                (commit at: #authorTimestamp) / 1000.
-		  commitDate >= since asDateAndTime and:
-			  commitDate <= until asDateAndTime ]
-]
-
 { #category : #accessing }
 BitBucketApi >> endpoint [
 
@@ -155,28 +118,6 @@ BitBucketApi >> prepareZnClient [
 	self apiToken ifNotNil: [ :anApiKey |
 		client headerAt: #Authorization put: 'Basic '
 			, (self username , ':' , self apiToken) utf8Encoded base64Encoded ].
-]
-
-{ #category : #'api - projects' }
-BitBucketApi >> projects [
-	"/rest/api/1.0/projects"
-
-	^ self allValuesOfPath: self basePath , '/projects'.
-]
-
-{ #category : #'api - projects' }
-BitBucketApi >> repositoryProjectsOfProjectGroupId: projectKey [
-	^self allValuesOfPath: self basePath, '/projects/', projectKey, '/repos'.
-]
-
-{ #category : #'api - user' }
-BitBucketApi >> user: accountId [
-	"https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/#api-user-get"
-
-	self prepareZnClient.
-	
-	self client path: self basePath, '/user/' , accountId printString.
-	^ self client get
 ]
 
 { #category : #accessing }
