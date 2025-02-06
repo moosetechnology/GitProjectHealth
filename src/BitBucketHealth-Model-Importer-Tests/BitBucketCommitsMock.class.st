@@ -1,11 +1,11 @@
 Class {
-	#name : #BitbucketCommitsMock,
+	#name : #BitBucketCommitsMock,
 	#superclass : #BitbucketApiMock,
 	#category : #'BitBucketHealth-Model-Importer-Tests'
 }
 
 { #category : #'api - get' }
-BitbucketCommitsMock >> allSince: since until: until inRepository: repositorySlug ofProject: projectKey [
+BitBucketCommitsMock >> allSince: since until: until inRepository: repositorySlug ofProject: projectKey [
 
 	^ self commitsMock select: [ :commit |
 		  | commitDate |
@@ -16,7 +16,7 @@ BitbucketCommitsMock >> allSince: since until: until inRepository: repositorySlu
 ]
 
 { #category : #'api - get' }
-BitbucketCommitsMock >> diffOf: commitId inRepository: repositorySlug ofProject: projectKey [
+BitBucketCommitsMock >> diffOf: commitId inRepository: repositorySlug ofProject: projectKey [
 
 		^ diffs
 ]

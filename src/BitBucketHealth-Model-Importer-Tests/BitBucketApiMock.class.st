@@ -45,7 +45,7 @@ BitbucketApiMock >> commit2 [
 { #category : #ressources }
 BitbucketApiMock >> commits [
 
-	^ BitbucketCommitsMock new commitsMock: commitsMock; diffs: diffs.
+	^ BitBucketCommitsMock new commitsMock: commitsMock; diffs: diffs.
 ]
 
 { #category : #'mock - commits' }
