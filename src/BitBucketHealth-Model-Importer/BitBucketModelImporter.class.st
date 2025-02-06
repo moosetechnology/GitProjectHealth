@@ -299,13 +299,12 @@ BitBucketModelImporter >> importDiffOfCommit: aCommit [
 BitBucketModelImporter >> importMergeRequestCommits: mergeRequest [
 
 	| commits |
-	commits := self repoApi
-		           commitsOfPullRequest: mergeRequest id
-		           ofRepoProjectId: mergeRequest project id
-		           inProjectGroupId: mergeRequest project group id.
+	commits := self repoApi pullRequests commitsOf: mergeRequest id inRepository: mergeRequest project id ofProject: mergeRequest project group id.
 
 	commits := commits collect: [ :commit |
-		           self parseCommitIntoGLHCommit: commit ofProject: mergeRequest project ].
+		           self
+			           parseCommitIntoGLHCommit: commit
+			           ofProject: mergeRequest project ].
 
 	mergeRequest commits: commits.
 
