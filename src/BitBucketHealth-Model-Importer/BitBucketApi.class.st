@@ -226,17 +226,3 @@ BitBucketApi >> username: anObject [
 
 	username := anObject
 ]
-
-{ #category : #'api - user' }
-BitBucketApi >> usersByUsername: usernameString [
-
-	| users |
-	self prepareZnClient.
-	self client path: self basePath , '/admin/users'.
-	self client queryAt: 'filter' put: usernameString.
-
-	users := self client get.
-	users := (NeoJSONReader on: users readStream) next.
-
-	^ (users at: #values)
-]

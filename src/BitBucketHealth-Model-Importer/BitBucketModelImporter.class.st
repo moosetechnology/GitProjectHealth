@@ -365,22 +365,17 @@ BitBucketModelImporter >> importMergeResquestMerger: mergeRequest [
 { #category : #'import - users' }
 BitBucketModelImporter >> importUserByUsername: username [
 
-	 
-
 	^ self userCatalogue collectUsernames at: username ifAbsent: [
-		|users glhUser user|
-		
-		users := self repoApi usersByUsername: username.
-		users ifEmpty: [ ^ nil ].
-		user := users first.
+		  | users glhUser user params|
+		  params := { #filter -> username } asDictionary. 
+		  users := self repoApi users allWithParams: params.
+		  users ifEmpty: [ ^ nil ].
+		  user := users first.
 
-		glhUser := self parseUserIntoGLHUser: user.
-		self glhModel add: glhUser unless: self blockOnIdEquality.
-		self userCatalogue addUser: glhUser withName: username. 
-		glhUser
-		 ].
-	
-	
+		  glhUser := self parseUserIntoGLHUser: user.
+		  self glhModel add: glhUser unless: self blockOnIdEquality.
+		  self userCatalogue addUser: glhUser withName: username.
+		  glhUser ]
 ]
 
 { #category : #parsing }

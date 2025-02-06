@@ -16,6 +16,12 @@ BitBucketApiMock >> activitiesOfPullRequest: pullRequestId inRepoProjectId: repo
 	^self pullRequestActivities
 ]
 
+{ #category : #api }
+BitBucketApiMock >> allWithParams: paramsDict [
+
+	userMock ifNil: [ ^ Array new ] ifNotNil: [ ^ { userMock } ]
+]
+
 { #category : #accessing }
 BitBucketApiMock >> commit2 [
 
@@ -1245,6 +1251,12 @@ BitBucketApiMock >> userMock [
 BitBucketApiMock >> userMock: anObject [
 
 	userMock := anObject
+]
+
+{ #category : #accessing }
+BitBucketApiMock >> users [
+
+	^ self
 ]
 
 { #category : #'api - user' }
