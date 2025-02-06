@@ -12,15 +12,6 @@ Class {
 	#category : #'BitBucketHealth-Model-Importer'
 }
 
-{ #category : #'api - pull-requests' }
-BitBucketApi >> activitiesOfPullRequest: pullRequestId inRepoProjectId: repositorySlug ofProjectGroupId: projectKey [
-
-	^ self allValuesOfPath:
-		  self basePath , '/projects/' , projectKey , '/repos/'
-		  , repositorySlug , '/pull-requests/' , pullRequestId printString
-		  , '/activities'
-]
-
 { #category : #'private - building' }
 BitBucketApi >> allValuesOfPath: path [
 

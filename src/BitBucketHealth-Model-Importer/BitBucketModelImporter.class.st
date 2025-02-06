@@ -343,10 +343,7 @@ BitBucketModelImporter >> importMergeResquestMerger: mergeRequest [
 	mergeRequest merge_user ifNotNil: [ ^ mergeRequest merge_user ].
 	mergeRequest state = 'merged' ifFalse: [ ^ nil ].
 
-	activities := self repoApi
-		              activitiesOfPullRequest: mergeRequest id
-		              inRepoProjectId: mergeRequest project id
-		              ofProjectGroupId: mergeRequest project group id.
+	activities := self repoApi pullRequests activitiesOf: mergeRequest id  inRepository: mergeRequest project id  ofProject: mergeRequest project group id.
 
 	mergeActivity := activities detect: [ :activity |
 		                 (activity at: #action) = 'MERGED' ].
