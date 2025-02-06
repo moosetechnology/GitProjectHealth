@@ -1133,7 +1133,7 @@ BitBucketApiMock >> pullRequests [
 
 { #category : #ressources }
 BitBucketApiMock >> repositories [
-	^BitbucketRepositoriesMock new.
+	^BitBucketRepositoriesMock new.
 ]
 
 { #category : #'mock - repositories' }
