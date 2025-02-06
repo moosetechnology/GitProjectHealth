@@ -16,6 +16,12 @@ BitBucketApiMock >> activitiesOfPullRequest: pullRequestId inRepoProjectId: repo
 	^self pullRequestActivities
 ]
 
+{ #category : #'api - get' }
+BitBucketApiMock >> allSince: since until: until withParams: paramsDictionary inRepository: repositorySlug ofProject: projectKey [
+
+	^ mergeRequests
+]
+
 { #category : #api }
 BitBucketApiMock >> allWithParams: paramsDict [
 
@@ -1146,6 +1152,12 @@ BitBucketApiMock >> pullRequestActivities [
 
 	^ pullRequestActivities := (NeoJSONReader on:
 		                            pullRequestActivities readStream) next
+]
+
+{ #category : #accessing }
+BitBucketApiMock >> pullRequests [
+
+	^ self
 ]
 
 { #category : #'api - pull-requests' }

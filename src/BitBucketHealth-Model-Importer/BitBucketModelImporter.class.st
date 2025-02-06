@@ -314,18 +314,19 @@ BitBucketModelImporter >> importMergeRequestCommits: mergeRequest [
 { #category : #'import - merge-requests' }
 BitBucketModelImporter >> importMergeRequests: aGLHProject since: fromDate until: toDate [
 
-	| pullRequests |
-	pullRequests := self repoApi
-		                pullRequestsOfRepoProjectId: aGLHProject id
-		                inProjectGroupId: aGLHProject group id
-		                since: fromDate
-		                until: toDate.
+	| pullRequests params |
+	params := { 
+		#state -> 'all'
+	 } asDictionary.
+	pullRequests := self repoApi pullRequests allSince: fromDate until: toDate withParams: params  inRepository: aGLHProject id ofProject: aGLHProject group id.
 
 	pullRequests := pullRequests collect: [ :pullRequest |
 		                self parsePullRequestIntoGLPHEMergeRequest:
 			                pullRequest ].
 
-	pullRequests := self glhModel addAll: pullRequests unless: self blockOnIdEquality.
+	pullRequests := self glhModel
+		                addAll: pullRequests
+		                unless: self blockOnIdEquality.
 
 	^ pullRequests
 ]
