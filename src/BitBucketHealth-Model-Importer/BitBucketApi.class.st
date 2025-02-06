@@ -9,7 +9,7 @@ Class {
 		'apiToken',
 		'username'
 	],
-	#category : 'BitBucketHealth-Model-Importer'
+	#category : #'BitBucketHealth-Model-Importer'
 }
 
 { #category : #'api - pull-requests' }
@@ -131,21 +131,6 @@ BitBucketApi >> commitsOfRepoProjectId: repositorySlug inProjectGroupId: project
 			                (commit at: #authorTimestamp) / 1000.
 		  commitDate >= since asDateAndTime and:
 			  commitDate <= until asDateAndTime ]
-]
-
-{ #category : #'api - commits' }
-BitBucketApi >> diffsOfCommit: commitID inRepoProjectId: repositorySlug inProjectGroupId: projectKey [
-
-	| results |
-	self prepareZnClient.
-
-	self client path:
-		self basePath , '/projects/' , projectKey , '/repos/'
-		, repositorySlug , '/commits/' , commitID , '/diff'.
-
-	results := self client get.
-
-	^ (NeoJSONReader on: results readStream) next
 ]
 
 { #category : #accessing }

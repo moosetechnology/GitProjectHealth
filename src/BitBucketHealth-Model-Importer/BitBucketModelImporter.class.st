@@ -280,10 +280,7 @@ BitBucketModelImporter >> importDiffOfCommit: aCommit [
 		'Diff already importer: ' , aCommit short_id printString recordInfo.
 		^ aCommit diffs ].
 	('Import diff of commit: ' , aCommit short_id printString) recordInfo.
-	result := self repoApi
-		          diffsOfCommit: aCommit id
-		          inRepoProjectId: aCommit repository project id
-		          inProjectGroupId: aCommit repository project group id.
+	result := self repoApi commits diffOf: aCommit id inRepository: aCommit repository project id  ofProject: aCommit repository project group id.
 
 	diffsResult := self convertBitBucketDiffToGitDiff: result.
 
@@ -400,10 +397,7 @@ BitBucketModelImporter >> parseCommitIntoGLHCommit: commitDictionary ofProject: 
 	parentIds := (commitDictionary at: #parents) collect: [ :parent |
 		             parent at: #id ].
 
-	commitDiffs := self repoApi
-		               diffsOfCommit: (commitDictionary at: #id)
-		               inRepoProjectId: aGLHProject id
-		               inProjectGroupId: aGLHProject group id.
+	commitDiffs := self repoApi commits diffOf: (commitDictionary at: #id) inRepository: aGLHProject id ofProject: aGLHProject group id.
 
 	contribution := self getContributionFromDiffs:
 		                (commitDiffs at: #diffs).
