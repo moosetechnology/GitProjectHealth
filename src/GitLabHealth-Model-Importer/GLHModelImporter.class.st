@@ -58,7 +58,6 @@ GLHModelImporter >> chainsCommitsFrom: commitsCollection [
 	^ commitsCollection
 ]
 
-
 { #category : #'import - projects' }
 GLHModelImporter >> completeImportProject: aGLHProject [
 
@@ -468,7 +467,6 @@ GLHModelImporter >> importCommitsOfProject: aProject since: fromDate until: toDa
 	^ self glhModel addAll: allCommits unless: self blockOnIdEquality
 ]
 
-
 { #category : #'import - projects' }
 GLHModelImporter >> importContributedProjectsOfUser: aGLHUser [
 
@@ -705,6 +703,13 @@ GLHModelImporter >> importProjects [
 	^ projects
 ]
 
+{ #category : #'import - projects' }
+GLHModelImporter >> importProjects: aCollectionOfProjectID [
+
+
+	^ aCollectionOfProjectID collect: [ :id | self importProject: id ]
+]
+
 { #category : #imports }
 GLHModelImporter >> importProjectsSince: since [
 	"heavy import of all projects"
@@ -730,13 +735,6 @@ GLHModelImporter >> importProjectsSince: since [
 			                      addAll: (self parseArrayOfProject: results)
 			                      unless: self blockOnIdEquality.
 		foundProject addAll: newlyFoundProjects ].
-]
-
-{ #category : #'import - projects' }
-GLHModelImporter >> importProjects: aCollectionOfProjectID [
-
-
-	^ aCollectionOfProjectID collect: [ :id | self importProject: id ]
 ]
 
 { #category : #'import - repositories' }
@@ -1149,8 +1147,10 @@ GLHModelImporter >> pipelinesOf: aProjectID [
 	| result |
 	('Search pipelines of: ' , aProjectID printString) recordInfo.
 	result := self repoApi pipelines getAllInProject: aProjectID.
-	"pipelinesOfProject: aProjectID."
-	^ (result collect: [ :pipelinesJson | self parsePipelinesResult: pipelinesJson ]) flattened
+	result isString ifTrue: [ ^ self parsePipelinesResult: result ].
+
+	^ (result collect: [ :pipelinesJson |
+			   self parsePipelinesResult: pipelinesJson ]) flattened
 ]
 
 { #category : #private }
