@@ -161,9 +161,10 @@ BaselineOfGitLabHealth >> definePackages: spec [
 		package: 'GitHubHealth-Model-Importer-Tests'
 		with: [ spec requires: #( 'GitHubHealth-Model-Importer' ) ].
 
-	"bitBucket"
+	"Bitbucket"
 	spec
-		package: 'BitBucketHealth-Model-Importer';
+		package: 'BitBucketHealth-Model-Importer'
+		with: [ spec requires: #( 'BitbucketPharoAPI' ) ];
 		package: 'BitBucketHealth-Model-Importer-Tests'
 		with: [ spec requires: #( 'BitBucketHealth-Model-Importer' ) ].
 
