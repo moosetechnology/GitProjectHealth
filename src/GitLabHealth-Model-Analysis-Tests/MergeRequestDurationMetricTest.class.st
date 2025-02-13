@@ -4,7 +4,7 @@ A MergeRequestDurationMetricTest is a test class for testing the behavior of Mer
 Class {
 	#name : #MergeRequestDurationMetricTest,
 	#superclass : #TestCase,
-	#category : 'GitLabHealth-Model-Analysis-Tests'
+	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }
@@ -21,19 +21,19 @@ MergeRequestDurationMetricTest >> testCalculate [
 	glhImporter mergeRequests: {
 			(GLHMergeRequest new
 				 author: user;
-				 created_at: '09-05-2024:00:00:00' asDateAndTime;
-				 merged_at: '09-05-2024:10:00:00' asDateAndTime).
+				 created_at: '2024-09-05:00:00:00' asDateAndTime;
+				 merged_at: '2024-09-05:10:00:00' asDateAndTime).
 			(GLHMergeRequest new
 				 author: user;
-				 created_at: '09-05-2024' asDate;
+				 created_at: '2024-09-05' asDate;
 				 merged_at: nil) }.
 
 
 	mergeRequestDuration := MergeRequestDurationMetric new
 		                        user: user;
 		                        glhImporter: glhImporter;
-		                        setPeriodSince: '09-04-2024'
-		                        until: '09-04-2024';
+		                        setPeriodSince: '2024-09-04'
+		                        until: '2024-09-04';
 		                        over: Week.
 
 	"When"
@@ -58,8 +58,8 @@ MergeRequestDurationMetricTest >> testCalculateNoMergeRequests [
 	mergeRequestDuration := MergeRequestDurationMetric new
 		                        user: user;
 		                        glhImporter: glhImporter;
-		                        setPeriodSince: '09-04-2024'
-		                        until: '09-04-2024';
+		                        setPeriodSince: '2024-09-04'
+		                        until: '2024-09-04';
 		                        over: Week.
 
 	"When"

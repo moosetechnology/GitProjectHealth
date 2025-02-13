@@ -4,7 +4,7 @@ A TimeBetweenCommitMetricTest is a test class for testing the behavior of TimeBe
 Class {
 	#name : #TimeBetweenCommitMetricTest,
 	#superclass : #TestCase,
-	#category : 'GitLabHealth-Model-Analysis-Tests'
+	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }
@@ -21,14 +21,14 @@ TimeBetweenCommitMetricTest >> testCalculate [
 	glhImporter commits: {
 			(GLHCommit new
 				 id: 1;
-				 created_at: '09-04-2024:01:00:00';
-				 committed_date: '09-04-2024:01:00:00' asDateAndTime;
+				 created_at: 	  '2024-09-04:01:00:00' asDateAndTime ;
+				 committed_date: '2024-09-04:01:00:00' asDateAndTime;
 				 commitCreator: user;
 				 additions: 5).
 			(GLHCommit new
 				 id: 2;
-				 created_at: '09-04-2024';
-				 committed_date: '09-05-2024' asDate;
+				 created_at: '2024-09-04' asDate;
+				 committed_date: '2024-09-05' asDate;
 				 commitCreator: user;
 				 additions: 5) }.
 
@@ -36,8 +36,8 @@ TimeBetweenCommitMetricTest >> testCalculate [
 	timeBetweenCommit := TimeBetweenCommitMetric new
 		                     user: user;
 		                     glhImporter: glhImporter;
-		                     setPeriodSince: '09-04-2024'
-		                     until: '09-04-2024';
+		                     setPeriodSince: '2024-09-04'
+		                     until: '2024-09-04';
 		                     over: Week.
 
 	"When"
@@ -63,8 +63,8 @@ TimeBetweenCommitMetricTest >> testCalculateNoCommits [
 	timeBetweenCommit := TimeBetweenCommitMetric new
 		                     user: user;
 		                     glhImporter: glhImporter;
-		                     setPeriodSince: '09-04-2024'
-		                     until: '09-04-2024';
+		                     setPeriodSince: '2024-09-04'
+		                     until: '2024-09-04';
 		                     over: Week.
 
 	"When"

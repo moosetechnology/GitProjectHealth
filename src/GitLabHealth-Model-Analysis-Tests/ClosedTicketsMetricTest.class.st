@@ -4,7 +4,7 @@ A ClosedTicketsMetricTest is a test class for testing the behavior of ClosedTick
 Class {
 	#name : #ClosedTicketsMetricTest,
 	#superclass : #TestCase,
-	#category : 'GitLabHealth-Model-Analysis-Tests'
+	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }
@@ -20,7 +20,7 @@ ClosedTicketsMetricTest >> testCalculate [
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
-			 created_at: '09-05-2024';
+			 created_at: '2024-09-05';
 			 title: '205 feat do something') }.
 
 	jiraImporter := JiraImporterMock new.
@@ -31,7 +31,7 @@ ClosedTicketsMetricTest >> testCalculate [
 		                user: user;
 		                glhImporter: glhImporter;
 		                jiraImporter: jiraImporter;
-		                setPeriodSince: '09-04-2024' until: '09-04-2024';
+		                setPeriodSince: '2024-09-04' until: '2024-09-04';
 		                over: Week.
 
 	"When"

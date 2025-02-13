@@ -4,7 +4,7 @@ A JiraTimeMRTimeDifferenceMetricTest is a test class for testing the behavior of
 Class {
 	#name : #JiraTimeMRTimeDifferenceMetricTest,
 	#superclass : #TestCase,
-	#category : 'GitLabHealth-Model-Analysis-Tests'
+	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }
@@ -20,13 +20,13 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculate [
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
-			 created_at: '09-05-2024';
-			 merged_at: '09-06-2024' asDate;
+			 created_at: '2024-09-05';
+			 merged_at: '2024-09-06' asDate;
 			 title: '205 feat do something') }.
 
 	glhImporter commits: { (GLHCommit new
 			 id: 1;
-			 created_at: '09-05-2024' asDate;
+			 created_at: '2024-09-05' asDate;
 			 commitCreator: user;
 			 deletions: 5) }.
 
@@ -40,8 +40,8 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculate [
 		                    user: user;
 		                    glhImporter: glhImporter;
 		                    jiraImporter: jiraImporter;
-		                    setPeriodSince: '09-04-2024'
-		                    until: '09-04-2024';
+		                    setPeriodSince: '2024-09-04'
+		                    until: '2024-09-04';
 		                    over: Week.
 
 	"When"
@@ -64,13 +64,13 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculate2PeriodWith1EmptyPeriod [
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
-			 created_at: '09-05-2024';
-			 merged_at: '09-06-2024' asDate;
+			 created_at: '2024-09-05';
+			 merged_at: '2024-09-06' asDate;
 			 title: '205 feat do something') }.
 
 	glhImporter commits: { (GLHCommit new
 			 id: 1;
-			 created_at: '09-05-2024' asDate;
+			 created_at: '2024-09-05' asDate;
 			 commitCreator: user;
 			 deletions: 5) }.
 
@@ -84,8 +84,8 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculate2PeriodWith1EmptyPeriod [
 		                    user: user;
 		                    glhImporter: glhImporter;
 		                    jiraImporter: jiraImporter;
-		                    setPeriodSince: '09-04-2024'
-		                    until: '09-09-2024';
+		                    setPeriodSince: '2024-09-04'
+		                    until: '2024-09-09';
 		                    over: Week.
 
 	"When"
@@ -114,8 +114,8 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculateNoMergeRequests [
 		                    user: user;
 		                    glhImporter: glhImporter;
 		                    jiraImporter: jiraImporter;
-		                    setPeriodSince: '09-04-2024'
-		                    until: '09-04-2024';
+		                    setPeriodSince: '2024-09-04'
+		                    until: '2024-09-04';
 		                    over: Week.
 
 	"When"
@@ -138,13 +138,13 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculateWithNoEstimatedTime [
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
-			 created_at: '09-05-2024';
-			 merged_at: '09-06-2024' asDate;
+			 created_at: '2024-09-05';
+			 merged_at: '2024-09-06' asDate;
 			 title: '205 feat do something') }.
 
 	glhImporter commits: { (GLHCommit new
 			 id: 1;
-			 created_at: '09-05-2024' asDate;
+			 created_at: '2024-09-05' asDate;
 			 commitCreator: user;
 			 deletions: 5) }.
 
@@ -156,8 +156,8 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculateWithNoEstimatedTime [
 		                    user: user;
 		                    glhImporter: glhImporter;
 		                    jiraImporter: jiraImporter;
-		                    setPeriodSince: '09-04-2024'
-		                    until: '09-04-2024';
+		                    setPeriodSince: '2024-09-04'
+		                    until: '2024-09-04';
 		                    over: Week.
 
 	"When"
@@ -180,13 +180,13 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculateWithTimeOriginalEstimateAndNo
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
-			 created_at: '09-05-2024';
-			 merged_at: '09-06-2024' asDate;
+			 created_at: '2024-09-05';
+			 merged_at: '2024-09-06' asDate;
 			 title: '205 feat do something') }.
 
 	glhImporter commits: { (GLHCommit new
 			 id: 1;
-			 created_at: '09-05-2024' asDate;
+			 created_at: '2024-09-05' asDate;
 			 commitCreator: user;
 			 deletions: 5) }.
 
@@ -200,8 +200,8 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculateWithTimeOriginalEstimateAndNo
 		                    user: user;
 		                    glhImporter: glhImporter;
 		                    jiraImporter: jiraImporter;
-		                    setPeriodSince: '09-04-2024'
-		                    until: '09-04-2024';
+		                    setPeriodSince: '2024-09-04'
+		                    until: '2024-09-04';
 		                    over: Week.
 
 	"When"

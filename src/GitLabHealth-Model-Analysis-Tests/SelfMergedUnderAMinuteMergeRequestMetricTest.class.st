@@ -4,7 +4,7 @@ A MergedMergeRequestWithoutReviewMetricTest is a test class for testing the beha
 Class {
 	#name : #SelfMergedUnderAMinuteMergeRequestMetricTest,
 	#superclass : #TestCase,
-	#category : 'GitLabHealth-Model-Analysis-Tests'
+	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }
@@ -23,21 +23,21 @@ SelfMergedUnderAMinuteMergeRequestMetricTest >> testCalculate [
 				 author: user;
 				 merge_user: user;
 				 reviewers: { user };
-				 created_at: '09-05-2024:00-00-00' asDateAndTime;
-				 merged_at: '09-05-2024:00-00-01' asDateAndTime).
+				 created_at: '2024-09-05:00-00-00' asDateAndTime;
+				 merged_at: '2024-09-05:00-00-01' asDateAndTime).
 			(GLHMergeRequest new
 				 author: user;
 				 merge_user: nil;
-				 created_at: '09-05-2024:00-00-00' asDateAndTime;
-				 merged_at: '09-05-2024:00-00-01' asDateAndTime) }.
+				 created_at: '2024-09-05:00-00-00' asDateAndTime;
+				 merged_at: '2024-09-05:00-00-01' asDateAndTime) }.
 
 
 	mergedMergeRequestWithoutReview := SelfMergedUnderAMinuteMergeRequestMetric
 		                                   new
 		                                   user: user;
 		                                   glhImporter: glhImporter;
-		                                   setPeriodSince: '09-04-2024'
-		                                   until: '09-04-2024';
+		                                   setPeriodSince: '2024-09-04'
+		                                   until: '2024-09-04';
 		                                   over: Week.
 
 	"When"
@@ -68,21 +68,21 @@ SelfMergedUnderAMinuteMergeRequestMetricTest >> testCalculateMergeButNotCreated 
 				 author: user2;
 				 merge_user: user;
 				 reviewers: { user };
-				 created_at: '09-05-2024:00-00-00' asDateAndTime;
-				 merged_at: '09-05-2024:00-00-01' asDateAndTime).
+				 created_at: '2024-09-05:00-00-00' asDateAndTime;
+				 merged_at: '2024-09-05:00-00-01' asDateAndTime).
 			(GLHMergeRequest new
 				 author: user;
 				 merge_user: nil;
-				 created_at: '09-05-2024:00-00-00' asDateAndTime;
-				 merged_at: '09-05-2024:00-00-01' asDateAndTime) }.
+				 created_at: '2024-09-05:00-00-00' asDateAndTime;
+				 merged_at: '2024-09-05:00-00-01' asDateAndTime) }.
 
 
 	mergedMergeRequestWithoutReview := SelfMergedUnderAMinuteMergeRequestMetric
 		                                   new
 		                                   user: user;
 		                                   glhImporter: glhImporter;
-		                                   setPeriodSince: '09-04-2024'
-		                                   until: '09-04-2024';
+		                                   setPeriodSince: '2024-09-04'
+		                                   until: '2024-09-04';
 		                                   over: Week.
 
 	"When"
@@ -108,8 +108,8 @@ SelfMergedUnderAMinuteMergeRequestMetricTest >> testCalculateNoMergeRequests [
 		                                   new
 		                                   user: user;
 		                                   glhImporter: glhImporter;
-		                                   setPeriodSince: '09-04-2024'
-		                                   until: '09-04-2024';
+		                                   setPeriodSince: '2024-09-04'
+		                                   until: '2024-09-04';
 		                                   over: Week.
 
 	"When"

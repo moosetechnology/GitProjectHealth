@@ -4,7 +4,7 @@ A PendingMergeRequestMetricTest is a test class for testing the behavior of Pend
 Class {
 	#name : #PendingMergeRequestMetricTest,
 	#superclass : #TestCase,
-	#category : 'GitLabHealth-Model-Analysis-Tests'
+	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #test }
@@ -22,7 +22,7 @@ PendingMergeRequestMetricTest >> testCalculate [
 			(GLHMergeRequest new
 				 author: user;
 				 merge_user: user;
-				 created_at: '09-05-2024:00-00-00' asDateAndTime;
+				 created_at: '2024-09-05:00-00-00' asDate asDateAndTime;
 				 state: 'opened'; 
 				 merged_at: nil).
 			 }.
@@ -32,8 +32,8 @@ PendingMergeRequestMetricTest >> testCalculate [
 		                                   new
 		                                   user: user;
 		                                   glhImporter: glhImporter;
-		                                   setPeriodSince: '09-01-2024'
-		                                   until: '09-07-2024';
+		                                   setPeriodSince: '2024-09-01'
+		                                   until: '2024-09-07';
 		                                   over: Week.
 
 	"When"
@@ -57,21 +57,21 @@ PendingMergeRequestMetricTest >> testCalculate1Pending1Closed [
 	glhImporter mergeRequests: {
 			(GLHMergeRequest new
 				 author: user;
-				 created_at: '09-05-2024:00-00-00' asDateAndTime;
+				 created_at: '2024-09-05:00-00-00' asDate asDateAndTime;
 				 state: 'opened';
 				 merged_at: nil).
 			(GLHMergeRequest new
 				 author: user;
-				 created_at: '09-01-2024:00-00-00' asDateAndTime;
+				 created_at: '2024-09-01:00-00-00' asDate asDateAndTime;
 				 state: 'closed';
-				 merged_at: '09-02-2024:00-00-00' asDateAndTime) }.
+				 merged_at: '2024-09-02:00-00-00' asDate asDateAndTime) }.
 
 
 	mergedMergeRequestPending := PendingMergeRequestMetric new
 		                             user: user;
 		                             glhImporter: glhImporter;
-		                             setPeriodSince: '09-01-2024'
-		                             until: '09-07-2024';
+		                             setPeriodSince: '2024-09-01'
+		                             until: '2024-09-07';
 		                             over: Week.
 
 	"When"
@@ -102,20 +102,20 @@ PendingMergeRequestMetricTest >> testCalculate1PendingByUser [
 	glhImporter mergeRequests: {
 			(GLHMergeRequest new
 				 author: user;
-				 created_at: '09-05-2024:00-00-00' asDateAndTime;
+				 created_at: '2024-09-05:00-00-00' asDateAndTime;
 				 state: 'opened';
 				 merged_at: nil).
 			(GLHMergeRequest new
 				 author: user2;
-				 created_at: '09-01-2024:00-00-00' asDateAndTime;
+				 created_at: '2024-09-01:00-00-00' asDateAndTime;
 				 state: 'opened';
 				 merged_at: nil) }.
 
 	mergedMergeRequestPending := PendingMergeRequestMetric new
 		                             user: user;
 		                             glhImporter: glhImporter;
-		                             setPeriodSince: '09-01-2024'
-		                             until: '09-07-2024';
+		                             setPeriodSince: '2024-09-01'
+		                             until: '2024-09-07';
 		                             over: Week.
 
 	"When"
@@ -146,20 +146,20 @@ PendingMergeRequestMetricTest >> testCalculate2Pending [
 	glhImporter mergeRequests: {
 			(GLHMergeRequest new
 				 author: user;
-				 created_at: '09-05-2024:00-00-00' asDateAndTime;
+				 created_at: '2024-09-05:00-00-00' asDateAndTime;
 				 state: 'opened';
 				 merged_at: nil).
 			(GLHMergeRequest new
 				 author: user;
-				 created_at: '09-02-2024:00-00-00' asDateAndTime;
+				 created_at: '2024-09-02:00-00-00' asDateAndTime;
 				 state: 'opened';
 				 merged_at: nil) }.
 
 	mergedMergeRequestPending := PendingMergeRequestMetric new
 		                             user: user;
 		                             glhImporter: glhImporter;
-		                             setPeriodSince: '09-01-2024'
-		                             until: '09-07-2024';
+		                             setPeriodSince: '2024-09-01'
+		                             until: '2024-09-07';
 		                             over: Week.
 
 	"When"

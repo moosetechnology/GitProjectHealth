@@ -4,7 +4,7 @@ A CodeDeletionMetricTest is a test class for testing the behavior of CodeDeletio
 Class {
 	#name : #CodeDeletionMetricTest,
 	#superclass : #TestCase,
-	#category : 'GitLabHealth-Model-Analysis-Tests'
+	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }
@@ -21,12 +21,12 @@ CodeDeletionMetricTest >> testCalculate [
 	glhImporter commits: {
 			(GLHCommit new
 				 id: 1;
-				 created_at: '04-09-2024';
+				 created_at: '2024-04-09';
 				 commitCreator: user;
 				 deletions: 5).
 			(GLHCommit new
 				 id: 2;
-				 created_at: '04-09-2024';
+				 created_at: '2024-04-09';
 				 commitCreator: user;
 				 deletions: 5) }.
 
@@ -34,7 +34,7 @@ CodeDeletionMetricTest >> testCalculate [
 	codeDeletion := CodeDeletionMetric new
 		                user: user;
 		                glhImporter: glhImporter;
-		                setPeriodSince: '04-09-2024' until: '04-09-2024';
+		                setPeriodSince: '2024-04-09' until: '2024-04-09';
 		                over: Week.
 
 	"When"
@@ -60,7 +60,7 @@ CodeDeletionMetricTest >> testCalculateNoCommits [
 	codeDeletion := CodeDeletionMetric new
 		                user: user;
 		                glhImporter: glhImporter;
-		                setPeriodSince: '04-09-2024' until: '04-09-2024';
+		                setPeriodSince: '2024-04-09' until: '2024-04-09';
 		                over: Week.
 
 	"When"

@@ -5,7 +5,7 @@ I am a try of normalization for the different importer.
 I also define some contract so it is easier to switch from one importer to another
 "
 Class {
-	#name : #GPModelImporter,
+	#name : #GitModelImporter,
 	#superclass : #Object,
 	#instVars : [
 		'withCommitsSince',
@@ -22,42 +22,42 @@ Class {
 }
 
 { #category : #'accessing - global variables' }
-GPModelImporter class >> importers [
+GitModelImporter class >> importers [
 	^ currentImporter 
 ]
 
 { #category : #initialization }
-GPModelImporter class >> reset [
+GitModelImporter class >> reset [
 	currentImporter := OrderedDictionary new.
 ]
 
 { #category : #accessing }
-GPModelImporter >> beWithFiles [
+GitModelImporter >> beWithFiles [
 
 	withFiles := true
 ]
 
 { #category : #accessing }
-GPModelImporter >> beWithoutFiles [
+GitModelImporter >> beWithoutFiles [
 
 	withFiles := false
 ]
 
 { #category : #'as yet unclassified' }
-GPModelImporter >> blockEqualityOn: aSymbol [
+GitModelImporter >> blockEqualityOn: aSymbol [
 	^ [ :existing :new |
 	  (existing perform: aSymbol) = (new perform: aSymbol) ]
 ]
 
 { #category : #equality }
-GPModelImporter >> blockForDiffEquality [
+GitModelImporter >> blockForDiffEquality [
 	^ [ :existing :new |
 			existing diffString size = new diffString size and: [
 				existing diffString = new diffString ] ]
 ]
 
 { #category : #'as yet unclassified' }
-GPModelImporter >> blockForDiffRangeEquality [
+GitModelImporter >> blockForDiffRangeEquality [
 
 	^ [ :existing :new |
 	  existing diff mooseID = new diff mooseID and: [
@@ -66,20 +66,20 @@ GPModelImporter >> blockForDiffRangeEquality [
 ]
 
 { #category : #equality }
-GPModelImporter >> blockOnIdEquality [
+GitModelImporter >> blockOnIdEquality [
 
 	^ [ :existing :new |
 	  existing id = new id ]
 ]
 
 { #category : #equality }
-GPModelImporter >> blockOnNameEquality [
+GitModelImporter >> blockOnNameEquality [
 
 	^ self blockEqualityOn: #name
 ]
 
 { #category : #commit }
-GPModelImporter >> chainsCommitsFrom: commitsCollection [
+GitModelImporter >> chainsCommitsFrom: commitsCollection [
 
 	| dic |
 	('Chains ' , commitsCollection size printString , ' commits')
@@ -101,7 +101,7 @@ GPModelImporter >> chainsCommitsFrom: commitsCollection [
 ]
 
 { #category : #commit }
-GPModelImporter >> completeImportedCommit: aGLHCommit [ 
+GitModelImporter >> completeImportedCommit: aGLHCommit [ 
 	
 	
 	('completing commit: ' , aGLHCommit short_id printString) recordInfo.
@@ -117,7 +117,7 @@ GPModelImporter >> completeImportedCommit: aGLHCommit [
 ]
 
 { #category : #'as yet unclassified' }
-GPModelImporter >> filterCommitChanges: aCollection [
+GitModelImporter >> filterCommitChanges: aCollection [
 
 	^ aCollection reject: [ :line |
 		  | trimmedLine |
@@ -128,19 +128,19 @@ GPModelImporter >> filterCommitChanges: aCollection [
 ]
 
 { #category : #accessing }
-GPModelImporter >> glhModel [
+GitModelImporter >> glhModel [
 
 	^ glhModel
 ]
 
 { #category : #accessing }
-GPModelImporter >> glhModel: anObject [
+GitModelImporter >> glhModel: anObject [
 
 	glhModel := anObject
 ]
 
 { #category : #import }
-GPModelImporter >> importDiffRangesForDiff: aGLHDiff [
+GitModelImporter >> importDiffRangesForDiff: aGLHDiff [
 
 	| diffRanges |
 	aGLHDiff diffRanges ifNotEmpty: [
@@ -159,7 +159,7 @@ GPModelImporter >> importDiffRangesForDiff: aGLHDiff [
 ]
 
 { #category : #initialization }
-GPModelImporter >> initialize [
+GitModelImporter >> initialize [
 
 	super initialize.
 	self withCommitsSince: (Date today - 1 week) asDateAndTime.
@@ -169,20 +169,20 @@ GPModelImporter >> initialize [
 ]
 
 { #category : #'as yet unclassified' }
-GPModelImporter >> makeGlobal [
+GitModelImporter >> makeGlobal [
 	^ self makeGlobal: DateAndTime now printString.
 ]
 
 { #category : #'as yet unclassified' }
-GPModelImporter >> makeGlobal: aLabel [ 
+GitModelImporter >> makeGlobal: aLabel [ 
 
-	currentImporter := GHModelImporter importers ifNil: [ OrderedDictionary new ].
+	currentImporter := GithubModelImporter importers ifNil: [ OrderedDictionary new ].
 	currentImporter at: aLabel put: self. 
 	^ currentImporter 
 ]
 
 { #category : #parsing }
-GPModelImporter >> parseDiffString: aDiff [
+GitModelImporter >> parseDiffString: aDiff [
 	"parse diff string to create entities for each lines"
 
 	| lines range index firstChangeRange |
@@ -225,61 +225,61 @@ GPModelImporter >> parseDiffString: aDiff [
 ]
 
 { #category : #accessing }
-GPModelImporter >> repoApi [
+GitModelImporter >> repoApi [
 
 	^ repoApi
 ]
 
 { #category : #accessing }
-GPModelImporter >> repoApi: anObject [
+GitModelImporter >> repoApi: anObject [
 
 	repoApi := anObject
 ]
 
 { #category : #accessing }
-GPModelImporter >> userCatalogue [
+GitModelImporter >> userCatalogue [
 	^ userCatalogue 
 ]
 
 { #category : #accessing }
-GPModelImporter >> userCatalogue: aGLHUserCatalogue [
+GitModelImporter >> userCatalogue: aGLHUserCatalogue [
 
 	userCatalogue := aGLHUserCatalogue.
 	aGLHUserCatalogue anImporter: self. 
 ]
 
 { #category : #accessing }
-GPModelImporter >> withCommitDiffs [
+GitModelImporter >> withCommitDiffs [
 
 	^ withCommitDiffs
 ]
 
 { #category : #accessing }
-GPModelImporter >> withCommitDiffs: anObject [
+GitModelImporter >> withCommitDiffs: anObject [
 
 	withCommitDiffs := anObject
 ]
 
 { #category : #accessing }
-GPModelImporter >> withCommitsSince [
+GitModelImporter >> withCommitsSince [
 
 	^ withCommitsSince
 ]
 
 { #category : #accessing }
-GPModelImporter >> withCommitsSince: anObject [
+GitModelImporter >> withCommitsSince: anObject [
 
 	withCommitsSince := anObject
 ]
 
 { #category : #accessing }
-GPModelImporter >> withFiles [
+GitModelImporter >> withFiles [
 
 	^ withFiles
 ]
 
 { #category : #accessing }
-GPModelImporter >> withFiles: anObject [
+GitModelImporter >> withFiles: anObject [
 
 	withFiles := anObject
 ]

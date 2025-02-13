@@ -1,11 +1,11 @@
 Class {
-	#name : #GLPHModelImporter,
-	#superclass : #GLHModelImporter,
+	#name : #GitlabWithMergeRequestModelImporter,
+	#superclass : #GitlabModelImporter,
 	#category : #'GitLabProjectHealth-Model-Importer'
 }
 
 { #category : #commit }
-GLPHModelImporter >> commitsOfProject: aGLHProject forRefName: refName until: toDate [
+GitlabWithMergeRequestModelImporter >> commitsOfProject: aGLHProject forRefName: refName until: toDate [
 
 	| newlyFoundCommit page |
 	page := 0.
@@ -45,7 +45,7 @@ GLPHModelImporter >> commitsOfProject: aGLHProject forRefName: refName until: to
 ]
 
 { #category : #'private - api' }
-GLPHModelImporter >> completeImportProject: aGLHProject [
+GitlabWithMergeRequestModelImporter >> completeImportProject: aGLHProject [
 	|completedProject|
 	completedProject := super completeImportProject: aGLHProject.
 
@@ -59,7 +59,7 @@ GLPHModelImporter >> completeImportProject: aGLHProject [
 ]
 
 { #category : #'private - configure reader' }
-GLPHModelImporter >> configureReaderForMergeRequest: reader [
+GitlabWithMergeRequestModelImporter >> configureReaderForMergeRequest: reader [
 	"declare quil y a un array a mapper"
 
 	reader for: #ArrayOfMergeRequest customDo: [ :customMappting |
@@ -108,7 +108,7 @@ GLPHModelImporter >> configureReaderForMergeRequest: reader [
 ]
 
 { #category : #import }
-GLPHModelImporter >> importCommitsOfBranch: aGLHBranch [
+GitlabWithMergeRequestModelImporter >> importCommitsOfBranch: aGLHBranch [
 
 	| commits |
 	"	result := self glhApi
@@ -128,7 +128,7 @@ GLPHModelImporter >> importCommitsOfBranch: aGLHBranch [
 ]
 
 { #category : #api }
-GLPHModelImporter >> importDiffOfCommit: aCommit [
+GitlabWithMergeRequestModelImporter >> importDiffOfCommit: aCommit [
 
 	super importDiffOfCommit: aCommit.
 	
@@ -139,7 +139,7 @@ GLPHModelImporter >> importDiffOfCommit: aCommit [
 ]
 
 { #category : #'as yet unclassified' }
-GLPHModelImporter >> importDiffOfMergeRequest: aMergeRequest [
+GitlabWithMergeRequestModelImporter >> importDiffOfMergeRequest: aMergeRequest [
 
 	| result diffsResult |
 	aMergeRequest diffs ifNotEmpty: [
@@ -168,7 +168,7 @@ GLPHModelImporter >> importDiffOfMergeRequest: aMergeRequest [
 ]
 
 { #category : #'import - merge request' }
-GLPHModelImporter >> importMergeRequestCommits: aGLPHEMergeRequest [
+GitlabWithMergeRequestModelImporter >> importMergeRequestCommits: aGLPHEMergeRequest [
 
 	| results page commits parseResult |
 	aGLPHEMergeRequest commits ifNotNil: [ ^ aGLPHEMergeRequest commits ].
@@ -197,7 +197,7 @@ GLPHModelImporter >> importMergeRequestCommits: aGLPHEMergeRequest [
 ]
 
 { #category : #import }
-GLPHModelImporter >> importMergeRequestMergeCommits: aGLPHEMergeRequest [
+GitlabWithMergeRequestModelImporter >> importMergeRequestMergeCommits: aGLPHEMergeRequest [
 
 	| foundCommits |
 	foundCommits := OrderedCollection new.
@@ -230,7 +230,7 @@ GLPHModelImporter >> importMergeRequestMergeCommits: aGLPHEMergeRequest [
 ]
 
 { #category : #'import - merge request' }
-GLPHModelImporter >> importMergeRequests: aGLHProject [
+GitlabWithMergeRequestModelImporter >> importMergeRequests: aGLHProject [
 
 	| results parsedResults mrs |
 	('Import merge request of Project: ' , aGLHProject id printString)
@@ -261,7 +261,7 @@ GLPHModelImporter >> importMergeRequests: aGLHProject [
 ]
 
 { #category : #'import - merge request' }
-GLPHModelImporter >> importMergeRequests: aGLHProject since: fromDate until: toDate [
+GitlabWithMergeRequestModelImporter >> importMergeRequests: aGLHProject since: fromDate until: toDate [
 
 	| newlyFoundMR page foundMR |
 	('import MR of Project ' , aGLHProject name) recordInfo.
@@ -306,7 +306,7 @@ GLPHModelImporter >> importMergeRequests: aGLHProject since: fromDate until: toD
 ]
 
 { #category : #'import - merge request' }
-GLPHModelImporter >> importMergeResquestApprovals: aGLPHEMergeRequest [
+GitlabWithMergeRequestModelImporter >> importMergeResquestApprovals: aGLPHEMergeRequest [
 
 	| results parsedResult |
 	(String streamContents: [ :str |
@@ -328,7 +328,7 @@ GLPHModelImporter >> importMergeResquestApprovals: aGLPHEMergeRequest [
 ]
 
 { #category : #'import - merge request' }
-GLPHModelImporter >> importMergeResquestAuthor: aGLPHEMergeRequest [
+GitlabWithMergeRequestModelImporter >> importMergeResquestAuthor: aGLPHEMergeRequest [
 
 	| authorID |
 	aGLPHEMergeRequest author ifNotNil: [ ^ aGLPHEMergeRequest author ].
@@ -343,7 +343,7 @@ GLPHModelImporter >> importMergeResquestAuthor: aGLPHEMergeRequest [
 ]
 
 { #category : #'import - merge request' }
-GLPHModelImporter >> importMergeResquestMerger: aGLPHEMergeRequest [
+GitlabWithMergeRequestModelImporter >> importMergeResquestMerger: aGLPHEMergeRequest [
 
 	| authorID |
 	aGLPHEMergeRequest merge_user ifNotNil: [
@@ -362,7 +362,7 @@ GLPHModelImporter >> importMergeResquestMerger: aGLPHEMergeRequest [
 ]
 
 { #category : #'private - api' }
-GLPHModelImporter >> importProject: aProjectID [
+GitlabWithMergeRequestModelImporter >> importProject: aProjectID [
 
 	| result projectResult |
 	('Import project with id:  ' , aProjectID printString) recordInfo.
@@ -374,7 +374,7 @@ GLPHModelImporter >> importProject: aProjectID [
 ]
 
 { #category : #'private - api' }
-GLPHModelImporter >> importRepository: aGLHRepository [
+GitlabWithMergeRequestModelImporter >> importRepository: aGLHRepository [
 
 	super importRepository: aGLHRepository.
 
@@ -384,28 +384,28 @@ GLPHModelImporter >> importRepository: aGLHRepository [
 ]
 
 { #category : #initialization }
-GLPHModelImporter >> initReader [
+GitlabWithMergeRequestModelImporter >> initReader [
 
 	super initReader.
 	self configureReaderForMergeRequest: generalReader
 ]
 
 { #category : #initialization }
-GLPHModelImporter >> initialize [
+GitlabWithMergeRequestModelImporter >> initialize [
 
 	super initialize.
 	withCommitDiffs := true
 ]
 
 { #category : #parsing }
-GLPHModelImporter >> parseMergeRequestResult: result [
+GitlabWithMergeRequestModelImporter >> parseMergeRequestResult: result [
 
 	generalReader on: result readStream.
 	^ generalReader nextAs: #ArrayOfMergeRequest
 ]
 
 { #category : #parsing }
-GLPHModelImporter >> parseProjectResult: aResult [ 
+GitlabWithMergeRequestModelImporter >> parseProjectResult: aResult [ 
 		| reader |
 	reader := NeoJSONReader on: aResult readStream.
 	reader for: GLHProject do: [ :mapping |
@@ -416,7 +416,7 @@ GLPHModelImporter >> parseProjectResult: aResult [
 ]
 
 { #category : #accessing }
-GLPHModelImporter >> withCommitsSince: someDays [
+GitlabWithMergeRequestModelImporter >> withCommitsSince: someDays [
 	"substract the current date with a given number of days. Use to retrieve the commits submit in the last giving days"
 
 	"(GLPHModelImporter new withCommitsSince: 1 week ) >>> (Date today - 1 week) asDateAndTime"

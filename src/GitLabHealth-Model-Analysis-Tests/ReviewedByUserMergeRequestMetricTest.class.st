@@ -4,7 +4,7 @@ A ReviewedByUserMergeRequestMetricTest is a test class for testing the behavior 
 Class {
 	#name : #ReviewedByUserMergeRequestMetricTest,
 	#superclass : #TestCase,
-	#category : 'GitLabHealth-Model-Analysis-Tests'
+	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #test }
@@ -27,19 +27,19 @@ ReviewedByUserMergeRequestMetricTest >> testCalculate [
 				 author: user;
 				 merge_user: user;
 				 reviewers: { user };
-				 created_at: '09-05-2024:00-00-00' asDateAndTime;
-				 merged_at: '09-05-2024:00-00-01' asDateAndTime).
+				 created_at: '2024-09-05:00-00-00' asDateAndTime;
+				 merged_at: '2024-09-05:00-00-01' asDateAndTime).
 			(GLHMergeRequest new
 				 author: user;
 				 merge_user: nil;
-				 created_at: '09-05-2024:00-00-00' asDateAndTime;
-				 merged_at: '09-05-2024:00-00-01' asDateAndTime) }.
+				 created_at: '2024-09-05:00-00-00' asDateAndTime;
+				 merged_at: '2024-09-05:00-00-01' asDateAndTime) }.
 
 
 	mergeRequests := ReviewedByUserMergeRequestMetric new
 		                 user: user;
 		                 glhImporter: glhImporter;
-		                 setPeriodSince: '09-04-2024' until: '09-04-2024';
+		                 setPeriodSince: '2024-09-04' until: '2024-09-04';
 		                 over: Week.
 
 	"When"
@@ -67,8 +67,8 @@ ReviewedByUserMergeRequestMetricTest >> testCalculateNoMergeRequests [
 		                                   new
 		                                   user: user;
 		                                   glhImporter: glhImporter;
-		                                   setPeriodSince: '09-04-2024'
-		                                   until: '09-04-2024';
+		                                   setPeriodSince: '2024-09-04'
+		                                   until: '2024-09-04';
 		                                   over: Week.
 
 	"When"
@@ -97,16 +97,16 @@ ReviewedByUserMergeRequestMetricTest >> testCalculateReviewButNotCreated [
 			 author: user2;
 			 merge_user: user2;
 			 reviewers: { user };
-			 created_at: '09-05-2024:00-00-00' asDateAndTime;
-			 merged_at: '09-05-2024:00-00-01' asDateAndTime) }.
+			 created_at: '2024-09-05:00-00-00' asDateAndTime;
+			 merged_at: '2024-09-05:00-00-01' asDateAndTime) }.
 
 
 	mergedMergeRequestWithoutReview := ReviewedByUserMergeRequestMetric
 		                                   new
 		                                   user: user;
 		                                   glhImporter: glhImporter;
-		                                   setPeriodSince: '09-04-2024'
-		                                   until: '09-04-2024';
+		                                   setPeriodSince: '2024-09-04'
+		                                   until: '2024-09-04';
 		                                   over: Week.
 
 	"When"
@@ -136,22 +136,22 @@ ReviewedByUserMergeRequestMetricTest >> testCalculateReviewByOther [
 				 author: user;
 				 merge_user: user;
 				 reviewers: { user2 };
-				 created_at: '09-05-2024:00-00-00' asDateAndTime;
-				 merged_at: '09-05-2024:00-00-01' asDateAndTime).
+				 created_at: '2024-09-05:00-00-00' asDateAndTime;
+				 merged_at: '2024-09-05:00-00-01' asDateAndTime).
 			(GLHMergeRequest new
 				 author: user;
 				 merge_user: user2;
 				 reviewers: { user2 };
-				 created_at: '09-05-2024:00-00-00' asDateAndTime;
-				 merged_at: '09-05-2024:00-00-01' asDateAndTime) }.
+				 created_at: '2024-09-05:00-00-00' asDateAndTime;
+				 merged_at: '2024-09-05:00-00-01' asDateAndTime) }.
 
 
 	mergedMergeRequestWithoutReview := ReviewedByUserMergeRequestMetric
 		                                   new
 		                                   user: user;
 		                                   glhImporter: glhImporter;
-		                                   setPeriodSince: '09-04-2024'
-		                                   until: '09-04-2024';
+		                                   setPeriodSince: '2024-09-04'
+		                                   until: '2024-09-04';
 		                                   over: Week.
 
 	"When"

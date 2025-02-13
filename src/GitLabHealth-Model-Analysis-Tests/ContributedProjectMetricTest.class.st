@@ -4,7 +4,7 @@ A ContributedProjectMetricTest is a test class for testing the behavior of Contr
 Class {
 	#name : #ContributedProjectMetricTest,
 	#superclass : #TestCase,
-	#category : 'GitLabHealth-Model-Analysis-Tests'
+	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }
@@ -22,14 +22,14 @@ ContributedProjectMetricTest >> testCalculate [
 	glhImporter commits: {
 			(GLHCommit new
 				 id: 1;
-				 created_at: '04-09-2024';
-				 committed_date: '04-09-2024';
+				 created_at: '2024-04-09';
+				 committed_date: '2024-04-09';
 				 commitCreator: user;
 				 repository: repository1).
 			(GLHCommit new
 				 id: 2;
-				 created_at: '04-09-2024';
-				 committed_date: '04-09-2024';
+				 created_at: '2024-04-09';
+				 committed_date: '2024-04-09';
 				 commitCreator: user;
 				 repository: repository1) }.
 
@@ -37,8 +37,8 @@ ContributedProjectMetricTest >> testCalculate [
 	contributedProject := ContributedProjectMetric new
 		                      user: user;
 		                      glhImporter: glhImporter;
-		                      setPeriodSince: '04-09-2024'
-		                      until: '04-09-2024';
+		                      setPeriodSince: '2024-04-09'
+		                      until: '2024-04-09';
 		                      over: Week.
 
 	"When"
@@ -65,8 +65,8 @@ ContributedProjectMetricTest >> testCalculateNoCommits [
 	contributedProject := ContributedProjectMetric new
 		                      user: user;
 		                      glhImporter: glhImporter;
-		                      setPeriodSince: '04-09-2024'
-		                      until: '04-09-2024';
+		                      setPeriodSince: '2024-04-09'
+		                      until: '2024-04-09';
 		                      over: Week.
 
 	"When"

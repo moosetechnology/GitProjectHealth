@@ -1,6 +1,6 @@
 Class {
 	#name : #BitBucketModelImporter,
-	#superclass : #GPModelImporter,
+	#superclass : #GitModelImporter,
 	#instVars : [
 		'withInitialCommits'
 	],

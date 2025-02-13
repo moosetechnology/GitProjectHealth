@@ -22,13 +22,13 @@ MergedMergeRequestMetricTest >> testCalculate [
 	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
 		    merge_user: user;
-			 created_at: '09-05-2024';
-			 merged_at: '09-05-2024').
+			 created_at: '2024-09-05';
+			 merged_at: '2024-09-05').
 			
 			(GLHMergeRequest new
 				author: user;
 				merge_user: user;
-				created_at: '09-02-2024';
+				created_at: '2024-09-02';
 			 	merged_at: nil)
 			}.
 
@@ -36,8 +36,8 @@ MergedMergeRequestMetricTest >> testCalculate [
 	mergedMergeRequest := MergedMergeRequestMetric new
 		                      user: user;
 		                      glhImporter: glhImporter;
-		                      setPeriodSince: '09-01-2024'
-		                      until: '09-07-2024';
+		                      setPeriodSince: '2024-09-01'
+		                      until: '2024-09-07';
 		                      over: Week.
 
 	"When"
@@ -63,23 +63,23 @@ MergedMergeRequestMetricTest >> testCalculate1MRInPeriod1Outside [
 			(GLHMergeRequest new
 				 author: user;
 				 merge_user: user;
-				 created_at: '09-05-2024';
-				 merged_at: '09-05-2024').
+				 created_at: '2024-09-05';
+				 merged_at: '2024-09-05').
 
 			"open but merged anotherWeek"
 			(GLHMergeRequest new
 				 author: user;
 				 merge_user: user;
-				 created_at: '09-05-2024';
-				 merged_at: '09-10-2024') }.
+				 created_at: '2024-09-05';
+				 merged_at: '2024-09-10') }.
 	"open and merge during the same week"
 
 
 	mergedMergeRequest := MergedMergeRequestMetric new
 		                      user: user;
 		                      glhImporter: glhImporter;
-		                      setPeriodSince: '09-01-2024'
-		                      until: '09-07-2024';
+		                      setPeriodSince: '2024-09-01'
+		                      until: '2024-09-07';
 		                      over: Week.
 
 	"When"
@@ -105,19 +105,19 @@ MergedMergeRequestMetricTest >> testCalculate1MROpenedButNotMerged [
 			(GLHMergeRequest new
 				 author: user;
 				 merge_user: user;
-				 created_at: '09-05-2024';
-				 merged_at: '09-05-2024').
+				 created_at: '2024-09-05';
+				 merged_at: '2024-09-05').
 			(GLHMergeRequest new
 				 author: user;
-				 created_at: '09-05-2024';
+				 created_at: '2024-09-05';
 				 merged_at: nil) }.
 
 
 	mergedMergeRequest := MergedMergeRequestMetric new
 		                      user: user;
 		                      glhImporter: glhImporter;
-		                      setPeriodSince: '09-01-2024'
-		                      until: '09-07-2024';
+		                      setPeriodSince: '2024-09-01'
+		                      until: '2024-09-07';
 		                      over: Week.
 
 	"When"
@@ -149,22 +149,22 @@ MergedMergeRequestMetricTest >> testCalculate2MROneForEachUser [
 			(GLHMergeRequest new
 				 author: user1;
 				 title: 'MR1';
-				 created_at: '09-05-2024';
+				 created_at: '2024-09-05';
 				 merge_user: user1;
-				 merged_at: '09-05-2024').
+				 merged_at: '2024-09-05').
 			(GLHMergeRequest new
 				 author: user2;
 				 title: 'MR2';
-				 created_at: '09-05-2024';
+				 created_at: '2024-09-05';
 				 merge_user: user2;
-				 merged_at: '09-06-2024') }.
+				 merged_at: '2024-09-06') }.
 
 
 	mergedMergeRequest := MergedMergeRequestMetric new
 		                      user: user1;
 		                      glhImporter: glhImporter;
-		                      setPeriodSince: '09-01-2024'
-		                      until: '09-07-2024';
+		                      setPeriodSince: '2024-09-01'
+		                      until: '2024-09-07';
 		                      over: Week.
 
 	"When"
@@ -196,28 +196,28 @@ MergedMergeRequestMetricTest >> testCalculate3MROpenButMergedByOthers [
 			(GLHMergeRequest new
 				 author: user1;
 				 title: 'MR1';
-				 created_at: '09-05-2024';
+				 created_at: '2024-09-05';
 				 merge_user: user2;
-				 merged_at: '09-05-2024').
+				 merged_at: '2024-09-05').
 			(GLHMergeRequest new
 				 author: user1;
 				 title: 'MR2';
-				 created_at: '09-05-2024';
+				 created_at: '2024-09-05';
 				 merge_user: user2;
-				 merged_at: '09-06-2024').
+				 merged_at: '2024-09-06').
 			(GLHMergeRequest new
 				 author: user1;
 				 title: 'MR3';
-				 created_at: '09-05-2024';
+				 created_at: '2024-09-05';
 				 merge_user: user2;
-				 merged_at: '09-06-2024') }.
+				 merged_at: '2024-09-06') }.
 
 
 	mergedMergeRequest := MergedMergeRequestMetric new
 		                      user: user1;
 		                      glhImporter: glhImporter;
-		                      setPeriodSince: '09-01-2024'
-		                      until: '09-07-2024';
+		                      setPeriodSince: '2024-09-01'
+		                      until: '2024-09-07';
 		                      over: Week.
 
 	"When"
@@ -249,28 +249,28 @@ MergedMergeRequestMetricTest >> testCalculate3MROpenByOther [
 			(GLHMergeRequest new
 				 author: user2;
 				 title: 'MR1';
-				 created_at: '09-05-2024';
+				 created_at: '2024-09-05';
 				 merge_user: user1;
-				 merged_at: '09-05-2024').
+				 merged_at: '2024-09-05').
 			(GLHMergeRequest new
 				 author: user2;
 				 title: 'MR2';
-				 created_at: '09-05-2024';
+				 created_at: '2024-09-05';
 				 merge_user: user1;
-				 merged_at: '09-06-2024').
+				 merged_at: '2024-09-06').
 			(GLHMergeRequest new
 				 author: user2;
 				 title: 'MR3';
-				 created_at: '09-05-2024';
+				 created_at: '2024-09-05';
 				 merge_user: user1;
-				 merged_at: '09-06-2024') }.
+				 merged_at: '2024-09-06') }.
 
 
 	mergedMergeRequest := MergedMergeRequestMetric new
 		                      user: user1;
 		                      glhImporter: glhImporter;
-		                      setPeriodSince: '09-01-2024'
-		                      until: '09-07-2024';
+		                      setPeriodSince: '2024-09-01'
+		                      until: '2024-09-07';
 		                      over: Week.
 
 	"When"
@@ -297,8 +297,8 @@ MergedMergeRequestMetricTest >> testCalculateNoMergeRequests [
 	mergedMergeRequest := MergedMergeRequestMetric new
 		                      user: user;
 		                      glhImporter: glhImporter;
-		                      setPeriodSince: '09-04-2024'
-		                      until: '09-04-2024';
+		                      setPeriodSince: '2024-09-04'
+		                      until: '2024-09-04';
 		                      over: Week.
 
 	"When"

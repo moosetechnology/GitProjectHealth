@@ -4,7 +4,7 @@ An OpenedMergeRequestMetricTest is a test class for testing the behavior of Open
 Class {
 	#name : #OpenedMergeRequestMetricTest,
 	#superclass : #TestCase,
-	#category : 'GitLabHealth-Model-Analysis-Tests'
+	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }
@@ -27,14 +27,14 @@ OpenedMergeRequestMetricTest >> testCalculate [
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
-			 created_at: '09-05-2024') }.
+			 created_at: '2024-09-05') }.
 
 
 	openedMergeRequest := OpenedMergeRequestMetric new
 		                      user: user;
 		                      glhImporter: glhImporter;
-		                      setPeriodSince: '09-01-2024'
-		                      until: '09-07-2024';
+		                      setPeriodSince: '2024-09-01'
+		                      until: '2024-09-07';
 		                      over: Week.
 
 	"When"
@@ -65,20 +65,20 @@ OpenedMergeRequestMetricTest >> testCalculate1OpenedAnd2NotOpenedByUser [
 	glhImporter mergeRequests: {
 			(GLHMergeRequest new
 				 author: user2;
-				 created_at: '09-02-2024').
+				 created_at: '2024-09-02').
 			(GLHMergeRequest new
 				 author: user2;
-				 created_at: '09-03-2024').
+				 created_at: '2024-09-03').
 			(GLHMergeRequest new
 				 author: user;
-				 created_at: '09-03-2024') }.
+				 created_at: '2024-09-03') }.
 
 
 	openedMergeRequest := OpenedMergeRequestMetric new
 		                      user: user;
 		                      glhImporter: glhImporter;
-		                      setPeriodSince: '09-01-2024'
-		                      until: '09-07-2024';
+		                      setPeriodSince: '2024-09-01'
+		                      until: '2024-09-07';
 		                      over: Week.
 
 	"When"
@@ -104,8 +104,8 @@ OpenedMergeRequestMetricTest >> testCalculateNoMergeRequests [
 	openedMergeRequest := OpenedMergeRequestMetric new
 		                      user: user;
 		                      glhImporter: glhImporter;
-		                      setPeriodSince: '09-01-2024'
-		                      until: '09-07-2024';
+		                      setPeriodSince: '2024-09-01'
+		                      until: '2024-09-07';
 		                      over: Week.
 
 	"When"
@@ -136,17 +136,17 @@ OpenedMergeRequestMetricTest >> testCalculateNotOpenedByUser [
 	glhImporter mergeRequests: {
 			(GLHMergeRequest new
 				 author: user2;
-				 created_at: '09-02-2024').
+				 created_at: '2024-09-02').
 			(GLHMergeRequest new
 				 author: user2;
-				 created_at: '09-03-2024') }.
+				 created_at: '2024-09-03') }.
 
 
 	openedMergeRequest := OpenedMergeRequestMetric new
 		                      user: user;
 		                      glhImporter: glhImporter;
-		                      setPeriodSince: '09-01-2024'
-		                      until: '09-07-2024';
+		                      setPeriodSince: '2024-09-01'
+		                      until: '2024-09-07';
 		                      over: Week.
 
 	"When"
