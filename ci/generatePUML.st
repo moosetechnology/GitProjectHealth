@@ -1,3 +1,5 @@
+| documentor |
+
 documentor := FamixUMLDocumentor new.
 documentor
 	model: GLHModel color: Color white;
