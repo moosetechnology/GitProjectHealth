@@ -1,6 +1,6 @@
-Extension { #name : 'GLHLineOfCode' }
+Extension { #name : #GLHLineOfCode }
 
-{ #category : '*GitLabHealth-Model-Extension' }
+{ #category : #'*GitLabHealth-Model-Extension' }
 GLHLineOfCode class >> newFrom: aDiffLine [
 
 	| aLoC infos |
@@ -10,7 +10,7 @@ GLHLineOfCode class >> newFrom: aDiffLine [
 	^ aLoC
 ]
 
-{ #category : '*GitLabHealth-Model-Extension' }
+{ #category : #'*GitLabHealth-Model-Extension' }
 GLHLineOfCode class >> newFromLoCRange: aDiffLine [
 
 	| aLoC infos ranges |
