@@ -778,7 +778,9 @@ GLHModelImporter >> importUser: aUserID [
 	result := self repoApi users get: aUserID.
 	userResult := self parseUserResult: result.
 	
-	^ self glhModel add: userResult unless: self blockOnIdEquality
+	userResult := self glhModel add: userResult unless: self blockOnIdEquality.
+	userCatalogue addUser: userResult.
+	^ userResult 
 ]
 
 { #category : #'import - users' }
