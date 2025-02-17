@@ -218,7 +218,7 @@ BitBucketModelImporterTest >> testImportAndLoadLatestsCommitsOfProject [
 	commit2 at: 'committerTimestamp' put: timestamp2.
 
 
-	bitBucketApi commits: {
+	bitBucketApi commitsMock: {
 			commit1.
 			commit2 }.
 
@@ -291,7 +291,7 @@ BitBucketModelImporterTest >> testImportContributedProjectsOfUser [
 	yesterdayAsTimestamp := (Date today - 1 days) asDateAndTime
 		                        asUnixTime * 1000.
 	commits first at: #committerTimestamp put: yesterdayAsTimestamp.
-	bitBucketApi commits: commits.
+	bitBucketApi commitsMock: commits.
 
 	"When"
 	projects := bitBucketImporter importContributedProjectsOfUser: user.

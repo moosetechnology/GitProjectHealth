@@ -1,6 +1,6 @@
-Extension { #name : 'GLHFile' }
+Extension { #name : #GLHFile }
 
-{ #category : '*GitLabHealth-Model-Extension' }
+{ #category : #'*GitLabHealth-Model-Extension' }
 GLHFile >> path [
 
 	^ (self directoryOwner

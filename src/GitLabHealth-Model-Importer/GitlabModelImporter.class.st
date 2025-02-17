@@ -1,6 +1,6 @@
 Class {
-	#name : #GLHModelImporter,
-	#superclass : #GPModelImporter,
+	#name : #GitlabModelImporter,
+	#superclass : #GitModelImporter,
 	#instVars : [
 		'withInitialCommits',
 		'withInitialMergeRequest',
@@ -10,7 +10,7 @@ Class {
 }
 
 { #category : #private }
-GLHModelImporter >> addCommits: commitsList toRepository: aProjectRepository [
+GitlabModelImporter >> addCommits: commitsList toRepository: aProjectRepository [
 	"I take a list of GLHCommit. But some might have been parsed but are already on the model..."
 
 	"I return the list of added commits"
@@ -27,7 +27,7 @@ GLHModelImporter >> addCommits: commitsList toRepository: aProjectRepository [
 ]
 
 { #category : #private }
-GLHModelImporter >> addGroupResultToModel: groupResult [
+GitlabModelImporter >> addGroupResultToModel: groupResult [
 	|group|
 	group := self glhModel add: groupResult unless: self blockOnIdEquality.
 	self glhModel
@@ -37,7 +37,7 @@ GLHModelImporter >> addGroupResultToModel: groupResult [
 ]
 
 { #category : #private }
-GLHModelImporter >> chainsCommitsFrom: commitsCollection [
+GitlabModelImporter >> chainsCommitsFrom: commitsCollection [
 
 	| dic |
 	
@@ -59,7 +59,7 @@ GLHModelImporter >> chainsCommitsFrom: commitsCollection [
 ]
 
 { #category : #'import - projects' }
-GLHModelImporter >> completeImportProject: aGLHProject [
+GitlabModelImporter >> completeImportProject: aGLHProject [
 
 	| importedProject |
 	('Complete import of project: ' , aGLHProject id printString)
@@ -86,7 +86,7 @@ GLHModelImporter >> completeImportProject: aGLHProject [
 ]
 
 { #category : #'import - commits' }
-GLHModelImporter >> completeImportedCommit: aCommit [
+GitlabModelImporter >> completeImportedCommit: aCommit [
 
 	('completing commit: ' , aCommit short_id printString) recordInfo.
 	self importCreatorOfCommit: aCommit.
@@ -101,7 +101,7 @@ GLHModelImporter >> completeImportedCommit: aCommit [
 ]
 
 { #category : #'private - configure reader' }
-GLHModelImporter >> configureReaderForCommit: reader [
+GitlabModelImporter >> configureReaderForCommit: reader [
 
   	reader for: GLHCommit do: [ :mapping |
 		mapping mapInstVars:
@@ -133,7 +133,7 @@ GLHModelImporter >> configureReaderForCommit: reader [
 ]
 
 { #category : #'private - configure reader' }
-GLHModelImporter >> configureReaderForDiffs: reader [
+GitlabModelImporter >> configureReaderForDiffs: reader [
 
 	reader for: GLHDiff do: [ :mapping |
 		mapping mapInstVars:
@@ -148,7 +148,7 @@ GLHModelImporter >> configureReaderForDiffs: reader [
 ]
 
 { #category : #'private - configure reader' }
-GLHModelImporter >> configureReaderForGroup: reader [
+GitlabModelImporter >> configureReaderForGroup: reader [
 
 	reader for: GLHGroup do: [ :mapping |
 		mapping mapInstVars.
@@ -165,7 +165,7 @@ GLHModelImporter >> configureReaderForGroup: reader [
 ]
 
 { #category : #private }
-GLHModelImporter >> convertApiFileAsFile: aAPIFile [
+GitlabModelImporter >> convertApiFileAsFile: aAPIFile [
 
 	aAPIFile type = 'tree' ifTrue: [ 
 		^ GLHFileDirectory new
@@ -177,14 +177,14 @@ GLHModelImporter >> convertApiFileAsFile: aAPIFile [
 ]
 
 { #category : #private }
-GLHModelImporter >> detectEntityType: aType overAttribut: aSelector equalTo: value [
+GitlabModelImporter >> detectEntityType: aType overAttribut: aSelector equalTo: value [
 
 	^ (self glhModel allWithType: aType) detect: [ :entity |
 		  (entity perform: aSelector) = value ] ifNone: [ nil ]. 
 ]
 
 { #category : #accessing }
-GLHModelImporter >> glhApi [
+GitlabModelImporter >> glhApi [
 
 	self
 		deprecated: 'Use #repoApi instead'
@@ -196,7 +196,7 @@ GLHModelImporter >> glhApi [
 ]
 
 { #category : #accessing }
-GLHModelImporter >> glhApi: anObject [
+GitlabModelImporter >> glhApi: anObject [
 
 	self
 		deprecated: 'Use #repoApi: instead'
@@ -208,19 +208,19 @@ GLHModelImporter >> glhApi: anObject [
 ]
 
 { #category : #accessing }
-GLHModelImporter >> glhModel [
+GitlabModelImporter >> glhModel [
 
 	^ glhModel
 ]
 
 { #category : #accessing }
-GLHModelImporter >> glhModel: anObject [
+GitlabModelImporter >> glhModel: anObject [
 
 	glhModel := anObject
 ]
 
 { #category : #'import - users' }
-GLHModelImporter >> importActiveHumanUsers [
+GitlabModelImporter >> importActiveHumanUsers [
 
 	| params result users |
 	params := { 
@@ -239,7 +239,7 @@ GLHModelImporter >> importActiveHumanUsers [
 ]
 
 { #category : #'import - groups' }
-GLHModelImporter >> importAllGroups [
+GitlabModelImporter >> importAllGroups [
 
 	| params results groups |
 	
@@ -255,7 +255,7 @@ GLHModelImporter >> importAllGroups [
 ]
 
 { #category : #'import - commits' }
-GLHModelImporter >> importAndLoadLatestsCommitsOfProject: aGLHProject [
+GitlabModelImporter >> importAndLoadLatestsCommitsOfProject: aGLHProject [
 
 	| commits completedProject |
 	completedProject := self completeImportProject: aGLHProject.
@@ -266,7 +266,7 @@ GLHModelImporter >> importAndLoadLatestsCommitsOfProject: aGLHProject [
 ]
 
 { #category : #'import - commits' }
-GLHModelImporter >> importCommit: aCommitID ofProject: aGLHProject [
+GitlabModelImporter >> importCommit: aCommitID ofProject: aGLHProject [
 
 	| result parsedResult |
 	(self glhModel allWithType: GLHCommit) asOrderedCollection
@@ -283,7 +283,7 @@ GLHModelImporter >> importCommit: aCommitID ofProject: aGLHProject [
 ]
 
 { #category : #'import - commits' }
-GLHModelImporter >> importCommitOfProject: anProject withId: anID [
+GitlabModelImporter >> importCommitOfProject: anProject withId: anID [
 
 	| commit result |
 	anID ifNil: [ ^ nil ].
@@ -310,7 +310,7 @@ GLHModelImporter >> importCommitOfProject: anProject withId: anID [
 ]
 
 { #category : #'import - commits' }
-GLHModelImporter >> importCommits: aGLHProject [
+GitlabModelImporter >> importCommits: aGLHProject [
 	"limited to the last 20 commits"
 
 	| results parsedResults params |
@@ -332,7 +332,7 @@ GLHModelImporter >> importCommits: aGLHProject [
 ]
 
 { #category : #'import - commits' }
-GLHModelImporter >> importCommitsFollowing: aCommit upToDays: aNumberOfDay [
+GitlabModelImporter >> importCommitsFollowing: aCommit upToDays: aNumberOfDay [
 	"import the 'n' commits of a project starting from an initial 'aCommit' commit. 
 	Lazy import does not import the entities inside the model"
 
@@ -347,7 +347,7 @@ GLHModelImporter >> importCommitsFollowing: aCommit upToDays: aNumberOfDay [
 ]
 
 { #category : #commit }
-GLHModelImporter >> importCommitsOf: aGLHProject withStats: aBoolean until: toDate [
+GitlabModelImporter >> importCommitsOf: aGLHProject withStats: aBoolean until: toDate [
 
 	| newlyFoundCommit page |
 	
@@ -392,7 +392,7 @@ GLHModelImporter >> importCommitsOf: aGLHProject withStats: aBoolean until: toDa
 ]
 
 { #category : #'import - commits' }
-GLHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName since: fromDate [
+GitlabModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName since: fromDate [
 
 	^ self
 		  importCommitsOfBranch: aGLHBranch
@@ -402,7 +402,7 @@ GLHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName since:
 ]
 
 { #category : #'import - commits' }
-GLHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName since: fromDate until: toDate [
+GitlabModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName since: fromDate until: toDate [
 
 	| params result allCommits |
 	params := { 
@@ -427,7 +427,7 @@ GLHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName since:
 ]
 
 { #category : #'import - commits' }
-GLHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName until: toDate [
+GitlabModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName until: toDate [
 
 	^ self
 		  importCommitsOfBranch: aGLHBranch
@@ -437,7 +437,7 @@ GLHModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName until:
 ]
 
 { #category : #'import - commits' }
-GLHModelImporter >> importCommitsOfProject: aProject since: fromDate until: toDate [
+GitlabModelImporter >> importCommitsOfProject: aProject since: fromDate until: toDate [
 
 	| params results allCommits |
 	params := {
@@ -468,7 +468,7 @@ GLHModelImporter >> importCommitsOfProject: aProject since: fromDate until: toDa
 ]
 
 { #category : #'import - projects' }
-GLHModelImporter >> importContributedProjectsOfUser: aGLHUser [
+GitlabModelImporter >> importContributedProjectsOfUser: aGLHUser [
 
 	| remaningProjects params results projects projectsIds |
 	params := {
@@ -500,7 +500,7 @@ GLHModelImporter >> importContributedProjectsOfUser: aGLHUser [
 ]
 
 { #category : #'import - commits' }
-GLHModelImporter >> importCreatorOfCommit: aCommit [
+GitlabModelImporter >> importCreatorOfCommit: aCommit [
 
 	aCommit commitCreator ifNil: [
 		aCommit commitCreator:
@@ -512,7 +512,7 @@ GLHModelImporter >> importCreatorOfCommit: aCommit [
 ]
 
 { #category : #'import - commits' }
-GLHModelImporter >> importDiffOfCommit: aCommit [
+GitlabModelImporter >> importDiffOfCommit: aCommit [
 
 	| result diffsResult |
 	aCommit diffs ifNotEmpty: [
@@ -530,7 +530,7 @@ GLHModelImporter >> importDiffOfCommit: aCommit [
 ]
 
 { #category : #'import - repositories' }
-GLHModelImporter >> importDirectoryFiles: aDirectoryFile OfBranch: aBranch [
+GitlabModelImporter >> importDirectoryFiles: aDirectoryFile OfBranch: aBranch [
 
 	| result files apiFiles params |
 	params := { 
@@ -556,7 +556,7 @@ GLHModelImporter >> importDirectoryFiles: aDirectoryFile OfBranch: aBranch [
 ]
 
 { #category : #'import - repositories' }
-GLHModelImporter >> importFilesOfBranch: aBranch [
+GitlabModelImporter >> importFilesOfBranch: aBranch [
 
 	| result files apiFiles params |
 	params := { 
@@ -581,7 +581,7 @@ GLHModelImporter >> importFilesOfBranch: aBranch [
 ]
 
 { #category : #'import - groups' }
-GLHModelImporter >> importGroup: aGroupID [
+GitlabModelImporter >> importGroup: aGroupID [
 
 	| result groupResult |
 	('Import group: ' , aGroupID printString) recordInfo.
@@ -604,7 +604,7 @@ GLHModelImporter >> importGroup: aGroupID [
 ]
 
 { #category : #'import - jobs' }
-GLHModelImporter >> importJobsOf: aPipeline [
+GitlabModelImporter >> importJobsOf: aPipeline [
 
 	| jobs results |
 	results := self repoApi jobs allForPipeline: aPipeline id inProject: aPipeline project id.
@@ -619,7 +619,7 @@ GLHModelImporter >> importJobsOf: aPipeline [
 ]
 
 { #category : #'import - commits' }
-GLHModelImporter >> importLastestCommitsOfProject: aGLHProject [
+GitlabModelImporter >> importLastestCommitsOfProject: aGLHProject [
 	"limited to the last 50 commits"
 
 	| results parsedResults params |
@@ -645,7 +645,7 @@ GLHModelImporter >> importLastestCommitsOfProject: aGLHProject [
 ]
 
 { #category : #'import - commits' }
-GLHModelImporter >> importParentCommitsOfCommit: aGLHCommit since: aDate [
+GitlabModelImporter >> importParentCommitsOfCommit: aGLHCommit since: aDate [
 
 	| parentsIds commits |
 	commits := OrderedCollection new.
@@ -669,7 +669,7 @@ GLHModelImporter >> importParentCommitsOfCommit: aGLHCommit since: aDate [
 ]
 
 { #category : #'imports - pipelines' }
-GLHModelImporter >> importPipelinesOfProject: aGLHProject [
+GitlabModelImporter >> importPipelinesOfProject: aGLHProject [
 
 	(self pipelinesOf: aGLHProject id) do: [ :pipeline |
 		self glhModel add: pipeline unless: self blockOnIdEquality .
@@ -677,7 +677,7 @@ GLHModelImporter >> importPipelinesOfProject: aGLHProject [
 ]
 
 { #category : #'import - projects' }
-GLHModelImporter >> importProject: aProjectID [
+GitlabModelImporter >> importProject: aProjectID [
 
 	| result projectResult |
 	('Import project with id: ' , aProjectID printString) recordInfo.
@@ -689,7 +689,7 @@ GLHModelImporter >> importProject: aProjectID [
 ]
 
 { #category : #'import - projects' }
-GLHModelImporter >> importProjects [
+GitlabModelImporter >> importProjects [
 
 	| result projects |
 	('import all Projects') recordInfo.
@@ -704,14 +704,14 @@ GLHModelImporter >> importProjects [
 ]
 
 { #category : #'import - projects' }
-GLHModelImporter >> importProjects: aCollectionOfProjectID [
+GitlabModelImporter >> importProjects: aCollectionOfProjectID [
 
 
 	^ aCollectionOfProjectID collect: [ :id | self importProject: id ]
 ]
 
 { #category : #imports }
-GLHModelImporter >> importProjectsSince: since [
+GitlabModelImporter >> importProjectsSince: since [
 	"heavy import of all projects"
 
 	"copy import from commits"
@@ -738,7 +738,7 @@ GLHModelImporter >> importProjectsSince: since [
 ]
 
 { #category : #'import - repositories' }
-GLHModelImporter >> importRepository: aGLHRepository [
+GitlabModelImporter >> importRepository: aGLHRepository [
 
 	| resultBranches branches |
 	[
@@ -767,7 +767,7 @@ GLHModelImporter >> importRepository: aGLHRepository [
 ]
 
 { #category : #'import - users' }
-GLHModelImporter >> importUser: aUserID [
+GitlabModelImporter >> importUser: aUserID [
 
 	| result userResult |
 	(self glhModel allWithType: GLHUser)
@@ -784,7 +784,7 @@ GLHModelImporter >> importUser: aUserID [
 ]
 
 { #category : #'import - users' }
-GLHModelImporter >> importUserByUsername: anUsername [
+GitlabModelImporter >> importUserByUsername: anUsername [
 
 	| dicUsername resultUser |
 	dicUsername := ((self glhModel allWithType: GLHUser) collect: [ :user |
@@ -839,7 +839,7 @@ GLHModelImporter >> importUserByUsername: anUsername [
 ]
 
 { #category : #initialization }
-GLHModelImporter >> initReader [
+GitlabModelImporter >> initReader [
 
 	generalReader := NeoJSONReader new.
 	self configureReaderForCommit: generalReader.
@@ -848,7 +848,7 @@ GLHModelImporter >> initReader [
 ]
 
 { #category : #initialization }
-GLHModelImporter >> initialize [
+GitlabModelImporter >> initialize [
 
 	super initialize.
 	withCommitDiffs := false.
@@ -862,12 +862,12 @@ GLHModelImporter >> initialize [
 ]
 
 { #category : #private }
-GLHModelImporter >> isServerError: aString [
+GitlabModelImporter >> isServerError: aString [
 	^ aString = '{"message":"500 Internal Server Error"}'
 ]
 
 { #category : #'import - projects' }
-GLHModelImporter >> loadAllProjectsFromRepositorySoftware [
+GitlabModelImporter >> loadAllProjectsFromRepositorySoftware [
 	"heavy import that load all the active project inside the model. Only import the project entities"
 	|projects|
 	
@@ -875,7 +875,7 @@ GLHModelImporter >> loadAllProjectsFromRepositorySoftware [
 ]
 
 { #category : #'private - parsing' }
-GLHModelImporter >> newParseCommitResult: result [
+GitlabModelImporter >> newParseCommitResult: result [
 
 	generalReader  on: result readStream.
 
@@ -883,14 +883,14 @@ GLHModelImporter >> newParseCommitResult: result [
 ]
 
 { #category : #'private - parsing' }
-GLHModelImporter >> newParseDiffResult: result [
+GitlabModelImporter >> newParseDiffResult: result [
 
 	generalReader on: result readStream.
 	^ generalReader nextAs: #ArrayOfDiffs
 ]
 
 { #category : #'private - parsing' }
-GLHModelImporter >> parseArrayOfProject: arrayOfProjects [
+GitlabModelImporter >> parseArrayOfProject: arrayOfProjects [
 
 	| reader |
 	reader := NeoJSONReader on: arrayOfProjects readStream.
@@ -909,7 +909,7 @@ GLHModelImporter >> parseArrayOfProject: arrayOfProjects [
 ]
 
 { #category : #'private - parsing' }
-GLHModelImporter >> parseBranchesResult: result [
+GitlabModelImporter >> parseBranchesResult: result [
 
 	| reader |
 	reader := NeoJSONReader on: result readStream.
@@ -922,7 +922,7 @@ GLHModelImporter >> parseBranchesResult: result [
 ]
 
 { #category : #'private - parsing' }
-GLHModelImporter >> parseCommitResult: result [
+GitlabModelImporter >> parseCommitResult: result [
 
 	| reader |
 	reader := NeoJSONReader on: result readStream.
@@ -954,7 +954,7 @@ GLHModelImporter >> parseCommitResult: result [
 ]
 
 { #category : #'private - parsing' }
-GLHModelImporter >> parseCommitsResult: result [
+GitlabModelImporter >> parseCommitsResult: result [
 
 	| reader |
 	reader := NeoJSONReader on: result readStream.
@@ -990,7 +990,7 @@ GLHModelImporter >> parseCommitsResult: result [
 ]
 
 { #category : #private }
-GLHModelImporter >> parseDiffResult: result [
+GitlabModelImporter >> parseDiffResult: result [
 
 	| reader |
 	self
@@ -1012,7 +1012,7 @@ GLHModelImporter >> parseDiffResult: result [
 ]
 
 { #category : #'private - parsing' }
-GLHModelImporter >> parseFileTreeResult: aResult [
+GitlabModelImporter >> parseFileTreeResult: aResult [
 
 	| reader |
 	reader := NeoJSONReader on: aResult readStream.
@@ -1025,7 +1025,7 @@ GLHModelImporter >> parseFileTreeResult: aResult [
 ]
 
 { #category : #'private - parsing' }
-GLHModelImporter >> parseGroupResult: aResult [
+GitlabModelImporter >> parseGroupResult: aResult [
 
 	| reader |
 
@@ -1042,7 +1042,7 @@ GLHModelImporter >> parseGroupResult: aResult [
 ]
 
 { #category : #'private - parsing' }
-GLHModelImporter >> parseJobsResult: result ofProject: aProject [
+GitlabModelImporter >> parseJobsResult: result ofProject: aProject [
 
 	| reader |
 	reader := NeoJSONReader on: result readStream.
@@ -1077,7 +1077,7 @@ GLHModelImporter >> parseJobsResult: result ofProject: aProject [
 ]
 
 { #category : #'private - parsing' }
-GLHModelImporter >> parsePipelinesResult: result [
+GitlabModelImporter >> parsePipelinesResult: result [
 
 	| reader |
 	
@@ -1099,7 +1099,7 @@ GLHModelImporter >> parsePipelinesResult: result [
 ]
 
 { #category : #'private - parsing' }
-GLHModelImporter >> parseProjectResult: aResult [ 
+GitlabModelImporter >> parseProjectResult: aResult [ 
 		| reader |
 	reader := NeoJSONReader on: aResult readStream.
 	reader for: GLHProject do: [ :mapping |
@@ -1110,7 +1110,7 @@ GLHModelImporter >> parseProjectResult: aResult [
 ]
 
 { #category : #'private - parsing' }
-GLHModelImporter >> parseSubGroupResult: aResult [
+GitlabModelImporter >> parseSubGroupResult: aResult [
 
 	| reader |
 	reader := NeoJSONReader on: aResult readStream.
@@ -1119,7 +1119,7 @@ GLHModelImporter >> parseSubGroupResult: aResult [
 ]
 
 { #category : #'private - parsing' }
-GLHModelImporter >> parseUserResult: result [
+GitlabModelImporter >> parseUserResult: result [
 
 	| reader |
 	reader := NeoJSONReader on: result readStream.
@@ -1128,7 +1128,7 @@ GLHModelImporter >> parseUserResult: result [
 ]
 
 { #category : #'private - parsing' }
-GLHModelImporter >> parseUsersResult: result [
+GitlabModelImporter >> parseUsersResult: result [
 
 	| reader |
 	reader := NeoJSONReader on: result readStream.
@@ -1144,7 +1144,7 @@ GLHModelImporter >> parseUsersResult: result [
 ]
 
 { #category : #'imports - pipelines' }
-GLHModelImporter >> pipelinesOf: aProjectID [
+GitlabModelImporter >> pipelinesOf: aProjectID [
 
 	| result |
 	('Search pipelines of: ' , aProjectID printString) recordInfo.
@@ -1156,14 +1156,14 @@ GLHModelImporter >> pipelinesOf: aProjectID [
 ]
 
 { #category : #private }
-GLHModelImporter >> selectEntityType: aType overAttribut: aSelector equalTo: value [
+GitlabModelImporter >> selectEntityType: aType overAttribut: aSelector equalTo: value [
 
 	^ (self glhModel allWithType: aType)
 		select: [ :entity | (entity perform: aSelector) = value ]
 ]
 
 { #category : #'import - groups' }
-GLHModelImporter >> subGroupsOf: aGroupID [
+GitlabModelImporter >> subGroupsOf: aGroupID [
 
 	| results subgroups |
 	('Search subgroup of: ' , aGroupID printString) recordInfo.
@@ -1174,6 +1174,6 @@ GLHModelImporter >> subGroupsOf: aGroupID [
 ]
 
 { #category : #accessing }
-GLHModelImporter >> withInitialCommits: boolean [
+GitlabModelImporter >> withInitialCommits: boolean [
 	withInitialCommits := boolean 
 ]

@@ -1,11 +1,11 @@
 Class {
-	#name : #GHModelImporter,
-	#superclass : #GPModelImporter,
+	#name : #GithubModelImporter,
+	#superclass : #GitModelImporter,
 	#category : #'GitHubHealth-Model-Importer'
 }
 
 { #category : #accessing }
-GHModelImporter >> api [
+GithubModelImporter >> api [
 
 	self
 		deprecated: 'Use #repoApi instead'
@@ -17,7 +17,7 @@ GHModelImporter >> api [
 ]
 
 { #category : #accessing }
-GHModelImporter >> api: anObject [
+GithubModelImporter >> api: anObject [
 
 	self
 		deprecated: 'Use #repoApi: instead'
@@ -29,7 +29,7 @@ GHModelImporter >> api: anObject [
 ]
 
 { #category : #api }
-GHModelImporter >> completeImportProject: aGLHProject [
+GithubModelImporter >> completeImportProject: aGLHProject [
 
 	self importPipelinesOf: aGLHProject.
 	self importBranchesOf: aGLHProject.
@@ -40,7 +40,7 @@ GHModelImporter >> completeImportProject: aGLHProject [
 ]
 
 { #category : #commit }
-GHModelImporter >> completeImportedCommit: aGLHCommit [
+GithubModelImporter >> completeImportedCommit: aGLHCommit [
 
 	| result |
 	('completing commit: ' , aGLHCommit short_id printString) recordInfo.
@@ -73,7 +73,7 @@ GHModelImporter >> completeImportedCommit: aGLHCommit [
 ]
 
 { #category : #private }
-GHModelImporter >> convertApiFileAsFile: aAPIFile [
+GithubModelImporter >> convertApiFileAsFile: aAPIFile [
 
 	aAPIFile type = 'dir' ifTrue: [ 
 		^ GLHFileDirectory new
@@ -85,7 +85,7 @@ GHModelImporter >> convertApiFileAsFile: aAPIFile [
 ]
 
 { #category : #api }
-GHModelImporter >> ensureGroupNamed: aGroupName [
+GithubModelImporter >> ensureGroupNamed: aGroupName [
 
 	^ self glhModel
 		  detect: [ :a |
@@ -94,7 +94,7 @@ GHModelImporter >> ensureGroupNamed: aGroupName [
 ]
 
 { #category : #api }
-GHModelImporter >> importBranchesOf: project [
+GithubModelImporter >> importBranchesOf: project [
 
 	"add the pipeline (actions runs) in the project"
 
@@ -113,7 +113,7 @@ GHModelImporter >> importBranchesOf: project [
 ]
 
 { #category : #api }
-GHModelImporter >> importCommitsOfProject: aGLHProject [
+GithubModelImporter >> importCommitsOfProject: aGLHProject [
 
 	| itemByPage foundCommits tmp pageNumber |
 	itemByPage := 100.
@@ -157,7 +157,7 @@ GHModelImporter >> importCommitsOfProject: aGLHProject [
 ]
 
 { #category : #'import - commits' }
-GHModelImporter >> importCreatorOfCommit: aGLHCommit [ 
+GithubModelImporter >> importCreatorOfCommit: aGLHCommit [ 
 		| creator |
 	(self glhModel allWithType: GLHUser)
 		detect: [ :user | user username = aGLHCommit author_name ]
@@ -171,7 +171,7 @@ GHModelImporter >> importCreatorOfCommit: aGLHCommit [
 ]
 
 { #category : #api }
-GHModelImporter >> importDiffOfCommit: aGLHCommit [
+GithubModelImporter >> importDiffOfCommit: aGLHCommit [
 
 	| result diffsResult |
 	aGLHCommit diffs ifNotEmpty: [
@@ -192,7 +192,7 @@ GHModelImporter >> importDiffOfCommit: aGLHCommit [
 ]
 
 { #category : #api }
-GHModelImporter >> importDirectoryFiles: aDirectoryFile OfBranch: aBranch [
+GithubModelImporter >> importDirectoryFiles: aDirectoryFile OfBranch: aBranch [
 
 	| result files apiFiles |
 	('Explore ' , aDirectoryFile name) recordInfo.
@@ -214,7 +214,7 @@ GHModelImporter >> importDirectoryFiles: aDirectoryFile OfBranch: aBranch [
 ]
 
 { #category : #api }
-GHModelImporter >> importFilesOfBranch: aBranch [
+GithubModelImporter >> importFilesOfBranch: aBranch [
 
 	| result files apiFiles |
 	result := self api
@@ -235,7 +235,7 @@ GHModelImporter >> importFilesOfBranch: aBranch [
 ]
 
 { #category : #api }
-GHModelImporter >> importGroup: aGroupName [
+GithubModelImporter >> importGroup: aGroupName [
 
 	| result groupResult |
 	result := self repoApi organization: aGroupName.
@@ -246,7 +246,7 @@ GHModelImporter >> importGroup: aGroupName [
 ]
 
 { #category : #'import - merge request' }
-GHModelImporter >> importMergeRequests: aProject [ 
+GithubModelImporter >> importMergeRequests: aProject [ 
 	|response mergeRequests|
 	response := self repoApi 
 			mergeRequestsOfRepo: aProject group name 
@@ -259,7 +259,7 @@ GHModelImporter >> importMergeRequests: aProject [
 ]
 
 { #category : #api }
-GHModelImporter >> importPipelinesOf: project [
+GithubModelImporter >> importPipelinesOf: project [
 
 	"add the pipeline (actions runs) in the project"
 
@@ -273,7 +273,7 @@ GHModelImporter >> importPipelinesOf: project [
 ]
 
 { #category : #api }
-GHModelImporter >> importProject: aProjectName ofGroup: aGroupName [
+GithubModelImporter >> importProject: aProjectName ofGroup: aGroupName [
 
 	| result projectResult group |
 	group := self ensureGroupNamed: aGroupName.
@@ -286,7 +286,7 @@ GHModelImporter >> importProject: aProjectName ofGroup: aGroupName [
 ]
 
 { #category : #api }
-GHModelImporter >> importRepositoriesOfGroup: groupResult [
+GithubModelImporter >> importRepositoriesOfGroup: groupResult [
 
 	| reposResult itemByPage pageNumber reposFound tmp |
 	itemByPage := 100.
@@ -320,7 +320,7 @@ GHModelImporter >> importRepositoriesOfGroup: groupResult [
 ]
 
 { #category : #api }
-GHModelImporter >> importUser: userID [
+GithubModelImporter >> importUser: userID [
 
 	| result userResult |
 	(glhModel allWithType: GLHUser)
@@ -335,7 +335,7 @@ GHModelImporter >> importUser: userID [
 ]
 
 { #category : #initialization }
-GHModelImporter >> initialize [
+GithubModelImporter >> initialize [
 
 	super initialize.
 	self repoApi: GHApi new.
@@ -344,7 +344,7 @@ GHModelImporter >> initialize [
 ]
 
 { #category : #parsing }
-GHModelImporter >> parseArrayOfProject: arrayOfProjects [
+GithubModelImporter >> parseArrayOfProject: arrayOfProjects [
 
 	| reader |
 	reader := NeoJSONReader on: arrayOfProjects readStream.
@@ -363,7 +363,7 @@ GHModelImporter >> parseArrayOfProject: arrayOfProjects [
 ]
 
 { #category : #parsing }
-GHModelImporter >> parseBranchesResult: arrayOfBranch [
+GithubModelImporter >> parseBranchesResult: arrayOfBranch [
 
 	| reader |
 	reader := NeoJSONReader on: arrayOfBranch readStream.
@@ -376,7 +376,7 @@ GHModelImporter >> parseBranchesResult: arrayOfBranch [
 ]
 
 { #category : #parsing }
-GHModelImporter >> parseCommitsResult: result [
+GithubModelImporter >> parseCommitsResult: result [
 
 	| reader |
 	(result includesSubstring: '"status":"409"') ifTrue: [
@@ -435,7 +435,7 @@ GHModelImporter >> parseCommitsResult: result [
 ]
 
 { #category : #parsing }
-GHModelImporter >> parseDiffresult: response [
+GithubModelImporter >> parseDiffresult: response [
 
 	| result |
 	result := (response at: #files) collect: [ :file |
@@ -448,7 +448,7 @@ GHModelImporter >> parseDiffresult: response [
 ]
 
 { #category : #parsing }
-GHModelImporter >> parseFileTreeResult: aResult [
+GithubModelImporter >> parseFileTreeResult: aResult [
 
 	| reader |
 	reader := NeoJSONReader on: aResult readStream.
@@ -461,7 +461,7 @@ GHModelImporter >> parseFileTreeResult: aResult [
 ]
 
 { #category : #parsing }
-GHModelImporter >> parseGroupResult: aResult [
+GithubModelImporter >> parseGroupResult: aResult [
 
 	| reader |
 	reader := NeoJSONReader on: aResult readStream.
@@ -474,7 +474,7 @@ GHModelImporter >> parseGroupResult: aResult [
 ]
 
 { #category : #parsing }
-GHModelImporter >> parseMergeRequestResult: response [
+GithubModelImporter >> parseMergeRequestResult: response [
 
 	| result |
 	self flag: 'temp version, must remade using NeoJsonReader'.
@@ -498,7 +498,7 @@ GHModelImporter >> parseMergeRequestResult: response [
 ]
 
 { #category : #parsing }
-GHModelImporter >> parsePipelinesResult: pipelineOverview [
+GithubModelImporter >> parsePipelinesResult: pipelineOverview [
 
 	| reader |
 	reader := NeoJSONReader on: pipelineOverview readStream.
@@ -520,7 +520,7 @@ GHModelImporter >> parsePipelinesResult: pipelineOverview [
 ]
 
 { #category : #parsing }
-GHModelImporter >> parseProjectResult: aResult [
+GithubModelImporter >> parseProjectResult: aResult [
 
 	| reader |
 	reader := NeoJSONReader on: aResult readStream.
@@ -535,7 +535,7 @@ GHModelImporter >> parseProjectResult: aResult [
 ]
 
 { #category : #parsing }
-GHModelImporter >> parseUserResult: result [
+GithubModelImporter >> parseUserResult: result [
 
 	| reader |
 	reader := NeoJSONReader on: result readStream.
@@ -554,11 +554,11 @@ GHModelImporter >> parseUserResult: result [
 ]
 
 { #category : #api }
-GHModelImporter >> privateToken [
+GithubModelImporter >> privateToken [
 	^ self api privateToken
 ]
 
 { #category : #api }
-GHModelImporter >> privateToken: aTokenString [
+GithubModelImporter >> privateToken: aTokenString [
 	^ self repoApi privateToken: aTokenString
 ]
