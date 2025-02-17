@@ -4,7 +4,7 @@ A CodeAdditionByMRMetricTest is a test class for testing the behavior of CodeAdd
 Class {
 	#name : #CodeAdditionByMRMetricTest,
 	#superclass : #TestCase,
-	#category : #'GitLabHealth-Model-Analysis-Tests'
+	#category : 'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }

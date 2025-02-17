@@ -4,7 +4,7 @@ A CodeDeletionMetricTest is a test class for testing the behavior of CodeDeletio
 Class {
 	#name : #CodeDeletionMetricTest,
 	#superclass : #TestCase,
-	#category : #'GitLabHealth-Model-Analysis-Tests'
+	#category : 'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }

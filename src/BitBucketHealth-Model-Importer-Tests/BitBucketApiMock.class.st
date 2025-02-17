@@ -3,14 +3,20 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'userMock',
-		'commitsMock',
+		'commits',
 		'diffs',
 		'mergeRequests'
 	],
 	#category : #'BitBucketHealth-Model-Importer-Tests'
 }
 
-{ #category : #'mock - commits' }
+{ #category : #'api - pull-requests' }
+BitBucketApiMock >> activitiesOfPullRequest: pullRequestId inRepoProjectId: repoSlug ofProjectGroupId: projectKey [
+
+	^self pullRequestActivities
+]
+
+{ #category : #accessing }
 BitBucketApiMock >> commit2 [
 
 	| commits2 |
@@ -42,13 +48,13 @@ BitBucketApiMock >> commit2 [
 	^ commits2 := (NeoJSONReader on: commits2 readStream) next
 ]
 
-{ #category : #ressources }
+{ #category : #accessing }
 BitBucketApiMock >> commits [
 
-	^ BitBucketCommitsMock new commitsMock: commitsMock; diffs: diffs.
+	^ commits
 ]
 
-{ #category : #'mock - commits' }
+{ #category : #accessing }
 BitBucketApiMock >> commits1 [
 
 	| commits1 |
@@ -80,19 +86,31 @@ BitBucketApiMock >> commits1 [
 	^ commits1 := (NeoJSONReader on: commits1 readStream) next
 ]
 
-{ #category : #'mock - commits' }
-BitBucketApiMock >> commitsMock [
+{ #category : #accessing }
+BitBucketApiMock >> commits: anObject [
 
-	^ commitsMock
+	commits := anObject
 ]
 
-{ #category : #'mock - commits' }
-BitBucketApiMock >> commitsMock: anObject [
+{ #category : #'api - pull-requests' }
+BitBucketApiMock >> commitsOfPullRequest: mergeRequestId ofRepoProjectId: repoSlug inProjectGroupId: projectKey [
 
-	commitsMock := anObject
+	^commits
 ]
 
-{ #category : #'mock - mergeRequests' }
+{ #category : #'api - projects' }
+BitBucketApiMock >> commitsOfRepoProjectId: repositorySlug inProjectGroupId: projectKey since: since until: until [
+
+	^ self commits select: [ :commit |
+		  | commitDate |
+			
+		  commitDate := DateAndTime fromUnixTime:
+			                (commit at: #committerTimestamp) / 1000.
+			
+		  commitDate >= since asDate and: commitDate <= until asDate ]
+]
+
+{ #category : #accessing }
 BitBucketApiMock >> declinedMergeRequest [
 
 	| pullRequest |
@@ -288,13 +306,13 @@ BitBucketApiMock >> declinedMergeRequest [
 	^ pullRequest := (NeoJSONReader on: pullRequest readStream) next
 ]
 
-{ #category : #'mock - diffs' }
+{ #category : #accessing }
 BitBucketApiMock >> diffs [
 
 	^ diffs
 ]
 
-{ #category : #'mock - diffs' }
+{ #category : #accessing }
 BitBucketApiMock >> diffs1 [
 
 	| diffs1 |
@@ -391,13 +409,13 @@ BitBucketApiMock >> diffs1 [
 	^ diffs1 := (NeoJSONReader on: diffs1 readStream) next
 ]
 
-{ #category : #'mock - diffs' }
+{ #category : #accessing }
 BitBucketApiMock >> diffs: anObject [
 
 	diffs := anObject
 ]
 
-{ #category : #'mock - diffs' }
+{ #category : #accessing }
 BitBucketApiMock >> diffsNohunks [
 
 	| diffs1 |
@@ -428,7 +446,12 @@ BitBucketApiMock >> diffsNohunks [
 	^ diffs1 := (NeoJSONReader on: diffs1 readStream) next
 ]
 
-{ #category : #'mock - diffs' }
+{ #category : #'api - commits' }
+BitBucketApiMock >> diffsOfCommit: commitID inRepoProjectId: repositorySlug inProjectGroupId: projectKey [
+	^diffs 
+]
+
+{ #category : #accessing }
 BitBucketApiMock >> diffsWithoutAdded [
 
 	| diffsWithoutAdded |
@@ -526,7 +549,7 @@ BitBucketApiMock >> diffsWithoutAdded [
 		                        diffsWithoutAdded readStream) next
 ]
 
-{ #category : #'mock - diffs' }
+{ #category : #accessing }
 BitBucketApiMock >> diffsWithoutHunks [
 
 	| diffsWithoutHunks |
@@ -566,7 +589,7 @@ BitBucketApiMock >> diffsWithoutHunks [
 		                        diffsWithoutHunks readStream) next
 ]
 
-{ #category : #'mock - diffs' }
+{ #category : #accessing }
 BitBucketApiMock >> diffsWithoutRemoved [
 
 	| diffsWithoutRemoved |
@@ -655,25 +678,25 @@ BitBucketApiMock >> diffsWithoutRemoved [
 { #category : #initialization }
 BitBucketApiMock >> initialize [
 
-	commitsMock := self commits1.
+	commits := self commits1.
 	diffs := self diffs1.
 	userMock := self user1.
 	mergeRequests := { self openedMergeRequest }
 ]
 
-{ #category : #'mock - mergeRequests' }
+{ #category : #accessing }
 BitBucketApiMock >> mergeRequests [
 
 	^ mergeRequests
 ]
 
-{ #category : #'mock - mergeRequests' }
+{ #category : #accessing }
 BitBucketApiMock >> mergeRequests: anObject [
 
 	mergeRequests := anObject
 ]
 
-{ #category : #'mock - mergeRequests' }
+{ #category : #accessing }
 BitBucketApiMock >> mergedMergeRequest [
 
 	| pullRequest |
@@ -869,7 +892,7 @@ BitBucketApiMock >> mergedMergeRequest [
 	^ pullRequest := (NeoJSONReader on: pullRequest readStream) next
 ]
 
-{ #category : #'mock - mergeRequests' }
+{ #category : #accessing }
 BitBucketApiMock >> openedMergeRequest [
 
 	| pullRequest |
@@ -1064,14 +1087,8 @@ BitBucketApiMock >> openedMergeRequest [
 	^pullRequest := (NeoJSONReader on: pullRequest readStream) next.
 ]
 
-{ #category : #ressources }
+{ #category : #accessing }
 BitBucketApiMock >> projects [
-
-	^BitBucketProjectsMock new
-]
-
-{ #category : #'mock - projects' }
-BitBucketApiMock >> projectsMock [
 
 	| projects |
 	projects := '[
@@ -1094,7 +1111,7 @@ BitBucketApiMock >> projectsMock [
 	^ projects
 ]
 
-{ #category : #'mock - mergeRequests' }
+{ #category : #accessing }
 BitBucketApiMock >> pullRequestActivities [
 
 	| pullRequestActivities |
@@ -1125,19 +1142,14 @@ BitBucketApiMock >> pullRequestActivities [
 		                            pullRequestActivities readStream) next
 ]
 
-{ #category : #ressources }
-BitBucketApiMock >> pullRequests [
-
-	^ BitbucketPullRequestsMock new mergeRequests: mergeRequests.
+{ #category : #'api - pull-requests' }
+BitBucketApiMock >> pullRequestsOfRepoProjectId: repoSlug inProjectGroupId: projectKey since: since until: until [
+	
+	^ mergeRequests
 ]
 
-{ #category : #ressources }
-BitBucketApiMock >> repositories [
-	^BitBucketRepositoriesMock new.
-]
-
-{ #category : #'mock - repositories' }
-BitBucketApiMock >> repositoriesMock [
+{ #category : #'api - projects' }
+BitBucketApiMock >> repositoryProjectsOfProjectGroupId: projectKey [
 
 	| repos |
 	repos := '[
@@ -1171,12 +1183,12 @@ BitBucketApiMock >> repositoriesMock [
     }
   ],'.
 
-	repos := (NeoJSONReader on: repos readStream) next.
+repos := (NeoJSONReader on: repos readStream) next.
 
-	^ repos
+^repos
 ]
 
-{ #category : #'mock - users' }
+{ #category : #accessing }
 BitBucketApiMock >> user1 [
 
 	| user1 |
@@ -1208,7 +1220,7 @@ BitBucketApiMock >> user1 [
 	^ user1 := (NeoJSONReader on: user1 readStream) next
 ]
 
-{ #category : #'mock - users' }
+{ #category : #accessing }
 BitBucketApiMock >> user: accountId [
 
 	| user |
@@ -1223,20 +1235,20 @@ BitBucketApiMock >> user: accountId [
 	^ user
 ]
 
-{ #category : #'mock - users' }
+{ #category : #accessing }
 BitBucketApiMock >> userMock [
 
 	^ userMock
 ]
 
-{ #category : #'mock - users' }
+{ #category : #accessing }
 BitBucketApiMock >> userMock: anObject [
 
 	userMock := anObject
 ]
 
-{ #category : #ressources }
-BitBucketApiMock >> users [
+{ #category : #'api - user' }
+BitBucketApiMock >> usersByUsername: username [
 
-	^ BitbucketUsersMock new userMock: userMock.
+	userMock ifNil: [ ^Array new ] ifNotNil: [ ^{ userMock }]
 ]

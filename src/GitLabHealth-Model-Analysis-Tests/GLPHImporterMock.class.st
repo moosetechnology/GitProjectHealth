@@ -7,7 +7,7 @@ Class {
 		'mergeRequests',
 		'glhModel'
 	],
-	#category : #'GitLabHealth-Model-Analysis-Tests'
+	#category : 'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #commit }

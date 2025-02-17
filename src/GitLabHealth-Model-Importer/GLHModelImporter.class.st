@@ -58,6 +58,7 @@ GLHModelImporter >> chainsCommitsFrom: commitsCollection [
 	^ commitsCollection
 ]
 
+
 { #category : #'import - projects' }
 GLHModelImporter >> completeImportProject: aGLHProject [
 
@@ -467,6 +468,7 @@ GLHModelImporter >> importCommitsOfProject: aProject since: fromDate until: toDa
 	^ self glhModel addAll: allCommits unless: self blockOnIdEquality
 ]
 
+
 { #category : #'import - projects' }
 GLHModelImporter >> importContributedProjectsOfUser: aGLHUser [
 
@@ -703,13 +705,6 @@ GLHModelImporter >> importProjects [
 	^ projects
 ]
 
-{ #category : #'import - projects' }
-GLHModelImporter >> importProjects: aCollectionOfProjectID [
-
-
-	^ aCollectionOfProjectID collect: [ :id | self importProject: id ]
-]
-
 { #category : #imports }
 GLHModelImporter >> importProjectsSince: since [
 	"heavy import of all projects"
@@ -735,6 +730,13 @@ GLHModelImporter >> importProjectsSince: since [
 			                      addAll: (self parseArrayOfProject: results)
 			                      unless: self blockOnIdEquality.
 		foundProject addAll: newlyFoundProjects ].
+]
+
+{ #category : #'import - projects' }
+GLHModelImporter >> importProjects: aCollectionOfProjectID [
+
+
+	^ aCollectionOfProjectID collect: [ :id | self importProject: id ]
 ]
 
 { #category : #'import - repositories' }
@@ -778,9 +780,7 @@ GLHModelImporter >> importUser: aUserID [
 	result := self repoApi users get: aUserID.
 	userResult := self parseUserResult: result.
 	
-	userResult := self glhModel add: userResult unless: self blockOnIdEquality.
-	userCatalogue addUser: userResult.
-	^ userResult 
+	^ self glhModel add: userResult unless: self blockOnIdEquality
 ]
 
 { #category : #'import - users' }
@@ -1149,10 +1149,8 @@ GLHModelImporter >> pipelinesOf: aProjectID [
 	| result |
 	('Search pipelines of: ' , aProjectID printString) recordInfo.
 	result := self repoApi pipelines getAllInProject: aProjectID.
-	result isString ifTrue: [ ^ self parsePipelinesResult: result ].
-
-	^ (result collect: [ :pipelinesJson |
-			   self parsePipelinesResult: pipelinesJson ]) flattened
+	"pipelinesOfProject: aProjectID."
+	^ (result collect: [ :pipelinesJson | self parsePipelinesResult: pipelinesJson ]) flattened
 ]
 
 { #category : #private }

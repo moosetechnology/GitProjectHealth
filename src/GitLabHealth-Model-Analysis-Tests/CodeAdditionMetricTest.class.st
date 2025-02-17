@@ -4,7 +4,7 @@ A CodeAdditionMetricTest is a test class for testing the behavior of CodeAdditio
 Class {
 	#name : #CodeAdditionMetricTest,
 	#superclass : #TestCase,
-	#category : #'GitLabHealth-Model-Analysis-Tests'
+	#category : 'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }

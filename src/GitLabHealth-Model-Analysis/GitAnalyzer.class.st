@@ -333,7 +333,7 @@ GitAnalyzer >> initialize [
 
 	glModel := GLHModel new.
 	fromCommit := GLHCommit new.
-	glhImporter := GitlabWithMergeRequestModelImporter new.
+	glhImporter := GLPHModelImporter new.
 	onProject := GLHProject new.
 	maxChildCommits := -1
 ]

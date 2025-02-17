@@ -18,7 +18,7 @@ GPModelImporterTest >> testParseDiffString [
 +++ b/etc/new-name.properties'.
 
 	"When"
-	diffRange := GitModelImporter new parseDiffString: diff.
+	diffRange := GPModelImporter new parseDiffString: diff.
 	
 	"Then"
 	self assert: diffRange equals: diff diffRanges.

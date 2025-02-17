@@ -46,14 +46,14 @@ GLHUserCatalogueV2 class >> scrapeContributedProjectsForCommitAuthorsRelatedToUs
 
 	maxProjects := 10.
 
-	GitlabModelImporter current withCommitDiffs: false.
+	GLHModelImporter current withCommitDiffs: false.
 	itsProjects := aGLHUser contributedProjects ifEmpty: [
-		               GitlabModelImporter current
+		               GLHModelImporter current
 			               importContributedProjectsOfUser: aGLHUser ].
 
 	itsProjects
 		collect: [ :project |
-			GitlabModelImporter current importAndLoadLatestsCommitsOfProject:
+			GLHModelImporter current importAndLoadLatestsCommitsOfProject:
 				project ]
 		from: 1
 		to: (itsProjects size min: maxProjects).
@@ -291,7 +291,7 @@ GLHUserCatalogueV2 >> initACatalogueEntryForUser: aGLHUser [.
 { #category : #initialization }
 GLHUserCatalogueV2 >> initialize [
 
-	anImporter := GitlabModelImporter new.
+	anImporter := GLHModelImporter new.
 ]
 
 { #category : #'as yet unclassified' }

@@ -4,7 +4,7 @@ A CodeAdditionByTicketMetricTest is a test class for testing the behavior of Cod
 Class {
 	#name : #CodeAdditionByTicketMetricTest,
 	#superclass : #TestCase,
-	#category : #'GitLabHealth-Model-Analysis-Tests'
+	#category : 'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }

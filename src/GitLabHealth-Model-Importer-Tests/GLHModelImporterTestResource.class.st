@@ -27,7 +27,7 @@ GLHModelImporterTestResource >> importModel [
 		           baseAPIUrl: 'https://gitlab.com/api/v4';
 		           yourself."
 
-	glhImporter := GitlabModelImporter new
+	glhImporter := GLHModelImporter new
 		               repoApi: gitlabApi;
 		               glhModel: model;
 		               withFiles: false;

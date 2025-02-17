@@ -4,7 +4,7 @@ A ContributedProjectMetricTest is a test class for testing the behavior of Contr
 Class {
 	#name : #ContributedProjectMetricTest,
 	#superclass : #TestCase,
-	#category : #'GitLabHealth-Model-Analysis-Tests'
+	#category : 'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }

@@ -1,6 +1,6 @@
-Extension { #name : #GLHUser }
+Extension { #name : 'GLHUser' }
 
-{ #category : #'*GitLabHealth-Model-Extension' }
+{ #category : '*GitLabHealth-Model-Extension' }
 GLHUser >> computeCommitFrequencyOver: aDateWeekMonthOrYear [
 
 	| orderedCommits |
@@ -9,7 +9,7 @@ GLHUser >> computeCommitFrequencyOver: aDateWeekMonthOrYear [
 
 	^ GitMetric4User new
 		  user: self;
-		glhImporter: GitlabModelImporter current;
+		glhImporter: GLHModelImporter current;
 		itsProjects: (self commits collect: [ :c |
 					   c repository project id -> c repository project ]) asDictionary ;
 		  commitFrequencySince: orderedCommits first created_at
@@ -17,12 +17,12 @@ GLHUser >> computeCommitFrequencyOver: aDateWeekMonthOrYear [
 		  overA: aDateWeekMonthOrYear
 ]
 
-{ #category : #'*GitLabHealth-Model-Extension' }
+{ #category : '*GitLabHealth-Model-Extension' }
 GLHUser >> computeCommitFrequencySince: since until: until overA: aDateWeekMonthOrYear [
 
 	^ GitMetric4User new
 		  user: self;
-		  glhImporter: GitlabModelImporter current;
+		  glhImporter: GLHModelImporter current;
 		  itsProjects: (self commits collect: [:c |  (c repository project id) -> (c repository project) ]) asDictionary;
 		  commitFrequencySince: since
 		  until: until

@@ -1,6 +1,6 @@
-Extension { #name : #GLHChange }
+Extension { #name : 'GLHChange' }
 
-{ #category : #'*GitLabHealth-Model-Extension' }
+{ #category : '*GitLabHealth-Model-Extension' }
 GLHChange class >> createFrom: aDiffLine [
 	"Factory a Change from a loc"
 
@@ -15,13 +15,13 @@ GLHChange class >> createFrom: aDiffLine [
 	^ aChange
 ]
 
-{ #category : #'*GitLabHealth-Model-Extension' }
+{ #category : '*GitLabHealth-Model-Extension' }
 GLHChange >> name [
 
 	^ sourceCode 
 ]
 
-{ #category : #'*GitLabHealth-Model-Extension' }
+{ #category : '*GitLabHealth-Model-Extension' }
 GLHChange class >> newFrom: aDiffLine [
 	"Factory a Change from a loc"
 

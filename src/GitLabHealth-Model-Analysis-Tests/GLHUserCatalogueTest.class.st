@@ -7,7 +7,7 @@ Class {
 	#instVars : [
 		'catalogue'
 	],
-	#category : #'GitLabHealth-Model-Analysis-Tests'
+	#category : 'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #running }
