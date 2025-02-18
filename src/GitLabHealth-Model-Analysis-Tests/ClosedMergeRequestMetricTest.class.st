@@ -4,7 +4,7 @@ A ClosedMergeRequestMetricTest is a test class for testing the behavior of Close
 Class {
 	#name : #ClosedMergeRequestMetricTest,
 	#superclass : #TestCase,
-	#category : 'GitLabHealth-Model-Analysis-Tests'
+	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }
