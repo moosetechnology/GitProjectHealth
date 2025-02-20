@@ -10,7 +10,7 @@ Class {
 		'since',
 		'glhImporter'
 	],
-	#category : 'GitLabHealth-Model-Importer-Tests'
+	#category : #'GitLabHealth-Model-Importer-Tests'
 }
 
 { #category : #accessing }
@@ -35,7 +35,7 @@ GLHModelImporterTest >> model [
 GLHModelImporterTest >> testFilterCommitChanges [
 
 	| importer collection resultCollection |
-	importer := GLHModelImporter new.
+	importer := GitlabModelImporter new.
 	collection := '--- a/code.js
 +++ b/code.js
 @@ -1,3 +1,4 @@

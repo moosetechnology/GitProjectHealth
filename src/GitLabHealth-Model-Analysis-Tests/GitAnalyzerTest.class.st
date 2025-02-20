@@ -30,7 +30,7 @@ GitAnalyzerTest >> setUp [
 
 	since := Date today - 2 day.
 
-	glhImporter := GLPHModelImporter new
+	glhImporter := GitlabWithMergeRequestModelImporter new
 		               repoApi: glphApi;
 		               glhModel: glphModel;
 		               withFiles: false;

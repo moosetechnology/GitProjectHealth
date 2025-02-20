@@ -1,13 +1,13 @@
-Extension { #name : 'MooseAbstractGroup' }
+Extension { #name : #MooseAbstractGroup }
 
-{ #category : '*GitLabHealth-Model-Extension' }
+{ #category : #'*GitLabHealth-Model-Extension' }
 MooseAbstractGroup >> add: anElmt unless: aConditionAsBlock [
 	"()>>>"
 
 	^ (self addAll: { anElmt } unless: aConditionAsBlock) first
 ]
 
-{ #category : '*GitLabHealth-Model-Extension' }
+{ #category : #'*GitLabHealth-Model-Extension' }
 MooseAbstractGroup >> addAll: anElmtCollection ofType: aType unless: aConditionAsBlock [
 
 	| originalCollection returnCollection |
@@ -27,7 +27,7 @@ MooseAbstractGroup >> addAll: anElmtCollection ofType: aType unless: aConditionA
 	^ returnCollection
 ]
 
-{ #category : '*GitLabHealth-Model-Extension' }
+{ #category : #'*GitLabHealth-Model-Extension' }
 MooseAbstractGroup >> addAll: anElmtCollection unless: aConditionAsBlock [
 	"()>>>"
 
