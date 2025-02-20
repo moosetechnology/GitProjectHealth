@@ -12,16 +12,19 @@ MergeFrequencyProjectMetricTest >> testCalculate [
 
 	| glhImporter result mergeFrequency project |
 	"Given"
-	project := GLHProject new name: 'test';repository: GLHRepository new.
+	project := GLHProject new
+		           name: 'test';
+		           repository: GLHRepository new.
 	glhImporter := GLPHImporterMock new.
-	glhImporter mergeRequests: { GLHMergeRequest new created_at: '04-10-2024' }.
+	glhImporter mergeRequests:
+		{ (GLHMergeRequest new created_at: '04-10-2024') }.
 
 
 	mergeFrequency := MergeFrequencyProjectMetric new
-		                   project: project;
-		                   glhImporter: glhImporter;
-		                   setPeriodSince: '04-09-2024' until: '04-11-2024';
-		                   over: Week.
+		                  project: project;
+		                  glhImporter: glhImporter;
+		                  setPeriodSince: '04-09-2024' until: '04-11-2024';
+		                  over: Week.
 
 	"When"
 	result := mergeFrequency calculate.
