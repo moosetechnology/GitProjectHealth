@@ -25,7 +25,7 @@ CreatedMergeRequestProjectMetric >> calculate [
 { #category : #accessing }
 CreatedMergeRequestProjectMetric >> description [
 
-	^ 'Merge frequency (avg) for a project '
+	^ 'Created Merge Request (avg)'
 ]
 
 { #category : #loading }

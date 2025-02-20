@@ -25,7 +25,7 @@ ClosedMergeRequestProjectMetric >> calculate [
 { #category : #accessing }
 ClosedMergeRequestProjectMetric >> description [
 
-	^ 'closed Merge frequency for a project  (avg)'
+	^ 'Closed Merge Request (avg)'
 ]
 
 { #category : #loading }

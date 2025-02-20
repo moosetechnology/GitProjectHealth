@@ -485,7 +485,10 @@ GitMetricExporter >> initialize [
 		
 		
 				"Project Metrics"
-				CommitFrequencyProjectMetric
+				CommitFrequencyProjectMetric.
+				ClosedMergeRequestProjectMetric.
+				CreatedMergeRequestProjectMetric.
+				MergedMergeRequestProjectMetric.
 		 }.
 ]
 

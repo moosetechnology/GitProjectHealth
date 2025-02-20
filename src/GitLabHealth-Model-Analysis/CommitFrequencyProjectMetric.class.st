@@ -25,7 +25,7 @@ CommitFrequencyProjectMetric >> calculate [
 { #category : #accessing }
 CommitFrequencyProjectMetric >> description [
 
-	^ 'commits frequency (avg)'
+	^ 'Commits frequency (avg)'
 ]
 
 { #category : #loading }
