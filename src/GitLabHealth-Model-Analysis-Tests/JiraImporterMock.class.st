@@ -5,7 +5,7 @@ Class {
 		'issues',
 		'model'
 	],
-	#category : 'GitLabHealth-Model-Analysis-Tests'
+	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #'api - import' }

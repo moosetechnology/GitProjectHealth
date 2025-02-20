@@ -4,7 +4,7 @@ A MergedMergeRequestWithoutReviewMetricTest is a test class for testing the beha
 Class {
 	#name : #SelfMergedUnderAMinuteMergeRequestMetricTest,
 	#superclass : #TestCase,
-	#category : 'GitLabHealth-Model-Analysis-Tests'
+	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }
