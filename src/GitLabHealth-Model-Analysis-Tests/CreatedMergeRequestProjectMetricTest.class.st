@@ -17,13 +17,13 @@ CreatedMergeRequestProjectMetricTest >> testCalculate [
 		           repository: GLHRepository new.
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests:
-		{ (GLHMergeRequest new created_at: '04-10-2024') }.
+		{ (GLHMergeRequest new created_at: '2024-04-10') }.
 
 
 	mergeFrequency := CreatedMergeRequestProjectMetric new
 		                  project: project;
 		                  glhImporter: glhImporter;
-		                  setPeriodSince: '04-09-2024' until: '04-11-2024';
+		                  setPeriodSince: '2024-04-09' until: '2024-04-11';
 		                  over: Week.
 
 	"When"

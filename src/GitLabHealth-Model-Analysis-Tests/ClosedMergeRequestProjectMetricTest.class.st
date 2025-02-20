@@ -17,12 +17,12 @@ ClosedMergeRequestProjectMetricTest >> testCalculate [
 		           repository: GLHRepository new.
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests:
-		{ (GLHMergeRequest new state:#closed ; closed_at: '04-10-2024') }.
+		{ (GLHMergeRequest new state:#closed ; closed_at: '2024-04-10') }.
 
 	mergeFrequency := ClosedMergeRequestProjectMetric new
 		                  project: project;
 		                  glhImporter: glhImporter;
-		                  setPeriodSince: '04-09-2024' until: '04-11-2024';
+		                  setPeriodSince: '2024-04-09' until: '2024-04-11';
 		                  over: Week.
 
 	"When"
