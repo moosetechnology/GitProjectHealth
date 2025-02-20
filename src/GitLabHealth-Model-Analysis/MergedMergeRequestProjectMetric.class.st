@@ -1,20 +1,20 @@
 Class {
-	#name : #MergedMergeFrequencyProjectMetric,
+	#name : #MergedMergeRequestProjectMetric,
 	#superclass : #ProjectMetric,
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
 { #category : #calculating }
-MergedMergeFrequencyProjectMetric >> calculate [
+MergedMergeRequestProjectMetric >> calculate [
 
 	| groupedByDate |
 	projectMergeRequests ifNil: [ self load ].
 
 	groupedByDate := self setupGroupedDate.
 
-	projectMergeRequests do: [ :c |
+(projectMergeRequests select: [ :mr| mr state= #merged ]) do: [ :c |
 		| dateOver |
-		dateOver := self transformDate: c created_at to: over.
+		dateOver := self transformDate: c merged_at to: over.
 		groupedByDate at: dateOver printString ifPresent: [ :v | v add: c ] ].
 
 	groupedByDate := groupedByDate collect: [ :group | group size ].
@@ -23,12 +23,15 @@ MergedMergeFrequencyProjectMetric >> calculate [
 ]
 
 { #category : #accessing }
-MergedMergeFrequencyProjectMetric >> description [
+MergedMergeRequestProjectMetric >> description [
 
 	^ 'merged Merge frequency (avg)'
 ]
 
 { #category : #loading }
-MergedMergeFrequencyProjectMetric >> load [
-	projectCommits := self loadCommitsSince: (period at: #since) until: (period at: #until) 
+MergedMergeRequestProjectMetric >> load [
+
+	projectMergeRequests := self
+		                  loadMergeRequestsSince:   (period at: #since)
+		                  until: (period at: #until)
 ]

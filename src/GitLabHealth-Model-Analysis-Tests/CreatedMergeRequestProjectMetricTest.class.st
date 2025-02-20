@@ -2,13 +2,13 @@
 A MergeFrequencyProjectMetricTest is a test class for testing the behavior of MergeFrequencyProjectMetric
 "
 Class {
-	#name : #MergeFrequencyProjectMetricTest,
+	#name : #CreatedMergeRequestProjectMetricTest,
 	#superclass : #TestCase,
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }
-MergeFrequencyProjectMetricTest >> testCalculate [
+CreatedMergeRequestProjectMetricTest >> testCalculate [
 
 	| glhImporter result mergeFrequency project |
 	"Given"
@@ -20,7 +20,7 @@ MergeFrequencyProjectMetricTest >> testCalculate [
 		{ (GLHMergeRequest new created_at: '04-10-2024') }.
 
 
-	mergeFrequency := MergeFrequencyProjectMetric new
+	mergeFrequency := CreatedMergeRequestProjectMetric new
 		                  project: project;
 		                  glhImporter: glhImporter;
 		                  setPeriodSince: '04-09-2024' until: '04-11-2024';
