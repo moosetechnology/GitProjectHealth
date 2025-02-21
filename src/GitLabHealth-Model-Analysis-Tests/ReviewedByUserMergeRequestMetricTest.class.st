@@ -3,7 +3,7 @@ A ReviewedByUserMergeRequestMetricTest is a test class for testing the behavior 
 "
 Class {
 	#name : #ReviewedByUserMergeRequestMetricTest,
-	#superclass : #TestCase,
+	#superclass : #UserMetricTest,
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 

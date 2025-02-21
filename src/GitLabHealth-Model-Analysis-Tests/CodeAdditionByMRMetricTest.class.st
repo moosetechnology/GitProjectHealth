@@ -3,11 +3,7 @@ A CodeAdditionByMRMetricTest is a test class for testing the behavior of CodeAdd
 "
 Class {
 	#name : #CodeAdditionByMRMetricTest,
-	#superclass : #TestCase,
-	#instVars : [
-		'project1',
-		'user'
-	],
+	#superclass : #UserMetricTest,
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
@@ -39,15 +35,15 @@ CodeAdditionByMRMetricTest >> testCalculate [
 			(GLHCommit new
 				 id: 1;
 				 repository: project1 repository;
-			 	 created_at: '2024-09-05T10:24:11.803+02:00' asDateAndTime;
+				 created_at: '2024-09-05T10:24:11.803+02:00' asDateAndTime;
 				 additions: 7;
 				 commitCreator: user;
 				 deletions: 5).
 			(GLHCommit new
 				 id: 2;
 				 repository: project1 repository;
-			     created_at: '2024-09-05T10:34:11.803+02:00' asDateAndTime;
-			 	 additions: 3;
+				 created_at: '2024-09-05T10:34:11.803+02:00' asDateAndTime;
+				 additions: 3;
 				 commitCreator: user;
 				 deletions: 5) }.
 
@@ -55,7 +51,7 @@ CodeAdditionByMRMetricTest >> testCalculate [
 	codeAddition := CodeAdditionByMRMetric new
 		                user: user;
 		                glhImporter: glhImporter;
-		                setPeriodSince: '09-04-2024' until: '09-05-2024';
+		                setPeriodSince: '2024-09-04' until: '2024-09-05';
 		                over: Week.
 
 	"When"
@@ -68,22 +64,20 @@ CodeAdditionByMRMetricTest >> testCalculate [
 { #category : #tests }
 CodeAdditionByMRMetricTest >> testCalculateNoCommits [
 
-	| result glhImporter  codeAddition |
-
-
+	| result glhImporter codeAddition |
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
-			project: project1;
+			 project: project1;
 			 created_at: '2024-09-05T10:24:11.803+02:00' asDateAndTime;
 			 merged_at: '2024-09-05T11:24:11.803+02:00' asDateAndTime;
-			state: 'merged';
+			 state: 'merged';
 			 title: '205 feat do something') }.
 
 	codeAddition := CodeAdditionByMRMetric new
 		                user: user;
 		                glhImporter: glhImporter;
-		                setPeriodSince: '09-04-2024' until: '09-04-2024';
+		                setPeriodSince: '2024-09-04' until: '2024-09-04';
 		                over: Week.
 
 	"When"
@@ -97,14 +91,12 @@ CodeAdditionByMRMetricTest >> testCalculateNoCommits [
 CodeAdditionByMRMetricTest >> testCalculateNoMergeRequests [
 
 	| result glhImporter codeAddition |
-
-
 	glhImporter := GLPHImporterMock new.
 
 	codeAddition := CodeAdditionByMRMetric new
 		                user: user;
 		                glhImporter: glhImporter;
-		                setPeriodSince: '09-04-2024' until: '09-04-2024';
+		                setPeriodSince: '2024-09-04' until: '2024-09-04';
 		                over: Week.
 
 	"When"

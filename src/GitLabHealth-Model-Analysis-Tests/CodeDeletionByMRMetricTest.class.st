@@ -3,9 +3,20 @@ A CodeDeletionByMRMetricTest is a test class for testing the behavior of CodeDel
 "
 Class {
 	#name : #CodeDeletionByMRMetricTest,
-	#superclass : #TestCase,
+	#superclass : #UserMetricTest,
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
+
+{ #category : #running }
+CodeDeletionByMRMetricTest >> setUp [
+
+	project1 := GLHProject new
+		            repository: GLHRepository new;
+		            name: 'project1'.
+	user := GLHUser new
+		        username: 'test';
+		        contributedProjects: { project1 }
+]
 
 { #category : #tests }
 CodeDeletionByMRMetricTest >> testCalculate [

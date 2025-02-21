@@ -3,11 +3,7 @@ A CommentContributionMetricTest is a test class for testing the behavior of Comm
 "
 Class {
 	#name : #CommentContributionMetricTest,
-	#superclass : #TestCase,
-	#instVars : [
-		'project1',
-		'user'
-	],
+	#superclass : #UserMetricTest,
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 

@@ -3,22 +3,9 @@ A CommitFrequencyProjectMetricTest is a test class for testing the behavior of C
 "
 Class {
 	#name : #CommitFrequencyProjectMetricTest,
-	#superclass : #TestCase,
-	#instVars : [
-		'project1',
-		'user'
-	],
+	#superclass : #UserMetricTest,
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
-
-{ #category : #running }
-CommitFrequencyProjectMetricTest >> setUp [ 
-	project1 := (GLHProject new repository: GLHRepository new; name: 'project1').
-		user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { project1 }.
-]
 
 { #category : #tests }
 CommitFrequencyProjectMetricTest >> testCalculate [

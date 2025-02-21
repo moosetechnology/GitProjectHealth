@@ -3,7 +3,7 @@ A CodeDeletionByTicketMetricTest is a test class for testing the behavior of Cod
 "
 Class {
 	#name : #CodeDeletionByTicketMetricTest,
-	#superclass : #TestCase,
+	#superclass : #UserMetricTest,
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 

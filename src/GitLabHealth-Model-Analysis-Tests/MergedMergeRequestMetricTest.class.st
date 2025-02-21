@@ -3,7 +3,7 @@ A MergedMergeRequestMetricTest is a test class for testing the behavior of Merge
 "
 Class {
 	#name : #MergedMergeRequestMetricTest,
-	#superclass : #TestCase,
+	#superclass : #UserMetricTest,
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 

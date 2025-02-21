@@ -3,20 +3,16 @@ A CommitFrequencyMetricTest is a test class for testing the behavior of CommitFr
 "
 Class {
 	#name : #CommitFrequencyMetricTest,
-	#superclass : #TestCase,
+	#superclass : #UserMetricTest,
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }
 CommitFrequencyMetricTest >> testCalculate [
 
-	| user glhImporter result commitFrequency |
-	"Given"
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
+	| glhImporter result commitFrequency |
 
+	self flag: 'TODO test'.
 	glhImporter := GLPHImporterMock new.
 
 
@@ -36,12 +32,8 @@ CommitFrequencyMetricTest >> testCalculate [
 { #category : #tests }
 CommitFrequencyMetricTest >> testCalculateNoCommits [
 
-	| user glhImporter result commitFrequency |
-	"Given"
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
+	| glhImporter result commitFrequency |
+
 
 	glhImporter := GLPHImporterMock new.
 

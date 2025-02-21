@@ -3,20 +3,16 @@ A ContributedProjectMetricTest is a test class for testing the behavior of Contr
 "
 Class {
 	#name : #ContributedProjectMetricTest,
-	#superclass : #TestCase,
+	#superclass : #UserMetricTest,
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }
 ContributedProjectMetricTest >> testCalculate [
 
-	| user glhImporter result contributedProject project1 repository1 |
+	| glhImporter result contributedProject repository1 |
 	"Given"
-	project1 := GLHProject new repository: GLHRepository new.
-	repository1 := GLHRepository new project: project1.
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects: { project1 }.
+
 
 	glhImporter := GLPHImporterMock new.
 	glhImporter commits: {
@@ -25,13 +21,13 @@ ContributedProjectMetricTest >> testCalculate [
 				 created_at: '04-09-2024';
 				 committed_date: '04-09-2024';
 				 commitCreator: user;
-				 repository: repository1).
+				 repository: project1 repository ).
 			(GLHCommit new
 				 id: 2;
 				 created_at: '04-09-2024';
 				 committed_date: '04-09-2024';
 				 commitCreator: user;
-				 repository: repository1) }.
+				 repository: project1 repository) }.
 
 
 	contributedProject := ContributedProjectMetric new
@@ -51,13 +47,8 @@ ContributedProjectMetricTest >> testCalculate [
 { #category : #tests }
 ContributedProjectMetricTest >> testCalculateNoCommits [
 
-	| user glhImporter result contributedProject project1 repository1 |
-	"Given"
-	project1 := GLHProject new repository: GLHRepository new.
-	repository1 := GLHRepository new project: project1.
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects: { project1 }.
+	|  glhImporter result contributedProject  |
+
 
 	glhImporter := GLPHImporterMock new.
 
@@ -65,8 +56,8 @@ ContributedProjectMetricTest >> testCalculateNoCommits [
 	contributedProject := ContributedProjectMetric new
 		                      user: user;
 		                      glhImporter: glhImporter;
-		                      setPeriodSince: '04-09-2024'
-		                      until: '04-09-2024';
+		                      setPeriodSince: '2024-04-09'
+		                      until: '2024-04-09';
 		                      over: Week.
 
 	"When"

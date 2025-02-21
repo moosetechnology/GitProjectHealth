@@ -3,22 +3,9 @@ A TimeBetweenCommitMetricTest is a test class for testing the behavior of TimeBe
 "
 Class {
 	#name : #TimeBetweenCommitMetricTest,
-	#superclass : #TestCase,
-	#instVars : [
-		'project1',
-		'user'
-	],
+	#superclass : #UserMetricTest,
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
-
-{ #category : #running }
-TimeBetweenCommitMetricTest >> setUp [ 
-	project1 := (GLHProject new repository: GLHRepository new; name: 'project1').
-		user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { project1 }.
-]
 
 { #category : #tests }
 TimeBetweenCommitMetricTest >> testCalculate [

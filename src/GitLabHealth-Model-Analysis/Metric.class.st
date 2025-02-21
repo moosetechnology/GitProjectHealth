@@ -79,7 +79,7 @@ Metric >> setupGroupedDate [
 	increment := 1.
 	start := self transformDate: (period at: #since) to: over.
 	end := self transformDate: (period at: #until) to: over.
-	
+
 	groupedByDate
 		at: start printString
 		ifAbsentPut: [ OrderedCollection new ].
@@ -91,9 +91,9 @@ Metric >> setupGroupedDate [
 		over := #day ].
 
 
-	[ groupedByDate keys last asDate asDateAndTime < end ] whileTrue: [
+	[ groupedByDate keys last asDate < end ] whileTrue: [
 		| index |
-		index := groupedByDate keys last asDate asDateAndTime
+		index := groupedByDate keys last asDate
 		         + (increment perform: overSymbol).
 		index := self transformDate: index to: over.
 		groupedByDate

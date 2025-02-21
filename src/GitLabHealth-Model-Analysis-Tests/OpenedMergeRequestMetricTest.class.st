@@ -3,7 +3,7 @@ An OpenedMergeRequestMetricTest is a test class for testing the behavior of Open
 "
 Class {
 	#name : #OpenedMergeRequestMetricTest,
-	#superclass : #TestCase,
+	#superclass : #UserMetricTest,
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 

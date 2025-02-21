@@ -3,24 +3,9 @@ A CommitsLinkWithTicketMetricTest is a test class for testing the behavior of Co
 "
 Class {
 	#name : #CommitsLinkWithTicketMetricTest,
-	#superclass : #TestCase,
-	#instVars : [
-		'project1',
-		'user'
-	],
+	#superclass : #UserMetricTest,
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
-
-{ #category : #running }
-CommitsLinkWithTicketMetricTest >> setUp [ 
-
-		"Given"
-	project1 := (GLHProject new repository: GLHRepository new; name: 'project1').
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { project1 }.
-]
 
 { #category : #tests }
 CommitsLinkWithTicketMetricTest >> testCalculate [

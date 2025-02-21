@@ -3,27 +3,22 @@ A ClosedMergeFrequencyProjectMetricTest is a test class for testing the behavior
 "
 Class {
 	#name : #ClosedMergeRequestProjectMetricTest,
-	#superclass : #TestCase,
+	#superclass : #ProjectMetricTest,
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }
 ClosedMergeRequestProjectMetricTest >> testCalculate [
 
-	| glhImporter result mergeFrequency project |
+	| glhImporter result mergeFrequency |
 	"Given"
-	project := GLHProject new
-		           name: 'test';
-		           repository: GLHRepository new.
+	
 	glhImporter := GLPHImporterMock new.
-	glhImporter mergeRequests:
-		{
-			(GLHMergeRequest new
-				 project: project;
-				 created_at: '2024-09-04T10:24:11.803+02:00' asDateAndTime;
-				 closed_at: '2024-09-04T11:24:11.803+02:00' asDateAndTime;
-				 state: 'closed').
-		}.
+	glhImporter mergeRequests: { (GLHMergeRequest new
+			 project: project;
+			 created_at: '2024-09-04T10:24:11.803+02:00' asDateAndTime;
+			 closed_at: '2024-09-04T11:24:11.803+02:00' asDateAndTime;
+			 state: 'closed') }.
 
 	mergeFrequency := ClosedMergeRequestProjectMetric new
 		                  project: project;

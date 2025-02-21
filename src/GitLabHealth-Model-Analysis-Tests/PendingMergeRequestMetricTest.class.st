@@ -3,7 +3,7 @@ A PendingMergeRequestMetricTest is a test class for testing the behavior of Pend
 "
 Class {
 	#name : #PendingMergeRequestMetricTest,
-	#superclass : #TestCase,
+	#superclass : #UserMetricTest,
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
