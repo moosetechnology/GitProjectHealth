@@ -21,12 +21,14 @@ ClosedMergeRequestMetricTest >> testCalculate [
 	glhImporter mergeRequests: {
 			(GLHMergeRequest new
 				 author: user;
-				 created_at: '09-05-2024';
-				 merged_at: '09-05-2024';
+				 created_at: '2024-09-05:01-00-00' asDateAndTime;
+				 closed_at: '2024-09-05:02-00-00' asDateAndTime;
+				 merged_at: nil;
 				 state: 'closed').
 			(GLHMergeRequest new
 				 author: user;
-				 created_at: '09-05-2024';
+				 created_at: '2024-09-05:03-00-00' asDateAndTime;
+				 closed_at: '2024-09-05:04-00-00' asDateAndTime;
 				 merged_at: nil;
 				 state: 'closed') }.
 
@@ -34,8 +36,8 @@ ClosedMergeRequestMetricTest >> testCalculate [
 	closedMergeRequestMetric := ClosedMergeRequestMetric new
 		                            user: user;
 		                            glhImporter: glhImporter;
-		                            setPeriodSince: '09-04-2024'
-		                            until: '09-04-2024';
+		                            setPeriodSince: '2024-09-04'
+		                            until: '2024-09-05';
 		                            over: Week.
 
 	"When"

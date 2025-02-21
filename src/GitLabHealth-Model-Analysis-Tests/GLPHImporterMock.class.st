@@ -48,6 +48,7 @@ GLPHImporterMock >> glhModel: anObject [
 { #category : #commit }
 GLPHImporterMock >> importCommitsOfProject: project since: since until: until [
 
+	self flag: 'Adds commits regardless of their creation date !'.
 	glhModel addAll: commits.
 	^ commits
 ]
@@ -67,6 +68,7 @@ GLPHImporterMock >> importMergeRequestCommits: mergeRequest [
 { #category : #'import - merge request' }
 GLPHImporterMock >> importMergeRequests: project since: since until: until [
 
+	self flag: 'Adds MR regardless of their creation date !'.
 	glhModel addAll: mergeRequests.
 	^ mergeRequests
 ]
