@@ -23,9 +23,8 @@ Metric >> cacheSymbolFor: anEntityType since: since until: until [
 ]
 
 { #category : #calculating }
-Metric >> calculate [
-
-	^self subclassResponsibility
+Metric >> calculate [ 
+ ^self subclassResponsibility 
 ]
 
 { #category : #accessing }

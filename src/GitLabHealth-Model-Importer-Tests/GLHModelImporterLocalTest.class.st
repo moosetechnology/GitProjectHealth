@@ -16,7 +16,7 @@ GLHModelImporterLocalTest >> setUp [
 
 	super setUp.
 
-	importer := GLHModelImporter new.
+	importer := GitlabModelImporter new.
 	model := GLHModel new.
 	importer glhModel: model.
 	importer repoApi: GLHApiMock new

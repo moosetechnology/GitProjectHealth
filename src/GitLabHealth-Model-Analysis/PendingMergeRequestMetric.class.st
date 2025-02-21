@@ -16,7 +16,7 @@ PendingMergeRequestMetric >> calculate [
 		                           userMergeRequest state = 'opened'  ].
 
 	userMergedMergeRequests do: [ :userMergeRequest |
-		"here we look at the specific date of its merged"
+		"here we look at the specific date of its created"
 		dateOver := self transformDate: userMergeRequest created_at to: over.
 		groupedByDate
 			at: dateOver printString

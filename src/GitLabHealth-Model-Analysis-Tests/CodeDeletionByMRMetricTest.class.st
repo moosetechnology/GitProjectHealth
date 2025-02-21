@@ -4,7 +4,7 @@ A CodeDeletionByMRMetricTest is a test class for testing the behavior of CodeDel
 Class {
 	#name : #CodeDeletionByMRMetricTest,
 	#superclass : #TestCase,
-	#category : 'GitLabHealth-Model-Analysis-Tests'
+	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }

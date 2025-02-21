@@ -4,7 +4,7 @@ A CommitFrequencyMetricTest is a test class for testing the behavior of CommitFr
 Class {
 	#name : #CommitFrequencyMetricTest,
 	#superclass : #TestCase,
-	#category : 'GitLabHealth-Model-Analysis-Tests'
+	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }

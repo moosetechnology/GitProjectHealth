@@ -4,7 +4,7 @@ A MergeRequestDurationMetricTest is a test class for testing the behavior of Mer
 Class {
 	#name : #MergeRequestDurationMetricTest,
 	#superclass : #TestCase,
-	#category : 'GitLabHealth-Model-Analysis-Tests'
+	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }
