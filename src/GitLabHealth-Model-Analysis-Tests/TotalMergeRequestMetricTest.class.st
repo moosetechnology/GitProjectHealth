@@ -3,6 +3,6 @@ A TotalMergeRequestMetricTest is a test class for testing the behavior of TotalM
 "
 Class {
 	#name : #TotalMergeRequestMetricTest,
-	#superclass : #TestCase,
+	#superclass : #UserMetricTest,
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }

@@ -3,27 +3,26 @@ A MergeFrequencyProjectMetricTest is a test class for testing the behavior of Me
 "
 Class {
 	#name : #CreatedMergeRequestProjectMetricTest,
-	#superclass : #TestCase,
+	#superclass : #ProjectMetricTest,
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }
 CreatedMergeRequestProjectMetricTest >> testCalculate [
 
-	| glhImporter result mergeFrequency project |
+	| glhImporter result mergeFrequency |
 	"Given"
-	project := GLHProject new
-		           name: 'test';
-		           repository: GLHRepository new.
 	glhImporter := GLPHImporterMock new.
-	glhImporter mergeRequests:
-		{ (GLHMergeRequest new created_at: '2024-04-10') }.
+	glhImporter mergeRequests: { (GLHMergeRequest new
+			 created_at: '2024-09-04T10:24:11.803+02:00' asDateAndTime;
+			 state: 'opened';
+			 project: project) }.
 
 
 	mergeFrequency := CreatedMergeRequestProjectMetric new
 		                  project: project;
 		                  glhImporter: glhImporter;
-		                  setPeriodSince: '2024-04-09' until: '2024-04-11';
+		                  setPeriodSince: '2024-09-04' until: '2024-09-05';
 		                  over: Week.
 
 	"When"

@@ -3,43 +3,53 @@ A ReviewedByUserMergeRequestMetricTest is a test class for testing the behavior 
 "
 Class {
 	#name : #ReviewedByUserMergeRequestMetricTest,
-	#superclass : #TestCase,
+	#superclass : #UserMetricTest,
+	#instVars : [
+		'user2'
+	],
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
+
+{ #category : #running }
+ReviewedByUserMergeRequestMetricTest >> setUp [
+
+	super setUp.
+
+	user2 := GLHUser new
+		         name: 'testUser2';
+		         contributedProjects:
+			         { project1 }.
+]
 
 { #category : #test }
 ReviewedByUserMergeRequestMetricTest >> testCalculate [
 
-	| result glhImporter user mergeRequests user2 |
+	| result glhImporter mergeRequests |
 	"Given"
-	user := GLHUser new
-		        name: 'testUser';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
-	user2 := GLHUser new
-		         name: 'testUser2';
-		         contributedProjects:
-			         { (GLHProject new repository: GLHRepository new) }.
-
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: {
 			(GLHMergeRequest new
 				 author: user;
 				 merge_user: user;
 				 reviewers: { user };
-				 created_at:  (DateAndTime year: 2024 month: 09 day: 05 hour: 00 minute: 0 second: 0);
-				 merged_at: (DateAndTime year: 2024 month: 09 day: 05 hour: 00 minute: 0 second: 1)).
+				 project: project1;
+				 created_at: createdAt ;
+				 state: #merged;
+				 merged_at: mergedAt ).
 			(GLHMergeRequest new
 				 author: user;
-				 merge_user: nil;
-				 created_at: (DateAndTime year: 2024 month: 09 day: 05 hour: 00 minute: 0 second: 0);
-				 merged_at: (DateAndTime year: 2024 month: 09 day: 05 hour: 00 minute: 0 second: 1)) }.
+				 merge_user: user2;
+				 reviewers: { user2 };
+				 project: project1;
+				 state: #merged;
+				 created_at: createdAt ;
+				 merged_at: mergedAt ) }.
 
 
 	mergeRequests := ReviewedByUserMergeRequestMetric new
 		                 user: user;
 		                 glhImporter: glhImporter;
-		                 setPeriodSince: '09-04-2024' until: '09-04-2024';
+		                 setPeriodSince: since until: until;
 		                 over: Week.
 
 	"When"
@@ -50,26 +60,20 @@ ReviewedByUserMergeRequestMetricTest >> testCalculate [
 ]
 
 { #category : #test }
-ReviewedByUserMergeRequestMetricTest >> testCalculateNoMergeRequests [ 
+ReviewedByUserMergeRequestMetricTest >> testCalculateNoMergeRequests [
 
-	| result glhImporter user mergeRequests |
+	| result glhImporter  mergeRequests |
 	"Given"
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
 
 	glhImporter := GLPHImporterMock new.
-	glhImporter mergeRequests: { }.
+	glhImporter mergeRequests: {  }.
 
 
-	mergeRequests := ReviewedByUserMergeRequestMetric
-		                                   new
-		                                   user: user;
-		                                   glhImporter: glhImporter;
-		                                   setPeriodSince: '09-04-2024'
-		                                   until: '09-04-2024';
-		                                   over: Week.
+	mergeRequests := ReviewedByUserMergeRequestMetric new
+		                 user: user;
+		                 glhImporter: glhImporter;
+		                 setPeriodSince: since until: until;
+		                 over: Week.
 
 	"When"
 	result := mergeRequests calculate.
@@ -81,32 +85,27 @@ ReviewedByUserMergeRequestMetricTest >> testCalculateNoMergeRequests [
 { #category : #tests }
 ReviewedByUserMergeRequestMetricTest >> testCalculateReviewButNotCreated [
 
-	| result glhImporter user mergedMergeRequestWithoutReview user2 |
+	| result glhImporter  mergedMergeRequestWithoutReview  |
 	"Given"
-	user := GLHUser new
-		        name: 'testUser';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
-	user2 := GLHUser new
-		         name: 'testUser2';
-		         contributedProjects:
-			         { (GLHProject new repository: GLHRepository new) }.
+
 
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user2;
 			 merge_user: user2;
 			 reviewers: { user };
-			 created_at: (DateAndTime year: 2024 month: 09 day: 05 hour: 00 minute: 0 second: 0);
-			 merged_at: (DateAndTime year: 2024 month: 09 day: 05 hour: 00 minute: 0 second: 1)) }.
+			 project: project1;
+			 state: #merged;
+			 created_at: createdAt ;
+			 merged_at: mergedAt ) }.
 
 
 	mergedMergeRequestWithoutReview := ReviewedByUserMergeRequestMetric
 		                                   new
 		                                   user: user;
 		                                   glhImporter: glhImporter;
-		                                   setPeriodSince: '09-04-2024'
-		                                   until: '09-04-2024';
+		                                   setPeriodSince: since
+		                                   until: until;
 		                                   over: Week.
 
 	"When"
@@ -119,39 +118,34 @@ ReviewedByUserMergeRequestMetricTest >> testCalculateReviewButNotCreated [
 { #category : #test }
 ReviewedByUserMergeRequestMetricTest >> testCalculateReviewByOther [
 
-	| result glhImporter user mergedMergeRequestWithoutReview user2 |
+	| result glhImporter  mergedMergeRequestWithoutReview  |
 	"Given"
-	user := GLHUser new
-		        name: 'testUser';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
-	user2 := GLHUser new
-		         name: 'testUser2';
-		         contributedProjects:
-			         { (GLHProject new repository: GLHRepository new) }.
+
 
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: {
 			(GLHMergeRequest new
 				 author: user;
+				 project: project1;
 				 merge_user: user;
 				 reviewers: { user2 };
-				 created_at: (DateAndTime year: 2024 month: 09 day: 05 hour: 00 minute: 0 second: 0);
-				 merged_at: (DateAndTime year: 2024 month: 09 day: 05 hour: 00 minute: 0 second: 1)).
+				 created_at: createdAt ;
+				 merged_at: mergedAt ).
 			(GLHMergeRequest new
 				 author: user;
 				 merge_user: user2;
+				 project: project1;
 				 reviewers: { user2 };
-				 created_at: (DateAndTime year: 2024 month: 09 day: 05 hour: 00 minute: 0 second: 0);
-				 merged_at: (DateAndTime year: 2024 month: 09 day: 05 hour: 00 minute: 0 second: 1)) }.
+				 created_at: createdAt ;
+				 merged_at: mergedAt ) }.
 
 
 	mergedMergeRequestWithoutReview := ReviewedByUserMergeRequestMetric
 		                                   new
 		                                   user: user;
 		                                   glhImporter: glhImporter;
-		                                   setPeriodSince: '09-04-2024'
-		                                   until: '09-04-2024';
+		                                   setPeriodSince: since 
+		                                   until: until ;
 		                                   over: Week.
 
 	"When"

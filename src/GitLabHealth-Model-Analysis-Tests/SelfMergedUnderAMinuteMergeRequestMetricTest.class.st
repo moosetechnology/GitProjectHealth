@@ -3,41 +3,55 @@ A MergedMergeRequestWithoutReviewMetricTest is a test class for testing the beha
 "
 Class {
 	#name : #SelfMergedUnderAMinuteMergeRequestMetricTest,
-	#superclass : #TestCase,
+	#superclass : #UserMetricTest,
+	#instVars : [
+		'user2'
+	],
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
+
+{ #category : #running }
+SelfMergedUnderAMinuteMergeRequestMetricTest >> setUp [
+
+	super setUp.
+
+	user2 := GLHUser new
+		         name: 'user2';
+		         contributedProjects:
+			         { project1 }.
+]
 
 { #category : #tests }
 SelfMergedUnderAMinuteMergeRequestMetricTest >> testCalculate [
 
-	| result glhImporter user mergedMergeRequestWithoutReview |
+	| result glhImporter mergedMergeRequestWithoutReview |
 	"Given"
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
-
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: {
 			(GLHMergeRequest new
 				 author: user;
 				 merge_user: user;
+				 project: project1;
 				 reviewers: { user };
-				 created_at: (DateAndTime year: 2024 month: 09 day: 05 hour: 00 minute: 0 second: 0);
-				 merged_at: (DateAndTime year: 2024 month: 09 day: 05 hour: 00 minute: 0 second: 1)).
+				 created_at: createdAt;
+				 state: #merged;
+				 merged_at: createdAt + 30 seconds).
 			(GLHMergeRequest new
 				 author: user;
-				 merge_user: nil;
-				 created_at: (DateAndTime year: 2024 month: 09 day: 05 hour: 00 minute: 0 second: 0);
-				 merged_at: (DateAndTime year: 2024 month: 09 day: 05 hour: 00 minute: 0 second: 1)) }.
+				 reviewers: { user };
+				 merge_user: user;
+				 project: project1;
+				 state: #merged;
+				 created_at: createdAt;
+				 merged_at: createdAt + 2 minutes) }.
 
 
 	mergedMergeRequestWithoutReview := SelfMergedUnderAMinuteMergeRequestMetric
 		                                   new
 		                                   user: user;
 		                                   glhImporter: glhImporter;
-		                                   setPeriodSince: '09-04-2024'
-		                                   until: '09-04-2024';
+		                                   setPeriodSince: since
+		                                   until: until;
 		                                   over: Week.
 
 	"When"
@@ -50,39 +64,35 @@ SelfMergedUnderAMinuteMergeRequestMetricTest >> testCalculate [
 { #category : #tests }
 SelfMergedUnderAMinuteMergeRequestMetricTest >> testCalculateMergeButNotCreated [
 
-	| result glhImporter user mergedMergeRequestWithoutReview user2 |
+	| result glhImporter  mergedMergeRequestWithoutReview  |
 	"Given"
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
-
-	user2 := GLHUser new
-		         name: 'testUser2';
-		         contributedProjects:
-			         { (GLHProject new repository: GLHRepository new) }.
 
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: {
 			(GLHMergeRequest new
 				 author: user2;
 				 merge_user: user;
+				 project: project1;
+				 state: #merged;
 				 reviewers: { user };
-				 created_at: (DateAndTime year: 2024 month: 09 day: 05 hour: 00 minute: 0 second: 0);
-				 merged_at: (DateAndTime year: 2024 month: 09 day: 05 hour: 00 minute: 0 second: 1)).
+				 created_at: createdAt ;
+				 merged_at: mergedAt ).
 			(GLHMergeRequest new
-				 author: user;
-				 merge_user: nil;
-				 created_at: (DateAndTime year: 2024 month: 09 day: 05 hour: 00 minute: 0 second: 0);
-				 merged_at: (DateAndTime year: 2024 month: 09 day: 05 hour: 00 minute: 0 second: 1)) }.
+				 author: user2;
+				 merge_user: user;
+				 project: project1;
+				 state: #merged;
+				 created_at: createdAt ;
+				 merged_at: mergedAt ) 
+			}.
 
 
 	mergedMergeRequestWithoutReview := SelfMergedUnderAMinuteMergeRequestMetric
 		                                   new
 		                                   user: user;
 		                                   glhImporter: glhImporter;
-		                                   setPeriodSince: '09-04-2024'
-		                                   until: '09-04-2024';
+		                                   setPeriodSince: since
+		                                   until: until;
 		                                   over: Week.
 
 	"When"
@@ -95,12 +105,8 @@ SelfMergedUnderAMinuteMergeRequestMetricTest >> testCalculateMergeButNotCreated 
 { #category : #tests }
 SelfMergedUnderAMinuteMergeRequestMetricTest >> testCalculateNoMergeRequests [
 
-	| result glhImporter user mergedMergeRequestWithoutReview |
+	| result glhImporter mergedMergeRequestWithoutReview |
 	"Given"
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
 
 	glhImporter := GLPHImporterMock new.
 
@@ -108,8 +114,8 @@ SelfMergedUnderAMinuteMergeRequestMetricTest >> testCalculateNoMergeRequests [
 		                                   new
 		                                   user: user;
 		                                   glhImporter: glhImporter;
-		                                   setPeriodSince: '09-04-2024'
-		                                   until: '09-04-2024';
+		                                   setPeriodSince: since
+		                                   until: until;
 		                                   over: Week.
 
 	"When"
