@@ -6,10 +6,3 @@ Class {
 	#superclass : #TestCase,
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
-
-{ #category : #tests }
-TotalMergeRequestMetricTest >> testCalculate [
-
-	self flag: #toImplement.
-	self assert: false
-]
