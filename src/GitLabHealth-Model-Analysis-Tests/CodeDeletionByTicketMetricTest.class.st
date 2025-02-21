@@ -10,30 +10,28 @@ Class {
 { #category : #tests }
 CodeDeletionByTicketMetricTest >> testCalculate [
 
-	| result glhImporter user jiraImporter codeAddition |
+	| result glhImporter jiraImporter codeAddition |
 	"Given"
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
-
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
-			 created_at: '09-05-2024';
-			 merged_at: '09-06-2024' asDate;
+			 project: project1;
+			 created_at: createdAt;
+			 merged_at: mergedAt;
 			 title: '205 feat do something') }.
 
 	glhImporter commits: {
 			(GLHCommit new
 				 id: 1;
-				 created_at: '09-05-2024' asDate;
+				 repository: project1 repository;
+				 created_at: createdAt;
 				 additions: 7;
 				 commitCreator: user;
 				 deletions: 5).
 			(GLHCommit new
 				 id: 2;
-				 created_at: '09-05-2024' asDate;
+				 repository: project1 repository;
+				 created_at: createdAt + 10 minutes;
 				 additions: 3;
 				 commitCreator: user;
 				 deletions: 5) }.
@@ -48,7 +46,7 @@ CodeDeletionByTicketMetricTest >> testCalculate [
 		                user: user;
 		                glhImporter: glhImporter;
 		                jiraImporter: jiraImporter;
-		                setPeriodSince: '09-04-2024' until: '09-04-2024';
+		                setPeriodSince: since until: until;
 		                over: Week.
 
 	"When"
@@ -59,20 +57,18 @@ CodeDeletionByTicketMetricTest >> testCalculate [
 ]
 
 { #category : #tests }
-CodeDeletionByTicketMetricTest >> testCalculateNoCommits [ 
+CodeDeletionByTicketMetricTest >> testCalculateNoCommits [
 
-	| result glhImporter user jiraImporter codeAddition |
+	| result glhImporter  jiraImporter codeAddition |
 	"Given"
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
+
 
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
-			 created_at: '09-05-2024';
-			 merged_at: '09-06-2024' asDate;
+			 created_at: createdAt ;
+			 merged_at: mergedAt ;
+			 project: project1;
 			 title: '205 feat do something') }.
 
 	jiraImporter := JiraImporterMock new.
@@ -85,7 +81,7 @@ CodeDeletionByTicketMetricTest >> testCalculateNoCommits [
 		                user: user;
 		                glhImporter: glhImporter;
 		                jiraImporter: jiraImporter;
-		                setPeriodSince: '09-04-2024' until: '09-04-2024';
+		                setPeriodSince: since until: until;
 		                over: Week.
 
 	"When"
@@ -98,12 +94,9 @@ CodeDeletionByTicketMetricTest >> testCalculateNoCommits [
 { #category : #tests }
 CodeDeletionByTicketMetricTest >> testCalculateNoMergeRequests [
 
-	| result glhImporter user jiraImporter codeAddition |
+	| result glhImporter  jiraImporter codeAddition |
 	"Given"
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
+
 
 	glhImporter := GLPHImporterMock new.
 
@@ -117,7 +110,7 @@ CodeDeletionByTicketMetricTest >> testCalculateNoMergeRequests [
 		                user: user;
 		                glhImporter: glhImporter;
 		                jiraImporter: jiraImporter;
-		                setPeriodSince: '09-04-2024' until: '09-04-2024';
+		                setPeriodSince: since until: until;
 		                over: Week.
 
 	"When"

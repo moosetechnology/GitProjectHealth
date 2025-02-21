@@ -10,19 +10,18 @@ Class {
 { #category : #tests }
 CommitFrequencyProjectMetricTest >> testCalculate [
 
-	| glhImporter result commitFrequency  |
+	| glhImporter result commitFrequency |
 	"Given"
-
 	glhImporter := GLPHImporterMock new.
-	glhImporter commits: { 
-	(GLHCommit new created_at: '04-10-2024'; repository: project1 repository )
-	 }.
+	glhImporter commits: { (GLHCommit new
+			 created_at: createdAt ;
+			 repository: project1 repository) }.
 
 
 	commitFrequency := CommitFrequencyProjectMetric new
 		                   project: project1;
 		                   glhImporter: glhImporter;
-		                   setPeriodSince: '04-09-2024' until: '04-11-2024';
+		                   setPeriodSince: since until: until;
 		                   over: Week.
 
 	"When"

@@ -7,17 +7,6 @@ Class {
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
-{ #category : #running }
-CodeAdditionByTicketMetricTest >> setUp [
-
-	project1 := GLHProject new
-		            repository: GLHRepository new;
-		            name: 'project1'.
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects: { project1 }
-]
-
 { #category : #tests }
 CodeAdditionByTicketMetricTest >> testCalculate [
 

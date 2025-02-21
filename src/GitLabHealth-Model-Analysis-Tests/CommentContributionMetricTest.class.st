@@ -7,29 +7,18 @@ Class {
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
-{ #category : #running }
-CommentContributionMetricTest >> setUp [ 
-	project1 := (GLHProject new repository: GLHRepository new; name: 'project1').
-		user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { project1 }.
-]
-
 { #category : #tests }
 CommentContributionMetricTest >> testCalculate [
 
-	|  glhImporter result commitDiff commentContribution |
-
-
+	| glhImporter result commitDiff commentContribution |
 	commitDiff := GLHDiff new diffRanges: { (GLHDiffRange new changes:
 			               { (GLHAddition new sourceCode: '// test') }) }.
 
 	glhImporter := GLPHImporterMock new.
 	glhImporter commits: { (GLHCommit new
 			 id: 1;
-			repository: project1 repository;
-			 created_at: '04-09-2024';
+			 repository: project1 repository;
+			 created_at: createdAt ;
 			 commitCreator: user;
 			 diffs: { commitDiff }) }.
 
@@ -37,8 +26,8 @@ CommentContributionMetricTest >> testCalculate [
 	commentContribution := CommentContributionMetric new
 		                       user: user;
 		                       glhImporter: glhImporter;
-		                       setPeriodSince: '04-09-2024'
-		                       until: '04-09-2024';
+		                       setPeriodSince: since
+		                       until: until;
 		                       over: Week.
 	"When"
 	result := commentContribution calculate.
@@ -50,17 +39,15 @@ CommentContributionMetricTest >> testCalculate [
 { #category : #tests }
 CommentContributionMetricTest >> testCalculateNoCommits [
 
-	|  glhImporter result commentContribution |
-
-
+	| glhImporter result commentContribution |
 	glhImporter := GLPHImporterMock new.
 
 
 	commentContribution := CommentContributionMetric new
 		                       user: user;
 		                       glhImporter: glhImporter;
-		                       setPeriodSince: '04-09-2024'
-		                       until: '04-09-2024';
+		                       setPeriodSince: since
+		                       until: until;
 		                       over: Week.
 	"When"
 	result := commentContribution calculate.

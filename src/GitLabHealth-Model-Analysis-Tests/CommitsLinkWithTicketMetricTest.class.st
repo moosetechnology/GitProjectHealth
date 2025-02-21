@@ -9,27 +9,25 @@ Class {
 
 { #category : #tests }
 CommitsLinkWithTicketMetricTest >> testCalculate [
-
 	"Given"
-	|  glhImporter jiraImporter commitLinkWithTicket result |
 
-
+	| glhImporter jiraImporter commitLinkWithTicket result |
 	glhImporter := GLPHImporterMock new.
-	
+
 	glhImporter commits: {
 			(GLHCommit new
 				 id: 1;
-				repository: project1 repository ;
-				 created_at: '09-05-2024' asDate;
-					message: 'test';
+				 repository: project1 repository;
+				 created_at: createdAt;
+				 message: 'test';
 				 additions: 7;
 				 commitCreator: user;
 				 deletions: 5).
 			(GLHCommit new
 				 id: 2;
-				repository: project1 repository ;
-				 created_at: '09-05-2024' asDate;
-				message: '205';
+				 repository: project1 repository;
+				 created_at: createdAt;
+				 message: '205';
 				 additions: 3;
 				 commitCreator: user;
 				 deletions: 5) }.
@@ -41,15 +39,16 @@ CommitsLinkWithTicketMetricTest >> testCalculate [
 
 
 	commitLinkWithTicket := CommitsLinkWithTicketMetric new
-		                user: user;
-		                glhImporter: glhImporter;
-		                jiraImporter: jiraImporter;
-		                setPeriodSince: '09-04-2024' until: '09-04-2024';
-		                over: Week.
-		
+		                        user: user;
+		                        glhImporter: glhImporter;
+		                        jiraImporter: jiraImporter;
+		                        setPeriodSince: since
+		                        until: until;
+		                        over: Week.
+
 	"When"
 	result := commitLinkWithTicket calculate.
-	
+
 	"Then"
-	self assert: result equals: 1.
+	self assert: result equals: 1
 ]

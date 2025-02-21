@@ -7,44 +7,33 @@ Class {
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
-{ #category : #running }
-CodeDeletionByMRMetricTest >> setUp [
-
-	project1 := GLHProject new
-		            repository: GLHRepository new;
-		            name: 'project1'.
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects: { project1 }
-]
-
 { #category : #tests }
 CodeDeletionByMRMetricTest >> testCalculate [
 
-	| result glhImporter user codeDeletion |
-	"Given"
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
+	| result glhImporter  codeDeletion |
+
 
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
-			 created_at: '09-05-2024';
-			 merged_at: '09-06-2024' asDate;
+			 project: project1;
+			 created_at: '2024-09-05T10:24:11.803+02:00' asDateAndTime;
+			 merged_at: '2024-09-05T11:24:11.803+02:00' asDateAndTime;
+			 state: #merged;
 			 title: '205 feat do something') }.
 
 	glhImporter commits: {
 			(GLHCommit new
 				 id: 1;
-				 created_at: '09-05-2024' asDate;
+				repository: project1 repository;
+			 created_at: '2024-09-05T10:24:11.803+02:00' asDateAndTime;
 				 additions: 7;
 				 commitCreator: user;
 				 deletions: 5).
 			(GLHCommit new
 				 id: 2;
-				 created_at: '09-05-2024' asDate;
+				repository: project1 repository;
+			 created_at: '2024-09-05T10:34:11.803+02:00' asDateAndTime;
 				 additions: 3;
 				 commitCreator: user;
 				 deletions: 5) }.
@@ -52,7 +41,7 @@ CodeDeletionByMRMetricTest >> testCalculate [
 	codeDeletion := CodeDeletionByMRMetric new
 		                user: user;
 		                glhImporter: glhImporter;
-		                setPeriodSince: '09-04-2024' until: '09-04-2024';
+		                setPeriodSince: '2024-09-04' until: '2024-09-04';
 		                over: Week.
 
 	"When"
@@ -65,18 +54,15 @@ CodeDeletionByMRMetricTest >> testCalculate [
 { #category : #tests }
 CodeDeletionByMRMetricTest >> testCalculateNoCommits [
 
-	| result glhImporter user codeDeletion |
+	| result glhImporter  codeDeletion |
 	"Given"
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
+
 
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
-			 created_at: '09-05-2024';
-			 merged_at: '09-06-2024' asDate;
+			 created_at: '2024-09-05T10:24:11.803+02:00' asDateAndTime;
+			 state: #opened;
 			 title: '205 feat do something') }.
 
 	codeDeletion := CodeDeletionByMRMetric new
@@ -95,19 +81,12 @@ CodeDeletionByMRMetricTest >> testCalculateNoCommits [
 { #category : #tests }
 CodeDeletionByMRMetricTest >> testCalculateNoMergeRequests [
 
-	| result glhImporter user codeDeletion |
+	| result glhImporter  codeDeletion |
 	"Given"
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
+
 
 	glhImporter := GLPHImporterMock new.
-	glhImporter mergeRequests: { (GLHMergeRequest new
-			 author: user;
-			 created_at: '09-05-2024';
-			 merged_at: '09-06-2024' asDate;
-			 title: '205 feat do something') }.
+	glhImporter mergeRequests: {  }.
 
 	codeDeletion := CodeDeletionByMRMetric new
 		                user: user;
