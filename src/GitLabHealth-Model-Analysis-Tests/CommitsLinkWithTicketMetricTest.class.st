@@ -4,24 +4,37 @@ A CommitsLinkWithTicketMetricTest is a test class for testing the behavior of Co
 Class {
 	#name : #CommitsLinkWithTicketMetricTest,
 	#superclass : #TestCase,
+	#instVars : [
+		'project1',
+		'user'
+	],
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
+
+{ #category : #running }
+CommitsLinkWithTicketMetricTest >> setUp [ 
+
+		"Given"
+	project1 := (GLHProject new repository: GLHRepository new; name: 'project1').
+	user := GLHUser new
+		        username: 'test';
+		        contributedProjects:
+			        { project1 }.
+]
 
 { #category : #tests }
 CommitsLinkWithTicketMetricTest >> testCalculate [
 
 	"Given"
-	| user glhImporter jiraImporter commitLinkWithTicket result |
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
+	|  glhImporter jiraImporter commitLinkWithTicket result |
+
 
 	glhImporter := GLPHImporterMock new.
 	
 	glhImporter commits: {
 			(GLHCommit new
 				 id: 1;
+				repository: project1 repository ;
 				 created_at: '09-05-2024' asDate;
 					message: 'test';
 				 additions: 7;
@@ -29,6 +42,7 @@ CommitsLinkWithTicketMetricTest >> testCalculate [
 				 deletions: 5).
 			(GLHCommit new
 				 id: 2;
+				repository: project1 repository ;
 				 created_at: '09-05-2024' asDate;
 				message: '205';
 				 additions: 3;

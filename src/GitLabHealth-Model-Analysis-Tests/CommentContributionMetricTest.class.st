@@ -4,18 +4,27 @@ A CommentContributionMetricTest is a test class for testing the behavior of Comm
 Class {
 	#name : #CommentContributionMetricTest,
 	#superclass : #TestCase,
+	#instVars : [
+		'project1',
+		'user'
+	],
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
+
+{ #category : #running }
+CommentContributionMetricTest >> setUp [ 
+	project1 := (GLHProject new repository: GLHRepository new; name: 'project1').
+		user := GLHUser new
+		        username: 'test';
+		        contributedProjects:
+			        { project1 }.
+]
 
 { #category : #tests }
 CommentContributionMetricTest >> testCalculate [
 
-	| user glhImporter result commitDiff commentContribution |
-	"Given"
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
+	|  glhImporter result commitDiff commentContribution |
+
 
 	commitDiff := GLHDiff new diffRanges: { (GLHDiffRange new changes:
 			               { (GLHAddition new sourceCode: '// test') }) }.
@@ -23,6 +32,7 @@ CommentContributionMetricTest >> testCalculate [
 	glhImporter := GLPHImporterMock new.
 	glhImporter commits: { (GLHCommit new
 			 id: 1;
+			repository: project1 repository;
 			 created_at: '04-09-2024';
 			 commitCreator: user;
 			 diffs: { commitDiff }) }.
@@ -44,12 +54,8 @@ CommentContributionMetricTest >> testCalculate [
 { #category : #tests }
 CommentContributionMetricTest >> testCalculateNoCommits [
 
-	| user glhImporter result commentContribution |
-	"Given"
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
+	|  glhImporter result commentContribution |
+
 
 	glhImporter := GLPHImporterMock new.
 

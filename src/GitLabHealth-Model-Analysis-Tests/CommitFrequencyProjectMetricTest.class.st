@@ -4,21 +4,36 @@ A CommitFrequencyProjectMetricTest is a test class for testing the behavior of C
 Class {
 	#name : #CommitFrequencyProjectMetricTest,
 	#superclass : #TestCase,
+	#instVars : [
+		'project1',
+		'user'
+	],
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
+
+{ #category : #running }
+CommitFrequencyProjectMetricTest >> setUp [ 
+	project1 := (GLHProject new repository: GLHRepository new; name: 'project1').
+		user := GLHUser new
+		        username: 'test';
+		        contributedProjects:
+			        { project1 }.
+]
 
 { #category : #tests }
 CommitFrequencyProjectMetricTest >> testCalculate [
 
-	| glhImporter result commitFrequency project |
+	| glhImporter result commitFrequency  |
 	"Given"
-	project := GLHProject new name: 'test';repository: GLHRepository new.
+
 	glhImporter := GLPHImporterMock new.
-	glhImporter commits: { GLHCommit new created_at: '04-10-2024' }.
+	glhImporter commits: { 
+	(GLHCommit new created_at: '04-10-2024'; repository: project1 repository )
+	 }.
 
 
 	commitFrequency := CommitFrequencyProjectMetric new
-		                   project: project;
+		                   project: project1;
 		                   glhImporter: glhImporter;
 		                   setPeriodSince: '04-09-2024' until: '04-11-2024';
 		                   over: Week.

@@ -4,28 +4,41 @@ A CodeAdditionMetricTest is a test class for testing the behavior of CodeAdditio
 Class {
 	#name : #CodeAdditionMetricTest,
 	#superclass : #TestCase,
+	#instVars : [
+		'project1',
+		'user'
+	],
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
+
+{ #category : #running }
+CodeAdditionMetricTest >> setUp [
+
+	project1 := GLHProject new
+		            repository: GLHRepository new;
+		            name: 'project1'.
+	user := GLHUser new
+		        username: 'test';
+		        contributedProjects: { project1 }
+]
 
 { #category : #tests }
 CodeAdditionMetricTest >> testCalculate [
 
-	| user glhImporter codeAddition result |
-	"Given"
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
+	|  glhImporter codeAddition result |
+
 
 	glhImporter := GLPHImporterMock new.
 	glhImporter commits: {
 			(GLHCommit new
 				 id: 1;
 				 created_at: '04-09-2024';
+				 repository: project1 repository;
 				 commitCreator: user;
 				 additions: 5).
 			(GLHCommit new
 				 id: 2;
+				 repository: project1 repository;
 				 created_at: '04-09-2024';
 				 commitCreator: user;
 				 additions: 5) }.
@@ -47,12 +60,8 @@ CodeAdditionMetricTest >> testCalculate [
 { #category : #tests }
 CodeAdditionMetricTest >> testCalculateNoCommits [
 
-	| user glhImporter codeAddition result |
-	"Given"
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
+	|  glhImporter codeAddition result |
+
 
 	glhImporter := GLPHImporterMock new.
 

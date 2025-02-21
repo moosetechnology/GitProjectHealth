@@ -4,28 +4,42 @@ A CodeDeletionMetricTest is a test class for testing the behavior of CodeDeletio
 Class {
 	#name : #CodeDeletionMetricTest,
 	#superclass : #TestCase,
+	#instVars : [
+		'project1',
+		'user'
+	],
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
+
+{ #category : #running }
+CodeDeletionMetricTest >> setUp [ 
+
+		"Given"
+	project1 := (GLHProject new repository: GLHRepository new; name: 'project1').
+	user := GLHUser new
+		        username: 'test';
+		        contributedProjects:
+			        { project1 }.
+]
 
 { #category : #tests }
 CodeDeletionMetricTest >> testCalculate [
 
-	| user glhImporter result codeDeletion |
+	| glhImporter result codeDeletion |
 	"Given"
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
+
 
 	glhImporter := GLPHImporterMock new.
 	glhImporter commits: {
 			(GLHCommit new
 				 id: 1;
+				repository: project1 repository;
 				 created_at: '04-09-2024';
 				 commitCreator: user;
 				 deletions: 5).
 			(GLHCommit new
 				 id: 2;
+				repository: project1 repository;
 				 created_at: '04-09-2024';
 				 commitCreator: user;
 				 deletions: 5) }.
@@ -47,12 +61,8 @@ CodeDeletionMetricTest >> testCalculate [
 { #category : #tests }
 CodeDeletionMetricTest >> testCalculateNoCommits [
 
-	| user glhImporter result codeDeletion |
-	"Given"
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
+	|  glhImporter result codeDeletion |
+
 
 	glhImporter := GLPHImporterMock new.
 
