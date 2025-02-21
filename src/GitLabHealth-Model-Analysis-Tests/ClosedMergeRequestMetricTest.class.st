@@ -4,29 +4,42 @@ A ClosedMergeRequestMetricTest is a test class for testing the behavior of Close
 Class {
 	#name : #ClosedMergeRequestMetricTest,
 	#superclass : #TestCase,
+	#instVars : [
+		'project1',
+		'user'
+	],
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
+
+{ #category : #running }
+ClosedMergeRequestMetricTest >> setUp [ 
+		"Given"
+	project1 := (GLHProject new repository: GLHRepository new; name: 'project1').
+	user := GLHUser new
+		        username: 'test';
+		        contributedProjects:
+			        { project1 }.
+]
 
 { #category : #tests }
 ClosedMergeRequestMetricTest >> testCalculate [
 
-	| result glhImporter user closedMergeRequestMetric |
+	| result glhImporter  closedMergeRequestMetric |
 	"Given"
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
+
 
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: {
 			(GLHMergeRequest new
 				 author: user;
+				 project: project1;
 				 created_at: '2024-09-04T10:24:11.803+02:00' asDateAndTime;
 				 closed_at: '2024-09-04T11:24:11.803+02:00' asDateAndTime;
 				 merged_at: nil;
 				 state: 'closed').
 			(GLHMergeRequest new
 				 author: user;
+				 project: project1;
 				 created_at: '2024-09-04T12:24:11.803+02:00' asDateAndTime;
 				 closed_at: '2024-09-04T13:24:11.803+02:00' asDateAndTime;
 				 merged_at: nil;
@@ -50,27 +63,26 @@ ClosedMergeRequestMetricTest >> testCalculate [
 { #category : #tests }
 ClosedMergeRequestMetricTest >> testCalculate1MRinPeriod2Outside [
 
-	| result glhImporter user closedMergeRequestMetric |
-	"Given"
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
+	| result glhImporter closedMergeRequestMetric |
+
 
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: {
 			(GLHMergeRequest new
 				 author: user;
+				 project: project1;
 				 created_at: '2024-09-04T10:24:11.803+02:00' asDateAndTime;
 				 closed_at: '2024-09-04T11:24:11.803+02:00' asDateAndTime;
 				 state: 'closed').
 			(GLHMergeRequest new
 				 author: user;
+				 project: project1;
 				 created_at: '2024-09-04T12:24:11.803+02:00' asDateAndTime;
 				 closed_at: '2024-09-04T13:24:11.803+02:00' asDateAndTime;
 				 state: 'closed').
 			(GLHMergeRequest new
 				 author: user;
+				 project: project1;
 				 created_at: '2024-08-01T12:24:11.803+02:00' asDateAndTime;
 				 closed_at: '2024-08-01T13:24:11.803+02:00' asDateAndTime;
 				 state: 'closed') }.
@@ -93,30 +105,30 @@ ClosedMergeRequestMetricTest >> testCalculate1MRinPeriod2Outside [
 { #category : #tests }
 ClosedMergeRequestMetricTest >> testCalculate3MR [
 
-	| result glhImporter user closedMergeRequestMetric |
-	"Given"
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
+	| result glhImporter closedMergeRequestMetric |
+
 
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: {
 			(GLHMergeRequest new
 				 author: user;
+				 project: project1;
 				 created_at: '2024-09-04T10:24:11.803+02:00' asDateAndTime;
 				 closed_at: '2024-09-04T11:24:11.803+02:00' asDateAndTime;
 				 state: 'closed').
 			(GLHMergeRequest new
 				 author: user;
+				 project: project1;
 				 created_at: '2024-09-04T12:24:11.803+02:00' asDateAndTime;
 				 closed_at: '2024-09-04T13:24:11.803+02:00' asDateAndTime;
 				 state: 'closed').
 			(GLHMergeRequest new
 				 author: user;
+				 project: project1;
 				 created_at: '2024-09-04T15:24:11.803+02:00' asDateAndTime;
 				 closed_at: '2024-09-04T16:24:11.803+02:00' asDateAndTime;
-				 state: 'closed') }.
+				 state: 'closed').
+			}.
 
 
 	closedMergeRequestMetric := ClosedMergeRequestMetric new
@@ -136,36 +148,37 @@ ClosedMergeRequestMetricTest >> testCalculate3MR [
 { #category : #tests }
 ClosedMergeRequestMetricTest >> testCalculate3MRClosed2Opened [
 
-	| result glhImporter user closedMergeRequestMetric |
-	"Given"
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
+	| result glhImporter closedMergeRequestMetric |
+
 
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: {
 			(GLHMergeRequest new
 				 author: user;
+				 project: project1;
 				 created_at: '2024-09-04T10:24:11.803+02:00' asDateAndTime;
 				 closed_at: '2024-09-04T11:24:11.803+02:00' asDateAndTime;
 				 state: 'closed').
 			(GLHMergeRequest new
 				 author: user;
+				 project: project1;
 				 created_at: '2024-09-04T12:24:11.803+02:00' asDateAndTime;
 				 closed_at: '2024-09-04T13:24:11.803+02:00' asDateAndTime;
 				 state: 'closed').
 			(GLHMergeRequest new
 				 author: user;
+				 project: project1;
 				 created_at: '2024-09-04T15:24:11.803+02:00' asDateAndTime;
 				 closed_at: '2024-09-04T16:24:11.803+02:00' asDateAndTime;
 				 state: 'closed').
 			(GLHMergeRequest new
 				 author: user;
+				 project: project1;
 				 created_at: '2024-09-04T10:24:11.803+02:00' asDateAndTime;
 				 state: 'opened').
 			(GLHMergeRequest new
 				 author: user;
+				 project: project1;
 				 created_at: '2024-09-04T11:24:11.803+02:00' asDateAndTime;
 				 state: 'opened') }.
 
@@ -187,12 +200,9 @@ ClosedMergeRequestMetricTest >> testCalculate3MRClosed2Opened [
 { #category : #tests }
 ClosedMergeRequestMetricTest >> testCalculateNoClosedMR [
 
-	| result glhImporter user closedMergeRequestMetric |
+	| result glhImporter closedMergeRequestMetric |
 	"Given"
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
+
 
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: {
@@ -239,12 +249,9 @@ ClosedMergeRequestMetricTest >> testCalculateNoClosedMR [
 { #category : #tests }
 ClosedMergeRequestMetricTest >> testCalculateNoMergeRequests [
 
-	| result glhImporter user closedMergeRequestMetric |
+	| result glhImporter closedMergeRequestMetric |
 	"Given"
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
+
 
 	glhImporter := GLPHImporterMock new.
 
@@ -265,12 +272,9 @@ ClosedMergeRequestMetricTest >> testCalculateNoMergeRequests [
 { #category : #tests }
 ClosedMergeRequestMetricTest >> testCalculateOutSidePeriod [
 
-	| result glhImporter user closedMergeRequestMetric |
+	| result glhImporter closedMergeRequestMetric |
 	"Given"
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
+
 
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: {

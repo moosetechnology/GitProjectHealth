@@ -50,7 +50,7 @@ GLPHImporterMock >> importCommitsOfProject: project since: since until: until [
 
 	self flag: 'Adds commits regardless of their creation date !'.
 	glhModel addAll: commits.
-	^ commits
+	^ commits select: [ :commit | commit repository project = project ].
 ]
 
 { #category : #'as yet unclassified' }
@@ -69,8 +69,9 @@ GLPHImporterMock >> importMergeRequestCommits: mergeRequest [
 GLPHImporterMock >> importMergeRequests: project since: since until: until [
 
 	self flag: 'Adds MR regardless of their creation date !'.
-	glhModel addAll: mergeRequests.
-	^ mergeRequests
+	glhModel addAll: mergeRequests .
+	
+	^ mergeRequests select: [ :mr | mr project = project ]
 ]
 
 { #category : #'import - merge request' }
