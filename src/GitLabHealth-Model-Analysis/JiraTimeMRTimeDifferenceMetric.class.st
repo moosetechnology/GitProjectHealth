@@ -22,23 +22,17 @@ JiraTimeMRTimeDifferenceMetric >> calculate [
 		                 | differences average |
 		                 differences := group collect: [ :mergeRequest |
 			                                | firstCommitDate mergeRequestTime jiraTime |
-			                                firstCommitDate := mergeRequest
-				                                                   commits last
-				                                                   created_at.
+													 
+													 "merge request commits are order first younger to older. Thus last returns the earliest MR"
+			                                firstCommitDate := mergeRequest commits last created_at.
 
-			                                mergeRequestTime := mergeRequest
-				                                                    merged_at
-			                                                    -
-			                                                    firstCommitDate.
+			                                mergeRequestTime := mergeRequest merged_at - firstCommitDate.
 
 			                                jiraTime := mergeRequest jiraIssue
 				                                            timeOriginalEstimate
 				                                            ifNil: [
 				                                            mergeRequest jiraIssue
-					                                            timeEstimate ]
-				                                            ifNotNil: [
-				                                            mergeRequest jiraIssue
-					                                            timeOriginalEstimate ].
+					                                            timeEstimate ].
 
 			                                (jiraTime - mergeRequestTime)
 				                                asSeconds ].

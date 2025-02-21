@@ -10,22 +10,20 @@ Class {
 { #category : #tests }
 ContributedProjectMetricTest >> testCalculate [
 
-	| glhImporter result contributedProject repository1 |
+	| glhImporter result contributedProject |
 	"Given"
-
-
 	glhImporter := GLPHImporterMock new.
 	glhImporter commits: {
 			(GLHCommit new
 				 id: 1;
-				 created_at: '04-09-2024';
-				 committed_date: '04-09-2024';
+				 created_at: createdAt ;
+				 committed_date: createdAt ;
 				 commitCreator: user;
-				 repository: project1 repository ).
+				 repository: project1 repository).
 			(GLHCommit new
 				 id: 2;
-				 created_at: '04-09-2024';
-				 committed_date: '04-09-2024';
+				 created_at: createdAt ;
+				 committed_date: createdAt ;
 				 commitCreator: user;
 				 repository: project1 repository) }.
 
@@ -33,8 +31,8 @@ ContributedProjectMetricTest >> testCalculate [
 	contributedProject := ContributedProjectMetric new
 		                      user: user;
 		                      glhImporter: glhImporter;
-		                      setPeriodSince: '04-09-2024'
-		                      until: '04-09-2024';
+		                      setPeriodSince: since
+		                      until: until;
 		                      over: Week.
 
 	"When"
@@ -47,17 +45,15 @@ ContributedProjectMetricTest >> testCalculate [
 { #category : #tests }
 ContributedProjectMetricTest >> testCalculateNoCommits [
 
-	|  glhImporter result contributedProject  |
-
-
+	| glhImporter result contributedProject |
 	glhImporter := GLPHImporterMock new.
 
 
 	contributedProject := ContributedProjectMetric new
 		                      user: user;
 		                      glhImporter: glhImporter;
-		                      setPeriodSince: '2024-04-09'
-		                      until: '2024-04-09';
+		                      setPeriodSince: since
+		                      until: until;
 		                      over: Week.
 
 	"When"

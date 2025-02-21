@@ -10,8 +10,7 @@ Class {
 { #category : #tests }
 MergeRequestDurationMetricTest >> testCalculate [
 
-	| result glhImporter  mergeRequestDuration |
-
+	| result glhImporter mergeRequestDuration |
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: {
 			(GLHMergeRequest new
@@ -33,8 +32,8 @@ MergeRequestDurationMetricTest >> testCalculate [
 						  second: 0)).
 			(GLHMergeRequest new
 				 author: user;
-				project: project1;
-				  created_at: (DateAndTime
+				 project: project1;
+				 created_at: (DateAndTime
 						  year: 2024
 						  month: 09
 						  day: 05
@@ -47,8 +46,8 @@ MergeRequestDurationMetricTest >> testCalculate [
 	mergeRequestDuration := MergeRequestDurationMetric new
 		                        user: user;
 		                        glhImporter: glhImporter;
-		                        setPeriodSince: '2024-09-04'
-		                        until: '2024-09-04';
+		                        setPeriodSince: since
+		                        until: until;
 		                        over: Week.
 
 	"When"
@@ -61,16 +60,14 @@ MergeRequestDurationMetricTest >> testCalculate [
 { #category : #tests }
 MergeRequestDurationMetricTest >> testCalculateNoMergeRequests [
 
-	| result glhImporter  mergeRequestDuration |
-
-
+	| result glhImporter mergeRequestDuration |
 	glhImporter := GLPHImporterMock new.
 
 	mergeRequestDuration := MergeRequestDurationMetric new
 		                        user: user;
 		                        glhImporter: glhImporter;
-		                        setPeriodSince: '2024-09-04'
-		                        until: '2024-09-05';
+		                        setPeriodSince: since
+		                        until: until;
 		                        over: Week.
 
 	"When"

@@ -10,6 +10,12 @@ Class {
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
+{ #category : #testing }
+Metric class >> isAbstract [
+
+	^ self == Metric
+]
+
 { #category : #'as yet unclassified' }
 Metric >> accronym [
 	^ (self name first uppercase asString), (self name select: #isUppercase) 
