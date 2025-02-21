@@ -54,21 +54,19 @@ CodeDeletionByMRMetricTest >> testCalculate [
 { #category : #tests }
 CodeDeletionByMRMetricTest >> testCalculateNoCommits [
 
-	| result glhImporter  codeDeletion |
+	| result glhImporter codeDeletion |
 	"Given"
-
-
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
-			 created_at: '2024-09-05T10:24:11.803+02:00' asDateAndTime;
+			 created_at: createdAt ;
 			 state: #opened;
 			 title: '205 feat do something') }.
 
 	codeDeletion := CodeDeletionByMRMetric new
 		                user: user;
 		                glhImporter: glhImporter;
-		                setPeriodSince: '09-04-2024' until: '09-04-2024';
+		                setPeriodSince: since until: until;
 		                over: Week.
 
 	"When"
@@ -81,17 +79,15 @@ CodeDeletionByMRMetricTest >> testCalculateNoCommits [
 { #category : #tests }
 CodeDeletionByMRMetricTest >> testCalculateNoMergeRequests [
 
-	| result glhImporter  codeDeletion |
+	| result glhImporter codeDeletion |
 	"Given"
-
-
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: {  }.
 
 	codeDeletion := CodeDeletionByMRMetric new
 		                user: user;
 		                glhImporter: glhImporter;
-		                setPeriodSince: '09-04-2024' until: '09-04-2024';
+		                setPeriodSince: since until: until;
 		                over: Week.
 
 	"When"

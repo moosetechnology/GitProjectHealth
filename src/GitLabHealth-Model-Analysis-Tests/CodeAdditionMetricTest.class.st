@@ -10,21 +10,19 @@ Class {
 { #category : #tests }
 CodeAdditionMetricTest >> testCalculate [
 
-	|  glhImporter codeAddition result |
-
-
+	| glhImporter codeAddition result |
 	glhImporter := GLPHImporterMock new.
 	glhImporter commits: {
 			(GLHCommit new
 				 id: 1;
-				 created_at: '04-09-2024';
+				 created_at: createdAt ;
 				 repository: project1 repository;
 				 commitCreator: user;
 				 additions: 5).
 			(GLHCommit new
 				 id: 2;
 				 repository: project1 repository;
-				 created_at: '04-09-2024';
+				 created_at: createdAt ;
 				 commitCreator: user;
 				 additions: 5) }.
 
@@ -32,7 +30,7 @@ CodeAdditionMetricTest >> testCalculate [
 	codeAddition := CodeAdditionMetric new
 		                user: user;
 		                glhImporter: glhImporter;
-		                setPeriodSince: '04-09-2024' until: '04-09-2024';
+		                setPeriodSince: since until: since;
 		                over: Week.
 
 	"When"
@@ -45,16 +43,14 @@ CodeAdditionMetricTest >> testCalculate [
 { #category : #tests }
 CodeAdditionMetricTest >> testCalculateNoCommits [
 
-	|  glhImporter codeAddition result |
-
-
+	| glhImporter codeAddition result |
 	glhImporter := GLPHImporterMock new.
 
 
 	codeAddition := CodeAdditionMetric new
 		                user: user;
 		                glhImporter: glhImporter;
-		                setPeriodSince: '04-09-2024' until: '04-09-2024';
+		                setPeriodSince: since until: until;
 		                over: Week.
 
 	"When"

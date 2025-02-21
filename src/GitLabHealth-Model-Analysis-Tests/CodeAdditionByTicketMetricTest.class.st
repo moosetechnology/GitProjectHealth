@@ -96,7 +96,6 @@ CodeAdditionByTicketMetricTest >> testCalculateNoCommits [
 CodeAdditionByTicketMetricTest >> testCalculateNoMergeRequests [
 
 	| result glhImporter jiraImporter codeAddition |
-
 	glhImporter := GLPHImporterMock new.
 
 	jiraImporter := JiraImporterMock new.
@@ -109,7 +108,7 @@ CodeAdditionByTicketMetricTest >> testCalculateNoMergeRequests [
 		                user: user;
 		                glhImporter: glhImporter;
 		                jiraImporter: jiraImporter;
-		                setPeriodSince: '09-04-2024' until: '09-04-2024';
+		                setPeriodSince: since until: until;
 		                over: Week.
 
 	"When"

@@ -1,6 +1,6 @@
 Class {
 	#name : #ProjectMetricTest,
-	#superclass : #TestCase,
+	#superclass : #MetricTest,
 	#instVars : [
 		'project',
 		'project1',
@@ -18,7 +18,7 @@ ProjectMetricTest >> setUp [
 	project := GLHProject new
 		           name: 'projectTest';
 		           repository: GLHRepository new.
-	
+
 	project1 := GLHProject new
 		            name: 'project1';
 		            repository: GLHRepository new.
@@ -26,5 +26,5 @@ ProjectMetricTest >> setUp [
 
 	project2 := GLHProject new
 		            name: 'project2';
-		            repository: GLHRepository new.
+		            repository: GLHRepository new
 ]

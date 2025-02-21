@@ -15,7 +15,7 @@ ClosedTicketsMetricTest >> testCalculate [
 	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
 			 project: project1;
-			 created_at: '2024-09-05T10:24:11.803+02:00' asDateAndTime;
+			 created_at: createdAt ;
 			 title: '205 feat do something') }.
 
 	jiraImporter := JiraImporterMock new.
@@ -26,7 +26,7 @@ ClosedTicketsMetricTest >> testCalculate [
 		                user: user;
 		                glhImporter: glhImporter;
 		                jiraImporter: jiraImporter;
-		                setPeriodSince: '2024-09-04' until: '2024-09-05';
+		                setPeriodSince: since until: until;
 		                over: Week.
 
 	"When"
