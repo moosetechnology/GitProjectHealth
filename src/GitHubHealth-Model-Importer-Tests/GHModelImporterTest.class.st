@@ -7,14 +7,14 @@ Class {
 	#instVars : [
 		'importer'
 	],
-	#category : 'GitHubHealth-Model-Importer-Tests'
+	#category : #'GitHubHealth-Model-Importer-Tests'
 }
 
 { #category : #running }
 GHModelImporterTest >> setUp [
 	super setUp.
 
-	importer := GHModelImporter new
+	importer := GithubModelImporter new
 ]
 
 { #category : #tests }

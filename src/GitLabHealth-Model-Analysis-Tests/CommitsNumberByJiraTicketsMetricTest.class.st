@@ -3,30 +3,29 @@ A CommitsNumberByJiraTicketsMetricTest is a test class for testing the behavior 
 "
 Class {
 	#name : #CommitsNumberByJiraTicketsMetricTest,
-	#superclass : #TestCase,
-	#category : 'GitLabHealth-Model-Analysis-Tests'
+	#superclass : #UserMetricTest,
+	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }
 CommitsNumberByJiraTicketsMetricTest >> testCalculate [
 
-	| result glhImporter user jiraImporter commitsNumber |
+	| result glhImporter  jiraImporter commitsNumber |
 	"Given"
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
+
 
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
-			 created_at: '09-05-2024';
-			 merged_at: '09-06-2024' asDate;
+			 project: project1;
+			 created_at: createdAt ;
+			 merged_at: mergedAt ;
 			 title: '205 feat do something') }.
 
 	glhImporter commits: { (GLHCommit new
 			 id: 1;
-			 created_at: '09-05-2024' asDate;
+			 repository: project1 repository;
+			 created_at: createdAt ;
 			 commitCreator: user;
 			 deletions: 5) }.
 
@@ -40,7 +39,7 @@ CommitsNumberByJiraTicketsMetricTest >> testCalculate [
 		                 user: user;
 		                 glhImporter: glhImporter;
 		                 jiraImporter: jiraImporter;
-		                 setPeriodSince: '09-04-2024' until: '09-04-2024';
+		                 setPeriodSince: since until: until ;
 		                 over: Week.
 
 	"When"
@@ -53,18 +52,17 @@ CommitsNumberByJiraTicketsMetricTest >> testCalculate [
 { #category : #tests }
 CommitsNumberByJiraTicketsMetricTest >> testCalculateNoCommits [
 
-	| result glhImporter user jiraImporter commitsNumber |
+	| result glhImporter  jiraImporter commitsNumber |
 	"Given"
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
+
 
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
-			 created_at: '09-05-2024';
-			 merged_at: '09-06-2024' asDate;
+			 project: project1;
+			 created_at: createdAt ;
+			 merged_at: mergedAt ;
+			 state: #merged;
 			 title: '205 feat do something') }.
 
 	jiraImporter := JiraImporterMock new.
@@ -77,7 +75,7 @@ CommitsNumberByJiraTicketsMetricTest >> testCalculateNoCommits [
 		                 user: user;
 		                 glhImporter: glhImporter;
 		                 jiraImporter: jiraImporter;
-		                 setPeriodSince: '09-04-2024' until: '09-04-2024';
+		                 setPeriodSince: since until: until;
 		                 over: Week.
 
 	"When"
@@ -90,12 +88,9 @@ CommitsNumberByJiraTicketsMetricTest >> testCalculateNoCommits [
 { #category : #tests }
 CommitsNumberByJiraTicketsMetricTest >> testCalculateNoMergeRequests [
 
-	| result glhImporter user jiraImporter commitsNumber |
+	| result glhImporter jiraImporter commitsNumber |
 	"Given"
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
+
 
 	glhImporter := GLPHImporterMock new.
 
@@ -109,7 +104,7 @@ CommitsNumberByJiraTicketsMetricTest >> testCalculateNoMergeRequests [
 		                 user: user;
 		                 glhImporter: glhImporter;
 		                 jiraImporter: jiraImporter;
-		                 setPeriodSince: '09-04-2024' until: '09-04-2024';
+		                 setPeriodSince: since until: until;
 		                 over: Week.
 
 	"When"

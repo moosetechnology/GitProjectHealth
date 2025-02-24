@@ -3,42 +3,36 @@ A ContributedProjectMetricTest is a test class for testing the behavior of Contr
 "
 Class {
 	#name : #ContributedProjectMetricTest,
-	#superclass : #TestCase,
-	#category : 'GitLabHealth-Model-Analysis-Tests'
+	#superclass : #UserMetricTest,
+	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }
 ContributedProjectMetricTest >> testCalculate [
 
-	| user glhImporter result contributedProject project1 repository1 |
+	| glhImporter result contributedProject |
 	"Given"
-	project1 := GLHProject new repository: GLHRepository new.
-	repository1 := GLHRepository new project: project1.
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects: { project1 }.
-
 	glhImporter := GLPHImporterMock new.
 	glhImporter commits: {
 			(GLHCommit new
 				 id: 1;
-				 created_at: '04-09-2024';
-				 committed_date: '04-09-2024';
+				 created_at: createdAt ;
+				 committed_date: createdAt ;
 				 commitCreator: user;
-				 repository: repository1).
+				 repository: project1 repository).
 			(GLHCommit new
 				 id: 2;
-				 created_at: '04-09-2024';
-				 committed_date: '04-09-2024';
+				 created_at: createdAt ;
+				 committed_date: createdAt ;
 				 commitCreator: user;
-				 repository: repository1) }.
+				 repository: project1 repository) }.
 
 
 	contributedProject := ContributedProjectMetric new
 		                      user: user;
 		                      glhImporter: glhImporter;
-		                      setPeriodSince: '04-09-2024'
-		                      until: '04-09-2024';
+		                      setPeriodSince: since
+		                      until: until;
 		                      over: Week.
 
 	"When"
@@ -51,22 +45,15 @@ ContributedProjectMetricTest >> testCalculate [
 { #category : #tests }
 ContributedProjectMetricTest >> testCalculateNoCommits [
 
-	| user glhImporter result contributedProject project1 repository1 |
-	"Given"
-	project1 := GLHProject new repository: GLHRepository new.
-	repository1 := GLHRepository new project: project1.
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects: { project1 }.
-
+	| glhImporter result contributedProject |
 	glhImporter := GLPHImporterMock new.
 
 
 	contributedProject := ContributedProjectMetric new
 		                      user: user;
 		                      glhImporter: glhImporter;
-		                      setPeriodSince: '04-09-2024'
-		                      until: '04-09-2024';
+		                      setPeriodSince: since
+		                      until: until;
 		                      over: Week.
 
 	"When"

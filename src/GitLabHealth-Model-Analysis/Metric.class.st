@@ -10,6 +10,12 @@ Class {
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
+{ #category : #testing }
+Metric class >> isAbstract [
+
+	^ self == Metric
+]
+
 { #category : #'as yet unclassified' }
 Metric >> accronym [
 	^ (self name first uppercase asString), (self name select: #isUppercase) 
@@ -23,9 +29,8 @@ Metric >> cacheSymbolFor: anEntityType since: since until: until [
 ]
 
 { #category : #calculating }
-Metric >> calculate [
-
-	^self subclassResponsibility
+Metric >> calculate [ 
+ ^self subclassResponsibility 
 ]
 
 { #category : #accessing }
@@ -80,7 +85,7 @@ Metric >> setupGroupedDate [
 	increment := 1.
 	start := self transformDate: (period at: #since) to: over.
 	end := self transformDate: (period at: #until) to: over.
-	
+
 	groupedByDate
 		at: start printString
 		ifAbsentPut: [ OrderedCollection new ].
@@ -92,9 +97,9 @@ Metric >> setupGroupedDate [
 		over := #day ].
 
 
-	[ groupedByDate keys last asDate asDateAndTime < end ] whileTrue: [
+	[ groupedByDate keys last asDate < end ] whileTrue: [
 		| index |
-		index := groupedByDate keys last asDate asDateAndTime
+		index := groupedByDate keys last asDate
 		         + (increment perform: overSymbol).
 		index := self transformDate: index to: over.
 		groupedByDate

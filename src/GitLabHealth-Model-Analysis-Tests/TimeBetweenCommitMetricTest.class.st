@@ -3,32 +3,29 @@ A TimeBetweenCommitMetricTest is a test class for testing the behavior of TimeBe
 "
 Class {
 	#name : #TimeBetweenCommitMetricTest,
-	#superclass : #TestCase,
-	#category : 'GitLabHealth-Model-Analysis-Tests'
+	#superclass : #UserMetricTest,
+	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }
 TimeBetweenCommitMetricTest >> testCalculate [
 
-	| user glhImporter result timeBetweenCommit |
+	| glhImporter result timeBetweenCommit |
 	"Given"
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
-
 	glhImporter := GLPHImporterMock new.
 	glhImporter commits: {
 			(GLHCommit new
 				 id: 1;
-				 created_at: (DateAndTime year: 2024 month: 09 day: 04 hour: 01 minute: 0 second: 0);
-				 committed_date: (DateAndTime year: 2024 month: 09 day: 04 hour: 01 minute: 0 second: 0);
+				 repository: project1 repository;
+				 created_at: createdAt ;
+				 committed_date: createdAt ;
 				 commitCreator: user;
 				 additions: 5).
 			(GLHCommit new
 				 id: 2;
-				 created_at: '09-04-2024';
-				 committed_date: '09-05-2024' asDate;
+				 repository: project1 repository;
+				 created_at: createdAt + 23 hours ;
+				 committed_date: createdAt + 23 hours ;
 				 commitCreator: user;
 				 additions: 5) }.
 
@@ -36,35 +33,30 @@ TimeBetweenCommitMetricTest >> testCalculate [
 	timeBetweenCommit := TimeBetweenCommitMetric new
 		                     user: user;
 		                     glhImporter: glhImporter;
-		                     setPeriodSince: '09-04-2024'
-		                     until: '09-04-2024';
+		                     setPeriodSince: since
+		                     until: until;
 		                     over: Week.
 
 	"When"
 	result := timeBetweenCommit calculate.
 
 	"Then"
-	self assert: result equals: (23 hours asSeconds)
+	self assert: result equals: 23 hours asSeconds
 ]
 
 { #category : #tests }
 TimeBetweenCommitMetricTest >> testCalculateNoCommits [
 
-	| user glhImporter result timeBetweenCommit |
+	| glhImporter result timeBetweenCommit |
 	"Given"
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
-
 	glhImporter := GLPHImporterMock new.
 
 
 	timeBetweenCommit := TimeBetweenCommitMetric new
 		                     user: user;
 		                     glhImporter: glhImporter;
-		                     setPeriodSince: '09-04-2024'
-		                     until: '09-04-2024';
+		                     setPeriodSince: since
+		                     until: until;
 		                     over: Week.
 
 	"When"

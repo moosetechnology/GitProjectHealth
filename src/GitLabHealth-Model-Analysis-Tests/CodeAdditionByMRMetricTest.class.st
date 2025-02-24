@@ -3,37 +3,35 @@ A CodeAdditionByMRMetricTest is a test class for testing the behavior of CodeAdd
 "
 Class {
 	#name : #CodeAdditionByMRMetricTest,
-	#superclass : #TestCase,
-	#category : 'GitLabHealth-Model-Analysis-Tests'
+	#superclass : #UserMetricTest,
+	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }
 CodeAdditionByMRMetricTest >> testCalculate [
 
-	| result glhImporter user codeAddition |
-	"Given"
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
-
+	| result glhImporter codeAddition |
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
-			 created_at: '09-05-2024';
-			 merged_at: '09-06-2024' asDate;
+			 project: project1;
+			 created_at: createdAt ;
+			 merged_at: mergedAt ;
+			 state: #merged;
 			 title: '205 feat do something') }.
 
 	glhImporter commits: {
 			(GLHCommit new
 				 id: 1;
-				 created_at: '09-05-2024' asDate;
+				 repository: project1 repository;
+				 created_at: createdAt ;
 				 additions: 7;
 				 commitCreator: user;
 				 deletions: 5).
 			(GLHCommit new
 				 id: 2;
-				 created_at: '09-05-2024' asDate;
+				 repository: project1 repository;
+				 created_at: createdAt ;
 				 additions: 3;
 				 commitCreator: user;
 				 deletions: 5) }.
@@ -42,7 +40,7 @@ CodeAdditionByMRMetricTest >> testCalculate [
 	codeAddition := CodeAdditionByMRMetric new
 		                user: user;
 		                glhImporter: glhImporter;
-		                setPeriodSince: '09-04-2024' until: '09-04-2024';
+		                setPeriodSince: since until: until;
 		                over: Week.
 
 	"When"
@@ -55,24 +53,20 @@ CodeAdditionByMRMetricTest >> testCalculate [
 { #category : #tests }
 CodeAdditionByMRMetricTest >> testCalculateNoCommits [
 
-	| result glhImporter user codeAddition |
-	"Given"
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
-
+	| result glhImporter codeAddition |
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
-			 created_at: '09-05-2024';
-			 merged_at: '09-06-2024' asDate;
+			 project: project1;
+			 created_at: createdAt ;
+			 merged_at: mergedAt ;
+			 state: #merged;
 			 title: '205 feat do something') }.
 
 	codeAddition := CodeAdditionByMRMetric new
 		                user: user;
 		                glhImporter: glhImporter;
-		                setPeriodSince: '09-04-2024' until: '09-04-2024';
+		                setPeriodSince: since until: until;
 		                over: Week.
 
 	"When"
@@ -85,19 +79,13 @@ CodeAdditionByMRMetricTest >> testCalculateNoCommits [
 { #category : #tests }
 CodeAdditionByMRMetricTest >> testCalculateNoMergeRequests [
 
-	| result glhImporter user codeAddition |
-	"Given"
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
-
+	| result glhImporter codeAddition |
 	glhImporter := GLPHImporterMock new.
 
 	codeAddition := CodeAdditionByMRMetric new
 		                user: user;
 		                glhImporter: glhImporter;
-		                setPeriodSince: '09-04-2024' until: '09-04-2024';
+		                setPeriodSince: since until: until;
 		                over: Week.
 
 	"When"

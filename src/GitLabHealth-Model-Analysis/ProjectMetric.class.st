@@ -3,10 +3,17 @@ Class {
 	#superclass : #Metric,
 	#instVars : [
 		'project',
-		'projectCommits'
+		'projectCommits',
+		'projectMergeRequests'
 	],
 	#category : #'GitLabHealth-Model-Analysis'
 }
+
+{ #category : #testing }
+ProjectMetric class >> isAbstract [
+
+	^ self == ProjectMetric
+]
 
 { #category : #loading }
 ProjectMetric >> loadCommitsSince: since until: until [
@@ -35,6 +42,34 @@ ProjectMetric >> loadCommitsSince: since until: until [
 	glhImporter withCommitDiffs: true.
 
 	^ allCommits
+]
+
+{ #category : #loading }
+ProjectMetric >> loadMergeRequestsSince: since until: until [
+
+	| cacheSymbol allMergeRequests |
+	glhImporter withCommitDiffs: false.
+
+	cacheSymbol := self
+		               cacheSymbolFor: GLHMergeRequest 
+		               since: since
+		               until: until.
+
+	"download mergerequest unless project cache is not empty"
+	allMergeRequests := project repository
+		                    cacheAt: cacheSymbol
+		                    ifAbsentPut: [
+			                    | foundMergeRequests |
+			                    foundMergeRequests := glhImporter
+				                                          importMergeRequests:
+				                                          project
+				                                          since: since
+				                                          until: until.
+			                    foundMergeRequests ].
+
+	glhImporter withCommitDiffs: true.
+
+	^ allMergeRequests
 ]
 
 { #category : #accessing }

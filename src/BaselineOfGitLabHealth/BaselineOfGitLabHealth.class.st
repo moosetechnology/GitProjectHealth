@@ -46,10 +46,15 @@ BaselineOfGitLabHealth >> defineDependencies: spec [
 	spec baseline: 'AWS' with: [
 		spec repository:
 			'github://Evref-BL/aws-sdk-smalltalk:master/pharo-repository' ].
-		
-  spec 		baseline: 'GitlabAPI' with: [
-		spec
-			repository: 'github://Evref-BL/Gitlab-Pharo-API:develop'].
+
+	spec
+		baseline: 'GitlabAPI'
+		with: [
+		spec repository: 'github://Evref-BL/Gitlab-Pharo-API:develop' ].
+	
+		spec baseline: 'BitbucketPharoAPI'
+		with: [
+		spec repository: 'github://Evref-BL/Bitbucket-Pharo-API:develop' ].
 
 ]
 
@@ -156,9 +161,10 @@ BaselineOfGitLabHealth >> definePackages: spec [
 		package: 'GitHubHealth-Model-Importer-Tests'
 		with: [ spec requires: #( 'GitHubHealth-Model-Importer' ) ].
 
-	"bitBucket"
+	"Bitbucket"
 	spec
-		package: 'BitBucketHealth-Model-Importer';
+		package: 'BitBucketHealth-Model-Importer'
+		with: [ spec requires: #( 'BitbucketPharoAPI' ) ];
 		package: 'BitBucketHealth-Model-Importer-Tests'
 		with: [ spec requires: #( 'BitBucketHealth-Model-Importer' ) ].
 
