@@ -3,41 +3,39 @@ A MergedMergeRequestMetricTest is a test class for testing the behavior of Merge
 "
 Class {
 	#name : #MergedMergeRequestMetricTest,
-	#superclass : #TestCase,
+	#superclass : #UserMetricTest,
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }
 MergedMergeRequestMetricTest >> testCalculate [
 
-	| result glhImporter user mergedMergeRequest |
+	| result glhImporter mergedMergeRequest |
 	"Given"
-	user := GLHUser new
-		        username: 'test';
-				 id: 1;
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
+
 
 	glhImporter := GLPHImporterMock new.
-	glhImporter mergeRequests: { (GLHMergeRequest new
-			 author: user;
-		    merge_user: user;
-			 created_at: '09-05-2024';
-			 merged_at: '09-05-2024').
-			
+	glhImporter mergeRequests: {
 			(GLHMergeRequest new
-				author: user;
-				merge_user: user;
-				created_at: '09-02-2024';
-			 	merged_at: nil)
-			}.
+				 author: user;
+				 merge_user: user;
+				 project: project1;
+				 created_at: createdAt ;
+				 merged_at: mergedAt ).
+
+			(GLHMergeRequest new
+				 author: user;
+				 merge_user: user;
+				 project: project1;
+				 created_at: createdAt - 20 days;
+				 merged_at: nil) }.
 
 
 	mergedMergeRequest := MergedMergeRequestMetric new
 		                      user: user;
 		                      glhImporter: glhImporter;
-		                      setPeriodSince: '09-01-2024'
-		                      until: '09-07-2024';
+		                      setPeriodSince: since
+		                      until: until;
 		                      over: Week.
 
 	"When"
@@ -50,36 +48,31 @@ MergedMergeRequestMetricTest >> testCalculate [
 { #category : #tests }
 MergedMergeRequestMetricTest >> testCalculate1MRInPeriod1Outside [
 
-	| result glhImporter user mergedMergeRequest |
+	| result glhImporter mergedMergeRequest |
 	"Given"
-	user := GLHUser new
-		        username: 'test';
-		        id: 1;
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
-
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: {
 			(GLHMergeRequest new
 				 author: user;
+				 project: project1;
 				 merge_user: user;
-				 created_at: '09-05-2024';
-				 merged_at: '09-05-2024').
+				 created_at: createdAt;
+				 merged_at: mergedAt).
 
 			"open but merged anotherWeek"
 			(GLHMergeRequest new
 				 author: user;
 				 merge_user: user;
-				 created_at: '09-05-2024';
-				 merged_at: '09-10-2024') }.
+				 project: project1;
+				 created_at: createdAt;
+				 merged_at: createdAt + 10 days) }.
 	"open and merge during the same week"
 
 
 	mergedMergeRequest := MergedMergeRequestMetric new
 		                      user: user;
 		                      glhImporter: glhImporter;
-		                      setPeriodSince: '09-01-2024'
-		                      until: '09-07-2024';
+		                      setPeriodSince: since until: until;
 		                      over: Week.
 
 	"When"
@@ -92,32 +85,29 @@ MergedMergeRequestMetricTest >> testCalculate1MRInPeriod1Outside [
 { #category : #tests }
 MergedMergeRequestMetricTest >> testCalculate1MROpenedButNotMerged [
 
-	| result glhImporter user mergedMergeRequest |
+	| result glhImporter mergedMergeRequest |
 	"Given"
-	user := GLHUser new
-		        username: 'test';
-		        id: 1;
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
-
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: {
 			(GLHMergeRequest new
 				 author: user;
 				 merge_user: user;
-				 created_at: '09-05-2024';
-				 merged_at: '09-05-2024').
+				 project: project1;
+				 created_at: createdAt;
+				 merged_at: mergedAt;
+				 state: #merged).
+
 			(GLHMergeRequest new
 				 author: user;
-				 created_at: '09-05-2024';
-				 merged_at: nil) }.
+				 project: project1;
+				 created_at: createdAt;
+				 state: #opened) }.
 
 
 	mergedMergeRequest := MergedMergeRequestMetric new
 		                      user: user;
 		                      glhImporter: glhImporter;
-		                      setPeriodSince: '09-01-2024'
-		                      until: '09-07-2024';
+		                      setPeriodSince: since until: until;
 		                      over: Week.
 
 	"When"
@@ -130,41 +120,37 @@ MergedMergeRequestMetricTest >> testCalculate1MROpenedButNotMerged [
 { #category : #tests }
 MergedMergeRequestMetricTest >> testCalculate2MROneForEachUser [
 
-	| result glhImporter user1 mergedMergeRequest user2 |
+	| result glhImporter  mergedMergeRequest user2 |
 	"Given"
-	user1 := GLHUser new
-		         name: 'test';
-		         id: 1;
-		         contributedProjects:
-			         { (GLHProject new repository: GLHRepository new) }.
+
 
 	user2 := GLHUser new
-		         name: 'test';
+		         name: 'user2';
 		         id: 2;
-		         contributedProjects:
-			         { (GLHProject new repository: GLHRepository new) }.
+		         contributedProjects: { project1 }.
 
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: {
 			(GLHMergeRequest new
-				 author: user1;
+				 author: user;
 				 title: 'MR1';
-				 created_at: '09-05-2024';
-				 merge_user: user1;
-				 merged_at: '09-05-2024').
+				 project: project1;
+				 created_at: createdAt;
+				 merge_user: user;
+				 merged_at: mergedAt).
 			(GLHMergeRequest new
 				 author: user2;
 				 title: 'MR2';
-				 created_at: '09-05-2024';
+				 project: project1;
+				 created_at: createdAt;
 				 merge_user: user2;
-				 merged_at: '09-06-2024') }.
+				 merged_at: mergedAt) }.
 
 
 	mergedMergeRequest := MergedMergeRequestMetric new
-		                      user: user1;
+		                      user: user;
 		                      glhImporter: glhImporter;
-		                      setPeriodSince: '09-01-2024'
-		                      until: '09-07-2024';
+		                      setPeriodSince: since until: until;
 		                      over: Week.
 
 	"When"
@@ -177,47 +163,43 @@ MergedMergeRequestMetricTest >> testCalculate2MROneForEachUser [
 { #category : #tests }
 MergedMergeRequestMetricTest >> testCalculate3MROpenButMergedByOthers [
 
-	| result glhImporter user1 mergedMergeRequest user2 |
+	| result glhImporter mergedMergeRequest user2 |
 	"Given"
-	user1 := GLHUser new
-		         name: 'test';
-		         id: 1;
-		         contributedProjects:
-			         { (GLHProject new repository: GLHRepository new) }.
+
 
 	user2 := GLHUser new
-		         name: 'test';
+		         name: 'user2';
 		         id: 2;
 		         contributedProjects:
-			         { (GLHProject new repository: GLHRepository new) }.
+			         { project1 }.
 
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: {
 			(GLHMergeRequest new
-				 author: user1;
+				 author: user;
 				 title: 'MR1';
-				 created_at: '09-05-2024';
+				 created_at: createdAt;
 				 merge_user: user2;
-				 merged_at: '09-05-2024').
+				 merged_at: mergedAt ).
 			(GLHMergeRequest new
-				 author: user1;
+				 author: user;
 				 title: 'MR2';
-				 created_at: '09-05-2024';
+				 created_at: createdAt ;
 				 merge_user: user2;
-				 merged_at: '09-06-2024').
+				 merged_at: mergedAt ).
 			(GLHMergeRequest new
-				 author: user1;
+				 author: user;
 				 title: 'MR3';
-				 created_at: '09-05-2024';
+				 created_at: createdAt ;
 				 merge_user: user2;
-				 merged_at: '09-06-2024') }.
+				 merged_at: mergedAt ) }.
 
 
 	mergedMergeRequest := MergedMergeRequestMetric new
-		                      user: user1;
+		                      user: user;
 		                      glhImporter: glhImporter;
-		                      setPeriodSince: '09-01-2024'
-		                      until: '09-07-2024';
+		                      setPeriodSince: since
+		                      until: until;
 		                      over: Week.
 
 	"When"
@@ -230,47 +212,48 @@ MergedMergeRequestMetricTest >> testCalculate3MROpenButMergedByOthers [
 { #category : #tests }
 MergedMergeRequestMetricTest >> testCalculate3MROpenByOther [
 
-	| result glhImporter user1 mergedMergeRequest user2 |
+	| result glhImporter  mergedMergeRequest user2 |
 	"Given"
-	user1 := GLHUser new
-		         name: 'test';
-		         id: 1;
-		         contributedProjects:
-			         { (GLHProject new repository: GLHRepository new) }.
 
 	user2 := GLHUser new
-		         name: 'test';
+		         name: 'user2';
 		         id: 2;
 		         contributedProjects:
-			         { (GLHProject new repository: GLHRepository new) }.
+			         { project1 }.
 
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: {
 			(GLHMergeRequest new
 				 author: user2;
 				 title: 'MR1';
-				 created_at: '09-05-2024';
-				 merge_user: user1;
-				 merged_at: '09-05-2024').
+				 created_at: createdAt ;
+				 merge_user: user;
+				project: project1 ;
+				state: #merged; 
+				 merged_at: mergedAt ).
 			(GLHMergeRequest new
 				 author: user2;
+				state: #merged; 
 				 title: 'MR2';
-				 created_at: '09-05-2024';
-				 merge_user: user1;
-				 merged_at: '09-06-2024').
+				 created_at: createdAt ;
+				project: project1 ;
+				 merge_user: user;
+				 merged_at: mergedAt ).
 			(GLHMergeRequest new
 				 author: user2;
+				state: #merged; 
 				 title: 'MR3';
-				 created_at: '09-05-2024';
-				 merge_user: user1;
-				 merged_at: '09-06-2024') }.
+				 created_at: createdAt ;
+				 project: project1 ;
+				 merge_user: user;
+				 merged_at: mergedAt ) }.
 
 
 	mergedMergeRequest := MergedMergeRequestMetric new
-		                      user: user1;
+		                      user: user;
 		                      glhImporter: glhImporter;
-		                      setPeriodSince: '09-01-2024'
-		                      until: '09-07-2024';
+		                      setPeriodSince: since
+		                      until: until;
 		                      over: Week.
 
 	"When"
@@ -281,24 +264,18 @@ MergedMergeRequestMetricTest >> testCalculate3MROpenByOther [
 ]
 
 { #category : #tests }
-MergedMergeRequestMetricTest >> testCalculateNoMergeRequests [ 
+MergedMergeRequestMetricTest >> testCalculateNoMergeRequests [
 
-	| result glhImporter user mergedMergeRequest |
+	| result glhImporter mergedMergeRequest |
 	"Given"
-	user := GLHUser new
-		        username: 'test';
-		id: 1;
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
-
 	glhImporter := GLPHImporterMock new.
 
 
 	mergedMergeRequest := MergedMergeRequestMetric new
 		                      user: user;
 		                      glhImporter: glhImporter;
-		                      setPeriodSince: '09-04-2024'
-		                      until: '09-04-2024';
+		                      setPeriodSince: since
+		                      until: until;
 		                      over: Week.
 
 	"When"

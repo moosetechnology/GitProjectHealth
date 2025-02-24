@@ -3,33 +3,35 @@ A JiraTimeMRTimeDifferenceMetricTest is a test class for testing the behavior of
 "
 Class {
 	#name : #JiraTimeMRTimeDifferenceMetricTest,
-	#superclass : #TestCase,
+	#superclass : #UserMetricTest,
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }
 JiraTimeMRTimeDifferenceMetricTest >> testCalculate [
 
-	| result glhImporter user jiraImporter jiraMRDifference |
+	| result glhImporter jiraImporter jiraMRDifference |
+	
 	"Given"
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
-
+	"a Merge request with 24h difference between creation and merge"
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
-			 created_at: '09-05-2024';
-			 merged_at: '09-06-2024' asDate;
+			 created_at: createdAt;
+			 merged_at: createdAt + 24 hours;
+			 state: #merged;
+			 project: project1;
 			 title: '205 feat do something') }.
 
 	glhImporter commits: { (GLHCommit new
 			 id: 1;
-			 created_at: '09-05-2024' asDate;
+			 created_at: createdAt;
+			 committed_date: createdAt;
+			 repository: project1 repository;
 			 commitCreator: user;
 			 deletions: 5) }.
-
+	
+	"and a Jira ticket estimated at 25 hours"
 	jiraImporter := JiraImporterMock new.
 	jiraImporter issues: { (JPIssue new
 			 key: '205';
@@ -40,37 +42,35 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculate [
 		                    user: user;
 		                    glhImporter: glhImporter;
 		                    jiraImporter: jiraImporter;
-		                    setPeriodSince: '09-04-2024'
-		                    until: '09-04-2024';
+		                    setPeriodSince: since until: until;
 		                    over: Week.
 
 	"When"
 	result := jiraMRDifference calculate.
 
 	"Then"
+	"the time difference must be 1h "
 	self assert: result equals: 1 hours asSeconds
 ]
 
 { #category : #tests }
 JiraTimeMRTimeDifferenceMetricTest >> testCalculate2PeriodWith1EmptyPeriod [
 
-	| result glhImporter user jiraImporter jiraMRDifference |
+	| result glhImporter jiraImporter jiraMRDifference |
 	"Given"
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
-
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
-			 created_at: '09-05-2024';
-			 merged_at: '09-06-2024' asDate;
+			 project: project1;
+			 state: #merged;
+			 created_at: createdAt;
+			 merged_at: createdAt + 24 hours;
 			 title: '205 feat do something') }.
 
 	glhImporter commits: { (GLHCommit new
 			 id: 1;
-			 created_at: '09-05-2024' asDate;
+			 repository: project1 repository;
+			 created_at: createdAt;
 			 commitCreator: user;
 			 deletions: 5) }.
 
@@ -80,30 +80,29 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculate2PeriodWith1EmptyPeriod [
 			 timeEstimate: 25 hours asDuration) }.
 
 
+	"period correspond to 2 weeks"
 	jiraMRDifference := JiraTimeMRTimeDifferenceMetric new
 		                    user: user;
 		                    glhImporter: glhImporter;
 		                    jiraImporter: jiraImporter;
-		                    setPeriodSince: '09-04-2024'
-		                    until: '09-09-2024';
-		                    over: Week.
+		                    setPeriodSince: '2024-09-01'
+		                    until: '2024-09-09';
+		                   over: Week.
 
 	"When"
 	result := jiraMRDifference calculate.
 
 	"Then"
-	self assert: result equals: 1 hours /2 asSeconds
+	"half an hours"
+	self assert: result equals: 1 hours / 2 asSeconds "1800"
 ]
 
 { #category : #tests }
 JiraTimeMRTimeDifferenceMetricTest >> testCalculateNoMergeRequests [
 
-	| result glhImporter user jiraImporter jiraMRDifference |
+	| result glhImporter jiraImporter jiraMRDifference |
 	"Given"
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
+
 
 	glhImporter := GLPHImporterMock new.
 
@@ -114,8 +113,8 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculateNoMergeRequests [
 		                    user: user;
 		                    glhImporter: glhImporter;
 		                    jiraImporter: jiraImporter;
-		                    setPeriodSince: '09-04-2024'
-		                    until: '09-04-2024';
+		                    setPeriodSince: since
+		                    until: until;
 		                    over: Week.
 
 	"When"
@@ -128,23 +127,20 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculateNoMergeRequests [
 { #category : #tests }
 JiraTimeMRTimeDifferenceMetricTest >> testCalculateWithNoEstimatedTime [
 
-	| result glhImporter user jiraImporter jiraMRDifference |
+	| result glhImporter jiraImporter jiraMRDifference |
 	"Given"
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
+
 
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
-			 created_at: '09-05-2024';
-			 merged_at: '09-06-2024' asDate;
+			 created_at: createdAt ;
+			 merged_at: mergedAt ;
 			 title: '205 feat do something') }.
 
 	glhImporter commits: { (GLHCommit new
 			 id: 1;
-			 created_at: '09-05-2024' asDate;
+			 created_at: createdAt ;
 			 commitCreator: user;
 			 deletions: 5) }.
 
@@ -156,8 +152,8 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculateWithNoEstimatedTime [
 		                    user: user;
 		                    glhImporter: glhImporter;
 		                    jiraImporter: jiraImporter;
-		                    setPeriodSince: '09-04-2024'
-		                    until: '09-04-2024';
+		                    setPeriodSince: since
+		                    until: until;
 		                    over: Week.
 
 	"When"
@@ -170,38 +166,38 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculateWithNoEstimatedTime [
 { #category : #tests }
 JiraTimeMRTimeDifferenceMetricTest >> testCalculateWithTimeOriginalEstimateAndNoTimeEstimate [
 
-	| result glhImporter user jiraImporter jiraMRDifference |
+	| result glhImporter jiraImporter jiraMRDifference |
 	"Given"
-	user := GLHUser new
-		        username: 'test';
-		        contributedProjects:
-			        { (GLHProject new repository: GLHRepository new) }.
 
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
-			 created_at: '09-05-2024';
-			 merged_at: '09-06-2024' asDate;
+			 project: project1;
+			 created_at: createdAt ;
+			 merged_at: (createdAt + 24 hours);
+			 state: #merged;
 			 title: '205 feat do something') }.
 
 	glhImporter commits: { (GLHCommit new
 			 id: 1;
-			 created_at: '09-05-2024' asDate;
+			 created_at: createdAt ;
+			 committed_date: createdAt ;
+			 repository: project1 repository ;
 			 commitCreator: user;
 			 deletions: 5) }.
 
 	jiraImporter := JiraImporterMock new.
 	jiraImporter issues: { (JPIssue new
 			 key: '205';
-			 timeEstimate: nil; timeOriginalEstimate: 25 hours asDuration)}.
-
+			 timeEstimate: nil;
+			 timeOriginalEstimate: 25 hours asDuration) }.
 
 	jiraMRDifference := JiraTimeMRTimeDifferenceMetric new
 		                    user: user;
 		                    glhImporter: glhImporter;
 		                    jiraImporter: jiraImporter;
-		                    setPeriodSince: '09-04-2024'
-		                    until: '09-04-2024';
+		                    setPeriodSince: since
+		                    until: until;
 		                    over: Week.
 
 	"When"
