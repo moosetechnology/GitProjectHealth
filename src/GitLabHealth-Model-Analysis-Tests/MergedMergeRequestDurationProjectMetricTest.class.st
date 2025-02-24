@@ -1,21 +1,21 @@
 "
-A MergeRequestDurationMetricTest is a test class for testing the behavior of MergeRequestDurationMetric
+A ClosedMergeRequestDurationProjectMetricTest is a test class for testing the behavior of ClosedMergeRequestDurationProjectMetric
 "
 Class {
-	#name : #MergeRequestDurationMetricTest,
-	#superclass : #UserMetricTest,
+	#name : #MergedMergeRequestDurationProjectMetricTest,
+	#superclass : #ProjectMetricTest,
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }
-MergeRequestDurationMetricTest >> testCalculate [
+MergedMergeRequestDurationProjectMetricTest >> testCalculate [
 
 	| result glhImporter mergeRequestDuration |
 	glhImporter := GLPHImporterMock new.
+	
 	glhImporter mergeRequests: {
 			(GLHMergeRequest new
-				 author: user;
-				 project: project1;
+				 project: project1 ;
 				 created_at: (DateAndTime
 						  year: 2024
 						  month: 09
@@ -31,7 +31,6 @@ MergeRequestDurationMetricTest >> testCalculate [
 						  minute: 0
 						  second: 0)).
 			(GLHMergeRequest new
-				 author: user;
 				 project: project1;
 				 created_at: (DateAndTime
 						  year: 2024
@@ -43,8 +42,8 @@ MergeRequestDurationMetricTest >> testCalculate [
 				 merged_at: nil) }.
 
 
-	mergeRequestDuration := MergeRequestDurationMetric new
-		                        user: user;
+	mergeRequestDuration := MergedMergeRequestDurationProjectMetric new 
+	                           project: project1 ;
 		                        glhImporter: glhImporter;
 		                        setPeriodSince: since
 		                        until: until;
@@ -55,24 +54,4 @@ MergeRequestDurationMetricTest >> testCalculate [
 
 	"Then"
 	self assert: result equals: 10 * 60 * 60
-]
-
-{ #category : #tests }
-MergeRequestDurationMetricTest >> testCalculateNoMergeRequests [
-
-	| result glhImporter mergeRequestDuration |
-	glhImporter := GLPHImporterMock new.
-
-	mergeRequestDuration := MergeRequestDurationMetric new
-		                        user: user;
-		                        glhImporter: glhImporter;
-		                        setPeriodSince: since
-		                        until: until;
-		                        over: Week.
-
-	"When"
-	result := mergeRequestDuration calculate.
-
-	"Then"
-	self assert: result equals: nil
 ]
