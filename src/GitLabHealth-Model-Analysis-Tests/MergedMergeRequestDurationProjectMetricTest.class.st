@@ -27,7 +27,23 @@ MergedMergeRequestDurationProjectMetricTest >> testCalculate [
 						  year: 2024
 						  month: 09
 						  day: 05
-						  hour: 10
+						  hour: 12
+						  minute: 0
+						  second: 0)).
+						(GLHMergeRequest new
+				 project: project1 ;
+				 created_at: (DateAndTime
+						  year: 2024
+						  month: 09
+						  day: 05
+						  hour: 00
+						  minute: 0
+						  second: 0);
+				 merged_at: (DateAndTime
+						  year: 2024
+						  month: 09
+						  day: 05
+						  hour: 08
 						  minute: 0
 						  second: 0)).
 			(GLHMergeRequest new
@@ -36,10 +52,16 @@ MergedMergeRequestDurationProjectMetricTest >> testCalculate [
 						  year: 2024
 						  month: 09
 						  day: 05
-						  hour: 01
+						  hour: 00
 						  minute: 0
 						  second: 0);
-				 merged_at: nil) }.
+				merged_at: (DateAndTime
+						  year: 2024
+						  month: 09
+						  day: 05
+						  hour: 10
+						  minute: 0
+						  second: 0)) }.
 
 
 	mergeRequestDuration := MergedMergeRequestDurationProjectMetric new 
@@ -53,5 +75,65 @@ MergedMergeRequestDurationProjectMetricTest >> testCalculate [
 	result := mergeRequestDuration calculate.
 
 	"Then"
-	self assert: result equals: 10 * 60 * 60
+	self assert:  result equals: 10 * 60 * 60 
+]
+
+{ #category : #tests }
+MergedMergeRequestDurationProjectMetricTest >> testCalculateNoMergeRequests [
+
+	| result glhImporter mergeRequestDuration |
+	glhImporter := GLPHImporterMock new.
+
+	mergeRequestDuration := MergedMergeRequestDurationProjectMetric new
+		                        project: project1 ;
+		                        glhImporter: glhImporter;
+		                        setPeriodSince: since
+		                        until: until;
+		                        over: Week.
+
+	"When"
+	result := mergeRequestDuration calculate.
+
+	"Then"
+	self assert: result equals: nil
+]
+
+{ #category : #tests }
+MergedMergeRequestDurationProjectMetricTest >> testCalculateOneMergeRequest [
+
+	| result glhImporter mergeRequestDuration |
+	glhImporter := GLPHImporterMock new.
+	
+	glhImporter mergeRequests: {
+			(GLHMergeRequest new
+				 project: project1 ;
+				 created_at: (DateAndTime
+						  year: 2024
+						  month: 09
+						  day: 05
+						  hour: 00
+						  minute: 0
+						  second: 0);
+				 merged_at: (DateAndTime
+						  year: 2024
+						  month: 09
+						  day: 05
+						  hour: 12
+						  minute: 0
+						  second: 0)).
+						}.
+
+
+	mergeRequestDuration := MergedMergeRequestDurationProjectMetric new 
+	                           project: project1 ;
+		                        glhImporter: glhImporter;
+		                        setPeriodSince: since
+		                        until: until;
+		                        over: Week.
+
+	"When"
+	result := mergeRequestDuration calculate.
+
+	"Then"
+	self assert:  result equals: 12 * 60 * 60 
 ]
