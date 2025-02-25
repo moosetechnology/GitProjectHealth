@@ -43,11 +43,11 @@ MergedMergeRequestDurationProjectMetricTest >> testCalculate [
 						  year: 2024
 						  month: 09
 						  day: 05
-						  hour: 08
+						  hour: 06
 						  minute: 0
 						  second: 0)).
 			(GLHMergeRequest new
-				 project: project1;
+				 project: project2;
 				 created_at: (DateAndTime
 						  year: 2024
 						  month: 09
@@ -75,7 +75,7 @@ MergedMergeRequestDurationProjectMetricTest >> testCalculate [
 	result := mergeRequestDuration calculate.
 
 	"Then"
-	self assert:  result equals: 10 * 60 * 60 
+	self assert:  result equals: 9 * 60 * 60 
 ]
 
 { #category : #tests }

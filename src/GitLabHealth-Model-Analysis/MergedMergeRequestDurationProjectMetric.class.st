@@ -7,7 +7,7 @@ Class {
 { #category : #calculating }
 MergedMergeRequestDurationProjectMetric >> calculate [
 
-	| groupedByDate gitAnalyzer mergeRequestsValidation filterGroups |
+	| groupedByDate gitAnalyzer mergeRequestsValidation filterGroups  |
 	projectMergeRequests ifNil: [ self load ].
 	
 	groupedByDate := self setupGroupedDate.
@@ -16,7 +16,7 @@ MergedMergeRequestDurationProjectMetric >> calculate [
 
 	gitAnalyzer := GitAnalyzer new.
 
-	mergeRequestsValidation := projectMergeRequests collect: [ :mr |
+	mergeRequestsValidation := projectMergeRequests  collect: [ :mr |
 		                           gitAnalyzer
 			                           analyseMergeResquestValidation: mr ].
 
