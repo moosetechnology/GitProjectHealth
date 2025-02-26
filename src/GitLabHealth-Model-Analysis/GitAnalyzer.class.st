@@ -135,11 +135,11 @@ GitAnalyzer >> analyseDelayUntilFirstChurn [
 { #category : #analyze }
 GitAnalyzer >> analyseMergeResquestValidation: aGLHPMergeRequest [
 
-	| creationDate mergedDate response |
+	| creationDate mergedDate closedDate response |
 	('GitAnalyzer, analyse merge request delay of: '
 	 , aGLHPMergeRequest printString) recordInfo.
 
-	^ aGLHPMergeRequest
+	^ aGLHPMergeRequest 
 		  cacheAt: #mergeRequestValidation
 		  ifPresent: [ :v | v ]
 		  ifAbsentPut: [
@@ -148,19 +148,30 @@ GitAnalyzer >> analyseMergeResquestValidation: aGLHPMergeRequest [
 				              (#id_merge_commit -> nil).
 				              (#created_at -> aGLHPMergeRequest created_at).
 				              (#merged_at -> nil).
+				              (#closed_at -> nil).
+				              (#close_duration -> nil).
 				              (#duration -> nil).
 				              (#status -> aGLHPMergeRequest merge_status) }
 				              asDictionary.
 
 			  creationDate := aGLHPMergeRequest created_at asDateAndTime.
 
-			  mergedDate := aGLHPMergeRequest merged_at ifNil: [ ^ response ].
+            "Handle merged case"
+            mergedDate := aGLHPMergeRequest merged_at ifNil: [ nil ].
+            mergedDate ifNotNil: [
+                response  
+                    at: #duration put: mergedDate - creationDate;  
+                    at: #id_merge_commit put: aGLHPMergeRequest merge_commit_sha;  
+                    at: #merged_at put: aGLHPMergeRequest merged_at.  
+            ].
 
-			  response
-				  at: #duration put: mergedDate - creationDate;
-				  at: #id_merge_commit put: aGLHPMergeRequest merge_commit_sha;
-				  at: #merged_at put: aGLHPMergeRequest merged_at;
-				  yourself ]
+            "Handle closed case"
+            closedDate := aGLHPMergeRequest closed_at ifNil: [ ^ response ].  
+            response  
+                at: #close_duration put: closedDate - creationDate;  
+                at: #closed_at put: aGLHPMergeRequest closed_at.  
+            response
+        ].
 ]
 
 { #category : #filter }
