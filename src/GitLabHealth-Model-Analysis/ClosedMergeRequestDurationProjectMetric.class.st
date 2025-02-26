@@ -54,7 +54,7 @@ ClosedMergeRequestDurationProjectMetric >> calculate [
 { #category : #accessing }
 ClosedMergeRequestDurationProjectMetric >> description [
 
-	^ 'closed duration'
+	^ 'closed merge request  duration (second)'
 ]
 
 { #category : #loading }

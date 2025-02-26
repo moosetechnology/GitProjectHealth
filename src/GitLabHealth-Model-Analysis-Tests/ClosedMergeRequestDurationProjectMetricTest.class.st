@@ -74,7 +74,7 @@ ClosedMergeRequestDurationProjectMetricTest >> testCalculate2ClosedMergRequest1D
 				 created_at: (DateAndTime
 						  year: 2024
 						  month: 09
-						  day: 05
+						  day: 05  
 						  hour: 00
 						  minute: 0
 						  second: 0);
