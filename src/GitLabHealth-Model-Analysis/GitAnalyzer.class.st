@@ -135,7 +135,7 @@ GitAnalyzer >> analyseDelayUntilFirstChurn [
 { #category : #analyze }
 GitAnalyzer >> analyseMergeResquestValidation: aGLHPMergeRequest [
 
-	| creationDate mergedDate closedDate response |
+	| creationDate mergedDate closedDate currentDate  response |
 	('GitAnalyzer, analyse merge request delay of: '
 	 , aGLHPMergeRequest printString) recordInfo.
 
@@ -147,15 +147,19 @@ GitAnalyzer >> analyseMergeResquestValidation: aGLHPMergeRequest [
 				              (#id_merge_resquest -> aGLHPMergeRequest iid).
 				              (#id_merge_commit -> nil).
 				              (#created_at -> aGLHPMergeRequest created_at).
+				              (#open_duration -> nil).
+				
 				              (#merged_at -> nil).
+				              (#duration -> nil).
+				
 				              (#closed_at -> nil).
 				              (#close_duration -> nil).
-				              (#duration -> nil).
+				              
 				              (#status -> aGLHPMergeRequest merge_status) }
 				              asDictionary.
 
 			  creationDate := aGLHPMergeRequest created_at asDateAndTime.
-
+            currentDate := DateAndTime now.  "Get the current timestamp"
             "Handle merged case"
             mergedDate := aGLHPMergeRequest merged_at ifNil: [ nil ].
             mergedDate ifNotNil: [
@@ -165,11 +169,19 @@ GitAnalyzer >> analyseMergeResquestValidation: aGLHPMergeRequest [
                     at: #merged_at put: aGLHPMergeRequest merged_at.  
             ].
 
-            "Handle closed case"
-            closedDate := aGLHPMergeRequest closed_at ifNil: [ ^ response ].  
-            response  
-                at: #close_duration put: closedDate - creationDate;  
-                at: #closed_at put: aGLHPMergeRequest closed_at.  
+           "Handle closed case"
+            closedDate := aGLHPMergeRequest closed_at ifNil: [ nil ].
+            closedDate ifNotNil: [
+                response  
+                    at: #close_duration put: closedDate - creationDate;  
+                    at: #closed_at put: aGLHPMergeRequest closed_at.
+            ].
+
+            "Handle open case (niether merged nor closed)"
+            (mergedDate isNil and: closedDate isNil) ifTrue: [
+                response at: #open_duration put: currentDate - creationDate.
+            ].
+
             response
         ].
 ]
