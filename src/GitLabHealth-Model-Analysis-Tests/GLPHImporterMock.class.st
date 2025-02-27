@@ -71,7 +71,7 @@ GLPHImporterMock >> importMergeRequests: project since: since until: until [
 	self flag: 'Adds MR regardless of their creation date !'.
 	glhModel addAll: mergeRequests .
 	
-	^ mergeRequests select: [ :mr | mr project = project ]
+	^ (mergeRequests select: [ :mr | mr project = project  ]) 
 ]
 
 { #category : #'import - merge request' }

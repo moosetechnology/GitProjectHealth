@@ -462,7 +462,6 @@ GitMetricExporter >> initialize [
 	analyses := OrderedCollection new.
 
 	metrics := {
-					"User Metrics"
 		           CodeAdditionMetric.
 		           CodeDeletionMetric.
 		           CommentContributionMetric.
@@ -471,8 +470,8 @@ GitMetricExporter >> initialize [
 		           DelayUntilFirstChurnMetric.
 		           TimeBetweenCommitMetric.
 		           ContributedProjectMetric.
-					  CodeAdditionByMRMetric .
-		           CodeDeletionByMRMetric .
+		           CodeAdditionByMRMetric.
+		           CodeDeletionByMRMetric.
 		           MergeRequestDurationMetric.
 		           OpenedMergeRequestMetric.
 		           ClosedMergeRequestMetric.
@@ -481,15 +480,19 @@ GitMetricExporter >> initialize [
 		           ClosedTicketsMetric.
 		           JiraTimeMRTimeDifferenceMetric.
 		           CommitsNumberByJiraTicketsMetric.
-					  CommitsLinkWithTicketMetric.
-		
-		
-				"Project Metrics"
-				CommitFrequencyProjectMetric.
-				ClosedMergeRequestProjectMetric.
-				CreatedMergeRequestProjectMetric.
-				MergedMergeRequestProjectMetric.
-		 }.
+		           CommitsLinkWithTicketMetric.
+
+
+		           "Project Metrics"
+		           CommitFrequencyProjectMetric.
+		           ClosedMergeRequestProjectMetric.
+		           CreatedMergeRequestProjectMetric.
+		           MergedMergeRequestProjectMetric.
+					 ClosedMergeRequestDurationProjectMetric.
+					OpenedMergeRequestDurationProjectMetric.
+					MergedMergeRequestDurationProjectMetric
+						 }
+	"User Metrics"
 ]
 
 { #category : #accessing }

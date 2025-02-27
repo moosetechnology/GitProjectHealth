@@ -1,22 +1,22 @@
 Class {
-	#name : #MergeRequestDurationMetric,
-	#superclass : #UserMergeRequestMetric,
+	#name : #OpenedMergeRequestDurationProjectMetric,
+	#superclass : #ProjectMetric,
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
 { #category : #calculating }
-MergeRequestDurationMetric >> calculate [
+OpenedMergeRequestDurationProjectMetric >> calculate [
 
 	| groupedByDate gitAnalyzer mergeRequestsValidation filterGroups |
-	userMergeRequests ifNil: [ self load ].
+	projectMergeRequests ifNil: [ self load ].
 
 	groupedByDate := self setupGroupedDate.
 
-	userMergeRequests ifEmpty: [ ^ nil ].
+	projectMergeRequests ifEmpty: [ ^ nil ].
 
 	gitAnalyzer := GitAnalyzer new.
 
-	mergeRequestsValidation := userMergeRequests collect: [ :mr |
+	mergeRequestsValidation := projectMergeRequests collect: [ :mr |
 		                           gitAnalyzer
 			                           analyseMergeResquestValidation: mr ].
 
@@ -27,10 +27,10 @@ MergeRequestDurationMetric >> calculate [
 
 		groupedByDate
 			at: overDate printString
-			ifPresent: [ :durations | durations add: (dic at: #duration) ]
-	 ].
+			ifPresent: [ :durations | durations add: (dic at: #open_duration) ]
+ ].
 
-
+	"deleting the empty array"
 	filterGroups := groupedByDate reject: [ :array | array isEmpty ].
 
 	filterGroups associations do: [ :assoc |
@@ -49,13 +49,15 @@ MergeRequestDurationMetric >> calculate [
 ]
 
 { #category : #accessing }
-MergeRequestDurationMetric >> description [
+OpenedMergeRequestDurationProjectMetric >> description [
 
-	^ 'average time to merge a merge request (in seconds)'
+	^ ' duration of a Merge Request since it creation  (second)'
 ]
 
-{ #category : #accessing }
-MergeRequestDurationMetric >> name [
+{ #category : #loading }
+OpenedMergeRequestDurationProjectMetric >> load [
 
-	^ 'mergeRequestDuration'
+	projectMergeRequests := self
+	                      loadMergeRequestsSince:  (period at: #since)
+	                      until:  (period at: #until)
 ]
