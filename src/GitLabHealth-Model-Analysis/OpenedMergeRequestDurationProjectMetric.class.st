@@ -7,16 +7,16 @@ Class {
 { #category : #calculating }
 OpenedMergeRequestDurationProjectMetric >> calculate [
 
-	| groupedByDate gitAnalyzer mergeRequestsValidation filterGroups  |
+	| groupedByDate gitAnalyzer mergeRequestsValidation filterGroups |
 	projectMergeRequests ifNil: [ self load ].
-	
+
 	groupedByDate := self setupGroupedDate.
 
 	projectMergeRequests ifEmpty: [ ^ nil ].
 
 	gitAnalyzer := GitAnalyzer new.
 
-	mergeRequestsValidation := projectMergeRequests  collect: [ :mr |
+	mergeRequestsValidation := projectMergeRequests collect: [ :mr |
 		                           gitAnalyzer
 			                           analyseMergeResquestValidation: mr ].
 
@@ -28,12 +28,9 @@ OpenedMergeRequestDurationProjectMetric >> calculate [
 		groupedByDate
 			at: overDate printString
 			ifPresent: [ :durations | durations add: (dic at: #open_duration) ]
-			ifAbsentPut: [
-				OrderedCollection new
-					add: (dic at: #open_duration);
-					yourself ] ].
+ ].
 
-     "deleting the empty array"
+	"deleting the empty array"
 	filterGroups := groupedByDate reject: [ :array | array isEmpty ].
 
 	filterGroups associations do: [ :assoc |
@@ -48,7 +45,7 @@ OpenedMergeRequestDurationProjectMetric >> calculate [
 
 		filterGroups at: assoc key put: sum / denominator ].
 
-	^ filterGroups average asSeconds 
+	^ filterGroups average asSeconds
 ]
 
 { #category : #accessing }

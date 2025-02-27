@@ -7,16 +7,16 @@ Class {
 { #category : #calculating }
 MergedMergeRequestDurationProjectMetric >> calculate [
 
-	| groupedByDate gitAnalyzer mergeRequestsValidation filterGroups  |
+	| groupedByDate gitAnalyzer mergeRequestsValidation filterGroups |
 	projectMergeRequests ifNil: [ self load ].
-	
+
 	groupedByDate := self setupGroupedDate.
 
 	projectMergeRequests ifEmpty: [ ^ nil ].
 
 	gitAnalyzer := GitAnalyzer new.
 
-	mergeRequestsValidation := projectMergeRequests  collect: [ :mr |
+	mergeRequestsValidation := projectMergeRequests collect: [ :mr |
 		                           gitAnalyzer
 			                           analyseMergeResquestValidation: mr ].
 
@@ -27,13 +27,9 @@ MergedMergeRequestDurationProjectMetric >> calculate [
 
 		groupedByDate
 			at: overDate printString
-			ifPresent: [ :durations | durations add: (dic at: #duration) ]
-			ifAbsentPut: [
-				OrderedCollection new
-					add: (dic at: #duration);
-					yourself ] ].
+			ifPresent: [ :durations | durations add: (dic at: #duration) ] ].
 
-"deleting the empty array (merge request thar are not merged )"
+	"deleting the empty array (merge request thar are not merged )"
 	filterGroups := groupedByDate reject: [ :array | array isEmpty ].
 
 	filterGroups associations do: [ :assoc |
