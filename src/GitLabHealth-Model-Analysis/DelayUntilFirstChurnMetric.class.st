@@ -27,10 +27,7 @@ DelayUntilFirstChurnMetric >> calculate [
 			groupedByDate
 				at: overDate printString
 				ifPresent: [ :arrayOfCommits | arrayOfCommits add: commit ]
-				ifAbsentPut: [
-					OrderedCollection new
-						add: commit;
-						yourself ] ] ].
+ ] ].
 
 
 

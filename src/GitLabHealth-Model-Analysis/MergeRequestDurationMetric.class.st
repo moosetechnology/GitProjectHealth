@@ -9,7 +9,7 @@ MergeRequestDurationMetric >> calculate [
 
 	| groupedByDate gitAnalyzer mergeRequestsValidation filterGroups |
 	userMergeRequests ifNil: [ self load ].
-	
+
 	groupedByDate := self setupGroupedDate.
 
 	userMergeRequests ifEmpty: [ ^ nil ].
@@ -28,10 +28,7 @@ MergeRequestDurationMetric >> calculate [
 		groupedByDate
 			at: overDate printString
 			ifPresent: [ :durations | durations add: (dic at: #duration) ]
-			ifAbsentPut: [
-				OrderedCollection new
-					add: (dic at: #duration);
-					yourself ] ].
+	 ].
 
 
 	filterGroups := groupedByDate reject: [ :array | array isEmpty ].
