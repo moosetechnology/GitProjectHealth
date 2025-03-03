@@ -29,9 +29,9 @@ ClosedMergeRequestDurationProjectMetric >> calculate [
 			at: overDate printString
 			ifPresent: [ :durations | durations add: (dic at: #close_duration) ] ].
 
-	"deleting the empty array (merge request thar are not merged )"
+	"deleting the empty array (merge request that are not closed )"
 	filterGroups := groupedByDate reject: [ :array | array isEmpty ].
-  "Check if filterGroups is empty before proceeding to avoid merge request out of analyse periode "
+	"Check if filterGroups is empty before proceeding to avoid merge request out of analyse periode "
 	filterGroups isEmpty ifTrue: [ ^ 0 ].
 
 	filterGroups associations do: [ :assoc |
