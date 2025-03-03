@@ -25,7 +25,7 @@ AutoCodeCommitFrequencyProjectMetric >> calculate [
 { #category : #accessing }
 AutoCodeCommitFrequencyProjectMetric >> description [
 
-	^ 'AutoCode Commits frequency (avg)'
+	^ 'Nb AutoCodeReview commit for accepted suggestion (avg)'
 ]
 
 { #category : #loading }
