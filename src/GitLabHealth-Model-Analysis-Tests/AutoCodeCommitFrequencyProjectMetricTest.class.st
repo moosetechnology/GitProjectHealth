@@ -18,7 +18,7 @@ AutoCodeCommitFrequencyProjectMetricTest >> testCalculate [
     autoCommit1 := GLHCommit new  
         created_at: createdAt;  
         repository: project1 repository;  
-        title: 'auto-code update'.  
+        title: '[ACR][JS117R-1] rename'.  
    autoCommit2 := GLHCommit new  
         created_at: createdAt;  
         repository: project1 repository;  
@@ -43,6 +43,6 @@ AutoCodeCommitFrequencyProjectMetricTest >> testCalculate [
     result := commitFrequency calculate.  
 
     "Then - Only auto commits should be counted"  
-    self assert: result equals: 2.
+    self assert: result equals: 1.
 
 ]

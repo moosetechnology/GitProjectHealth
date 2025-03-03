@@ -11,7 +11,7 @@ AutoCodeCommitFrequencyProjectMetric >> calculate [
     groupedByDate := self setupGroupedDate.  
 
     projectCommits do: [ :c |  
-        (c title beginsWith: 'auto')  ifTrue: [  
+        (c title beginsWith: '[ACR]')  ifTrue: [  
             | dateOver |  
             dateOver := self transformDate: c created_at to: over.  
             groupedByDate at: dateOver printString ifPresent: [ :v | v add: c ]  
