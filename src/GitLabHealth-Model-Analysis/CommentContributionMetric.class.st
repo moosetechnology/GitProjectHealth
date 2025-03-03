@@ -24,11 +24,7 @@ CommentContributionMetric >> calculate [
 		dateOver := self transformDate: assoc key created_at to: over.
 		groupedByDate
 			at: dateOver printString
-			ifPresent: [ :v | v add: assoc value ]
-			ifAbsentPut: [
-				OrderedCollection new
-					add: assoc value;
-					yourself ] ].
+			ifPresent: [ :v | v add: assoc value ] ].
 
 	groupedByDate := groupedByDate collect: [ :contribs |
 		                 contribs

@@ -12,26 +12,26 @@ ClosedMergeRequestDurationProjectMetricTest >> testCalculate [
 
 	| result glhImporter mergeRequestDuration |
 	glhImporter := GLPHImporterMock new.
-	
+
 	glhImporter mergeRequests: {
-			(GLHMergeRequest new 
-				 project: project1 ;
+			(GLHMergeRequest new
+				 project: project1;
 				 created_at: (DateAndTime
-						  year: 2024
+						  year: 2000
 						  month: 09
 						  day: 05
 						  hour: 00
 						  minute: 0
 						  second: 0);
 				 closed_at: (DateAndTime
-						  year: 2024
+						  year: 2000
 						  month: 09
 						  day: 05
-						  hour: 10
+						  hour: 5
 						  minute: 0
 						  second: 0)).
-						(GLHMergeRequest new
-				 project: project1 ;
+			(GLHMergeRequest new
+				 project: project1;
 				 created_at: (DateAndTime
 						  year: 2024
 						  month: 09
@@ -45,21 +45,74 @@ ClosedMergeRequestDurationProjectMetricTest >> testCalculate [
 						  day: 05
 						  hour: 06
 						  minute: 0
-						  second: 0)). }.
+						  second: 0)) }.
 
 
-	mergeRequestDuration := ClosedMergeRequestDurationProjectMetric new 
-	                           project: project1 ;
+	mergeRequestDuration := ClosedMergeRequestDurationProjectMetric new
+		                        project: project1;
 		                        glhImporter: glhImporter;
-		                        setPeriodSince: since
-		                        until: until;
+		                        setPeriodSince: since until: until;
 		                        over: Week.
 
 	"When"
 	result := mergeRequestDuration calculate.
 
 	"Then"
-	self assert:  result equals:  8* 60 * 60 
+	self assert: result equals: 6 * 60 * 60
+]
+
+{ #category : #tests }
+ClosedMergeRequestDurationProjectMetricTest >> testCalculate1MRClosedOutsidePeriode [
+
+	| result glhImporter mergeRequestDuration |
+	glhImporter := GLPHImporterMock new.
+
+	glhImporter mergeRequests: {
+			(GLHMergeRequest new
+				 project: project1;
+				 created_at: (DateAndTime
+						  year: 2023
+						  month: 09
+						  day: 05
+						  hour: 00
+						  minute: 0
+						  second: 0);
+				 closed_at: (DateAndTime
+						  year: 2023
+						  month: 09
+						  day: 05
+						  hour: 10
+						  minute: 0
+						  second: 0)).
+			(GLHMergeRequest new
+				 project: project1;
+				 created_at: (DateAndTime
+						  year: 2024
+						  month: 09
+						  day: 05
+						  hour: 00
+						  minute: 0
+						  second: 0);
+				 closed_at: (DateAndTime
+						  year: 2024
+						  month: 09
+						  day: 05
+						  hour: 06
+						  minute: 0
+						  second: 0)) }.
+
+
+	mergeRequestDuration := ClosedMergeRequestDurationProjectMetric new
+		                        project: project1;
+		                        glhImporter: glhImporter;
+		                        setPeriodSince: since until: until;
+		                        over: Week.
+
+	"When"
+	result := mergeRequestDuration calculate.
+
+	"Then"
+	self assert: result equals: 6 * 60 * 60
 ]
 
 { #category : #tests }
