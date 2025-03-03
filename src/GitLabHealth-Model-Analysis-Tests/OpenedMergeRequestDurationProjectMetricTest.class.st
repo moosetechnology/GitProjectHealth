@@ -13,7 +13,7 @@ OpenedMergeRequestDurationProjectMetricTest >> testCalculate [
 
     glhImporter := GLPHImporterMock new.  
       "to calculate the exact duration from the creation to the  current  date "
-    createdAt := DateAndTime   year: 2025   month: 02  day: 24  hour: 00   minute: 0  second: 0.
+    createdAt := DateAndTime   year: 2024   month: 09  day: 04  hour: 00   minute: 0  second: 0.
      "Calculate expected open duration in seconds"
     currentDate := DateAndTime now.
     durationInSeconds := (currentDate - createdAt) asSeconds.
@@ -46,28 +46,24 @@ OpenedMergeRequestDurationProjectMetricTest >> testCalculate3MergeRequest [
     glhImporter := GLPHImporterMock new.  
 
     "Define creation timestamps for three merge requests"
-    createdAt1 := DateAndTime year: 2025 month: 02 day: 24 hour: 00 minute: 0 second: 0.
-    createdAt2 := DateAndTime year: 2025 month: 02 day: 23 hour: 12 minute: 0 second: 0.
+    createdAt1 := DateAndTime year: 2020 month: 05 day: 24 hour: 00 minute: 0 second: 0.
+    createdAt2 := DateAndTime year: 2024 month: 09 day: 04 hour: 12 minute: 0 second: 0.
     createdAt3 := DateAndTime year: 2025 month: 02 day: 23 hour: 12 minute: 0 second: 0.
    
    
 
     "Calculate expected open duration in seconds for each request"
     currentDate := DateAndTime now.
-    totalDuration := (currentDate - createdAt1) asSeconds +
-                     (currentDate - createdAt2) asSeconds +
-                     (currentDate - createdAt3) asSeconds .
+    totalDuration := (currentDate - createdAt2) asSeconds .
     "Calculate average duration"
-    averageDuration := totalDuration / 3.
+    averageDuration := totalDuration / 1.
 
-    "Mock merge requests"
     glhImporter mergeRequests: {  
         (GLHMergeRequest new project: project1 ; created_at: createdAt1).  
         (GLHMergeRequest new project: project1 ; created_at: createdAt2). 
         (GLHMergeRequest new project: project1 ; created_at: createdAt3).  
     }.  
 
-    "Initialize the metric calculation"
     mergeRequestDuration := OpenedMergeRequestDurationProjectMetric new  
                                project: project1 ;  
                                glhImporter: glhImporter;  
@@ -79,7 +75,7 @@ OpenedMergeRequestDurationProjectMetricTest >> testCalculate3MergeRequest [
     result := mergeRequestDuration calculate.  
 
     "Then"
-    self assert: result equals: averageDuration.
+    self assert: result equals: totalDuration .
 
 
 ]

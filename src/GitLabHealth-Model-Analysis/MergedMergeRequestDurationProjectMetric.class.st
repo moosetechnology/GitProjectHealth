@@ -23,18 +23,16 @@ MergedMergeRequestDurationProjectMetric >> calculate [
 
 	mergeRequestsValidation do: [ :dic |
 		| overDate |
-		overDate := self transformDate: (dic at: #created_at) to: over.
+		overDate := self transformDate: (dic at: #merged_at) to: over.
 
 		groupedByDate
 			at: overDate printString
-			ifPresent: [ :durations | durations add: (dic at: #duration) ]
-			ifAbsentPut: [
-				OrderedCollection new
-					add: (dic at: #duration);
-					yourself ] ].
+			ifPresent: [ :durations | durations add: (dic at: #duration) ]].
 
-"deleting the empty array (merge request thar are not merged )"
-	filterGroups := groupedByDate reject: [ :array | array isEmpty ].
+    "deleting the empty array (merge request thar are not merged )"
+	 filterGroups := groupedByDate reject: [ :array | array isEmpty ].
+	 "Check if filterGroups is empty before proceeding to avoid merge request out of analyse periode "
+    filterGroups isEmpty ifTrue: [ ^ 0 ].  
 
 	filterGroups associations do: [ :assoc |
 		| sum denominator |

@@ -27,15 +27,13 @@ OpenedMergeRequestDurationProjectMetric >> calculate [
 
 		groupedByDate
 			at: overDate printString
-			ifPresent: [ :durations | durations add: (dic at: #open_duration) ]
-			ifAbsentPut: [
-				OrderedCollection new
-					add: (dic at: #open_duration);
-					yourself ] ].
+			ifPresent: [ :durations | durations add: (dic at: #open_duration) ] ].
 
      "deleting the empty array"
 	filterGroups := groupedByDate reject: [ :array | array isEmpty ].
-
+	"Check if filterGroups is empty before proceeding to avoid merge request out of analyse periode "
+   filterGroups isEmpty ifTrue: [ ^ 0 ].
+ 
 	filterGroups associations do: [ :assoc |
 		| sum denominator |
 		denominator := assoc value size.
