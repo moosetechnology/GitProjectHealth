@@ -72,6 +72,19 @@ ProjectMetric >> loadMergeRequestsSince: since until: until [
 	^ allMergeRequests
 ]
 
+{ #category : #loading }
+ProjectMetric >> loadProjectCompleteMergeRequestsSince: since until: until [
+
+	| mergeRequests |
+	mergeRequests := self loadMergeRequestsSince:  since until: until.
+
+	mergeRequests do: [ :mergeRequest |
+		glhImporter importMergeResquestMerger: mergeRequest.
+		glhImporter importMergeRequestCommits: mergeRequest ].
+
+	^ mergeRequests
+]
+
 { #category : #accessing }
 ProjectMetric >> project [
 
