@@ -21,17 +21,14 @@ CodeAdditionByMergeRequestProjectMetricTest >> testCalculate [
 	glhImporter commits: {
 			(GLHCommit new
 				 id: 1;
-				 created_at: createdAt ;
 				 additions: 7;
 				 deletions: 5).
 			(GLHCommit new
 				 id: 2;
-				 created_at: createdAt ;
 				 additions: 3;
 				 deletions: 5).
 				(GLHCommit new
-				 id: 2;
-				 created_at: createdAt ;
+				 id: 3;
 				 additions: 3;
 				 deletions: 5) }.
 
@@ -47,4 +44,47 @@ CodeAdditionByMergeRequestProjectMetricTest >> testCalculate [
 
 	"Then"
 	self assert: result equals: 13
+]
+
+{ #category : #tests }
+CodeAdditionByMergeRequestProjectMetricTest >> testCalculateNoCommits [
+
+	| result glhImporter codeAddition |
+	glhImporter := GLPHImporterMock new.
+	glhImporter mergeRequests: { (GLHMergeRequest new
+			 project: project1;
+			 created_at: createdAt ;
+			 merged_at: mergedAt ;
+			 state: #merged ) }.
+
+	codeAddition := CodeAdditionByMergeRequestProjectMetric new
+		                project: project1;
+		                glhImporter: glhImporter;
+		                setPeriodSince: since until: until;
+		                over: Week.
+
+	"When"
+	result := codeAddition calculate.
+
+	"Then"
+	self assert: result equals: 0
+]
+
+{ #category : #tests }
+CodeAdditionByMergeRequestProjectMetricTest >> testCalculateNoMergeRequests [
+
+	| result glhImporter codeAddition |
+	glhImporter := GLPHImporterMock new.
+
+	codeAddition := CodeAdditionByMergeRequestProjectMetric new
+		                project: project1 ;
+		                glhImporter: glhImporter;
+		                setPeriodSince: since until: until;
+		                over: Week.
+
+	"When"
+	result := codeAddition calculate.
+
+	"Then"
+	self assert: result equals: 0
 ]
