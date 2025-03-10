@@ -1,0 +1,50 @@
+"
+A CodeAdditionByMergeRequestProjectMetricTest is a test class for testing the behavior of CodeAdditionByMergeRequestProjectMetric
+"
+Class {
+	#name : #CodeAdditionByMergeRequestProjectMetricTest,
+	#superclass : #ProjectMetricTest,
+	#category : #'GitLabHealth-Model-Analysis-Tests'
+}
+
+{ #category : #tests }
+CodeAdditionByMergeRequestProjectMetricTest >> testCalculate [
+
+	| result glhImporter codeAddition |
+	glhImporter := GLPHImporterMock new.
+	glhImporter mergeRequests: { (GLHMergeRequest new
+			 project: project2;
+			 created_at: createdAt ;
+			 merged_at: mergedAt ;
+			 state: #merged) }.
+
+	glhImporter commits: {
+			(GLHCommit new
+				 id: 1;
+				 created_at: createdAt ;
+				 additions: 7;
+				 deletions: 5).
+			(GLHCommit new
+				 id: 2;
+				 created_at: createdAt ;
+				 additions: 3;
+				 deletions: 5).
+				(GLHCommit new
+				 id: 2;
+				 created_at: createdAt ;
+				 additions: 3;
+				 deletions: 5) }.
+
+
+	codeAddition := CodeAdditionByMergeRequestProjectMetric new
+		                project: project2 ;
+		                glhImporter: glhImporter;
+		                setPeriodSince: since until: until;
+		                over: Week.
+
+	"When"
+	result := codeAddition calculate.
+
+	"Then"
+	self assert: result equals: 13
+]

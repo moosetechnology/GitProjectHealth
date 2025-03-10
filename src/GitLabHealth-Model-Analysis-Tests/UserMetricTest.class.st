@@ -3,7 +3,8 @@ Class {
 	#superclass : #MetricTest,
 	#instVars : [
 		'user',
-		'project1'
+		'project1',
+		'project2'
 	],
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
