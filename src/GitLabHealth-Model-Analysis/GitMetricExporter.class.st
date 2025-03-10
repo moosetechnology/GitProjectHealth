@@ -461,6 +461,7 @@ GitMetricExporter >> initialize [
 
 	analyses := OrderedCollection new.
 
+	"User Metrics"
 	metrics := {
 		           CodeAdditionMetric.
 		           CodeDeletionMetric.
@@ -488,11 +489,10 @@ GitMetricExporter >> initialize [
 		           ClosedMergeRequestProjectMetric.
 		           CreatedMergeRequestProjectMetric.
 		           MergedMergeRequestProjectMetric.
-					 ClosedMergeRequestDurationProjectMetric.
-					OpenedMergeRequestDurationProjectMetric.
-					MergedMergeRequestDurationProjectMetric
-						 }
-	"User Metrics"
+		           ClosedMergeRequestDurationProjectMetric.
+		           OpenedMergeRequestDurationProjectMetric.
+		           MergedMergeRequestDurationProjectMetric.
+		           SelfMergedUnderAMinuteMergeRequestProjectMetric }
 ]
 
 { #category : #accessing }
