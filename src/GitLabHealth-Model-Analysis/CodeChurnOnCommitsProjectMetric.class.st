@@ -68,7 +68,7 @@ CodeChurnOnCommitsProjectMetric >> calculate [
 { #category : #accessing }
 CodeChurnOnCommitsProjectMetric >> description [
 
-	^ 'churn in project (avg)'
+	^ 'churn % in project (W=' , maxCommitWindow printString , ')'
 ]
 
 { #category : #initialization }
