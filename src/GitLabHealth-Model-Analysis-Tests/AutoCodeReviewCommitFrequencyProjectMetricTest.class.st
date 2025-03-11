@@ -2,13 +2,13 @@
 An AutoCodeCommitFrequencyProjectMetricTest is a test class for testing the behavior of AutoCodeCommitFrequencyProjectMetric
 "
 Class {
-	#name : #AutoCodeCommitFrequencyProjectMetricTest,
+	#name : #AutoCodeReviewCommitFrequencyProjectMetricTest,
 	#superclass : #ProjectMetricTest,
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }
-AutoCodeCommitFrequencyProjectMetricTest >> testCalculate [  
+AutoCodeReviewCommitFrequencyProjectMetricTest >> testCalculate [  
     | glhImporter result commitFrequency autoCommit   |  
 
     "Given"  
@@ -23,7 +23,7 @@ AutoCodeCommitFrequencyProjectMetricTest >> testCalculate [
  
     glhImporter commits: {   autoCommit }.  
 
-    commitFrequency := AutoCodeCommitFrequencyProjectMetric new  
+    commitFrequency := AutoCodeReviewCommitFrequencyProjectMetric new  
         project: project1;  
         glhImporter: glhImporter;  
         setPeriodSince: since until: until;  
@@ -38,7 +38,7 @@ AutoCodeCommitFrequencyProjectMetricTest >> testCalculate [
 ]
 
 { #category : #tests }
-AutoCodeCommitFrequencyProjectMetricTest >> testCalculateMultipleCommit [  
+AutoCodeReviewCommitFrequencyProjectMetricTest >> testCalculateMultipleCommit [  
     | glhImporter result commitFrequency autoCommit1 autoCommit2 manuelcommit  |  
 
     "Given"  
@@ -62,7 +62,7 @@ AutoCodeCommitFrequencyProjectMetricTest >> testCalculateMultipleCommit [
  
     glhImporter commits: { autoCommit1. autoCommit2 . manuelcommit}.  
 
-    commitFrequency := AutoCodeCommitFrequencyProjectMetric new  
+    commitFrequency := AutoCodeReviewCommitFrequencyProjectMetric new  
         project: project1;  
         glhImporter: glhImporter;  
         setPeriodSince: since until: until;  
@@ -77,7 +77,7 @@ AutoCodeCommitFrequencyProjectMetricTest >> testCalculateMultipleCommit [
 ]
 
 { #category : #tests }
-AutoCodeCommitFrequencyProjectMetricTest >> testCalculateMultipleCommitDiffProejct [  
+AutoCodeReviewCommitFrequencyProjectMetricTest >> testCalculateMultipleCommitDiffProejct [  
     | glhImporter result commitFrequency autoCommit1 autoCommit2 autoCommit3 autoCommit4 autoCommit5  |  
 
     "Given"  
@@ -108,7 +108,7 @@ AutoCodeCommitFrequencyProjectMetricTest >> testCalculateMultipleCommitDiffProej
  
     glhImporter commits: { autoCommit1. autoCommit2 . autoCommit3 .autoCommit4 .autoCommit5 }.  
 
-    commitFrequency := AutoCodeCommitFrequencyProjectMetric new  
+    commitFrequency := AutoCodeReviewCommitFrequencyProjectMetric new  
         project: project2;  
         glhImporter: glhImporter;  
         setPeriodSince: since until: until;  
@@ -123,7 +123,7 @@ AutoCodeCommitFrequencyProjectMetricTest >> testCalculateMultipleCommitDiffProej
 ]
 
 { #category : #tests }
-AutoCodeCommitFrequencyProjectMetricTest >> testCalculateNoCommit [  
+AutoCodeReviewCommitFrequencyProjectMetricTest >> testCalculateNoCommit [  
     | glhImporter result commitFrequency Commit1 Commit2   |  
 
     "Given"  
@@ -143,7 +143,7 @@ AutoCodeCommitFrequencyProjectMetricTest >> testCalculateNoCommit [
  
     glhImporter commits: { Commit1. Commit2 }.  
 
-    commitFrequency := AutoCodeCommitFrequencyProjectMetric new  
+    commitFrequency := AutoCodeReviewCommitFrequencyProjectMetric new  
         project: project1;  
         glhImporter: glhImporter;  
         setPeriodSince: since until: until;  

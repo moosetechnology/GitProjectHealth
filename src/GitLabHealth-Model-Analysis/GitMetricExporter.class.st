@@ -489,10 +489,14 @@ GitMetricExporter >> initialize [
 		           ClosedMergeRequestProjectMetric.
 		           CreatedMergeRequestProjectMetric.
 		           MergedMergeRequestProjectMetric.
+
 		           ClosedMergeRequestDurationProjectMetric.
 		           OpenedMergeRequestDurationProjectMetric.
 		           MergedMergeRequestDurationProjectMetric.
-		           SelfMergedUnderAMinuteMergeRequestProjectMetric }
+		           SelfMergedUnderAMinuteMergeRequestProjectMetric.
+               AutoCodeReviewCommitFrequencyProjectMetric
+
+						 }
 ]
 
 { #category : #accessing }

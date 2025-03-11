@@ -4,7 +4,7 @@ Class {
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
-{ #category : #calculating }
+{ #category : #'as yet unclassified' }
 MergedMergeRequestProjectMetric >> calculate [
 
 	| groupedByDate |
@@ -22,13 +22,13 @@ MergedMergeRequestProjectMetric >> calculate [
 	^ groupedByDate average asFloat
 ]
 
-{ #category : #accessing }
+{ #category : #'as yet unclassified' }
 MergedMergeRequestProjectMetric >> description [
 
 	^ 'Merged Merge Request (avg)'
 ]
 
-{ #category : #loading }
+{ #category : #'as yet unclassified' }
 MergedMergeRequestProjectMetric >> load [
 
 	projectMergeRequests := self
