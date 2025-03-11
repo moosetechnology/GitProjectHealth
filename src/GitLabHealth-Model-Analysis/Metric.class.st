@@ -50,13 +50,13 @@ Metric >> foundSuccessorOf: commits andCompleteImportForMax: commitLimit [
 		GitAnalyzer new
 			visitChildCommits: c childCommits
 			toStoreThemIn: analyzingCommits
-			upto: commitLimit ].
+			upto: commitLimit.
+		analyzingCommits add: c.
+		 ].
 
 	i := 0.
 	size := analyzingCommits size.
-	analyzingCommits do: [ :c |
-
-		glhImporter completeImportedCommit: c ].
+	analyzingCommits do: [ :c | glhImporter completeImportedCommit: c ].
 
 	^ analyzingCommits
 ]

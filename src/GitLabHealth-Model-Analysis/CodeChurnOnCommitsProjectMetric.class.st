@@ -25,6 +25,7 @@ CodeChurnOnCommitsProjectMetric >> calculate [
 		       commit -> (gitAnalyzer
 			        fromCommit: commit;
 			        analyseChurn) ].
+		
 	res do: [ :commits4Churns |
 		| commit allChurnsInCommit sumChurnInCommit overDate contribution churnOnCommit |
 		commit := commits4Churns key.
@@ -82,4 +83,9 @@ CodeChurnOnCommitsProjectMetric >> load [
 	projectCommits := self
 		                  loadCommitsSince: (period at: #since)
 		                  until: (period at: #until)
+]
+
+{ #category : #accessing }
+CodeChurnOnCommitsProjectMetric >> maxCommitWindow: anInteger [ 
+	maxCommitWindow := anInteger
 ]
