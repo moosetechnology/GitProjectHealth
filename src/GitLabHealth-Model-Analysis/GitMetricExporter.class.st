@@ -490,7 +490,8 @@ GitMetricExporter >> initialize [
 		           MergedMergeRequestProjectMetric.
 					 ClosedMergeRequestDurationProjectMetric.
 					OpenedMergeRequestDurationProjectMetric.
-					MergedMergeRequestDurationProjectMetric
+					MergedMergeRequestDurationProjectMetric.
+					AutoCodeReviewCommitFrequencyProjectMetric
 						 }
 	"User Metrics"
 ]
