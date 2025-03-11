@@ -39,6 +39,28 @@ Metric >> description [
 	^ self subclassResponsibility
 ]
 
+{ #category : #churn }
+Metric >> foundSuccessorOf: commits andCompleteImportForMax: commitLimit [
+
+	| analyzingCommits i size |
+	analyzingCommits := Set new.
+	glhImporter withCommitDiffs: true.
+
+	commits do: [ :c |
+		GitAnalyzer new
+			visitChildCommits: c childCommits
+			toStoreThemIn: analyzingCommits
+			upto: commitLimit ].
+
+	i := 0.
+	size := analyzingCommits size.
+	analyzingCommits do: [ :c |
+
+		glhImporter completeImportedCommit: c ].
+
+	^ analyzingCommits
+]
+
 { #category : #accessing }
 Metric >> glhImporter: anObject [
 
