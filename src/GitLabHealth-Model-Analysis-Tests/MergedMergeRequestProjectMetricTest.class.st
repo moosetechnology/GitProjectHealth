@@ -17,15 +17,15 @@ MergedMergeRequestProjectMetricTest >> testCalculate [
 
 	glhImporter mergeRequests: { (GLHMergeRequest new
 				project: project;
-				created_at: '2024-09-04T10:24:11.803+02:00' asDateAndTime;
-				merged_at: '2024-09-04T11:24:11.803+02:00' asDateAndTime;
+				created_at: createdAt ;
+				merged_at: mergedAt ;
 			 state: #merged) }.
 
 
 	mergeFrequency := MergedMergeRequestProjectMetric new
 		                  project: project;
 		                  glhImporter: glhImporter;
-		                  setPeriodSince: '2024-09-04' until: '2024-09-05';
+		                  setPeriodSince: since until: until;
 		                  over: Week.
 
 	"When"

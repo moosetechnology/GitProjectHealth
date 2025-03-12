@@ -1,24 +1,24 @@
 Class {
-	#name : #CodeAdditionByMRMetric,
-	#superclass : #UserMergeRequestMetric,
+	#name : #CodeAdditionByMergeRequestProjectMetric,
+	#superclass : #ProjectMetric,
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
 { #category : #calculating }
-CodeAdditionByMRMetric >> calculate [
+CodeAdditionByMergeRequestProjectMetric >> calculate [
 
 	| groupedByDate dateOver |
-	userMergeRequests ifNil: [ self load ].
+	projectMergeRequests ifNil: [ self load ].
 
 	groupedByDate := self setupGroupedDate.
-	userMergeRequests ifEmpty: [ ^ 0 ].
+	projectMergeRequests ifEmpty: [ ^ 0 ].
 
 
-	userMergeRequests do: [ :userMergeRequest |
-		dateOver := self transformDate: userMergeRequest created_at to: over.
+	projectMergeRequests  do: [ :mr |
+		dateOver := self transformDate: mr created_at to: over.
 		groupedByDate
 			at: dateOver printString
-			ifPresent: [ :value | value add: userMergeRequest ] ].
+			ifPresent: [ :value | value add: mr ] ].
 
 	groupedByDate := groupedByDate collect: [ :group |
 		                 | average |
@@ -30,15 +30,15 @@ CodeAdditionByMRMetric >> calculate [
 ]
 
 { #category : #accessing }
-CodeAdditionByMRMetric >> description [
+CodeAdditionByMergeRequestProjectMetric >> description [
 
 	^ 'average code addition by merge request'
 ]
 
 { #category : #loading }
-CodeAdditionByMRMetric >> load [
+CodeAdditionByMergeRequestProjectMetric >> load [
 
-	userMergeRequests := self
-		                     loadUserCompleteMergeRequestsSince:  (period at: #since)
-		                     until: (period at: #until)
+	projectMergeRequests := self
+		                  loadProjectCompleteMergeRequestsSince: (period at: #since)
+		                  until: (period at: #until)
 ]

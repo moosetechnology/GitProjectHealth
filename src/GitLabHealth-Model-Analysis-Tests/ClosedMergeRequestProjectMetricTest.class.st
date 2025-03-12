@@ -16,14 +16,14 @@ ClosedMergeRequestProjectMetricTest >> testCalculate [
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: { (GLHMergeRequest new
 			 project: project;
-			 created_at: '2024-09-04T10:24:11.803+02:00' asDateAndTime;
-			 closed_at: '2024-09-04T11:24:11.803+02:00' asDateAndTime;
+			 created_at: createdAt;
+			 closed_at: closedAt ;
 			 state: 'closed') }.
 
 	mergeFrequency := ClosedMergeRequestProjectMetric new
 		                  project: project;
 		                  glhImporter: glhImporter;
-		                  setPeriodSince: '2024-09-04' until: '2024-09-04';
+		                  setPeriodSince: since until: until;
 		                  over: Week.
 
 	"When"
@@ -52,15 +52,15 @@ ClosedMergeRequestProjectMetricTest >> testCalculate1MRNotInProject [
 		{
 			(GLHMergeRequest new
 				 project: project2;
-				 created_at: '2024-09-04T10:24:11.803+02:00' asDateAndTime;
-				 closed_at: '2024-09-04T11:24:11.803+02:00' asDateAndTime;
+				 created_at: createdAt ;
+				 closed_at: closedAt ;
 				 state: 'closed').
 		}.
 
 	mergeFrequency := ClosedMergeRequestProjectMetric new
 		                  project: project1;
 		                  glhImporter: glhImporter;
-		                  setPeriodSince: '2024-09-04' until: '2024-09-04';
+		                  setPeriodSince: since until: until;
 		                  over: Week.
 
 	"When"
