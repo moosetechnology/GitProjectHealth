@@ -1,21 +1,20 @@
 Class {
-	#name : #SelfMergedUnderAMinuteMergeRequestMetric,
-	#superclass : #UserMergeRequestMetric,
+	#name : #SelfMergedUnderAMinuteMergeRequestProjectMetric,
+	#superclass : #ProjectMetric,
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
 { #category : #calculating }
-SelfMergedUnderAMinuteMergeRequestMetric >> calculate [
+SelfMergedUnderAMinuteMergeRequestProjectMetric >> calculate [
 
-	| groupedByDate mergedMergeRequest noVerificationMergeRequests dateOver gitAnalyzer |
-	userMergeRequests ifNil: [ self load ].
+	| groupedByDate gitAnalyzer mergedMergeRequest noVerificationMergeRequests |
+	projectMergeRequests ifNil: [ self load ].
 	groupedByDate := self setupGroupedDate.
 
 	gitAnalyzer := GitAnalyzer new.
 
-	mergedMergeRequest := userMergeRequests select: [ :mr |
+	mergedMergeRequest := projectMergeRequests select: [ :mr |
 		                      mr merged_at isNotNil ].
-
 
 	noVerificationMergeRequests := mergedMergeRequest select: [
 		                               :userMergeRequest |
@@ -23,19 +22,18 @@ SelfMergedUnderAMinuteMergeRequestMetric >> calculate [
 		                               validation := gitAnalyzer
 			                                             analyseMergeResquestValidation:
 			                                             userMergeRequest.
-
+			
 		                               userMergeRequest merge_user
-		                               = userMergeRequest author and:
+		                               = userMergeRequest author and: [
 			                               (validation at: #duration)
-			                               < 1 minutes ].
-
+			                               < 1 minutes ] ].
 
 	noVerificationMergeRequests do: [ :userMergeRequest |
+		| dateOver |
 		dateOver := self transformDate: userMergeRequest created_at to: over.
 		groupedByDate
 			at: dateOver printString
 			ifPresent: [ :value | value add: userMergeRequest ] ].
-
 
 	groupedByDate := groupedByDate collect: [ :group | group size ].
 
@@ -43,22 +41,21 @@ SelfMergedUnderAMinuteMergeRequestMetric >> calculate [
 ]
 
 { #category : #accessing }
-SelfMergedUnderAMinuteMergeRequestMetric >> description [
+SelfMergedUnderAMinuteMergeRequestProjectMetric >> description [
 
-	^ 'number of merge requests merged by its author under a minute after creation'
+	^ 'Merged merge requests merged by its author under a minute after creation'
 ]
 
 { #category : #loading }
-SelfMergedUnderAMinuteMergeRequestMetric >> load [
+SelfMergedUnderAMinuteMergeRequestProjectMetric >> load [
 
-	userMergeRequests := self
-		                     loadUserCompleteMergeRequestsSince:
-		                     (period at: #since)
-		                     until: (period at: #until)
+	projectMergeRequests := self
+		                        loadMergeRequestsSince: (period at: #since)
+		                        until: (period at: #until)
 ]
 
 { #category : #accessing }
-SelfMergedUnderAMinuteMergeRequestMetric >> name [
+SelfMergedUnderAMinuteMergeRequestProjectMetric >> name [
 
-	^ 'SelfMergedUnderAMinuteMergeRequest'
+	^ 'ProjectSelfMergedUnderAMinuteMergeRequest'
 ]

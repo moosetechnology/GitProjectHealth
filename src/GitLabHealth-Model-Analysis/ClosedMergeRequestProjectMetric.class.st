@@ -32,6 +32,8 @@ ClosedMergeRequestProjectMetric >> description [
 ClosedMergeRequestProjectMetric >> load [
 
 	projectMergeRequests := self
-		                  loadMergeRequestsSince:  (period at: #since)
-		                  until: (period at: #until)
+		                        loadMergeRequestsSince: (period at: #since)
+		                        until: (period at: #until).
+	projectMergeRequests do: [ :mergeRequest |
+		glhImporter importMergeResquestMerger: mergeRequest ]
 ]
