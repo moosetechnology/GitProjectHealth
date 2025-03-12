@@ -16,10 +16,11 @@ Class {
 
 { #category : #running }
 MetricTest >> setUp [
+
 	super setUp.
 
 	"Put here a common initialization logic for tests"
-		createdAt := '2024-09-04T10:24:11.803+02:00' asDateAndTime.
+	createdAt := '2024-09-04T10:24:11.803+02:00' asDateAndTime.
 	closedAt := '2024-09-04T11:24:11.803+02:00' asDateAndTime.
 	mergedAt := '2024-09-04T11:24:11.803+02:00' asDateAndTime.
 

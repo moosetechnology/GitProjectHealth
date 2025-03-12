@@ -10,23 +10,22 @@ Class {
 { #category : #tests }
 SelfMergedUnderAMinuteMergeRequestProjectMetricTest >> testCalculate [
 
-	
 	| glhImporter result mergeFrequency |
 	"Given"
 	glhImporter := GLPHImporterMock new.
 
 
 	glhImporter mergeRequests: { (GLHMergeRequest new
-				project: project;
-				created_at: '2024-09-04T10:24:11.803+02:00' asDateAndTime;
-				merged_at: '2024-09-04T10:24:12.203+02:00' asDateAndTime;
+			 project: project;
+			 created_at: createdAt;
+			 merged_at: createdAt + 10 seconds;
 			 state: #merged) }.
 
 
 	mergeFrequency := SelfMergedUnderAMinuteMergeRequestProjectMetric new
 		                  project: project;
 		                  glhImporter: glhImporter;
-		                  setPeriodSince: '2024-09-04' until: '2024-09-05';
+		                  setPeriodSince: since until: until;
 		                  over: Week.
 
 	"When"
@@ -51,15 +50,15 @@ SelfMergedUnderAMinuteMergeRequestProjectMetricTest >> testCalculateDifferentUse
 			 project: project;
 			 author: user1;
 			 merge_user: user2;
-			 created_at: '2024-09-04T10:24:11.803+02:00' asDateAndTime;
-			 merged_at: '2024-09-04T10:24:12.203+02:00' asDateAndTime;
+			 created_at: createdAt;
+			 merged_at: createdAt + 10 second;
 			 state: #merged) }.
 
 
 	mergeFrequency := SelfMergedUnderAMinuteMergeRequestProjectMetric new
 		                  project: project;
 		                  glhImporter: glhImporter;
-		                  setPeriodSince: '2024-09-04' until: '2024-09-05';
+		                  setPeriodSince: since until: until;
 		                  over: Week.
 
 	"When"
@@ -84,15 +83,15 @@ SelfMergedUnderAMinuteMergeRequestProjectMetricTest >> testCalculateSameUser [
 			 project: project;
 			 author: user1;
 			 merge_user: user1;
-			 created_at: '2024-09-04T10:24:11.803+02:00' asDateAndTime;
-			 merged_at: '2024-09-04T10:24:12.203+02:00' asDateAndTime;
+			 created_at: createdAt;
+			 merged_at: createdAt + 10 second;
 			 state: #merged) }.
 
 
 	mergeFrequency := SelfMergedUnderAMinuteMergeRequestProjectMetric new
 		                  project: project;
 		                  glhImporter: glhImporter;
-		                  setPeriodSince: '2024-09-04' until: '2024-09-05';
+		                  setPeriodSince: since until: until;
 		                  over: Week.
 
 	"When"
