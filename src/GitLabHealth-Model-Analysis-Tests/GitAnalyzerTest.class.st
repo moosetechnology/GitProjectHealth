@@ -146,6 +146,7 @@ GitAnalyzerTest >> testChurnMetric [
 	tuesdayCommit := glhImporter
 		                 importCommitOfProject: projects first
 		                 withId: '2c7308c727560dd425ef78f9a95ca7650d164bed'.
+		
 
 	myCommits := {
 		             mondayCommit.
@@ -168,11 +169,12 @@ GitAnalyzerTest >> testChurnMetric [
 		       analyseChurn.
 
 	codeJs := (res at: #churns) first.
-	churn4CodeJs := codeJs value. 
+	churn4CodeJs := codeJs value.
 
-	self assert: (churn4CodeJs at: #churnLoC) equals: 3 .
-	self assert: (churn4CodeJs at: #churnFromInitialCommitLines) equals: 2 .
-	self assert: (churn4CodeJs at: #churnFromCommitCreatorOnly ) equals: 2. 
-	self assert: (res at: #totalContribution) equals: 7. 
-	
+	self assert: (churn4CodeJs at: #churnLoC) equals: 3.
+	self
+		assert: (churn4CodeJs at: #churnFromInitialCommitLines)
+		equals: 2.
+	self assert: (churn4CodeJs at: #churnFromCommitCreatorOnly) equals: 2.
+	self assert: (res at: #totalContribution) equals: 7
 ]

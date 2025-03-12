@@ -1,11 +1,11 @@
 Class {
-	#name : #AutoCodeCommitFrequencyProjectMetric,
+	#name : #AutoCodeReviewCommitFrequencyProjectMetric,
 	#superclass : #ProjectMetric,
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
 { #category : #calculating }
-AutoCodeCommitFrequencyProjectMetric >> calculate [  
+AutoCodeReviewCommitFrequencyProjectMetric >> calculate [  
     | groupedByDate |  
     projectCommits ifNil: [ self load ].  
     groupedByDate := self setupGroupedDate.  
@@ -23,12 +23,12 @@ AutoCodeCommitFrequencyProjectMetric >> calculate [
 ]
 
 { #category : #accessing }
-AutoCodeCommitFrequencyProjectMetric >> description [
+AutoCodeReviewCommitFrequencyProjectMetric >> description [
 
 	^ 'Nb AutoCodeReview commit for accepted suggestion (avg)'
 ]
 
 { #category : #loading }
-AutoCodeCommitFrequencyProjectMetric >> load [
+AutoCodeReviewCommitFrequencyProjectMetric >> load [
 	projectCommits := self loadCommitsSince: (period at: #since) until: (period at: #until) 
 ]
