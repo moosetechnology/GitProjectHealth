@@ -14,8 +14,8 @@ CodeAdditionByTicketMetricTest >> testCalculate [
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
-			 created_at: '2024-09-05T10:24:11.803+02:00' asDateAndTime;
-			 merged_at: '2024-09-05T11:24:11.803+02:00' asDateAndTime;
+			 created_at: createdAt ;
+			 merged_at: closedAt ;
 			 project: project1;
 			 state: 'merged';
 			 title: '205 feat do something') }.
@@ -24,14 +24,14 @@ CodeAdditionByTicketMetricTest >> testCalculate [
 			(GLHCommit new
 				 id: 1;
 				 repository: project1 repository;
-				 created_at: '2024-09-05T10:24:11.803+02:00' asDateAndTime;
+				 created_at: createdAt ;
 				 additions: 7;
 				 commitCreator: user;
 				 deletions: 5).
 			(GLHCommit new
 				 id: 2;
 				 repository: project1 repository;
-				 created_at: '2024-09-05T10:26:11.803+02:00' asDateAndTime;
+				 created_at: createdAt ;
 				 additions: 3;
 				 commitCreator: user;
 				 deletions: 5) }.
@@ -46,7 +46,7 @@ CodeAdditionByTicketMetricTest >> testCalculate [
 		                user: user;
 		                glhImporter: glhImporter;
 		                jiraImporter: jiraImporter;
-		                setPeriodSince: '2024-09-04' until: '2024-09-04';
+		                setPeriodSince: since until: until;
 		                over: Week.
 
 	"When"
@@ -65,8 +65,8 @@ CodeAdditionByTicketMetricTest >> testCalculateNoCommits [
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
-			 created_at: '2024-09-05T10:24:11.803+02:00' asDateAndTime;
-			 merged_at: '2024-09-05T11:24:11.803+02:00' asDateAndTime;
+			 created_at: createdAt ;
+			 merged_at: mergedAt ;
 			 project: project1;
 			 state: 'merged';
 			 title: '205 feat do something') }.
@@ -82,7 +82,7 @@ CodeAdditionByTicketMetricTest >> testCalculateNoCommits [
 		                user: user;
 		                glhImporter: glhImporter;
 		                jiraImporter: jiraImporter;
-		                setPeriodSince: '2024-09-04' until: '2024-09-05';
+		                setPeriodSince: since until: until;
 		                over: Week.
 
 	"When"
