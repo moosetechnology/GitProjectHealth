@@ -337,7 +337,7 @@ GitlabWithMergeRequestModelImporter >> importProject: aProjectID [
 
 	(glhModel allWithType: GLHProject)
 		detect: [ :project | project id = aProjectID ]
-		ifOne: [ :project | ^ project ].
+		ifFound: [ :project | ^ project ].
 
 	result := self repoApi projects get: aProjectID.
 	projectResult := self parseProjectResult: result.
