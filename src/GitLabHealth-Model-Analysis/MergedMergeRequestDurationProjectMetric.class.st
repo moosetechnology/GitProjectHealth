@@ -11,6 +11,10 @@ MergedMergeRequestDurationProjectMetric >> calculate [
 	projectMergeRequests ifNil: [ self load ].
 
 	groupedByDate := self setupGroupedDate.
+	
+	"Filtrer les merge requests pour ne garder que celles qui ont une date de clôture (closed_at) et un statut 'closed'"
+     projectMergeRequests := projectMergeRequests select: [ :mr | 
+    (mr merged_at) notNil and: [(mr state) = 'merged'] ]. 
 
 	projectMergeRequests ifEmpty: [ ^ nil ].
 
