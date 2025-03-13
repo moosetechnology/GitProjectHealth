@@ -15,6 +15,7 @@ MergedMergeRequestDurationProjectMetricTest >> testCalculate [
 	
 	glhImporter mergeRequests: {
 			(GLHMergeRequest new
+			     state: 'merged';
 				 project: project1 ;
 				 created_at: (DateAndTime
 						  year: 2024
@@ -32,6 +33,7 @@ MergedMergeRequestDurationProjectMetricTest >> testCalculate [
 						  second: 0)).
 						(GLHMergeRequest new
 				 project: project1 ;
+				 state: 'merged';
 				 created_at: (DateAndTime
 						  year: 2024
 						  month: 09
@@ -119,6 +121,7 @@ MergedMergeRequestDurationProjectMetricTest >> testCalculateMergeRequestOutOfAna
 						  second: 0)).
 			(GLHMergeRequest new
 				 project: project1;
+				 state: 'merged';
 				 created_at: (DateAndTime
 						  year: 2024
 						  month: 09
@@ -146,6 +149,76 @@ MergedMergeRequestDurationProjectMetricTest >> testCalculateMergeRequestOutOfAna
 
 	"Then"
 	self assert: result equals: 10 hours asSeconds 
+]
+
+{ #category : #tests }
+MergedMergeRequestDurationProjectMetricTest >> testCalculateMergeRequestWithoutMergedAtDate [
+
+	| result glhImporter mergeRequestDuration |
+	glhImporter := GLPHImporterMock new.
+
+	glhImporter mergeRequests: {
+			(GLHMergeRequest new
+				 project: project1;
+				 state: 'merged';
+				 created_at: (DateAndTime
+						  year: 2024
+						  month: 09
+						  day: 05
+						  hour: 00
+						  minute: 0
+						  second: 0)). }.
+
+
+	mergeRequestDuration := MergedMergeRequestDurationProjectMetric new
+		                        project: project1;
+		                        glhImporter: glhImporter;
+		                        setPeriodSince: since until: until;
+		                        over: Week.
+
+	"When"
+	result := mergeRequestDuration calculate.
+
+	"Then"
+	self assert: result equals: nil
+]
+
+{ #category : #tests }
+MergedMergeRequestDurationProjectMetricTest >> testCalculateMergeRequestWithoutMergedState [
+
+	| result glhImporter mergeRequestDuration |
+	glhImporter := GLPHImporterMock new.
+
+	glhImporter mergeRequests: {
+			(GLHMergeRequest new
+				 project: project1;
+				 created_at: (DateAndTime
+						  year: 2024
+						  month: 09
+						  day: 05
+						  hour: 00
+						  minute: 0
+						  second: 0);
+				 merged_at: (DateAndTime
+						  year: 2024
+						  month: 09
+						  day: 05
+						  hour: 12
+						  minute: 0
+						  second: 0)). }.
+
+
+	mergeRequestDuration := MergedMergeRequestDurationProjectMetric new
+		                        project: project1;
+		                        glhImporter: glhImporter;
+		                        setPeriodSince: since until: until;
+		                        over: Week.
+
+	"When"
+	result := mergeRequestDuration calculate.
+
+	"Then"
+	self assert: result equals: nil
 ]
 
 { #category : #tests }
