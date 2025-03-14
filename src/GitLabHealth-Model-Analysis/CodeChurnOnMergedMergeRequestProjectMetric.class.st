@@ -10,24 +10,36 @@ Class {
 { #category : #calculating }
 CodeChurnOnMergedMergeRequestProjectMetric >> calculate [
 
-	| commits res groupedByDate totalContributions gitAnalyzer |
+	| res groupedByDate totalContributions gitAnalyzer parentsCommits |
 	projectMergeRequests ifNil: [ self load ].
 
-	
-	1 halt. 
-	projectMergeRequests := projectMergeRequests select: [ :mr | mr state = #merged ].
-	
-
-
 	totalContributions := OrderedCollection new.
+	projectMergeRequests := projectMergeRequests select: [ :mr |
+		                        mr state = #merged ].
+
 	groupedByDate := self setupGroupedDate.
-	gitAnalyzer := GitAnalyzer new maxChildCommit: maxCommitWindow.
 
-	commits := self
-		           foundSuccessorOf: projectCommits
-		           andCompleteImportForMax: 1.
 
-	res := commits collect: [ :commit |
+
+	parentsCommits := projectMergeRequests collect: [ :mr |
+		                  | parentCommit mergedCommit |
+		                  mergedCommit := mr mergedCommit.
+		                  mergedCommit parentCommits
+			                  addAll:
+				                  (mergedCommit parent_ids collect: [ :id |
+					                   glhImporter
+						                   importCommit: id
+						                   ofProject: project ])
+			                  unless: glhImporter blockOnIdEquality.
+		                  parentCommit := (mergedCommit parentCommits sort: [
+			                                   :c1
+			                                   :c2 | "oldest commit first"
+			                                   c1 created_at < c2 created_at ])
+			                                  first ].
+
+
+	gitAnalyzer := GitAnalyzer new maxChildCommit: 1.
+	res := parentsCommits collect: [ :commit |
 		       commit -> (gitAnalyzer
 			        fromCommit: commit;
 			        analyseChurn) ].
