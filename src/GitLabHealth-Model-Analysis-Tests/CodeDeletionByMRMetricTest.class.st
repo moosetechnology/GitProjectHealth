@@ -17,8 +17,8 @@ CodeDeletionByMRMetricTest >> testCalculate [
 	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
 			 project: project1;
-			 created_at: '2024-09-05T10:24:11.803+02:00' asDateAndTime;
-			 merged_at: '2024-09-05T11:24:11.803+02:00' asDateAndTime;
+			 created_at: createdAt ;
+			 merged_at: mergedAt ;
 			 state: #merged;
 			 title: '205 feat do something') }.
 
@@ -26,14 +26,14 @@ CodeDeletionByMRMetricTest >> testCalculate [
 			(GLHCommit new
 				 id: 1;
 				repository: project1 repository;
-			 created_at: '2024-09-05T10:24:11.803+02:00' asDateAndTime;
+			 created_at: createdAt ;
 				 additions: 7;
 				 commitCreator: user;
 				 deletions: 5).
 			(GLHCommit new
 				 id: 2;
 				repository: project1 repository;
-			 created_at: '2024-09-05T10:34:11.803+02:00' asDateAndTime;
+			 created_at: createdAt ;
 				 additions: 3;
 				 commitCreator: user;
 				 deletions: 5) }.
@@ -41,7 +41,7 @@ CodeDeletionByMRMetricTest >> testCalculate [
 	codeDeletion := CodeDeletionByMRMetric new
 		                user: user;
 		                glhImporter: glhImporter;
-		                setPeriodSince: '2024-09-04' until: '2024-09-04';
+		                setPeriodSince: since until: until;
 		                over: Week.
 
 	"When"

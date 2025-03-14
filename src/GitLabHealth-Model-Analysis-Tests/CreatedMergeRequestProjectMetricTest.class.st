@@ -14,7 +14,7 @@ CreatedMergeRequestProjectMetricTest >> testCalculate [
 	"Given"
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: { (GLHMergeRequest new
-			 created_at: '2024-09-04T10:24:11.803+02:00' asDateAndTime;
+			 created_at: createdAt ;
 			 state: 'opened';
 			 project: project) }.
 
@@ -22,7 +22,7 @@ CreatedMergeRequestProjectMetricTest >> testCalculate [
 	mergeFrequency := CreatedMergeRequestProjectMetric new
 		                  project: project;
 		                  glhImporter: glhImporter;
-		                  setPeriodSince: '2024-09-04' until: '2024-09-05';
+		                  setPeriodSince: since until: until;
 		                  over: Week.
 
 	"When"

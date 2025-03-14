@@ -2,18 +2,17 @@
 A GPJCConnectorTest is a test class for testing the behavior of GPJCConnector
 "
 Class {
-	#name : 'GPJCConnectorTest',
-	#superclass : 'TestCase',
+	#name : #GPJCConnectorTest,
+	#superclass : #TestCase,
 	#instVars : [
 		'connector',
 		'gitProject',
 		'jiraModel'
 	],
-	#category : 'GitProject-JiraConnector-Tests',
-	#package : 'GitProject-JiraConnector-Tests'
+	#category : #'GitProject-JiraConnector-Tests'
 }
 
-{ #category : 'running' }
+{ #category : #running }
 GPJCConnectorTest >> setUp [
 
 	super setUp.
@@ -24,7 +23,7 @@ GPJCConnectorTest >> setUp [
 	connector gpModel: gitProject
 ]
 
-{ #category : 'test' }
+{ #category : #test }
 GPJCConnectorTest >> testConnectCommit [
 
 	| issue commit |
@@ -39,7 +38,7 @@ GPJCConnectorTest >> testConnectCommit [
 	self assert: commit jiraIssue equals: issue
 ]
 
-{ #category : 'test' }
+{ #category : #test }
 GPJCConnectorTest >> testConnectCommitDoesNotExist [
 
 	| issue commit |
@@ -54,7 +53,7 @@ GPJCConnectorTest >> testConnectCommitDoesNotExist [
 	self assert: commit jiraIssue equals: nil
 ]
 
-{ #category : 'test' }
+{ #category : #test }
 GPJCConnectorTest >> testConnectMergeRequest [
 
 	| issue mergeRequest |
@@ -69,7 +68,7 @@ GPJCConnectorTest >> testConnectMergeRequest [
 	self assert: mergeRequest jiraIssue equals: issue
 ]
 
-{ #category : 'test' }
+{ #category : #test }
 GPJCConnectorTest >> testConnectMergeRequestDoesNotExist [
 
 	| issue mergeRequest |
@@ -84,7 +83,7 @@ GPJCConnectorTest >> testConnectMergeRequestDoesNotExist [
 	self assert: mergeRequest jiraIssue equals: nil
 ]
 
-{ #category : 'test' }
+{ #category : #test }
 GPJCConnectorTest >> testConnectSeveralCommit [
 
 	| issue commit commit2 commit3 |
@@ -107,4 +106,40 @@ GPJCConnectorTest >> testConnectSeveralCommit [
 	self assert: commit jiraIssue equals: issue.
 	self assert: commit2 jiraIssue equals: issue.
 	self assert: commit3 jiraIssue equals: issue
+]
+
+{ #category : #tests }
+GPJCConnectorTest >> testJiraKeyFromCommitMessage [
+
+	self assert: (connector jiraKeyFromCommitMessage: 'AV1-4974 hello') equals: 'AV1-4974'
+]
+
+{ #category : #tests }
+GPJCConnectorTest >> testJiraKeyFromCommitMessageWithBrackets [
+
+	self assert: (connector jiraKeyFromCommitMessage: '[AV1-4974] hello') equals: 'AV1-4974'
+]
+
+{ #category : #tests }
+GPJCConnectorTest >> testJiraKeyFromCommitMessageWithBracketsAtTheEnd [
+
+	self assert: (connector jiraKeyFromCommitMessage: 'hello [AV1-4974]') equals: 'AV1-4974'
+]
+
+{ #category : #tests }
+GPJCConnectorTest >> testJiraKeyFromCommitMessageWithBracketsInTheMiddle [
+
+	self assert: (connector jiraKeyFromCommitMessage: 'hello [AV1-4974] middle') equals: 'AV1-4974'
+]
+
+{ #category : #tests }
+GPJCConnectorTest >> testJiraKeyFromCommitMessageWithBranchName [
+
+	self assert: (connector jiraKeyFromCommitMessage: 'Merge branch ''feature/AV1-4897-3'' into ''develop''') equals: 'AV1-4897'
+]
+
+{ #category : #tests }
+GPJCConnectorTest >> testJiraKeyFromWrongCommitMessage [
+
+	self assert: (connector jiraKeyFromCommitMessage: 'hello') equals: nil
 ]

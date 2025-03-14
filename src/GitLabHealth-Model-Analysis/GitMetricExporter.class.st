@@ -461,8 +461,9 @@ GitMetricExporter >> initialize [
 
 	analyses := OrderedCollection new.
 
+	"User Metrics"
 	metrics := {
-					"User Metrics"
+					"UserMetric subclasses"
 		           CodeAdditionMetric.
 		           CodeDeletionMetric.
 		           CommentContributionMetric.
@@ -471,8 +472,8 @@ GitMetricExporter >> initialize [
 		           DelayUntilFirstChurnMetric.
 		           TimeBetweenCommitMetric.
 		           ContributedProjectMetric.
-					  CodeAdditionByMRMetric .
-		           CodeDeletionByMRMetric .
+		           CodeAdditionByMRMetric.
+		           CodeDeletionByMRMetric.
 		           MergeRequestDurationMetric.
 		           OpenedMergeRequestMetric.
 		           ClosedMergeRequestMetric.
@@ -481,15 +482,24 @@ GitMetricExporter >> initialize [
 		           ClosedTicketsMetric.
 		           JiraTimeMRTimeDifferenceMetric.
 		           CommitsNumberByJiraTicketsMetric.
-					  CommitsLinkWithTicketMetric.
-		
-		
-				"Project Metrics"
-				CommitFrequencyProjectMetric.
-				ClosedMergeRequestProjectMetric.
-				CreatedMergeRequestProjectMetric.
-				MergedMergeRequestProjectMetric.
-		 }.
+		           CommitsLinkWithTicketMetric.
+
+					"ProjectMetric subclasses"
+		           ClosedMergeRequestProjectMetric.
+		           CommitFrequencyProjectMetric.
+		           CreatedMergeRequestProjectMetric.
+		           MergedMergeRequestProjectMetric.
+		           ClosedMergeRequestDurationProjectMetric.
+		           MergedMergeRequestDurationProjectMetric.
+		           OpenedMergeRequestDurationProjectMetric.
+		           ContributorsProjectMetric.
+		           AutoCodeReviewCommitFrequencyProjectMetric.
+		           CodeAdditionByMergeRequestProjectMetric.
+		           CodeChurnOnCommitsProjectMetric.
+		           SelfMergedUnderAMinuteMergeRequestProjectMetric }.
+
+	self flag: 'Futur updates should considers loading metrics directly from subclasses instead of manual selection inside the initialize'
+	"metrics addAll: ProjectMetric subclasses."
 ]
 
 { #category : #accessing }

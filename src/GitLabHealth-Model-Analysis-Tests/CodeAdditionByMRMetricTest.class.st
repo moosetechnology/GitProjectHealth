@@ -56,7 +56,7 @@ CodeAdditionByMRMetricTest >> testCalculateNoCommits [
 	| result glhImporter codeAddition |
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: { (GLHMergeRequest new
-			 author: user;
+			
 			 project: project1;
 			 created_at: createdAt ;
 			 merged_at: mergedAt ;

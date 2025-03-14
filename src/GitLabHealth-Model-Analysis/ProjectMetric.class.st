@@ -70,6 +70,30 @@ ProjectMetric >> loadMergeRequestsSince: since until: until [
 	glhImporter withCommitDiffs: true.
 
 	^ allMergeRequests
+	
+
+]
+
+{ #category : #loading }
+ProjectMetric >> loadProjectCompleteMergeRequestsSince: since until: until [
+
+	| mergeRequests |
+    mergeRequests := self loadProjectMergeRequestsSince:  since until: until.
+
+	mergeRequests do: [ :mergeRequest |
+		glhImporter importMergeResquestMerger: mergeRequest.
+		glhImporter importMergeRequestCommits: mergeRequest ].
+
+	^ mergeRequests
+]
+
+{ #category : #'as yet unclassified' }
+ProjectMetric >> loadProjectMergeRequestsSince: since until: until [
+
+	| mergeRequests |
+	 mergeRequests := self loadMergeRequestsSince: since until: until.
+
+	^ mergeRequests select: [ :mergeRequest | mergeRequest project = project  ]
 ]
 
 { #category : #accessing }

@@ -32,7 +32,6 @@ SelfMergedUnderAMinuteMergeRequestMetric >> calculate [
 
 	noVerificationMergeRequests do: [ :userMergeRequest |
 		dateOver := self transformDate: userMergeRequest created_at to: over.
-
 		groupedByDate
 			at: dateOver printString
 			ifPresent: [ :value | value add: userMergeRequest ] ].

@@ -25,10 +25,7 @@ CodeDeletionMetric >> calculate [
 		groupedByDate
 			at: dateOver printString
 			ifPresent: [ :v | v add: assoc value ]
-			ifAbsentPut: [
-				OrderedCollection new
-					add: assoc value;
-					yourself ] ].
+			].
 
 	groupedByDate := groupedByDate collect: [ :contribs |
 		                 contribs sum: [ :v | v at: #deletion ] ].

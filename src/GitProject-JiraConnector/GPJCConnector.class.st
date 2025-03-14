@@ -13,17 +13,16 @@ GPJCConnector new
 I also ensure to not repeat relations (you can execute me multiple times safely)
 "
 Class {
-	#name : 'GPJCConnector',
-	#superclass : 'Object',
+	#name : #GPJCConnector,
+	#superclass : #Object,
 	#instVars : [
 		'jiraModel',
 		'gpModel'
 	],
-	#category : 'GitProject-JiraConnector',
-	#package : 'GitProject-JiraConnector'
+	#category : #'GitProject-JiraConnector'
 }
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GPJCConnector >> connect [
 	(self gpModel allWithType: GLHCommit) do: [ :commit |
 		self connectCommit: commit ].
@@ -31,7 +30,7 @@ GPJCConnector >> connect [
 		self connectMergeRequest: mergeRequest ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GPJCConnector >> connectCommit: commit [
 
 	(jiraModel allWithType: JPIssue)
@@ -39,7 +38,7 @@ GPJCConnector >> connectCommit: commit [
 		ifFound: [ :issue | commit jiraIssue: issue ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GPJCConnector >> connectMergeRequest: mergeRequest [
 
 	(jiraModel allWithType: JPIssue)
@@ -47,25 +46,34 @@ GPJCConnector >> connectMergeRequest: mergeRequest [
 		ifFound: [ :issue | mergeRequest jiraIssue: issue ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GPJCConnector >> gpModel [
 
 	^ gpModel
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GPJCConnector >> gpModel: anObject [
 
 	gpModel := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
+GPJCConnector >> jiraKeyFromCommitMessage: aString [
+
+	| result |
+	result := aString allRegexMatches: '\b[A-Z1-9]+-\d+\b'.
+	result isEmpty ifTrue: [ ^ nil ].
+	^ result anyOne
+]
+
+{ #category : #accessing }
 GPJCConnector >> jiraModel [
 
 	^ jiraModel
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 GPJCConnector >> jiraModel: anObject [
 
 	jiraModel := anObject
