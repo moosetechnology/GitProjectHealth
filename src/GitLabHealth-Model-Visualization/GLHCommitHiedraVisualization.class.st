@@ -19,7 +19,8 @@ GLHCommitHiedraVisualization >> forCommits: commits [
 	table
 		addColumn: (SpImageTableColumn evaluated: [ :item |
 					 hiedraColumnController cellMorphAtValue: item ]);
-		addColumn: (SpStringTableColumn evaluated: [ :item | item message ]).
+		addColumn: (SpStringTableColumn evaluated: [ :item | item message ]);
+		addColumn: (SpStringTableColumn evaluated: [:commit | String streamContents:[:str |  commit committed_date asDate printOn: str format: #(1 2 3 $  2 2) ] ]).
 	hiedraColumnController ruler:
 		(HiRulerBuilder newRulerValues: commits linksBlock: [ :aCommit |
 			 (aCommit parentCommits collect: #id) collect: [ :id |
@@ -27,6 +28,7 @@ GLHCommitHiedraVisualization >> forCommits: commits [
 	hiedraColumnController reset.
 	"After #reset, we know the desired width for the column."
 	table columns first width: hiedraColumnController rulerWidth.
+	table columns last width: 75.
 	^ table
 ]
 
