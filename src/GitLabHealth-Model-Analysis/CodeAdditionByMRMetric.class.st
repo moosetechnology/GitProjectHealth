@@ -13,7 +13,6 @@ CodeAdditionByMRMetric >> calculate [
 	groupedByDate := self setupGroupedDate.
 	userMergeRequests ifEmpty: [ ^ 0 ].
 
-
 	userMergeRequests do: [ :userMergeRequest |
 		dateOver := self transformDate: userMergeRequest created_at to: over.
 		groupedByDate
@@ -39,6 +38,7 @@ CodeAdditionByMRMetric >> description [
 CodeAdditionByMRMetric >> load [
 
 	userMergeRequests := self
-		                     loadUserCompleteMergeRequestsSince:  (period at: #since)
+		                     loadUserCompleteMergeRequestsSince:
+		                     (period at: #since)
 		                     until: (period at: #until)
 ]

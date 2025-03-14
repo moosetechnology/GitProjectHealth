@@ -12,10 +12,12 @@ MergedMergeRequestProjectMetric >> calculate [
 
 	groupedByDate := self setupGroupedDate.
 
-(projectMergeRequests select: [ :mr| mr state= #merged ]) do: [ :c |
-		| dateOver |
-		dateOver := self transformDate: c merged_at to: over.
-		groupedByDate at: dateOver printString ifPresent: [ :v | v add: c ] ].
+	projectMergeRequests
+		select: [ :mr | mr state = #merged ]
+		thenDo: [ :c |
+			| dateOver |
+			dateOver := self transformDate: c merged_at to: over.
+			groupedByDate at: dateOver printString ifPresent: [ :v | v add: c ] ].
 
 	groupedByDate := groupedByDate collect: [ :group | group size ].
 
