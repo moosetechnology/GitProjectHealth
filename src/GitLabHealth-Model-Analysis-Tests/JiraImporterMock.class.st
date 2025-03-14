@@ -34,6 +34,12 @@ JiraImporterMock >> issues: anObject [
 	issues := anObject
 ]
 
+{ #category : #load }
+JiraImporterMock >> loadIssues: aCollection [ 
+	self model addAll: aCollection.
+	^aCollection 
+]
+
 { #category : #accessing }
 JiraImporterMock >> model [
 
