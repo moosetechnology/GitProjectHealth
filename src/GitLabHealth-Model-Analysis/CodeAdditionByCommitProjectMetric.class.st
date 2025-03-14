@@ -1,19 +1,19 @@
 Class {
-	#name : #CodeAdditionMetric,
-	#superclass : #UserCommitsMetric,
+	#name : #CodeAdditionByCommitProjectMetric,
+	#superclass : #ProjectMetric,
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
 { #category : #calculating }
-CodeAdditionMetric >> calculate [
+CodeAdditionByCommitProjectMetric >> calculate [
 
-	| gitAnalyzer contributions groupedByDate |
-	userCommits ifNil: [ self load ].
+		| gitAnalyzer contributions groupedByDate |
+	projectCommits ifNil: [ self load ].
 	groupedByDate := self setupGroupedDate.
 
 	gitAnalyzer := GitAnalyzer new.
 
-	contributions := userCommits collect: [ :commit |
+	contributions := projectCommits collect: [ :commit |
 		                 commit -> (gitAnalyzer
 			                  fromCommit: commit;
 			                  analyseCommitContribution) ].
@@ -24,8 +24,7 @@ CodeAdditionMetric >> calculate [
 		dateOver := self transformDate: assoc key created_at to: over.
 		groupedByDate
 			at: dateOver printString
-			ifPresent: [ :v | v add: assoc value ]
-			 ].
+			ifPresent: [ :v | v add: assoc value ] ].
 
 	groupedByDate := groupedByDate collect: [ :contribs |
 		                 contribs sum: [ :v | v at: #addition ] ].
@@ -34,7 +33,15 @@ CodeAdditionMetric >> calculate [
 ]
 
 { #category : #accessing }
-CodeAdditionMetric >> description [
+CodeAdditionByCommitProjectMetric >> description [
 
-	^ 'code addition (avg)'
+	^ 'Code Addition by Commits (avg)'
+]
+
+{ #category : #loading }
+CodeAdditionByCommitProjectMetric >> load [
+
+	projectCommits := self
+		                  loadCommitsSince: (period at: #since)
+		                  until: (period at: #until)
 ]
