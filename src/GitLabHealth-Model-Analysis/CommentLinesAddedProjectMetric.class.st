@@ -1,19 +1,22 @@
 Class {
-	#name : #CommentContributionMetric,
-	#superclass : #UserCommitsMetric,
+	#name : #CommentLinesAddedProjectMetric,
+	#superclass : #ProjectMetric,
+	#instVars : [
+		'maxCommitWindow'
+	],
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
 { #category : #calculating }
-CommentContributionMetric >> calculate [
+CommentLinesAddedProjectMetric >> calculate [
 
 	| groupedByDate gitAnalyzer contributions |
-	userCommits ifNil: [ self load ].
+	projectCommits ifNil: [ self load ].
 	groupedByDate := self setupGroupedDate.
 
 	gitAnalyzer := GitAnalyzer new.
 
-	contributions := userCommits collect: [ :commit |
+	contributions := projectCommits collect: [ :commit |
 		                 commit -> (gitAnalyzer
 			                  fromCommit: commit;
 			                  analyseCommentContribution) ].
@@ -36,15 +39,14 @@ CommentContributionMetric >> calculate [
 ]
 
 { #category : #accessing }
-CommentContributionMetric >> description [
+CommentLinesAddedProjectMetric >> description [
+	"as the sum of each comment line in commits made in the period, average by the unit scale"
 
-	^ 'comment contribution (avg)'
+	^ 'Comment lines added (avg by ',over printString,')'
 ]
 
 { #category : #loading }
-CommentContributionMetric >> load [
+CommentLinesAddedProjectMetric >> load [
 
-	userCommits := self
-		               loadUserCompleteCommitsSince: (period at: #since)
-		               until: (period at: #until)
+	projectCommits := self loadCommitsSince: (period at:#since) until: (period at:#until) 
 ]
