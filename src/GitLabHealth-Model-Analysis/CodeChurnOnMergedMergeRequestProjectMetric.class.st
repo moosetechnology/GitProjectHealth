@@ -14,12 +14,9 @@ CodeChurnOnMergedMergeRequestProjectMetric >> calculate [
 	projectMergeRequests ifNil: [ self load ].
 
 	totalContributions := OrderedCollection new.
-	projectMergeRequests := projectMergeRequests select: [ :mr |
-		                        mr state = #merged ].
+
 
 	groupedByDate := self setupGroupedDate.
-
-
 
 	parentsCommits := projectMergeRequests collect: [ :mr |
 		                  | parentCommit mergedCommit |
@@ -99,7 +96,13 @@ CodeChurnOnMergedMergeRequestProjectMetric >> initialize [
 CodeChurnOnMergedMergeRequestProjectMetric >> load [
 
 	projectMergeRequests := self
-		                  loadMergeRequestsSince: (period at: #since) until: (period at: #until).
+		                        loadMergeRequestsSince: (period at: #since)
+		                        until: (period at: #until).
+		
+		projectMergeRequests := projectMergeRequests select: [ :mr |
+		                        mr state = #merged ].
+	
+		projectMergeRequests do: [ :mr | glhImporter importMergeRequestMergeCommits: mr ]
 ]
 
 { #category : #accessing }
