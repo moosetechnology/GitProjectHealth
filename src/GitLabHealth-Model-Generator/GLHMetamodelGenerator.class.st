@@ -143,7 +143,7 @@ GLHMetamodelGenerator >> defineClasses [
 	note := builder
 		             newClassNamed: #Note
 		             comment:
-		             'a indicate on which line of code are concerned by a diff (usually declared with @@ oldRange, newRange @@) '.
+		             'a note (a diff) proposed in a Merge Request; can be accepted, modified or deleted'.
 ]
 
 { #category : #definition }
@@ -279,7 +279,7 @@ GLHMetamodelGenerator >> defineRelations [
 	(project property: #mergeRequests)
 	<>-* (mergeRequest property: #project).
 	
-	(note property: #MergeRequest) *- (mergeRequest property: #note).
+	(note property: #mergeRequest) *- (mergeRequest property: #note).
 
 	"DIFF"
 	(diff property: #file) <>-* (file property: #diffs).
@@ -401,7 +401,31 @@ GLHMetamodelGenerator >> mergeRequestProperties [
 
 { #category : #'as yet unclassified' }
 GLHMetamodelGenerator >> noteProperties [ 
+	note property: #id type: #Number.
 	note property: #body type: #String. 
+	note property: #attachment type: #Object.
+	note property: #author type: #Object.
+	note property: #created_at type: #Object.
+	note property: #updated_at type: #Object.
+	note property: #system type: #Boolean.
+	note property: #noteable_id type: #Number.
+	note property: #noteable_type type: #String.
+	note property: #project_id type: #Number.
+	note property: #noteable_iid type: #Number.
+	note property: #resolvable type: #Boolean.
+	note property: #confidential type: #Boolean.
+	note property: #internal type: #Boolean.
+	note property: #imported type: #Boolean.
+	note property: #imported_from type: #String.
+	 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
 
 ]
 
