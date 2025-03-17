@@ -20,7 +20,8 @@ Class {
 		'change',
 		'addition',
 		'deletion',
-		'lineOfCode'
+		'lineOfCode',
+		'note'
 	],
 	#category : #'GitLabHealth-Model-Generator'
 }
@@ -138,6 +139,11 @@ GLHMetamodelGenerator >> defineClasses [
 		             newClassNamed: #DiffRange
 		             comment:
 		             'a indicate on which line of code are concerned by a diff (usually declared with @@ oldRange, newRange @@) '.
+		
+	note := builder
+		             newClassNamed: #Note
+		             comment:
+		             'a indicate on which line of code are concerned by a diff (usually declared with @@ oldRange, newRange @@) '.
 ]
 
 { #category : #definition }
@@ -154,6 +160,7 @@ GLHMetamodelGenerator >> defineHierarchy [
 	commit --|> #TNamedEntity.
 	diff --|> #TNamedEntity.
 	job --|> #TNamedEntity.
+	note --|> #TNamedEntity.
 
 	change --|> #TNamedEntity.
 	change <|-- addition.
@@ -201,7 +208,8 @@ GLHMetamodelGenerator >> defineProperties [
 	self jobProperties.
 	self changeProperties.
 	self mergeRequestProperties.
-	self diffRangeProperties
+	self diffRangeProperties.
+	self noteProperties.
 ]
 
 { #category : #definition }
@@ -270,6 +278,8 @@ GLHMetamodelGenerator >> defineRelations [
 
 	(project property: #mergeRequests)
 	<>-* (mergeRequest property: #project).
+	
+	(note property: #MergeRequest) *- (mergeRequest property: #note).
 
 	"DIFF"
 	(diff property: #file) <>-* (file property: #diffs).
@@ -387,6 +397,12 @@ GLHMetamodelGenerator >> mergeRequestProperties [
 
 	"see https://github.com/moosetechnology/GitProjectHealth/issues/88"
 	mergeRequest property: #commits type: #Object
+]
+
+{ #category : #'as yet unclassified' }
+GLHMetamodelGenerator >> noteProperties [ 
+	note property: #body type: #String. 
+
 ]
 
 { #category : #definition }
