@@ -10,3 +10,10 @@ GLHRepository >> rsCommitDistribution: aBuilder [
 					   self commits);
 		  yourself
 ]
+
+{ #category : #'*GitLabHealth-Model-Visualization' }
+GLHRepository >> rsCommitHistory: aBuilder [
+
+	<inspectorPresentationOrder: 100 title: 'Commits History'>
+	^ GLHCommitHiedraVisualization new forCommits: self commits
+]

@@ -57,13 +57,13 @@ GLHCommitDistributionVisualization >> forCommits: commits [
 	^ c canvas
 ]
 
-{ #category : #accessing }
+{ #category : #'as yet unclassified' }
 GLHCommitDistributionVisualization >> groupCommitBlock [
 
 	^ groupCommitBlock
 ]
 
-{ #category : #accessing }
+{ #category : #'as yet unclassified' }
 GLHCommitDistributionVisualization >> groupCommitBlock: anObject [
 
 	groupCommitBlock := anObject
