@@ -16,8 +16,7 @@ JiraTimeMRTimeDifferenceProjectMetricTest >> testCalculate [
 			project:project1;  
 			created_at: createdAt;  
 			merged_at: createdAt + 24 hours;  
-			state: #merged;  
-			project: project1;  
+			state: #merged;    
 			title: '[TI-205] feat do something') }.  
 
 	glhImporter commits: { (GLHCommit new  
@@ -47,5 +46,68 @@ JiraTimeMRTimeDifferenceProjectMetricTest >> testCalculate [
 
 	
 	self assert: result equals: 1 hours asSeconds.
+
+]
+
+{ #category : #tests }
+JiraTimeMRTimeDifferenceProjectMetricTest >> testCalculateNoMergeRequests [
+
+	| result glhImporter jiraImporter jiraMRDifference |
+	"Given"
+
+
+	glhImporter := GLPHImporterMock new.
+
+	jiraImporter := JiraImporterMock new.
+
+
+	jiraMRDifference := JiraTimeMRTimeDifferenceProjectMetric new
+		                    project: project1 ;
+		                    glhImporter: glhImporter;
+		                    jiraImporter: jiraImporter;
+		                    setPeriodSince: since
+		                    until: until;
+		                    over: Week.
+
+	"When"
+	result := jiraMRDifference calculate.
+
+	"Then"
+	self assert: result equals: nil
+]
+
+{ #category : #tests }
+JiraTimeMRTimeDifferenceProjectMetricTest >> testCalculateWithNoEstimatedTime [
+
+	| result glhImporter jiraImporter jiraMRDifference  jiraIssue |  
+  
+	glhImporter := GLPHImporterMock new.  
+	glhImporter mergeRequests: { (GLHMergeRequest new  
+			project:project1;  
+			created_at: createdAt;  
+			merged_at: createdAt + 24 hours;  
+			state: #merged;  
+			title: '[AZ-654] feat do something') }.  
+
+
+ 
+	jiraImporter := JiraImporterMock new.
+	jiraIssue := JPIssue new id: 'AZ-654'; key: 'AZ-654'; yourself .  
+   jiraImporter issues: { jiraIssue }.
+
+
+
+	jiraMRDifference := JiraTimeMRTimeDifferenceProjectMetric new  
+		                    project:project1;  
+		                    glhImporter: glhImporter;  
+		                    jiraImporter: jiraImporter;  
+		                    setPeriodSince: since until: until;  
+		                    over: Week.  
+
+ 
+	result := jiraMRDifference calculate.  
+
+	
+	self assert: result equals: nil.
 
 ]

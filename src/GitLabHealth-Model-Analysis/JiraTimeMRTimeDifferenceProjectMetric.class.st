@@ -39,12 +39,13 @@ JiraTimeMRTimeDifferenceProjectMetric >> calculate [
 			       mergeRequestTime :=     mergeRequest merged_at - firstCommitDate.  
 
 			
-			       jiraTime := jiraIssue timeOriginalEstimate   ifNil: [ jiraIssue timeEstimate ].  
-
+			       jiraTime := jiraIssue timeOriginalEstimate   ifNil: [ jiraIssue timeEstimate ]. 
+			
+			        jiraTime ifNil: [ ^ nil ].      
 			       (jiraTime - mergeRequestTime) asSeconds  
 		].  
 
-		average := group ifEmpty: [ 0 ] ifNotEmpty: [ differences average ].  
+		average := group ifEmpty: [ 0 ] ifNotEmpty: [ differences average ].
 		average  
 	].  
 
@@ -64,7 +65,17 @@ JiraTimeMRTimeDifferenceProjectMetric >> load [
 	projectMergeRequests := self
 		                     loadProjectCompleteMergeRequestsSince:  (period at: #since)
 		                     until: (period at: #until).
-	 self loadMergeRequestIssues: projectMergeRequests. 
+	 self loadMergeRequestIssues: projectMergeRequests .
+	
+	projectMergeRequests := projectMergeRequests select: [ :mergeRequest |
+		                     | issueIsEstimated |
+		                     issueIsEstimated := mergeRequest jiraIssue
+			                                         timeEstimate isNotNil or:
+			                                         mergeRequest jiraIssue
+				                                         timeOriginalEstimate
+				                                         isNotNil.
+		                     mergeRequest merged_at isNotNil and:
+			                     issueIsEstimated ]
 ]
 
 { #category : #issue }
