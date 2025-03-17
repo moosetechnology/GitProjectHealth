@@ -644,6 +644,19 @@ GitlabModelImporter >> importLastestCommitsOfProject: aGLHProject [
 	^ parsedResults
 ]
 
+{ #category : #'import - notes' }
+GitlabModelImporter >> importNotesfromMergeRequest: mergeRequestIID ofProject: projectId [
+	| results notes |
+	
+	results := self repoApi notes allInMergeRequest: mergeRequestIID ofProject: projectId.
+	
+	notes := self parseNoteJson: results.
+	self glhModel addAll: notes unless: self blockOnIdEquality.
+	
+
+	
+]
+
 { #category : #'import - commits' }
 GitlabModelImporter >> importParentCommitsOfCommit: aGLHCommit since: aDate [
 
@@ -1074,6 +1087,35 @@ GitlabModelImporter >> parseJobsResult: result ofProject: aProject [
 		customDo: [ :customMappting |
 		customMappting listOfElementSchema: GLHJob ].
 	^ reader nextAs: #ArrayOfGLHJob
+]
+
+{ #category : #'private - parsing' }
+GitlabModelImporter >> parseNoteJson: results [
+	
+	^results collect: [ :each |
+        GLHNote new
+            id: (each at: #id);
+            noteable_id: (each at: #noteable_id);
+            attachment: (each at: #attachment);
+            system: (each at: #system);
+            confidential: (each at: #confidential);
+            internal: (each at: #internal);
+            noteable_iid: (each at: #noteable_iid);
+            resolvable: (each at: #resolvable);
+            imported: (each at: #imported);
+            imported_from: (each at: #imported_from);
+            author: (each at: #author);
+            body: (each at: #body);
+            project_id: (each at: #project_id);
+            noteable_type: (each at: #noteable_type);
+            created_at: (DateAndTime fromString: (each at: #created_at));
+            updated_at: (DateAndTime fromString: (each at: #updated_at));
+            yourself. ].
+	
+	
+	
+	
+	
 ]
 
 { #category : #'private - parsing' }
