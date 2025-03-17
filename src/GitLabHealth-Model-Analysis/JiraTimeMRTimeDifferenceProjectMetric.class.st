@@ -8,49 +8,56 @@ Class {
 }
 
 { #category : #calculating }
-JiraTimeMRTimeDifferenceProjectMetric >> calculate [  
-	| groupedByDate dateOver  jiraID  | 
+JiraTimeMRTimeDifferenceProjectMetric >> calculate [
 
-	projectMergeRequests ifNil: [ self load ].  
-	projectMergeRequests ifEmpty: [ ^ nil ].  
+	| groupedByDate dateOver jiraID |
 
-	groupedByDate := self setupGroupedDate.  
+	projectMergeRequests ifNil: [ self load ].
+	projectMergeRequests ifEmpty: [ ^ nil ].
 
-	projectMergeRequests do: [ :mr |  
-		dateOver := self transformDate: mr created_at to: over.  
+	groupedByDate := self setupGroupedDate.
 
-		"Extraction de l'ID du ticket Jira depuis le titre du mr"  
-		jiraID := GPJCConnector new jiraKeyFromCommitMessage: mr title.  
+	projectMergeRequests do: [ :mr |
+		dateOver := self transformDate: mr created_at to: over.
 
-		groupedByDate  
-			at: dateOver printString  
-			ifPresent: [ :value | value add: mr ]  
-	].  
+		"Extraction de l'ID du ticket Jira depuis le titre du mr"
+		jiraID := GPJCConnector new jiraKeyFromCommitMessage: mr title.
 
-	       groupedByDate := groupedByDate collect: [ :group |  
-		                  | differences average |  
-		                        differences := group collect: [ :mergeRequest |  
-		                	| firstCommitDate mergeRequestTime jiraTime jiraIssue |  
-			
-			       jiraIssue := mergeRequest jiraIssue.
-			 
-			
-		          firstCommitDate  :=     mergeRequest commits last created_at.  
-			       mergeRequestTime :=     mergeRequest merged_at - firstCommitDate.  
+		groupedByDate
+			at: dateOver printString
+			ifPresent: [ :value | value add: mr ] ].
 
-			
-			       jiraTime := jiraIssue timeOriginalEstimate   ifNil: [ jiraIssue timeEstimate ]. 
-			
-			        jiraTime ifNil: [ ^ nil ].      
-			       (jiraTime - mergeRequestTime) asSeconds  
-		].  
+	groupedByDate := groupedByDate collect: [ :group |
+		                 | differences average |
+		                 differences := group collect: [ :mergeRequest |
+			                                | firstCommitDate mergeRequestTime jiraTime jiraIssue |
+			                                jiraIssue := mergeRequest jiraIssue.
 
-		average := group ifEmpty: [ 0 ] ifNotEmpty: [ differences average ].
-		average  
-	].  
 
-	^ groupedByDate average asFloat.
+			                                firstCommitDate := mergeRequest
+				                                                   commits last
+				                                                   created_at.
+			                                mergeRequestTime := mergeRequest
+				                                                    merged_at
+			                                                    -
+			                                                    firstCommitDate.
 
+
+			                                jiraTime := jiraIssue
+				                                            timeOriginalEstimate
+				                                            ifNil: [
+				                                            jiraIssue timeEstimate ].
+
+			                                jiraTime ifNil: [ ^ nil ].
+			                                (jiraTime - mergeRequestTime)
+				                                asSeconds ].
+
+		                 average := group
+			                            ifEmpty: [ 0 ]
+			                            ifNotEmpty: [ differences average ].
+		                 average ].
+
+	^ groupedByDate average asFloat
 ]
 
 { #category : #accessing }
@@ -65,17 +72,13 @@ JiraTimeMRTimeDifferenceProjectMetric >> load [
 	projectMergeRequests := self
 		                     loadProjectCompleteMergeRequestsSince:  (period at: #since)
 		                     until: (period at: #until).
-	 self loadMergeRequestIssues: projectMergeRequests .
 	
 	projectMergeRequests := projectMergeRequests select: [ :mergeRequest |
-		                     | issueIsEstimated |
-		                     issueIsEstimated := mergeRequest jiraIssue
-			                                         timeEstimate isNotNil or:
-			                                         mergeRequest jiraIssue
-				                                         timeOriginalEstimate
-				                                         isNotNil.
-		                     mergeRequest merged_at isNotNil and:
-			                     issueIsEstimated ]
+		                     mergeRequest state = #merged and:
+			                     [mergeRequest merged_at isNotNil] ].
+	
+	self loadMergeRequestIssues: projectMergeRequests .
+	
 ]
 
 { #category : #issue }
@@ -83,14 +86,8 @@ JiraTimeMRTimeDifferenceProjectMetric >> loadMergeRequestIssues: aMergeRequestCo
 	
 	 (aMergeRequestCollection do: [ :mr | 
 		|id|
-
 		id := GPJCConnector new jiraKeyFromCommitMessage: mr title .
-	         	jiraImporter issues detect: [ :issue | issue key = id  ] ifFound: [:issue | 
-			   jiraImporter loadIssues:  { issue }.
-			                                       GPJCConnector new
-                                                             gpModel: glhImporter glhModel;
-                                                             jiraModel: jiraImporter model;
-                                                             connect.
-			].  
+		jiraImporter importIssue: id.      
+		GPJCConnector new gpModel: glhImporter glhModel; jiraModel: jiraImporter model; connect.
 		 ]).
 ]

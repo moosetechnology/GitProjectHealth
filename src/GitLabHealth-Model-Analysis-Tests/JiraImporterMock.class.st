@@ -15,6 +15,13 @@ JiraImporterMock >> importAllCurrentAndPastIssuesOf: email [
 	^ issues
 ]
 
+{ #category : #'api - issue' }
+JiraImporterMock >> importIssue: aKeyOrId [ 
+	self model addAll: self issues unless: [ :existing :new |
+	  existing id = new id ]. 
+	^ self issues detect: [ :issue | issue id = aKeyOrId or: [ issue key = aKeyOrId ] ] ifNone: [  nil ].
+]
+
 { #category : #initialization }
 JiraImporterMock >> initialize [
 
