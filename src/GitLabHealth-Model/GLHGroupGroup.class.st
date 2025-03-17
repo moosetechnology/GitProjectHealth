@@ -1,7 +1,7 @@
 Class {
 	#name : #GLHGroupGroup,
 	#superclass : #MooseSpecializedGroup,
-	#category : 'GitLabHealth-Model-Groups'
+	#category : #'GitLabHealth-Model-Groups'
 }
 
 { #category : #meta }

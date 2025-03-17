@@ -32,7 +32,7 @@ Class {
 		'#sourceCode => FMProperty',
 		'#diffRange => FMOne type: #GLHDiffRange opposite: #changes'
 	],
-	#category : 'GitLabHealth-Model-Entities'
+	#category : #'GitLabHealth-Model-Entities'
 }
 
 { #category : #meta }
