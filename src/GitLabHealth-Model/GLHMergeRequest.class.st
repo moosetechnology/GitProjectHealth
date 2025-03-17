@@ -22,7 +22,7 @@ a gitlab merge request
 | `merge_user` | `GLHMergeRequest` | `usedMerges` | `GLHUser` | |
 | `mergedCommit` | `GLHMergeRequest` | `commitedMergeRequest` | `GLHCommit` | |
 | `merged_by` | `GLHMergeRequest` | `mergerOfMergeRequests` | `GLHUser` | |
-| `note` | `GLHMergeRequest` | `MergeRequest` | `GLHNote` | |
+| `note` | `GLHMergeRequest` | `mergeRequest` | `GLHNote` | |
 | `pipeline` | `GLHMergeRequest` | `mergeResquest` | `GLHPipeline` | |
 | `reviewers` | `GLHMergeRequest` | `reviewedMergeResquest` | `GLHUser` | |
 | `squashCommit` | `GLHMergeRequest` | `squashedMergeRequest` | `GLHCommit` | |
@@ -128,7 +128,7 @@ Class {
 		'#merged_at => FMProperty',
 		'#merged_by => FMOne type: #GLHUser opposite: #mergerOfMergeRequests',
 		'#milestone => FMProperty',
-		'#note => FMMany type: #GLHNote opposite: #MergeRequest',
+		'#note => FMMany type: #GLHNote opposite: #mergeRequest',
 		'#pipeline => FMOne type: #GLHPipeline opposite: #mergeResquest',
 		'#project => FMOne type: #GLHProject opposite: #mergeRequests',
 		'#project_id => FMProperty',
@@ -703,7 +703,7 @@ GLHMergeRequest >> name [
 
 { #category : #accessing }
 GLHMergeRequest >> note [
-	"Relation named: #note type: #GLHNote opposite: #MergeRequest"
+	"Relation named: #note type: #GLHNote opposite: #mergeRequest"
 
 	<generated>
 	<derived>
