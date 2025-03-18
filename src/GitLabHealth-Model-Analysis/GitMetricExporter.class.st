@@ -465,6 +465,7 @@ GitMetricExporter >> initialize [
 	"Project and User Metrics"
 	metrics := Metric allSubclasses reject: #isAbstract.
 	
+
 ]
 
 { #category : #accessing }
