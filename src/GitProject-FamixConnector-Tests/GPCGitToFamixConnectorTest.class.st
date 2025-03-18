@@ -97,12 +97,12 @@ GPCGitToFamixConnectorTest >> testConnectDiffToJavaEnum [
 	diff new_path: pathUnderTests.
 	commit diffs add: diff.
 
-	javaClass := famixModel newEnum.
+	javaClass := famixModel newEnum name: 'EnumJava'; yourself.
 	javaIndexedFileAnchor := famixModel newIndexedFileAnchor.
 	javaIndexedFileAnchor fileName: '../../dede/../' , pathUnderTests.
 	javaClass sourceAnchor: javaIndexedFileAnchor.
 	connector connect.
-	self assert: diff onSourceEntity  equals: javaClass.
+	self assert: diff onSourceEntity equals: javaClass.
 	self assert: javaClass appliedDiffs anyOne equals: diff
 ]
 

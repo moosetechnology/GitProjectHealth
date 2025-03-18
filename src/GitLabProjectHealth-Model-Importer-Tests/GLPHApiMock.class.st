@@ -8,3 +8,8 @@ Class {
 GLPHApiMock >> mergeRequests [
 	^GitlabMergeRequestsMock new
 ]
+
+{ #category : #accessing }
+GLPHApiMock >> output: aString [ 
+	^ self.
+]

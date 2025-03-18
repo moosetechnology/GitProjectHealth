@@ -10,6 +10,11 @@ GLHApiMock >> commits [
 ]
 
 { #category : #accessing }
+GLHApiMock >> output: aString [ 
+	^ self 
+]
+
+{ #category : #accessing }
 GLHApiMock >> users [
 	^GitlabUsersMock new
 ]
