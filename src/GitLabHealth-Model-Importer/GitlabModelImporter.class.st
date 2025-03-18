@@ -1181,7 +1181,7 @@ GitlabModelImporter >> initialize [
 	withInitialCommits := false.
 	withInitialMergeRequest := false.
 
-	withCommitsSince := (Date today - 1 week) asDateAndTime.
+	self withCommitsSince: 1 week.
 
 	self initReader
 ]

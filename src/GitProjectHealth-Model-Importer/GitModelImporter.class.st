@@ -277,7 +277,7 @@ GitModelImporter >> withCommitsSince: someDays [
 	(someDays isKindOf: DateAndTime)
 		ifTrue: [ withCommitsSince := someDays ]
 		ifFalse: [
-		withCommitsSince := (Date today - someDays) asDate asDateAndTime ].
+		withCommitsSince := (DateAndTime today - someDays) ].
 	^ withCommitsSince
 ]
 
