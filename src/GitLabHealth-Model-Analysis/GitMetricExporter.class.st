@@ -497,7 +497,8 @@ GitMetricExporter >> initialize [
 		           CodeDeletionDuringAndByMergeRequestProjectMetric.
 		           CodeAdditionDuringAndByMergeRequestProjectMetric.
 		           CodeChurnOnCommitsProjectMetric.
-		           SelfMergedUnderAMinuteMergeRequestProjectMetric }.
+		           SelfMergedUnderAMinuteMergeRequestProjectMetric.
+					 JiraTimeMRTimeDifferenceProjectMetric }.
 	"UserMetric subclasses"
 
 	self flag:
