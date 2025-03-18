@@ -2,13 +2,13 @@
 A CodeAdditionByMergeRequestProjectMetricTest is a test class for testing the behavior of CodeAdditionByMergeRequestProjectMetric
 "
 Class {
-	#name : #CodeAdditionByMergeRequestProjectMetricTest,
+	#name : #CodeDeletionDuringAndByMergeRequestProjectMetricTest,
 	#superclass : #ProjectMetricTest,
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #'as yet unclassified' }
-CodeAdditionByMergeRequestProjectMetricTest >> testCalculate [
+CodeDeletionDuringAndByMergeRequestProjectMetricTest >> testCalculate [
 
 	| result glhImporter codeAddition mergedCommit |
 	glhImporter := GLPHImporterMock new.
@@ -38,7 +38,7 @@ CodeAdditionByMergeRequestProjectMetricTest >> testCalculate [
 				 deletions: 5) }.
 
 
-	codeAddition := CodeAdditionByMergeRequestProjectMetric new
+	codeAddition := CodeDeletionDuringAndByMergeRequestProjectMetric new
 		                project: project2;
 		                glhImporter: glhImporter;
 		                setPeriodSince: since until: until;
@@ -48,11 +48,11 @@ CodeAdditionByMergeRequestProjectMetricTest >> testCalculate [
 	result := codeAddition calculate.
 
 	"Then"
-	self assert: result equals: 42
+	self assert: result equals: 15
 ]
 
 { #category : #'as yet unclassified' }
-CodeAdditionByMergeRequestProjectMetricTest >> testCalculateMROpenOnly [
+CodeDeletionDuringAndByMergeRequestProjectMetricTest >> testCalculateMROpenOnly [
 
 	| result glhImporter codeAddition |
 	glhImporter := GLPHImporterMock new.
@@ -62,7 +62,7 @@ CodeAdditionByMergeRequestProjectMetricTest >> testCalculateMROpenOnly [
 			 merged_at: mergedAt ;
 			 state: #opened ) }.
 
-	codeAddition := CodeAdditionByMergeRequestProjectMetric new
+	codeAddition := CodeDeletionDuringAndByMergeRequestProjectMetric new
 		                project: project1;
 		                glhImporter: glhImporter;
 		                setPeriodSince: since until: until;
@@ -76,7 +76,7 @@ CodeAdditionByMergeRequestProjectMetricTest >> testCalculateMROpenOnly [
 ]
 
 { #category : #'as yet unclassified' }
-CodeAdditionByMergeRequestProjectMetricTest >> testCalculateNoCommits [
+CodeDeletionDuringAndByMergeRequestProjectMetricTest >> testCalculateNoCommits [
 
 	| result glhImporter codeAddition |
 	glhImporter := GLPHImporterMock new.
@@ -86,7 +86,7 @@ CodeAdditionByMergeRequestProjectMetricTest >> testCalculateNoCommits [
 			 merged_at: mergedAt ;
 			 state: #closed ) }.
 
-	codeAddition := CodeAdditionByMergeRequestProjectMetric new
+	codeAddition := CodeDeletionDuringAndByMergeRequestProjectMetric new
 		                project: project1;
 		                glhImporter: glhImporter;
 		                setPeriodSince: since until: until;
@@ -100,12 +100,12 @@ CodeAdditionByMergeRequestProjectMetricTest >> testCalculateNoCommits [
 ]
 
 { #category : #'as yet unclassified' }
-CodeAdditionByMergeRequestProjectMetricTest >> testCalculateNoMergeRequests [
+CodeDeletionDuringAndByMergeRequestProjectMetricTest >> testCalculateNoMergeRequests [
 
 	| result glhImporter codeAddition |
 	glhImporter := GLPHImporterMock new.
 
-	codeAddition := CodeAdditionByMergeRequestProjectMetric new
+	codeAddition := CodeDeletionDuringAndByMergeRequestProjectMetric new
 		                project: project1 ;
 		                glhImporter: glhImporter;
 		                setPeriodSince: since until: until;
