@@ -650,8 +650,13 @@ GitlabModelImporter >> importNotesfromMergeRequest: mergeRequestIID ofProject: p
 	
 	results := self repoApi notes allInMergeRequest: mergeRequestIID ofProject: projectId.
 	
-	notes := self parseNoteJson: results.
-	self glhModel addAll: notes unless: self blockOnIdEquality.
+	notes := results collect: [ :note | 
+		self parseNoteJson: note ].
+	"notes := self parseNoteJson: results."
+	notes := notes collect: [ :tabNotes | tabNotes collect: [ :note |
+			note author: (self importUser: (note author at: #id)).]. ].
+	
+	notes do: [:note | self glhModel addAll: note unless: self blockOnIdEquality.]
 	
 
 	
@@ -1090,32 +1095,36 @@ GitlabModelImporter >> parseJobsResult: result ofProject: aProject [
 ]
 
 { #category : #'private - parsing' }
-GitlabModelImporter >> parseNoteJson: results [
-	
-	^results collect: [ :each |
-        GLHNote new
-            id: (each at: #id);
-            noteable_id: (each at: #noteable_id);
-            attachment: (each at: #attachment);
-            system: (each at: #system);
-            confidential: (each at: #confidential);
-            internal: (each at: #internal);
-            noteable_iid: (each at: #noteable_iid);
-            resolvable: (each at: #resolvable);
-            imported: (each at: #imported);
-            imported_from: (each at: #imported_from);
-            author: (each at: #author);
-            body: (each at: #body);
-            project_id: (each at: #project_id);
-            noteable_type: (each at: #noteable_type);
-            created_at: (DateAndTime fromString: (each at: #created_at));
-            updated_at: (DateAndTime fromString: (each at: #updated_at));
-            yourself. ].
-	
-	
-	
-	
-	
+GitlabModelImporter >> parseNoteJson: results [  
+    | reader |  
+
+    "Créer un lecteur JSON"
+    reader := NeoJSONReader on: results readStream.    
+
+    "Définir le mapping pour l'objet GLHNote"
+    reader for: GLHNote do: [ :mapping |  
+        mapping mapInstVars: #(id noteable_id attachment system confidential internal  
+                               noteable_iid resolvable imported imported_from  
+                               author body project_id noteable_type).  
+
+        (mapping mapInstVar: #created_at) valueSchema: DateAndTime.  
+        (mapping mapInstVar: #updated_at) valueSchema: DateAndTime.  
+    ].    
+
+    "Corriger la conversion des dates"
+    reader for: DateAndTime customDo: [ :mapping |  
+        mapping decoder: [ :string | DateAndTime readFrom: string readStream ] ].
+
+	reader
+		for: #ArrayOfNote
+		customDo: [ :customMappting | 
+		customMappting listOfElementSchema: GLHNote ].
+	 ^ reader nextAs: #ArrayOfNote
+
+    "Retourner la Note"
+    "^ reader nextAs: GLHNote"
+
+
 ]
 
 { #category : #'private - parsing' }

@@ -21,8 +21,8 @@ a commit attached to a repository
 | Relation | Origin | Opposite | Type | Comment |
 |---|
 | `childCommits` | `GLHCommit` | `parentCommits` | `GLHCommit` | |
-| `commitedMergeRequest` | `GLHCommit` | `mergedCommit` | `GLHMergeRequest` | |
 | `commitedMergeRequest` | `GLHCommit` | `mergeRequestCommit` | `GLHMergeRequest` | |
+| `commitedMergeRequest` | `GLHCommit` | `mergedCommit` | `GLHMergeRequest` | |
 | `parentCommits` | `GLHCommit` | `childCommits` | `GLHCommit` | |
 | `squashedMergeRequest` | `GLHCommit` | `squashCommit` | `GLHMergeRequest` | |
 
