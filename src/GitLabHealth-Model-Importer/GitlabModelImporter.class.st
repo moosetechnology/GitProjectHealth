@@ -265,6 +265,25 @@ GitlabModelImporter >> importAndLoadLatestsCommitsOfProject: aGLHProject [
 	^ commits
 ]
 
+{ #category : #'import - repositories' }
+GitlabModelImporter >> importBranches: aGLHProject [ 
+	"Fetches all branches of the given project"
+	| results parsedResults |
+
+	"Fetch branches from the repository API"
+	results := self repoApi branches getAllFromProject: aGLHProject id.
+
+	"Parse the retrieved branches"
+	parsedResults := (results collect: [ :branchJson | self parseBranchesResult: branchJson ]) flattened.
+
+	"Add branches to the model (if not blocked by name equality)"
+	self glhModel addAll: parsedResults unless: self blockOnNameEquality.
+
+	"Return the list of parsed branches"
+	^ parsedResults.
+
+]
+
 { #category : #'import - commits' }
 GitlabModelImporter >> importCommit: aCommitID ofProject: aGLHProject [
 
