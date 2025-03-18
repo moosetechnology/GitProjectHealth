@@ -5,7 +5,6 @@ Class {
 }
 
 { #category : #calculating }
-
 CodeAdditionByMergeRequestProjectMetric >> calculate [
 
 	| groupedByDate dateOver |
@@ -29,17 +28,13 @@ CodeAdditionByMergeRequestProjectMetric >> calculate [
 	^ groupedByDate average asFloat
 ]
 
-
 { #category : #accessing }
-
 CodeAdditionByMergeRequestProjectMetric >> description [
 
 	^ 'average code addition by merge request'
 ]
 
-
 { #category : #loading }
-
 CodeAdditionByMergeRequestProjectMetric >> load [
 
 	projectMergeRequests := self

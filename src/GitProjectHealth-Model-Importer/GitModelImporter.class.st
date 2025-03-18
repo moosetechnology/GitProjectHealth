@@ -267,9 +267,18 @@ GitModelImporter >> withCommitsSince [
 ]
 
 { #category : #accessing }
-GitModelImporter >> withCommitsSince: anObject [
+GitModelImporter >> withCommitsSince: someDays [
+	"substract the current date with a given number of days. Use to retrieve the commits submit in the last giving days"
 
-	withCommitsSince := anObject
+	"(GitlabModelImporter new withCommitsSince: 1 week ) >>> (Date today - 1 week) asDateAndTime"
+
+	"(GitlabModelImporter new withCommitsSince: 30 day ) >>> (Date today - 30 day) asDateAndTime"
+
+	(someDays isKindOf: DateAndTime)
+		ifTrue: [ withCommitsSince := someDays ]
+		ifFalse: [
+		withCommitsSince := (Date today - someDays) asDate asDateAndTime ].
+	^ withCommitsSince
 ]
 
 { #category : #accessing }
