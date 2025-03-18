@@ -37,4 +37,3 @@ MergedMergeRequestProjectMetric >> load [
 		                  loadMergeRequestsSince:   (period at: #since)
 		                  until: (period at: #until)
 ]
-

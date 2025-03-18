@@ -1,11 +1,11 @@
 Class {
-	#name : #CodeAdditionByMergeRequestProjectMetric,
+	#name : #CodeDeletionDuringAndByMergeRequestProjectMetric,
 	#superclass : #ProjectMetric,
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
 { #category : #'as yet unclassified' }
-CodeAdditionByMergeRequestProjectMetric >> calculate [
+CodeDeletionDuringAndByMergeRequestProjectMetric >> calculate [
 
 	| groupedByDate dateOver |
 	projectMergeRequests ifNil: [ self load ].
@@ -23,19 +23,19 @@ CodeAdditionByMergeRequestProjectMetric >> calculate [
 	groupedByDate := groupedByDate collect: [ :group |
 		                 group ifEmpty: [ 0 ] ifNotEmpty: [
 			                 (group collect: [ :mergeRequest |
-				                  mergeRequest mergedCommit additions ]) average ] ].
+				                  mergeRequest commits sum: #deletions ]) average ] ].
 
 	^ groupedByDate average asFloat
 ]
 
 { #category : #'as yet unclassified' }
-CodeAdditionByMergeRequestProjectMetric >> description [
+CodeDeletionDuringAndByMergeRequestProjectMetric >> description [
 
 	^ 'average code addition by merge request'
 ]
 
 { #category : #'as yet unclassified' }
-CodeAdditionByMergeRequestProjectMetric >> load [
+CodeDeletionDuringAndByMergeRequestProjectMetric >> load [
 
 	projectMergeRequests := self
 		                  loadProjectCompleteMergeRequestsSince: (period at: #since)

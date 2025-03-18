@@ -494,11 +494,12 @@ GitMetricExporter >> initialize [
 		           ContributorsProjectMetric.
 		           AutoCodeReviewCommitFrequencyProjectMetric.
 		           CodeAdditionByMergeRequestProjectMetric.
-		           CodeDeletionByMergeRequestProjectMetric.
+		           CodeDeletionDuringAndByMergeRequestProjectMetric.
+		           CodeAdditionDuringAndByMergeRequestProjectMetric.
 		           CodeChurnOnCommitsProjectMetric.
 		           SelfMergedUnderAMinuteMergeRequestProjectMetric.
-					    JiraTimeMRTimeDifferenceProjectMetric.
-		 }.
+					 JiraTimeMRTimeDifferenceProjectMetric }.
+	"UserMetric subclasses"
 
 	self flag:
 		'Futur updates should considers loading metrics directly from subclasses instead of manual selection inside the initialize'
