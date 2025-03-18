@@ -460,7 +460,6 @@ GitMetricExporter >> initialize [
 	over := Date.
 
 	analyses := OrderedCollection new.
-	metrics := OrderedCollection new.
 
 
 	"Project and User Metrics"
