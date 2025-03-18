@@ -463,7 +463,7 @@ GitMetricExporter >> initialize [
 
 
 	"Project and User Metrics"
-	metrics addAll: (Metric allSubclasses reject: #isAbstract).
+	metrics := Metric allSubclasses reject: #isAbstract.
 	
 ]
 
