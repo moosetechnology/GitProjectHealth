@@ -7,8 +7,7 @@ Class {
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
-
-{ #category : #'tests' }
+{ #category : #tests }
 CodeAdditionByMergeRequestProjectMetricTest >> testCalculate [
 
 	| result glhImporter codeAddition mergedCommit |
@@ -102,7 +101,6 @@ CodeAdditionByMergeRequestProjectMetricTest >> testCalculateNoCommits [
 	"Then"
 	self assert: result equals: 0
 ]
-
 
 { #category : #tests }
 CodeAdditionByMergeRequestProjectMetricTest >> testCalculateNoMergeRequests [
