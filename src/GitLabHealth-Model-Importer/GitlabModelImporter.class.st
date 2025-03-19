@@ -644,24 +644,6 @@ GitlabModelImporter >> importLastestCommitsOfProject: aGLHProject [
 	^ parsedResults
 ]
 
-{ #category : #'import - notes' }
-GitlabModelImporter >> importNotesfromMergeRequest: mergeRequestIID ofProject: projectId [
-	| results notes |
-	
-	results := self repoApi notes allInMergeRequest: mergeRequestIID ofProject: projectId.
-	
-	notes := results collect: [ :note | 
-		self parseNoteJson: note ].
-	"notes := self parseNoteJson: results."
-	notes := notes collect: [ :tabNotes | tabNotes collect: [ :note |
-			note author: (self importUser: (note author at: #id)).]. ].
-	
-	notes do: [:note | self glhModel addAll: note unless: self blockOnIdEquality.]
-	
-
-	
-]
-
 { #category : #'import - commits' }
 GitlabModelImporter >> importParentCommitsOfCommit: aGLHCommit since: aDate [
 

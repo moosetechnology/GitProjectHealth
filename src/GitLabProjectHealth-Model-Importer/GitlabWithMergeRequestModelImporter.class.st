@@ -249,6 +249,7 @@ GitlabWithMergeRequestModelImporter >> importMergeRequests: aGLHProject since: f
 	result := self repoApi mergeRequests
 		          allOfProject: aGLHProject id
 		          withParams: params.
+		
 	mergeRequests := (result collect: [ :mergeRequestsJson |
 		                  self parseMergeRequestResult: mergeRequestsJson ])
 		                 flattened.
@@ -327,6 +328,25 @@ GitlabWithMergeRequestModelImporter >> importMergeResquestMerger: aGLPHEMergeReq
 			            ifPresent: [ :mergeUser |
 			            mergeUser ifNotNil: [ :mruser | mruser at: #id ] ] ].
 	^aGLPHEMergeRequest merge_user: (self importUser: authorID)
+]
+
+{ #category : #'import - notes' }
+GitlabWithMergeRequestModelImporter >> importNotesfromMergeRequest: mergeRequestIID ofProject: projectId [
+	| results notes |
+	
+	results := self repoApi notes allInMergeRequest: mergeRequestIID ofProject: projectId.
+	
+	notes := results collect: [ :note | 
+		self parseNoteJson: note ].
+	"notes := self parseNoteJson: results."
+	notes do: [ :tabNotes | tabNotes do: [ :note |
+			note author: (self importUser: (note author at: #id)).
+			note name: note id asString]. ].
+	
+	notes do: [:note | self glhModel addAll: note unless: self blockOnIdEquality.]
+	
+
+	
 ]
 
 { #category : #'import - projects' }
