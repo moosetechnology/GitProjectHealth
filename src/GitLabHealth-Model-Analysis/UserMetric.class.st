@@ -10,6 +10,12 @@ Class {
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
+{ #category : #testing }
+UserMetric class >> isAbstract [
+
+	^ self == UserMetric
+]
+
 { #category : #calculating }
 UserMetric >> calculate [
 
