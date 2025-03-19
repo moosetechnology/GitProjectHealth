@@ -147,3 +147,59 @@ JiraTimeMRTimeDifferenceProjectMetricTest >> testCalculateWithNoEstimatedTime [
 
 	self assert: result equals: nil
 ]
+
+{ #category : #tests }
+JiraTimeMRTimeDifferenceProjectMetricTest >> testCalculateWithNoIssue [
+
+	| result glhImporter jiraImporter jiraMRDifference jiraIssue commitMerged commit1 |
+	glhImporter := GLPHImporterMock new.
+
+
+	commit1 := GLHCommit new
+		           id: 1;
+		           created_at: createdAt;
+		           committed_date: createdAt;
+		           repository: project1 repository;
+		           deletions: 5.
+
+	commitMerged := GLHCommit new
+		                id: 2;
+		                created_at: createdAt + 1 minutes;
+		                committed_date: createdAt + 1 minutes;
+		                repository: project1 repository;
+		                deletions: 5.
+
+	glhImporter mergeRequests: { (GLHMergeRequest new
+			 project: project1;
+			 created_at: createdAt;
+			 merged_at: createdAt + 24 hours;
+			 state: #merged;
+			 mergedCommit: commitMerged;
+			 title: 'feat do something') }.
+
+
+	"those commits will be added to the MR with the mock importer"
+	glhImporter commits: { commit1 }.
+
+	jiraImporter := JiraImporterMock new.
+	jiraIssue := JPIssue new
+		             id: 'AZ-654';
+		             key: 'AZ-654';
+		             yourself.
+	jiraImporter issues: {  }.
+
+
+
+	jiraMRDifference := JiraTimeMRTimeDifferenceProjectMetric new
+		                    project: project1;
+		                    glhImporter: glhImporter;
+		                    jiraImporter: jiraImporter;
+		                    setPeriodSince: since until: until;
+		                    over: Week.
+
+
+	result := jiraMRDifference calculate.
+
+
+	self assert: result equals: nil
+]
