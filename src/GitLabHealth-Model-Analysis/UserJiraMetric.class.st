@@ -4,6 +4,12 @@ Class {
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
+{ #category : #testing }
+UserJiraMetric class >> isAbstract [
+
+	^ self == UserJiraMetric
+]
+
 { #category : #calculating }
 UserJiraMetric >> calculate [
 

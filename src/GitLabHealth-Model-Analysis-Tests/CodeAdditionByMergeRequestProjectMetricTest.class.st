@@ -7,7 +7,7 @@ Class {
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
-{ #category : #tests }
+{ #category : #'as yet unclassified' }
 CodeAdditionByMergeRequestProjectMetricTest >> testCalculate [
 
 	| result glhImporter codeAddition mergedCommit |
@@ -51,7 +51,7 @@ CodeAdditionByMergeRequestProjectMetricTest >> testCalculate [
 	self assert: result equals: 42
 ]
 
-{ #category : #tests }
+{ #category : #'as yet unclassified' }
 CodeAdditionByMergeRequestProjectMetricTest >> testCalculateMROpenOnly [
 
 	| result glhImporter codeAddition |
@@ -75,7 +75,7 @@ CodeAdditionByMergeRequestProjectMetricTest >> testCalculateMROpenOnly [
 	self assert: result equals: 0
 ]
 
-{ #category : #tests }
+{ #category : #'as yet unclassified' }
 CodeAdditionByMergeRequestProjectMetricTest >> testCalculateNoCommits [
 
 	| result glhImporter codeAddition |
@@ -99,7 +99,7 @@ CodeAdditionByMergeRequestProjectMetricTest >> testCalculateNoCommits [
 	self assert: result equals: 0
 ]
 
-{ #category : #tests }
+{ #category : #'as yet unclassified' }
 CodeAdditionByMergeRequestProjectMetricTest >> testCalculateNoMergeRequests [
 
 	| result glhImporter codeAddition |

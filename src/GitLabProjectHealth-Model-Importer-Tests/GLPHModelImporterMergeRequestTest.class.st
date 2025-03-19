@@ -15,7 +15,7 @@ Class {
 GLPHModelImporterMergeRequestTest >> setUp [
 
 	super setUp.
-	glhImporter := GitlabWithMergeRequestModelImporter new.
+	glhImporter := GitlabModelImporter new.
 	glhImporter repoApi: GLPHApiMock new.
 	glhModel := GLHModel new.
 	glhImporter glhModel: glhModel.
