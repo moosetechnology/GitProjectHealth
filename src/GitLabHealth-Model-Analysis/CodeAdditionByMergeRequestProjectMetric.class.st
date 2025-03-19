@@ -14,7 +14,7 @@ CodeAdditionByMergeRequestProjectMetric >> calculate [
 	projectMergeRequests ifEmpty: [ ^ 0 ].
 
 
-	projectMergeRequests do: [ :mr |
+	projectMergeRequests  do: [ :mr |
 		dateOver := self transformDate: mr created_at to: over.
 		groupedByDate
 			at: dateOver printString
@@ -45,4 +45,5 @@ CodeAdditionByMergeRequestProjectMetric >> load [
 		                        mr state = #merged ]. 
 		
 	projectMergeRequests do: [:mr | glhImporter importMergeRequestMergeCommits: mr].
+
 ]
