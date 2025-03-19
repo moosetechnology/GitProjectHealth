@@ -345,6 +345,39 @@ GitlabModelImporter >> importAndLoadLatestsCommitsOfProject: aGLHProject [
 	^ commits
 ]
 
+{ #category : #'import-gitblame' }
+GitlabModelImporter >> importBlame: aGLHFile ofProject: aGLHProject [
+
+	| results  params   |
+
+
+			params := { 
+		    #ref ->  'main'  .
+	       } asDictionary.
+	  results := self repoApi blames getBlameFile: aGLHFile ofProject: aGLHProject withParams: params      .
+	^ results 
+	
+]
+
+{ #category : #'import-gitblame' }
+GitlabModelImporter >> importBlame: aGLHFile ofProject: aGLHProject fromBranch: aGLHBranch [
+
+	| results  params  blameDict   |
+
+
+			params := { 
+		    #ref ->   aGLHBranch  .
+	       } asDictionary.
+	  results := self repoApi blames getBlameFile: aGLHFile ofProject: aGLHProject withParams: params      .
+	  "Créer un dictionnaire avec le fichier en clé et le blâme en valeur"
+	^results 
+ "     blameDict := Dictionary new.
+      blameDict at: aGLHFile put: results.
+
+   ^ blameDict."
+	
+]
+
 { #category : #'import - repositories' }
 GitlabModelImporter >> importBranches: aGLHProject [ 
 	"Fetches all branches of the given project"
@@ -730,7 +763,8 @@ GitlabModelImporter >> importFilesOfBranch: aBranch [
 	files
 		select: [ :file | file isKindOf: GLHFileDirectory ]
 		thenCollect: [ :file | 
-		self importDirectoryFiles: file OfBranch: aBranch ]
+		self importDirectoryFiles: file OfBranch: aBranch ] .
+	^ files 
 ]
 
 { #category : #'import - groups' }
