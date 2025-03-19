@@ -157,16 +157,18 @@ GithubModelImporter >> importCommitsOfProject: aGLHProject [
 ]
 
 { #category : #'import - commits' }
-GithubModelImporter >> importCreatorOfCommit: aGLHCommit [ 
-		| creator |
+GithubModelImporter >> importCreatorOfCommit: aGLHCommit [
+
+	| creator |
 	(self glhModel allWithType: GLHUser)
 		detect: [ :user | user username = aGLHCommit author_name ]
 		ifFound: [ :user |
 			aGLHCommit commitCreator: user.
 			^ user ].
 
-	creator := self importUserByUsername: aGLHCommit author_name.
-	aGLHCommit commitCreator: creator.
+	aGLHCommit author_name ifNotNil: [ :author_name |
+		creator := self importUserByUsername: author_name.
+		aGLHCommit commitCreator: creator ].
 	^ creator
 ]
 
