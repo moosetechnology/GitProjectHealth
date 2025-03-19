@@ -343,9 +343,8 @@ GitlabWithMergeRequestModelImporter >> importNotesfromMergeRequest: mergeRequest
 			note author: (self importUser: (note author at: #id)).
 			note name: note id asString]. ].
 	
-	notes do: [:note | self glhModel addAll: note unless: self blockOnIdEquality.]
-	
-
+	notes do: [:note | self glhModel addAll: note unless: self blockOnIdEquality.].
+	^notes
 	
 ]
 
