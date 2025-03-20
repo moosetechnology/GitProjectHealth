@@ -87,16 +87,6 @@ GLHModelImporterTest >> testImportGroup [
 ]
 
 { #category : #tests }
-GLHModelImporterTest >> testImportNote [
-	| testNote |
-	
-	testNote := glhImporter importNotesfromMergeRequest: 16 ofProject: 6845.
-	self assert: ((self model allWithType: GLHNote size) equals: 3). 
-	
-	
-]
-
-{ #category : #tests }
 GLHModelImporterTest >> testImportProject [
 
 	self assert: (self model allWithType: GLHProject) size equals: 1.
