@@ -346,6 +346,22 @@ GitlabModelImporter >> importAndLoadLatestsCommitsOfProject: aGLHProject [
 ]
 
 { #category : #'import-gitblame' }
+GitlabModelImporter >> importBlame: aGLHFile [ 
+	| results  params   jsonObject   |
+
+
+			params := { 
+		    #ref ->   aGLHFile branch name  .
+	       } asDictionary.
+	           results := self repoApi blames getBlameFile: aGLHFile path ofProject: aGLHFile branch repository project id withParams: params      .
+              jsonObject := NeoJSONReader fromString: results .
+   ^ jsonObject  
+	
+
+	
+]
+
+{ #category : #'import-gitblame' }
 GitlabModelImporter >> importBlame: aGLHFile ofProject: aGLHProject [
 
 	| results  params   |
@@ -362,19 +378,18 @@ GitlabModelImporter >> importBlame: aGLHFile ofProject: aGLHProject [
 { #category : #'import-gitblame' }
 GitlabModelImporter >> importBlame: aGLHFile ofProject: aGLHProject fromBranch: aGLHBranch [
 
-	| results  params  blameDict   |
+	| results  params   jsonObject   |
 
 
 			params := { 
 		    #ref ->   aGLHBranch  .
+		    #output -> 'JSON'.
 	       } asDictionary.
-	  results := self repoApi blames getBlameFile: aGLHFile ofProject: aGLHProject withParams: params      .
-	  "Créer un dictionnaire avec le fichier en clé et le blâme en valeur"
-	^results 
- "     blameDict := Dictionary new.
-      blameDict at: aGLHFile put: results.
+	           results := self repoApi blames getBlameFile: aGLHFile ofProject: aGLHProject withParams: params      .
+              jsonObject := NeoJSONReader fromString: results .
+   ^ jsonObject  
+	
 
-   ^ blameDict."
 	
 ]
 
