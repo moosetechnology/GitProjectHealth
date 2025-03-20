@@ -330,24 +330,6 @@ GitlabWithMergeRequestModelImporter >> importMergeResquestMerger: aGLPHEMergeReq
 	^aGLPHEMergeRequest merge_user: (self importUser: authorID)
 ]
 
-{ #category : #'import - notes' }
-GitlabWithMergeRequestModelImporter >> importNotesfromMergeRequest: mergeRequestIID ofProject: projectId [
-	| results notes |
-	
-	results := self repoApi notes allInMergeRequest: mergeRequestIID ofProject: projectId.
-	
-	notes := results collect: [ :note | 
-		self parseNoteJson: note ].
-	"notes := self parseNoteJson: results."
-	notes do: [ :tabNotes | tabNotes do: [ :note |
-			note author: (self importUser: (note author at: #id)).
-			note name: note id asString]. ].
-	
-	notes do: [:note | self glhModel addAll: note unless: self blockOnIdEquality.].
-	^notes
-	
-]
-
 { #category : #'import - projects' }
 GitlabWithMergeRequestModelImporter >> importProject: aProjectID [
 
@@ -393,39 +375,6 @@ GitlabWithMergeRequestModelImporter >> parseMergeRequestResult: result [
 
 	generalReader on: result readStream.
 	^ generalReader nextAs: #ArrayOfMergeRequest
-]
-
-{ #category : #'private - parsing' }
-GitlabWithMergeRequestModelImporter >> parseNoteJson: results [  
-    | reader |  
-
-    "Créer un lecteur JSON"
-    reader := NeoJSONReader on: results readStream.    
-
-    "Définir le mapping pour l'objet GLHNote"
-    reader for: GLHNote do: [ :mapping |  
-        mapping mapInstVars: #(id noteable_id attachment system confidential internal  
-                               noteable_iid resolvable imported imported_from  
-                               author body project_id noteable_type).  
-
-        (mapping mapInstVar: #created_at) valueSchema: DateAndTime.  
-        (mapping mapInstVar: #updated_at) valueSchema: DateAndTime.  
-    ].    
-
-    "Corriger la conversion des dates"
-    reader for: DateAndTime customDo: [ :mapping |  
-        mapping decoder: [ :string | DateAndTime readFrom: string readStream ] ].
-
-	reader
-		for: #ArrayOfNote
-		customDo: [ :customMappting | 
-		customMappting listOfElementSchema: GLHNote ].
-	 ^ reader nextAs: #ArrayOfNote
-
-    "Retourner la Note"
-    "^ reader nextAs: GLHNote"
-
-
 ]
 
 { #category : #'private - parsing' }
