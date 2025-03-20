@@ -461,45 +461,8 @@ GitMetricExporter >> initialize [
 
 	analyses := OrderedCollection new.
 
-	"User Metrics"
-	metrics := {
-					"UserMetric subclasses"
-		           CodeAdditionMetric.
-		           CodeDeletionMetric.
-		           CommentContributionMetric.
-		           CommitFrequencyMetric.
-		           CodeChurnMetric.
-		           DelayUntilFirstChurnMetric.
-		           TimeBetweenCommitMetric.
-		           ContributedProjectMetric.
-		           CodeAdditionByMRMetric.
-		           CodeDeletionByMRMetric.
-		           MergeRequestDurationMetric.
-		           OpenedMergeRequestMetric.
-		           ClosedMergeRequestMetric.
-		           MergedMergeRequestMetric.
-		           SelfMergedUnderAMinuteMergeRequestMetric.
-		           ClosedTicketsMetric.
-		           JiraTimeMRTimeDifferenceMetric.
-		           CommitsNumberByJiraTicketsMetric.
-		           CommitsLinkWithTicketMetric.
+	metrics := Metric allSubclasses reject: #isAbstract.
 
-					"ProjectMetric subclasses"
-		           ClosedMergeRequestProjectMetric.
-		           CommitFrequencyProjectMetric.
-		           CreatedMergeRequestProjectMetric.
-		           MergedMergeRequestProjectMetric.
-		           ClosedMergeRequestDurationProjectMetric.
-		           MergedMergeRequestDurationProjectMetric.
-		           OpenedMergeRequestDurationProjectMetric.
-		           ContributorsProjectMetric.
-		           AutoCodeReviewCommitFrequencyProjectMetric.
-		           CodeAdditionByMergeRequestProjectMetric.
-		           CodeChurnOnCommitsProjectMetric.
-		           SelfMergedUnderAMinuteMergeRequestProjectMetric }.
-
-	self flag: 'Futur updates should considers loading metrics directly from subclasses instead of manual selection inside the initialize'
-	"metrics addAll: ProjectMetric subclasses."
 ]
 
 { #category : #accessing }

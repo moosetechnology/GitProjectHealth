@@ -4,6 +4,12 @@ Class {
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
+{ #category : #testing }
+UserMergeRequestMetric class >> isAbstract [
+
+	^ self == UserMergeRequestMetric
+]
+
 { #category : #calculating }
 UserMergeRequestMetric >> calculate [
 

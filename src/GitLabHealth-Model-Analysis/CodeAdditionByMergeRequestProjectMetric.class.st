@@ -12,9 +12,9 @@ CodeAdditionByMergeRequestProjectMetric >> calculate [
 
 	groupedByDate := self setupGroupedDate.
 	projectMergeRequests ifEmpty: [ ^ 0 ].
-	projectMergeRequests := projectMergeRequests select: [ :mr |
-		                        mr state = #merged ].
-	projectMergeRequests do: [ :mr |
+
+
+	projectMergeRequests  do: [ :mr |
 		dateOver := self transformDate: mr created_at to: over.
 		groupedByDate
 			at: dateOver printString
@@ -39,5 +39,11 @@ CodeAdditionByMergeRequestProjectMetric >> load [
 
 	projectMergeRequests := self
 		                  loadProjectCompleteMergeRequestsSince: (period at: #since)
-		                  until: (period at: #until)
+		                  until: (period at: #until).
+		
+	projectMergeRequests := projectMergeRequests select: [ :mr |
+		                        mr state = #merged ]. 
+		
+	projectMergeRequests do: [:mr | glhImporter importMergeRequestMergeCommits: mr].
+
 ]

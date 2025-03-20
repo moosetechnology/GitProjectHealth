@@ -32,6 +32,7 @@ CodeAdditionByMergeRequestProjectMetricTest >> testCalculate [
 				 id: 2;
 				 additions: 3;
 				 deletions: 5).
+
 			(GLHCommit new
 				 id: 3;
 				 additions: 3;
@@ -48,10 +49,11 @@ CodeAdditionByMergeRequestProjectMetricTest >> testCalculate [
 	result := codeAddition calculate.
 
 	"Then"
+
 	self assert: result equals: 42
 ]
 
-{ #category : #tests }
+{ #category : #'as yet unclassified' }
 CodeAdditionByMergeRequestProjectMetricTest >> testCalculateMROpenOnly [
 
 	| result glhImporter codeAddition |
@@ -85,6 +87,7 @@ CodeAdditionByMergeRequestProjectMetricTest >> testCalculateNoCommits [
 			 created_at: createdAt ;
 			 merged_at: mergedAt ;
 			 state: #closed ) }.
+
 
 	codeAddition := CodeAdditionByMergeRequestProjectMetric new
 		                project: project1;

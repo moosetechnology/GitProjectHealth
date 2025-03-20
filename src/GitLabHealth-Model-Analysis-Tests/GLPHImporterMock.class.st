@@ -11,6 +11,12 @@ Class {
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
+{ #category : #equality }
+GLPHImporterMock >> blockOnIdEquality [
+
+	^ [ :existing :new | existing id = new id ].
+]
+
 { #category : #commit }
 GLPHImporterMock >> chainsCommitsFrom: fromCommits [
 	^self
@@ -46,6 +52,11 @@ GLPHImporterMock >> glhModel: anObject [
 	glhModel := anObject
 ]
 
+{ #category : #'import - commits' }
+GLPHImporterMock >> importCommit: aString ofProject: aGLHProject [ 
+	^ self commits detect: [ :c | c id = aString ] ifNone: [nil].
+]
+
 { #category : #commit }
 GLPHImporterMock >> importCommitsOfProject: project since: since until: until [
 
@@ -64,6 +75,11 @@ GLPHImporterMock >> importCreatorOfCommit: commit [
 GLPHImporterMock >> importMergeRequestCommits: mergeRequest [
 
 	mergeRequest commits: self commits
+]
+
+{ #category : #'import - merge request' }
+GLPHImporterMock >> importMergeRequestMergeCommits: aGLHMergeRequest [ 
+	^ {aGLHMergeRequest mergedCommit . aGLHMergeRequest squashCommit . aGLHMergeRequest mergeRequestCommit } .
 ]
 
 { #category : #'import - merge request' }
