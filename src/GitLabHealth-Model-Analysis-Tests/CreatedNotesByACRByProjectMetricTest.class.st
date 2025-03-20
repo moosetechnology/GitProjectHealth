@@ -17,7 +17,7 @@ CreatedNotesByACRByProjectMetricTest >> testCalculate [
 	glhImporter notes: { (GLHNote new
 			 created_at: createdAt ;
 			 updated_at: updatedAt;
-			 body: 'ccaca').
+			 body: 'n importe quoi').
 			(GLHNote new
 			 created_at: createdAt ;
 			 updated_at: updatedAt;
