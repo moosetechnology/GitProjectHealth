@@ -2,15 +2,15 @@
 A CodeAdditionByMergeRequestProjectMetricTest is a test class for testing the behavior of CodeAdditionByMergeRequestProjectMetric
 "
 Class {
-	#name : #CodeAdditionByMergeRequestProjectMetricTest,
+	#name : #CodeDeletionByMergeRequestProjectMetricTest,
 	#superclass : #ProjectMetricTest,
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }
-CodeAdditionByMergeRequestProjectMetricTest >> testCalculate [
+CodeDeletionByMergeRequestProjectMetricTest >> testCalculate [
 
-	| result glhImporter codeAddition mergedCommit |
+	| result glhImporter codeDeletion mergedCommit |
 	glhImporter := GLPHImporterMock new.
 	mergedCommit := GLHCommit new
 		                id: 4;
@@ -32,31 +32,29 @@ CodeAdditionByMergeRequestProjectMetricTest >> testCalculate [
 				 id: 2;
 				 additions: 3;
 				 deletions: 5).
-
 			(GLHCommit new
 				 id: 3;
 				 additions: 3;
 				 deletions: 5) }.
 
 
-	codeAddition := CodeAdditionByMergeRequestProjectMetric new
+	codeDeletion := CodeDeletionByMergeRequestProjectMetric new
 		                project: project2;
 		                glhImporter: glhImporter;
 		                setPeriodSince: since until: until;
 		                over: Week.
 
 	"When"
-	result := codeAddition calculate.
+	result := codeDeletion calculate.
 
 	"Then"
-
-	self assert: result equals: 42
+	self assert: result equals: 78
 ]
 
-{ #category : #'as yet unclassified' }
-CodeAdditionByMergeRequestProjectMetricTest >> testCalculateMROpenOnly [
+{ #category : #tests }
+CodeDeletionByMergeRequestProjectMetricTest >> testCalculateMROpenOnly [
 
-	| result glhImporter codeAddition |
+	| result glhImporter codeDeletion |
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: { (GLHMergeRequest new
 			 project: project1;
@@ -64,23 +62,23 @@ CodeAdditionByMergeRequestProjectMetricTest >> testCalculateMROpenOnly [
 			 merged_at: mergedAt ;
 			 state: #opened ) }.
 
-	codeAddition := CodeAdditionByMergeRequestProjectMetric new
+	codeDeletion := CodeDeletionByMergeRequestProjectMetric new
 		                project: project1;
 		                glhImporter: glhImporter;
 		                setPeriodSince: since until: until;
 		                over: Week.
 
 	"When"
-	result := codeAddition calculate.
+	result := codeDeletion calculate.
 
 	"Then"
 	self assert: result equals: 0
 ]
 
 { #category : #tests }
-CodeAdditionByMergeRequestProjectMetricTest >> testCalculateNoCommits [
+CodeDeletionByMergeRequestProjectMetricTest >> testCalculateNoCommits [
 
-	| result glhImporter codeAddition |
+	| result glhImporter codeDeletion |
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: { (GLHMergeRequest new
 			 project: project1;
@@ -88,34 +86,33 @@ CodeAdditionByMergeRequestProjectMetricTest >> testCalculateNoCommits [
 			 merged_at: mergedAt ;
 			 state: #closed ) }.
 
-
-	codeAddition := CodeAdditionByMergeRequestProjectMetric new
+	codeDeletion := CodeDeletionByMergeRequestProjectMetric new
 		                project: project1;
 		                glhImporter: glhImporter;
 		                setPeriodSince: since until: until;
 		                over: Week.
 
 	"When"
-	result := codeAddition calculate.
+	result := codeDeletion calculate.
 
 	"Then"
 	self assert: result equals: 0
 ]
 
 { #category : #tests }
-CodeAdditionByMergeRequestProjectMetricTest >> testCalculateNoMergeRequests [
+CodeDeletionByMergeRequestProjectMetricTest >> testCalculateNoMergeRequests [
 
-	| result glhImporter codeAddition |
+	| result glhImporter codeDeletion |
 	glhImporter := GLPHImporterMock new.
 
-	codeAddition := CodeAdditionByMergeRequestProjectMetric new
+	codeDeletion := CodeDeletionByMergeRequestProjectMetric new
 		                project: project1 ;
 		                glhImporter: glhImporter;
 		                setPeriodSince: since until: until;
 		                over: Week.
 
 	"When"
-	result := codeAddition calculate.
+	result := codeDeletion calculate.
 
 	"Then"
 	self assert: result equals: 0

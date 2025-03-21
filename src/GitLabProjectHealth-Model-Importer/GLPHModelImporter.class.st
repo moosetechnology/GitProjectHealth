@@ -1,6 +1,6 @@
 Class {
 	#name : #GLPHModelImporter,
-	#superclass : #GitlabWithMergeRequestModelImporter,
+	#superclass : #GitlabModelImporter,
 	#category : #'GitLabProjectHealth-Model-Importer'
 }
 
