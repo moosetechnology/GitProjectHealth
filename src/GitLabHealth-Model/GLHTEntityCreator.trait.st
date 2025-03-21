@@ -6,7 +6,7 @@ It provides an API for creating entities and adding them to the model.
 "
 Trait {
 	#name : #GLHTEntityCreator,
-	#category : 'GitLabHealth-Model-Model'
+	#category : #'GitLabHealth-Model-Model'
 }
 
 { #category : #meta }
@@ -156,6 +156,20 @@ GLHTEntityCreator >> newMergeRequestNamed: aName [
 
 	<generated>
 	^ self add: (GLHMergeRequest named: aName)
+]
+
+{ #category : #'entity creation' }
+GLHTEntityCreator >> newNote [
+
+	<generated>
+	^ self add: GLHNote new
+]
+
+{ #category : #'entity creation' }
+GLHTEntityCreator >> newNoteNamed: aName [
+
+	<generated>
+	^ self add: (GLHNote named: aName)
 ]
 
 { #category : #'entity creation' }
