@@ -978,19 +978,6 @@ GitlabModelImporter >> importNotesfromMergeRequest: mergeRequest [
 	
 ]
 
-{ #category : #'import - notes' }
-GitlabModelImporter >> importNotesfromMergeRequest: mergeRequest ofProject: projectId [
-
-	self
-		deprecated:
-		'Use importNotesfromMergeRequest: instead of current one'
-		on: '20 March 2025'
-		in:
-		'Pharo-12.0.0+SNAPSHOT.build.1567.sha.ee47bfdbe3db3390b952b3c0277d9d1f46162275 (64 Bit)'.
-
-	^ self importNotesfromMergeRequest: mergeRequest
-]
-
 { #category : #'import - commits' }
 GitlabModelImporter >> importParentCommitsOfCommit: aGLHCommit since: aDate [
 
