@@ -959,6 +959,38 @@ GitlabModelImporter >> importMergeResquestMerger: aGLPHEMergeRequest [
 	^aGLPHEMergeRequest merge_user: (self importUser: authorID)
 ]
 
+{ #category : #'import - notes' }
+GitlabModelImporter >> importNotesfromMergeRequest: mergeRequest [
+	| results notes |
+	
+	results := self repoApi notes allInMergeRequest: mergeRequest iid ofProject: mergeRequest project id.
+	
+	notes := results collect: [ :note | 
+		self parseNoteJson: note ].
+	"notes := self parseNoteJson: results."
+	notes do: [ :tabNotes | tabNotes do: [ :note |
+			note author: (self importUser: (note author at: #id)).
+			note name: note id asString]. ].
+	notes := notes flattened.
+	notes := self glhModel addAll: notes unless: self blockOnIdEquality. 
+	notes := mergeRequest note addAll: notes unless: self blockOnIdEquality. 
+	^notes
+	
+]
+
+{ #category : #'import - notes' }
+GitlabModelImporter >> importNotesfromMergeRequest: mergeRequest ofProject: projectId [
+
+	self
+		deprecated:
+		'Use importNotesfromMergeRequest: instead of current one'
+		on: '20 March 2025'
+		in:
+		'Pharo-12.0.0+SNAPSHOT.build.1567.sha.ee47bfdbe3db3390b952b3c0277d9d1f46162275 (64 Bit)'.
+
+	^ self importNotesfromMergeRequest: mergeRequest
+]
+
 { #category : #'import - commits' }
 GitlabModelImporter >> importParentCommitsOfCommit: aGLHCommit since: aDate [
 
