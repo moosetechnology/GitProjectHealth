@@ -4,15 +4,17 @@ Class {
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
+{ #category : #acr }
+CreatedNotesByACRByProjectMetric class >> acrBotId [
+	^ 2661 .
+]
+
 { #category : #'as yet unclassified' }
 CreatedNotesByACRByProjectMetric >> calculate [  
-    | groupedByDate regex filteredGroupedByDate |  
+    | groupedByDate |  
 
     projectMergeRequests ifNil: [ self load ].  
     groupedByDate := self setupGroupedDate.  
-
-    "Définition du regex pour filtrer les notes"
-    regex := '.*Auto code review has detected that the code violates this rule.*' asRegex.
 
     "Parcourir les merge requests et regrouper les notes par date"
     projectMergeRequests do: [ :mr |  
@@ -23,13 +25,13 @@ CreatedNotesByACRByProjectMetric >> calculate [
         ]  
     ].  
 
-    "Appliquer le regex sur les notes déjà filtrées par période"
-    filteredGroupedByDate := groupedByDate collect: [ :notesGroup |  
-        (notesGroup select: [ :note | regex search: note body ]) size.  
+    " filter note over ACR bot Id"
+    groupedByDate := groupedByDate collect: [ :notesGroup |  
+        (notesGroup select: [ :note | note author id = CreatedNotesByACRByProjectMetric acrBotId ]) size.  
     ].  
 
     "Retourner le total des notes filtrées"
-    ^ filteredGroupedByDate sum.
+    ^ groupedByDate average asFloat.
 
 ]
 
