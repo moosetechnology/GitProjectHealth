@@ -37,7 +37,7 @@ CreatedNotesByACRByProjectMetric >> calculate [
 
 { #category : #accessing }
 CreatedNotesByACRByProjectMetric >> description [
-	^ 'Nb AutoCodeReview notes for a project (all MR) in a given timeline'
+	^ 'Nb AutoCodeReview notes in averge by MR'
 ]
 
 { #category : #loading }
