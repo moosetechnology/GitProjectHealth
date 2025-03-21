@@ -5,26 +5,31 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
-CreatedNotesByACRByProjectMetric >> calculate [
-    | notes acrnotes regex |
+CreatedNotesByACRByProjectMetric >> calculate [  
+    | groupedByDate regex filteredGroupedByDate |  
 
-    projectMergeRequests ifNil: [ self load ].
+    projectMergeRequests ifNil: [ self load ].  
+    groupedByDate := self setupGroupedDate.  
 
-    "Import all notes from project merge request"
-    notes := projectMergeRequests 
-        flatCollect: [ :mr | glhImporter importNotesfromMergeRequest: mr iid ofProject: mr project id ].
-
-    "Filtering notes with ACR notation"
+    "Définition du regex pour filtrer les notes"
     regex := '.*Auto code review has detected that the code violates this rule.*' asRegex.
 
-    acrnotes := notes 
-        flatCollect: [ :noteArray | 
-            noteArray select: [ :note | (regex search: note body) 
-													and: ((note created_at asDateAndTime > (period at: #since) asDateAndTime) 
-													and: (note updated_at asDateAndTime < (period at: #until))).] 
-        ].
+    "Parcourir les merge requests et regrouper les notes par date"
+    projectMergeRequests do: [ :mr |  
+        mr note do: [ :note |  
+            | dateOver |  
+            dateOver := self transformDate: note created_at to: over.  
+            groupedByDate at: dateOver printString ifPresent: [ :v | v add: note ].  
+        ]  
+    ].  
 
-    ^ acrnotes size.
+    "Appliquer le regex sur les notes déjà filtrées par période"
+    filteredGroupedByDate := groupedByDate collect: [ :notesGroup |  
+        (notesGroup select: [ :note | regex search: note body ]) size.  
+    ].  
+
+    "Retourner le total des notes filtrées"
+    ^ filteredGroupedByDate sum.
 
 ]
 
@@ -37,5 +42,6 @@ CreatedNotesByACRByProjectMetric >> description [
 CreatedNotesByACRByProjectMetric >> load [
 	projectMergeRequests := self
 	                      loadMergeRequestsSince:  (period at: #since)
-	                      until:  (period at: #until)
+	                      until:  (period at: #until) .
+	projectMergeRequests do: [ :mr | glhImporter importNotesfromMergeRequest: mr ].
 ]

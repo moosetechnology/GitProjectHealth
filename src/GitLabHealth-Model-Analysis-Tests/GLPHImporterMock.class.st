@@ -102,9 +102,9 @@ GLPHImporterMock >> importMergeResquestMerger: mergeRequest [
 ]
 
 { #category : #'import - notes' }
-GLPHImporterMock >> importNotesfromMergeRequest: mriid ofProject: projectid [
+GLPHImporterMock >> importNotesfromMergeRequest: mriid [
 
-	^OrderedCollection with: notes
+	^OrderedCollection with: (notes select: [ :note | (note noteable_iid == mriid) ]) 
 ]
 
 { #category : #initialization }

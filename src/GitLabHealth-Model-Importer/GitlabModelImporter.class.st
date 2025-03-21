@@ -116,24 +116,6 @@ GitlabModelImporter >> completeImportProject: aGLHProject [
 
 ]
 
-{ #category : #'import - notes' }
-GitlabModelImporter >> importNotesfromMergeRequest: mergeRequestIID ofProject: projectId [
-	| results notes |
-	
-	results := self repoApi notes allInMergeRequest: mergeRequestIID ofProject: projectId.
-	
-	notes := results collect: [ :note | 
-		self parseNoteJson: note ].
-	"notes := self parseNoteJson: results."
-	notes do: [ :tabNotes | tabNotes do: [ :note |
-			note author: (self importUser: (note author at: #id)).
-			note name: note id asString]. ].
-	
-	notes do: [:note | self glhModel addAll: note unless: self blockOnIdEquality.].
-	^notes
-	
-]
-
 { #category : #'import - commits' }
 GitlabModelImporter >> completeImportedCommit: aCommit [
 
@@ -977,6 +959,38 @@ GitlabModelImporter >> importMergeResquestMerger: aGLPHEMergeRequest [
 	^aGLPHEMergeRequest merge_user: (self importUser: authorID)
 ]
 
+{ #category : #'import - notes' }
+GitlabModelImporter >> importNotesfromMergeRequest: mergeRequest [
+	| results notes |
+	
+	results := self repoApi notes allInMergeRequest: mergeRequest iid ofProject: mergeRequest project id.
+	
+	notes := results collect: [ :note | 
+		self parseNoteJson: note ].
+	"notes := self parseNoteJson: results."
+	notes do: [ :tabNotes | tabNotes do: [ :note |
+			note author: (self importUser: (note author at: #id)).
+			note name: note id asString]. ].
+	notes := notes flattened.
+	notes := self glhModel addAll: notes unless: self blockOnIdEquality. 
+	notes := mergeRequest note addAll: notes unless: self blockOnIdEquality. 
+	^notes
+	
+]
+
+{ #category : #'import - notes' }
+GitlabModelImporter >> importNotesfromMergeRequest: mergeRequest ofProject: projectId [
+
+	self
+		deprecated:
+		'Use importNotesfromMergeRequest: instead of current one'
+		on: '20 March 2025'
+		in:
+		'Pharo-12.0.0+SNAPSHOT.build.1567.sha.ee47bfdbe3db3390b952b3c0277d9d1f46162275 (64 Bit)'.
+
+	^ self importNotesfromMergeRequest: mergeRequest
+]
+
 { #category : #'import - commits' }
 GitlabModelImporter >> importParentCommitsOfCommit: aGLHCommit since: aDate [
 
@@ -1297,39 +1311,6 @@ GitlabModelImporter >> parseCommitResult: result [
 ]
 
 { #category : #'private - parsing' }
-GitlabModelImporter >> parseNoteJson: results [  
-    | reader |  
-
-    "Créer un lecteur JSON"
-    reader := NeoJSONReader on: results readStream.    
-
-    "Définir le mapping pour l'objet GLHNote"
-    reader for: GLHNote do: [ :mapping |  
-        mapping mapInstVars: #(id noteable_id attachment system confidential internal  
-                               noteable_iid resolvable imported imported_from  
-                               author body project_id noteable_type).  
-
-        (mapping mapInstVar: #created_at) valueSchema: DateAndTime.  
-        (mapping mapInstVar: #updated_at) valueSchema: DateAndTime.  
-    ].    
-
-    "Corriger la conversion des dates"
-    reader for: DateAndTime customDo: [ :mapping |  
-        mapping decoder: [ :string | DateAndTime readFrom: string readStream ] ].
-
-	reader
-		for: #ArrayOfNote
-		customDo: [ :customMappting | 
-		customMappting listOfElementSchema: GLHNote ].
-	 ^ reader nextAs: #ArrayOfNote
-
-    "Retourner la Note"
-    "^ reader nextAs: GLHNote"
-
-
-]
-
-{ #category : #'private - parsing' }
 GitlabModelImporter >> parseCommitsResult: result [
 
 	| reader |
@@ -1457,6 +1438,39 @@ GitlabModelImporter >> parseMergeRequestResult: result [
 
 	generalReader on: result readStream.
 	^ generalReader nextAs: #ArrayOfMergeRequest
+]
+
+{ #category : #'private - parsing' }
+GitlabModelImporter >> parseNoteJson: results [  
+    | reader |  
+
+    "Créer un lecteur JSON"
+    reader := NeoJSONReader on: results readStream.    
+
+    "Définir le mapping pour l'objet GLHNote"
+    reader for: GLHNote do: [ :mapping |  
+        mapping mapInstVars: #(id noteable_id attachment system confidential internal  
+                               noteable_iid resolvable imported imported_from  
+                               author body project_id noteable_type).  
+
+        (mapping mapInstVar: #created_at) valueSchema: DateAndTime.  
+        (mapping mapInstVar: #updated_at) valueSchema: DateAndTime.  
+    ].    
+
+    "Corriger la conversion des dates"
+    reader for: DateAndTime customDo: [ :mapping |  
+        mapping decoder: [ :string | DateAndTime readFrom: string readStream ] ].
+
+	reader
+		for: #ArrayOfNote
+		customDo: [ :customMappting | 
+		customMappting listOfElementSchema: GLHNote ].
+	 ^ reader nextAs: #ArrayOfNote
+
+    "Retourner la Note"
+    "^ reader nextAs: GLHNote"
+
+
 ]
 
 { #category : #'private - parsing' }
