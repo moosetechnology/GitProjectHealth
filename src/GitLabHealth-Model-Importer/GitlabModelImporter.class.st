@@ -361,38 +361,6 @@ GitlabModelImporter >> importBlame: aGLHFile [
 	
 ]
 
-{ #category : #'import-gitblame' }
-GitlabModelImporter >> importBlame: aGLHFile ofProject: aGLHProject [
-
-	| results  params   |
-
-
-			params := { 
-		    #ref ->  'main'  .
-	       } asDictionary.
-	  results := self repoApi blames getBlameFile: aGLHFile ofProject: aGLHProject withParams: params      .
-	^ results 
-	
-]
-
-{ #category : #'import-gitblame' }
-GitlabModelImporter >> importBlame: aGLHFile ofProject: aGLHProject fromBranch: aGLHBranch [
-
-	| results  params   jsonObject   |
-
-
-			params := { 
-		    #ref ->   aGLHBranch  .
-		    #output -> 'JSON'.
-	       } asDictionary.
-	           results := self repoApi blames getBlameFile: aGLHFile ofProject: aGLHProject withParams: params      .
-              jsonObject := NeoJSONReader fromString: results .
-   ^ jsonObject  
-	
-
-	
-]
-
 { #category : #'import - repositories' }
 GitlabModelImporter >> importBranches: aGLHProject [ 
 	"Fetches all branches of the given project"
@@ -1229,6 +1197,34 @@ GitlabModelImporter >> importUserByUsername: anUsername [
 	self userCatalogue addUser: resultUser withName: anUsername.
 
 	^ resultUser
+]
+
+{ #category : #'import-gitblame' }
+GitlabModelImporter >> importUserContributionFromBlames: blamesArray [
+    | dictionary_Emails_Lines |
+
+    "Step 1: Initialize dictionary to store email -> total lines count"
+    dictionary_Emails_Lines := Dictionary new.
+
+    "Step 2: Process each blame dictionary"
+    blamesArray do: [:blameEntries |
+        blameEntries isArray ifTrue: [  "Ensure it's a valid blame entry"
+            blameEntries do: [:element | 
+                | authorEmail linesSize |
+                authorEmail := (element at: 'commit') at: 'author_email'.
+                linesSize := (element at: 'lines') size.  "Number of lines modified"
+
+                "Update dictionary (add lines if email exists, otherwise initialize)"
+                (dictionary_Emails_Lines includesKey: authorEmail)
+                    ifTrue: [ dictionary_Emails_Lines at: authorEmail put: ((dictionary_Emails_Lines at: authorEmail) + linesSize) ]
+                    ifFalse: [ dictionary_Emails_Lines at: authorEmail put: linesSize ].
+            ].
+        ].
+    ].
+
+    "Return the final dictionary of email -> total modified lines"
+    ^ dictionary_Emails_Lines
+
 ]
 
 { #category : #initialization }
