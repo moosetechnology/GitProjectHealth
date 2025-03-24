@@ -1201,10 +1201,18 @@ GitlabModelImporter >> importUserByUsername: anUsername [
 
 { #category : #'import-gitblame' }
 GitlabModelImporter >> importUserContributionFromBlames: blamesArray [
-    | dictionary_Emails_Lines |
+    | dictionary_Emails_Lines line |
 
     "Step 1: Initialize dictionary to store email -> total lines count"
     dictionary_Emails_Lines := Dictionary new.
+    "calculer le nombre totale des ligns "
+    line := blamesArray collect: [ :bl |
+    bl  collect: [ :element |
+	    |  lines |
+        lines :=  ((element at: 'lines')size) .
+    ]
+   ].
+    line:=( line flattened) sum .
 
     "Step 2: Process each blame dictionary"
     blamesArray do: [:blameEntries |
@@ -1216,8 +1224,8 @@ GitlabModelImporter >> importUserContributionFromBlames: blamesArray [
 
                 "Update dictionary (add lines if email exists, otherwise initialize)"
                 (dictionary_Emails_Lines includesKey: authorEmail)
-                    ifTrue: [ dictionary_Emails_Lines at: authorEmail put: ((dictionary_Emails_Lines at: authorEmail) + linesSize) ]
-                    ifFalse: [ dictionary_Emails_Lines at: authorEmail put: linesSize ].
+                    ifTrue: [ dictionary_Emails_Lines at: authorEmail put: ((dictionary_Emails_Lines at: authorEmail) + ((linesSize)/line)asFloat) ]
+                    ifFalse: [ dictionary_Emails_Lines at: authorEmail put:((linesSize)/line)asFloat ].
             ].
         ].
     ].
