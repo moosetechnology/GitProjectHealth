@@ -1539,6 +1539,12 @@ GitlabModelImporter >> pipelinesOf: aProjectID [
 			   self parsePipelinesResult: pipelinesJson ]) flattened
 ]
 
+{ #category : #accessing }
+GitlabModelImporter >> repoApi: anObject [
+	super repoApi: anObject.
+	self repoApi output: 'json'
+]
+
 { #category : #private }
 GitlabModelImporter >> selectEntityType: aType overAttribut: aSelector equalTo: value [
 
