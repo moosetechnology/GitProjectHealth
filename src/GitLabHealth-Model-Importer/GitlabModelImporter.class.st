@@ -345,22 +345,6 @@ GitlabModelImporter >> importAndLoadLatestsCommitsOfProject: aGLHProject [
 	^ commits
 ]
 
-{ #category : #'import-gitblame' }
-GitlabModelImporter >> importBlame: aGLHFile [ 
-	| results  params   jsonObject  result |
-			params := { 
-		    #ref ->   aGLHFile branch name  .
-	       } asDictionary.
-	           results := self repoApi blames getBlameFile: aGLHFile path ofProject: aGLHFile branch repository project id withParams: params      .
-              jsonObject := NeoJSONReader fromString: results .
-              result:= (jsonObject isArray ifTrue: [jsonObject ] ifFalse: [nil]).
-"              result:= result reject: [:item | item isNil]."
-   ^result 
-	
-
-	
-]
-
 { #category : #'import - repositories' }
 GitlabModelImporter >> importBranches: aGLHProject [ 
 	"Fetches all branches of the given project"
@@ -738,11 +722,9 @@ GitlabModelImporter >> importFilesOfBranch: aBranch [
 		          ofBranch: aBranch name
 		          andPath: nil."
 	apiFiles := (result collect: [ :filesJson | self parseFileTreeResult: filesJson  ]) flattened.
-	files := apiFiles collect: [ :apiFile | 
-		         self convertApiFileAsFile: apiFile ].
-	files do: [ :file | 
-		self glhModel add: file.
-		aBranch addFile: file ].
+	files := apiFiles collect: [ :apiFile |  self convertApiFileAsFile: apiFile ].
+   files := self glhModel addAll: files unless: [:f1 :f2 | f1 branch = f2 branch and: [f1 path = f2 path]].
+   files := aBranch addAll: files unless: [:f1 :f2 | f1 branch = f2 branch and: [f1 path = f2 path]].
 	files
 		select: [ :file | file isKindOf: GLHFileDirectory ]
 		thenCollect: [ :file | 
@@ -1216,43 +1198,6 @@ GitlabModelImporter >> importUserByUsername: anUsername [
 	self userCatalogue addUser: resultUser withName: anUsername.
 
 	^ resultUser
-]
-
-{ #category : #'import-gitblame' }
-GitlabModelImporter >> importUserContributionFromBlames: blamesArray [
-    | dictionary_Emails_Lines line blames   |
-     "filter if  the blame isn't nil  bacause some file like media and photo dosn'thave blame  "
-    blames := blamesArray reject: [:item | item isNil].
-    "Step 1: Initialize dictionary to store email -> total lines count"
-    dictionary_Emails_Lines := Dictionary new.
-    "calculer le nombre totale des ligns "
-    line :=  blames collect: [ :bl |
-    bl  collect: [ :element |
-	    |  lines |
-        lines :=  ((element at: 'lines')size) .
-    ]
-   ].
-    line:=( line flattened) sum .
-
-    "Step 2: Process each blame dictionary"
-     blames do: [:blameEntries |
-        blameEntries isArray ifTrue: [  "Ensure it's a valid blame entry"
-            blameEntries do: [:element | 
-                | authorEmail linesSize |
-                authorEmail := (element at: 'commit') at: 'author_email'.
-                linesSize := (element at: 'lines') size.  "Number of lines modified"
-
-                "Update dictionary (add lines if email exists, otherwise initialize)"
-                (dictionary_Emails_Lines includesKey: authorEmail)
-                    ifTrue: [ dictionary_Emails_Lines at: authorEmail put: ((dictionary_Emails_Lines at: authorEmail) + ((linesSize)/line)asFloat) ]
-                    ifFalse: [ dictionary_Emails_Lines at: authorEmail put:((linesSize)/line)asFloat ].
-            ].
-        ].
-    ].
-
-    "Return the final dictionary of email -> total modified lines"
-    ^ dictionary_Emails_Lines
-
 ]
 
 { #category : #initialization }
