@@ -7,7 +7,7 @@ Class {
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #tests }
 CodeAdditionByMergeRequestProjectMetricTest >> testCalculate [
 
 	| result glhImporter codeAddition mergedCommit |
@@ -32,6 +32,7 @@ CodeAdditionByMergeRequestProjectMetricTest >> testCalculate [
 				 id: 2;
 				 additions: 3;
 				 deletions: 5).
+
 			(GLHCommit new
 				 id: 3;
 				 additions: 3;
@@ -48,6 +49,7 @@ CodeAdditionByMergeRequestProjectMetricTest >> testCalculate [
 	result := codeAddition calculate.
 
 	"Then"
+
 	self assert: result equals: 42
 ]
 
@@ -75,7 +77,7 @@ CodeAdditionByMergeRequestProjectMetricTest >> testCalculateMROpenOnly [
 	self assert: result equals: 0
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #tests }
 CodeAdditionByMergeRequestProjectMetricTest >> testCalculateNoCommits [
 
 	| result glhImporter codeAddition |
@@ -85,6 +87,7 @@ CodeAdditionByMergeRequestProjectMetricTest >> testCalculateNoCommits [
 			 created_at: createdAt ;
 			 merged_at: mergedAt ;
 			 state: #closed ) }.
+
 
 	codeAddition := CodeAdditionByMergeRequestProjectMetric new
 		                project: project1;
@@ -99,7 +102,7 @@ CodeAdditionByMergeRequestProjectMetricTest >> testCalculateNoCommits [
 	self assert: result equals: 0
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #tests }
 CodeAdditionByMergeRequestProjectMetricTest >> testCalculateNoMergeRequests [
 
 	| result glhImporter codeAddition |

@@ -38,7 +38,6 @@ CodeAdditionByMRMetric >> description [
 CodeAdditionByMRMetric >> load [
 
 	userMergeRequests := self
-		                     loadUserCompleteMergeRequestsSince:
-		                     (period at: #since)
+		                     loadUserCompleteMergeRequestsSince: (period at: #since)
 		                     until: (period at: #until)
 ]

@@ -28,3 +28,15 @@ ProjectMetricTest >> setUp [
 		            name: 'project2';
 		            repository: GLHRepository new
 ]
+
+{ #category : #tests }
+ProjectMetricTest >> testAllDescriptionDifferent [
+
+	| metrics metricsDescription |
+	metrics := ProjectMetric allSubclasses reject: [ :metric |
+		           metric isAbstract ].
+	metricsDescription := metrics
+		                      collect: [ :me | me new description ]
+		                      as: Set.
+	self assert: metrics size equals: metricsDescription size
+]

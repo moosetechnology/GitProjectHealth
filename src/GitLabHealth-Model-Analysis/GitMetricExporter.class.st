@@ -461,10 +461,7 @@ GitMetricExporter >> initialize [
 
 	analyses := OrderedCollection new.
 
-
-	"Project and User Metrics"
 	metrics := Metric allSubclasses reject: #isAbstract.
-	
 
 ]
 
