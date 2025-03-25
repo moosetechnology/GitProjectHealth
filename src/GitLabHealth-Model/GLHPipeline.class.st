@@ -41,7 +41,7 @@ Class {
 		'#runDate => FMProperty',
 		'#status => FMProperty'
 	],
-	#category : 'GitLabHealth-Model-Entities'
+	#category : #'GitLabHealth-Model-Entities'
 }
 
 { #category : #meta }

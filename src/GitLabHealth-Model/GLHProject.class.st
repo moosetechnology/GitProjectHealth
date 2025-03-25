@@ -61,7 +61,7 @@ Class {
 		'#topics => FMProperty',
 		'#web_url => FMProperty'
 	],
-	#category : 'GitLabHealth-Model-Entities'
+	#category : #'GitLabHealth-Model-Entities'
 }
 
 { #category : #meta }

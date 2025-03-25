@@ -52,7 +52,7 @@ Class {
 		'#old_path => FMProperty',
 		'#renamed_file => FMProperty defaultValue: false'
 	],
-	#category : 'GitLabHealth-Model-Entities'
+	#category : #'GitLabHealth-Model-Entities'
 }
 
 { #category : #meta }
