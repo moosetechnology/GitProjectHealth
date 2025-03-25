@@ -347,15 +347,15 @@ GitlabModelImporter >> importAndLoadLatestsCommitsOfProject: aGLHProject [
 
 { #category : #'import-gitblame' }
 GitlabModelImporter >> importBlame: aGLHFile [ 
-	| results  params   jsonObject   |
-
-
+	| results  params   jsonObject  result |
 			params := { 
 		    #ref ->   aGLHFile branch name  .
 	       } asDictionary.
 	           results := self repoApi blames getBlameFile: aGLHFile path ofProject: aGLHFile branch repository project id withParams: params      .
               jsonObject := NeoJSONReader fromString: results .
-   ^ jsonObject  
+              result:= (jsonObject isArray ifTrue: [jsonObject ] ifFalse: [nil]).
+"              result:= result reject: [:item | item isNil]."
+   ^result 
 	
 
 	
@@ -1201,12 +1201,13 @@ GitlabModelImporter >> importUserByUsername: anUsername [
 
 { #category : #'import-gitblame' }
 GitlabModelImporter >> importUserContributionFromBlames: blamesArray [
-    | dictionary_Emails_Lines line |
-
+    | dictionary_Emails_Lines line blames   |
+     "filter if  the blame isn't nil  bacause some file like media and photo dosn'thave blame  "
+    blames := blamesArray reject: [:item | item isNil].
     "Step 1: Initialize dictionary to store email -> total lines count"
     dictionary_Emails_Lines := Dictionary new.
     "calculer le nombre totale des ligns "
-    line := blamesArray collect: [ :bl |
+    line :=  blames collect: [ :bl |
     bl  collect: [ :element |
 	    |  lines |
         lines :=  ((element at: 'lines')size) .
@@ -1215,7 +1216,7 @@ GitlabModelImporter >> importUserContributionFromBlames: blamesArray [
     line:=( line flattened) sum .
 
     "Step 2: Process each blame dictionary"
-    blamesArray do: [:blameEntries |
+     blames do: [:blameEntries |
         blameEntries isArray ifTrue: [  "Ensure it's a valid blame entry"
             blameEntries do: [:element | 
                 | authorEmail linesSize |
