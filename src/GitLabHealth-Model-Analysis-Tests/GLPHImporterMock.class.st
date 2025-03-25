@@ -5,7 +5,8 @@ Class {
 		'commits',
 		'commitDiffs',
 		'mergeRequests',
-		'glhModel'
+		'glhModel',
+		'notes'
 	],
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
@@ -100,6 +101,12 @@ GLPHImporterMock >> importMergeResquestMerger: mergeRequest [
 	^self
 ]
 
+{ #category : #'import - notes' }
+GLPHImporterMock >> importNotesfromMergeRequest: mriid [
+
+	^OrderedCollection with: (notes select: [ :note | (note noteable_iid == mriid) ]) 
+]
+
 { #category : #initialization }
 GLPHImporterMock >> initialize [
 
@@ -119,6 +126,18 @@ GLPHImporterMock >> mergeRequests [
 GLPHImporterMock >> mergeRequests: anObject [
 
 	mergeRequests := anObject
+]
+
+{ #category : #accessing }
+GLPHImporterMock >> notes [
+
+	^notes
+]
+
+{ #category : #accessing }
+GLPHImporterMock >> notes: anObject [
+
+	notes := anObject 
 ]
 
 { #category : #accessing }

@@ -24,3 +24,15 @@ UserMetricTest >> setUp [
 
 
 ]
+
+{ #category : #running }
+UserMetricTest >> testAllDescriptionDifferent [
+
+	| metrics metricsDescription |
+	metrics := UserMetric allSubclasses reject: [ :metric |
+		           metric isAbstract ].
+	metricsDescription := metrics
+		                      collect: [ :me | me new description ]
+		                      as: Set.
+	self assert: metrics size equals: metricsDescription size
+]

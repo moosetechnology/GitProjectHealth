@@ -11,8 +11,8 @@ Class {
 JiraTimeMRTimeDifferenceProjectMetric >> calculate [
 
 	| groupedByDate dateOver jiraID |
-
 	projectMergeRequests ifNil: [ self load ].
+	projectMergeRequests := projectMergeRequests reject: [:mr | mr jiraIssue isNil or: [(mr jiraIssue timeOriginalEstimate ifNil: [mr jiraIssue timeEstimate ]) isNil]].
 	projectMergeRequests ifEmpty: [ ^ nil ].
 
 	groupedByDate := self setupGroupedDate.
@@ -48,7 +48,6 @@ JiraTimeMRTimeDifferenceProjectMetric >> calculate [
 				                                            ifNil: [
 				                                            jiraIssue timeEstimate ].
 
-			                                jiraTime ifNil: [ ^ nil ].
 			                                (jiraTime - mergeRequestTime)
 				                                asSeconds ].
 

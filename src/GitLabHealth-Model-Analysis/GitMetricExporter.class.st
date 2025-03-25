@@ -462,6 +462,7 @@ GitMetricExporter >> initialize [
 	analyses := OrderedCollection new.
 
 	metrics := Metric allSubclasses reject: #isAbstract.
+
 ]
 
 { #category : #accessing }

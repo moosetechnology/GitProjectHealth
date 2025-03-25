@@ -31,7 +31,7 @@ CodeDeletionDuringAndByMergeRequestProjectMetric >> calculate [
 { #category : #'as yet unclassified' }
 CodeDeletionDuringAndByMergeRequestProjectMetric >> description [
 
-	^ 'average code addition by merge request'
+	^ 'average code deletion during and by merge request'
 ]
 
 { #category : #'as yet unclassified' }

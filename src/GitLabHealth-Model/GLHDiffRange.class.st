@@ -35,7 +35,7 @@ Class {
 		'#diff => FMOne type: #GLHDiff opposite: #diffRanges',
 		'#changes => FMMany type: #GLHChange opposite: #diffRange'
 	],
-	#category : 'GitLabHealth-Model-Entities'
+	#category : #'GitLabHealth-Model-Entities'
 }
 
 { #category : #meta }

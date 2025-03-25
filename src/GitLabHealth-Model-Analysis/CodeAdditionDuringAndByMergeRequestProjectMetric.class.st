@@ -31,7 +31,7 @@ CodeAdditionDuringAndByMergeRequestProjectMetric >> calculate [
 { #category : #'as yet unclassified' }
 CodeAdditionDuringAndByMergeRequestProjectMetric >> description [
 
-	^ 'average code addition by merge request'
+	^ 'average code addition during and by merge request'
 ]
 
 { #category : #'as yet unclassified' }

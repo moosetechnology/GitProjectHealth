@@ -29,7 +29,7 @@ Class {
 		'#directoryOwner => FMOne type: #GLHFileDirectory opposite: #files',
 		'#name => FMProperty'
 	],
-	#category : 'GitLabHealth-Model-Entities'
+	#category : #'GitLabHealth-Model-Entities'
 }
 
 { #category : #meta }

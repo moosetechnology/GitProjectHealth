@@ -21,8 +21,8 @@ a commit attached to a repository
 | Relation | Origin | Opposite | Type | Comment |
 |---|
 | `childCommits` | `GLHCommit` | `parentCommits` | `GLHCommit` | |
-| `commitedMergeRequest` | `GLHCommit` | `mergedCommit` | `GLHMergeRequest` | |
 | `commitedMergeRequest` | `GLHCommit` | `mergeRequestCommit` | `GLHMergeRequest` | |
+| `commitedMergeRequest` | `GLHCommit` | `mergedCommit` | `GLHMergeRequest` | |
 | `parentCommits` | `GLHCommit` | `childCommits` | `GLHCommit` | |
 | `squashedMergeRequest` | `GLHCommit` | `squashCommit` | `GLHMergeRequest` | |
 
@@ -74,7 +74,7 @@ Class {
 		'#jobs => FMMany type: #GLHJob opposite: #commit',
 		'#message => FMProperty',
 		'#parentCommits => FMMany type: #GLHCommit opposite: #childCommits',
-		'#parent_ids => FMProperty defaultValue: ((OrderedCollection new))',
+		'#parent_ids => FMProperty defaultValue: \'OrderedCollection new\'',
 		'#repository => FMOne type: #GLHRepository opposite: #commits',
 		'#short_id => FMProperty',
 		'#squashedMergeRequest => FMOne type: #GLHMergeRequest opposite: #squashCommit',

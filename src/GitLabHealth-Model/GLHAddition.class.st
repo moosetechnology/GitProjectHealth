@@ -13,9 +13,9 @@ Class {
 	#name : #GLHAddition,
 	#superclass : #GLHChange,
 	#instVars : [
-		'#delimiter => FMProperty defaultValue: #+'
+		'#delimiter => FMProperty defaultValue: \'#+\''
 	],
-	#category : 'GitLabHealth-Model-Entities'
+	#category : #'GitLabHealth-Model-Entities'
 }
 
 { #category : #meta }
@@ -25,6 +25,14 @@ GLHAddition class >> annotation [
 	<package: #'GitLabHealth-Model'>
 	<generated>
 	^ self
+]
+
+{ #category : #accessing }
+GLHAddition >> delimiter [
+
+	<FMProperty: #delimiter type: #String defaultValue: '#+'>
+	<generated>
+	^ delimiter ifNil: [ delimiter := '#+' ]
 ]
 
 { #category : #accessing }

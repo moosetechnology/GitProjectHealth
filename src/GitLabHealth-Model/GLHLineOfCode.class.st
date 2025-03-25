@@ -6,7 +6,7 @@ a line of code in a diff comparaison
 Class {
 	#name : #GLHLineOfCode,
 	#superclass : #GLHChange,
-	#category : 'GitLabHealth-Model-Entities'
+	#category : #'GitLabHealth-Model-Entities'
 }
 
 { #category : #meta }
