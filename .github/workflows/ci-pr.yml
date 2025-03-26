@@ -36,7 +36,7 @@ jobs:
 
       - name: AutoReneraku
         if: matrix.smalltalk == 'Moose64-12'
-        uses: badetitou/AutoReneraku@v1.0.4
+        uses: badetitou/AutoReneraku@v1.0.5
         with:
           pat: ${{ secrets.PAT }}
 
