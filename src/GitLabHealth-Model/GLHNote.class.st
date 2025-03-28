@@ -40,23 +40,23 @@ Class {
 	#traits : 'FamixTNamedEntity',
 	#classTraits : 'FamixTNamedEntity classTrait',
 	#instVars : [
+		'#id => FMProperty',
+		'#body => FMProperty',
 		'#attachment => FMProperty',
 		'#author => FMProperty',
-		'#body => FMProperty',
-		'#confidential => FMProperty',
 		'#created_at => FMProperty',
-		'#id => FMProperty',
-		'#imported => FMProperty',
-		'#imported_from => FMProperty',
-		'#internal => FMProperty',
-		'#mergeRequest => FMOne type: #GLHMergeRequest opposite: #note',
+		'#updated_at => FMProperty',
+		'#system => FMProperty',
 		'#noteable_id => FMProperty',
-		'#noteable_iid => FMProperty',
 		'#noteable_type => FMProperty',
 		'#project_id => FMProperty',
+		'#noteable_iid => FMProperty',
 		'#resolvable => FMProperty',
-		'#system => FMProperty',
-		'#updated_at => FMProperty'
+		'#confidential => FMProperty',
+		'#internal => FMProperty',
+		'#imported => FMProperty',
+		'#imported_from => FMProperty',
+		'#mergeRequest => FMOne type: #GLHMergeRequest opposite: #note'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }

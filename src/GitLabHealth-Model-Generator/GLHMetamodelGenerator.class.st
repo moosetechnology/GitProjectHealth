@@ -21,7 +21,8 @@ Class {
 		'addition',
 		'deletion',
 		'lineOfCode',
-		'note'
+		'note',
+		'entity'
 	],
 	#category : #'GitLabHealth-Model-Generator'
 }
@@ -87,6 +88,7 @@ GLHMetamodelGenerator >> commitProperties [
 GLHMetamodelGenerator >> defineClasses [
 
 	super defineClasses.
+	entity := (builder ensureClassNamed: #Entity).
 	group := builder newClassNamed: #Group comment: 'A GitLab Group'.
 	group withGroup.
 	project := builder
@@ -150,7 +152,7 @@ GLHMetamodelGenerator >> defineClasses [
 GLHMetamodelGenerator >> defineHierarchy [
 
 	super defineHierarchy.
-	(builder ensureClassNamed: #Entity) --|> #TEntityMetaLevelDependency.
+	entity --|> #TEntityMetaLevelDependency.
 	fileDirectory --|> file.
 	fileBlob --|> file.
 

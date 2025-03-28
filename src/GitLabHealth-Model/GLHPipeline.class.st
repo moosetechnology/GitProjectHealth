@@ -34,12 +34,12 @@ Class {
 	#name : #GLHPipeline,
 	#superclass : #GLHEntity,
 	#instVars : [
-		'#id => FMProperty',
-		'#jobs => FMMany type: #GLHJob opposite: #pipeline',
-		'#mergeResquest => FMOne type: #GLHMergeRequest opposite: #pipeline',
-		'#project => FMOne type: #GLHProject opposite: #pipelines',
+		'#status => FMProperty',
 		'#runDate => FMProperty',
-		'#status => FMProperty'
+		'#id => FMProperty',
+		'#project => FMOne type: #GLHProject opposite: #pipelines',
+		'#jobs => FMMany type: #GLHJob opposite: #pipeline',
+		'#mergeResquest => FMOne type: #GLHMergeRequest opposite: #pipeline'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }

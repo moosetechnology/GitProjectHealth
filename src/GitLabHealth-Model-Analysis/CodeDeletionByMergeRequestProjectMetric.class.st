@@ -23,7 +23,9 @@ CodeDeletionByMergeRequestProjectMetric >> calculate [
 	groupedByDate := groupedByDate collect: [ :group |
 		                 group ifEmpty: [ 0 ] ifNotEmpty: [
 			                 (group collect: [ :mergeRequest |
-				                  mergeRequest mergedCommit deletions ]) average ] ].
+				                  (mergeRequest mergedCommit ifNil: [
+					                   mergeRequest squashCommit ]) deletions ])
+				                 average ] ].
 
 	^ groupedByDate average asFloat
 ]

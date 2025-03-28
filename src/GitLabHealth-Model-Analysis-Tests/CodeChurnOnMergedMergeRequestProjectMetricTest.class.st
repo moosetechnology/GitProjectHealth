@@ -223,3 +223,42 @@ CodeChurnOnMergedMergeRequestProjectMetricTest >> testCalculateNoMergeRequests [
 	"Then"
 	self assert: result rounded equals: 0
 ]
+
+{ #category : #tests }
+CodeChurnOnMergedMergeRequestProjectMetricTest >> testCalculateOnSquash [
+
+
+	| glhImporter codeChurn result |
+	glhImporter := GLPHImporterMock new.
+
+	glhImporter commits: {
+			commit1.
+			commit2.
+			commit3 }.
+
+	commit1 addChildCommit: commit2.
+	commit2 addParentCommit: commit1.
+	commit2 parent_ids: { commit1 id }.
+
+	glhImporter mergeRequests: { (GLHMergeRequest new
+			 iid: '123';
+			 id: '12345664qdkjckesjnd';
+			 project: project1;
+			 state: #merged;
+			 merged_at: mergedAt;
+			 title: 'merge request';
+			 squashCommit: commit2) }.
+
+
+	codeChurn := CodeChurnOnMergedMergeRequestProjectMetric new
+		             project: project1;
+		             glhImporter: glhImporter;
+		             setPeriodSince: since until: since;
+		             over: Week.
+
+	"When"
+	result := codeChurn calculate.
+
+	"Then"
+	self assert: result rounded equals: 0
+]

@@ -24,10 +24,10 @@ Class {
 	#name : #GLHFile,
 	#superclass : #GLHEntity,
 	#instVars : [
+		'#name => FMProperty',
 		'#branch => FMOne type: #GLHBranch opposite: #files',
-		'#diffs => FMOne type: #GLHDiff opposite: #file',
 		'#directoryOwner => FMOne type: #GLHFileDirectory opposite: #files',
-		'#name => FMProperty'
+		'#diffs => FMOne type: #GLHDiff opposite: #file'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }

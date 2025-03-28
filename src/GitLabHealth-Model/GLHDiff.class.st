@@ -41,16 +41,16 @@ Class {
 	#traits : 'FamixTNamedEntity',
 	#classTraits : 'FamixTNamedEntity classTrait',
 	#instVars : [
-		'#commit => FMOne type: #GLHCommit opposite: #diffs',
-		'#deleted_file => FMProperty defaultValue: false',
-		'#diffRanges => FMMany type: #GLHDiffRange opposite: #diff',
 		'#diffString => FMProperty',
-		'#file => FMMany type: #GLHFile opposite: #diffs',
-		'#mergeRequest => FMOne type: #GLHMergeRequest opposite: #diffs',
-		'#new_file => FMProperty defaultValue: false',
 		'#new_path => FMProperty',
 		'#old_path => FMProperty',
-		'#renamed_file => FMProperty defaultValue: false'
+		'#new_file => FMProperty defaultValue: false',
+		'#renamed_file => FMProperty defaultValue: false',
+		'#deleted_file => FMProperty defaultValue: false',
+		'#commit => FMOne type: #GLHCommit opposite: #diffs',
+		'#mergeRequest => FMOne type: #GLHMergeRequest opposite: #diffs',
+		'#file => FMMany type: #GLHFile opposite: #diffs',
+		'#diffRanges => FMMany type: #GLHDiffRange opposite: #diff'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }
@@ -173,16 +173,6 @@ GLHDiff >> fileGroup [
 	<generated>
 	<navigation: 'File'>
 	^ MooseSpecializedGroup withAll: self file asSet
-]
-
-{ #category : #'as yet unclassified' }
-GLHDiff >> inspectionGLHDiff [
-
-	<inspectorPresentationOrder: 3 title: 'Files Impacted'>
-	| canvas |
-	canvas := RSCommitDiff canvasFor: self.
-
-	^ canvas asPresenter
 ]
 
 { #category : #accessing }
