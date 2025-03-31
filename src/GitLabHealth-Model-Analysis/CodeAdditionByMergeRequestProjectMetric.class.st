@@ -14,7 +14,7 @@ CodeAdditionByMergeRequestProjectMetric >> calculate [
 	projectMergeRequests ifEmpty: [ ^ 0 ].
 
 
-	projectMergeRequests  do: [ :mr |
+	projectMergeRequests do: [ :mr |
 		dateOver := self transformDate: mr created_at to: over.
 		groupedByDate
 			at: dateOver printString
@@ -23,7 +23,9 @@ CodeAdditionByMergeRequestProjectMetric >> calculate [
 	groupedByDate := groupedByDate collect: [ :group |
 		                 group ifEmpty: [ 0 ] ifNotEmpty: [
 			                 (group collect: [ :mergeRequest |
-				                  mergeRequest mergedCommit additions ]) average ] ].
+				                  (mergeRequest mergedCommit ifNil: [
+					                   mergeRequest squashCommit ]) additions ])
+				                 average ] ].
 
 	^ groupedByDate average asFloat
 ]

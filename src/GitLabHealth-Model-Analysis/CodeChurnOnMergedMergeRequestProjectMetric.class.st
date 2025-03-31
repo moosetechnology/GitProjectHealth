@@ -98,11 +98,13 @@ CodeChurnOnMergedMergeRequestProjectMetric >> load [
 	projectMergeRequests := self
 		                        loadMergeRequestsSince: (period at: #since)
 		                        until: (period at: #until).
-		
-		projectMergeRequests := projectMergeRequests select: [ :mr |
-		                        mr state = #merged ].
-	
-		projectMergeRequests do: [ :mr | glhImporter importMergeRequestMergeCommits: mr ]
+
+	projectMergeRequests := projectMergeRequests select: [ :mr |
+		                        mr state = #merged and: [
+			                        mr mergedCommit isNotNil ] ].
+
+	projectMergeRequests do: [ :mr |
+		glhImporter importMergeRequestMergeCommits: mr ]
 ]
 
 { #category : #accessing }
