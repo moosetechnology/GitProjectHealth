@@ -158,6 +158,22 @@ GitModelImporter >> importDiffRangesForDiff: aGLHDiff [
 		  unless: self blockForDiffRangeEquality
 ]
 
+{ #category : #'import - projects' }
+GitModelImporter >> importProject: id [
+	"id can be a string or an integer depending on the APi implementation"
+
+	"return the project created or retrieved"
+
+	^ self subclassResponsibility
+]
+
+{ #category : #'import - projects' }
+GitModelImporter >> importProjects: aCollectionOfProjectID [
+
+
+	^ aCollectionOfProjectID collect: [ :id | self importProject: id ]
+]
+
 { #category : #initialization }
 GitModelImporter >> initialize [
 

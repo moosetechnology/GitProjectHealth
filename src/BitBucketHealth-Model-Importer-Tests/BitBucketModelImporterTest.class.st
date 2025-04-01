@@ -541,6 +541,28 @@ BitBucketModelImporterTest >> testImportMergeResquestMerger [
 ]
 
 { #category : #tests }
+BitBucketModelImporterTest >> testImportProject [
+
+	| bitBucketApi glphModel bitBucketImporter project |
+	bitBucketApi := BitBucketApiMock new.
+
+	glphModel := GLHModel new name: 'test'.
+
+	bitBucketImporter := BitBucketModelImporter new
+		                     repoApi: bitBucketApi;
+		                     glhModel: glphModel.
+
+	"When"
+	project := bitBucketImporter importProject: 'carlsource'.
+
+	"Then"
+	self assert: (glphModel allWithType: GLHProject) size equals: 1.
+	self
+		assertCollection: (glphModel allWithType: GLHProject)
+		hasSameElements: { project }
+]
+
+{ #category : #tests }
 BitBucketModelImporterTest >> testImportUserByUsername [
 	"Given"
 

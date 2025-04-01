@@ -358,6 +358,24 @@ BitBucketModelImporter >> importMergeResquestMerger: mergeRequest [
 	^ mergeUser
 ]
 
+{ #category : #'import - projects' }
+BitBucketModelImporter >> importProject: aProjectID [
+
+	| result projectResult |
+	('Import project with id:  ' , aProjectID printString) recordInfo.
+
+	(glhModel allWithType: GLHProject)
+		detect: [ :project | project id = aProjectID ]
+		ifFound: [ :project | ^ project ].
+
+	result := self repoApi projects get: aProjectID.
+	projectResult := self parseProjectResult: result.
+
+	self glhModel add: projectResult unless: self blockOnIdEquality.
+
+	^ self completeImportProject: projectResult
+]
+
 { #category : #'import - users' }
 BitBucketModelImporter >> importUserByUsername: username [
 
@@ -384,7 +402,10 @@ BitBucketModelImporter >> parseCommitIntoGLHCommit: commitDictionary ofProject: 
 	parentIds := (commitDictionary at: #parents) collect: [ :parent |
 		             parent at: #id ].
 
-	commitDiffs := self repoApi commits diffOf: (commitDictionary at: #id) inRepository: aGLHProject id ofProject: aGLHProject group id.
+	commitDiffs := self repoApi commits
+		               diffOf: (commitDictionary at: #id)
+		               inRepository: aGLHProject id
+		               ofProject: aGLHProject group id.
 
 	contribution := self getContributionFromDiffs:
 		                (commitDiffs at: #diffs).
@@ -410,10 +431,21 @@ BitBucketModelImporter >> parseCommitIntoGLHCommit: commitDictionary ofProject: 
 { #category : #parsing }
 BitBucketModelImporter >> parseProjectIntoGLHGroup: projectRepository [
 
-	^GLHGroup new
-				                     name: (projectRepository at: #name);
-				                     id: (projectRepository at: #key);
-				                     description: (projectRepository at: #description).
+	^ GLHGroup new
+		  name: (projectRepository at: #name);
+		  id: (projectRepository at: #key);
+		  description: (projectRepository at: #description)
+]
+
+{ #category : #parsing }
+BitBucketModelImporter >> parseProjectResult: aDictionary [
+
+	^ GLHProject new
+		  id: (aDictionary at: #key);
+		  "use key instead of id because key is use everywhere else for API"
+		  description: (aDictionary at: #description);
+		  name: (aDictionary at: #name);
+		  yourself
 ]
 
 { #category : #parsing }
@@ -422,19 +454,19 @@ BitBucketModelImporter >> parsePullRequestIntoGLPHEMergeRequest: pullRequestDict
 	| repository project toRef fromRef glpheMergeRequest author state reviewers |
 	toRef := pullRequestDictionary at: #toRef.
 	fromRef := pullRequestDictionary at: #fromRef.
-	
+
 	reviewers := pullRequestDictionary at: #reviewers.
-	reviewers := reviewers collect: [ :reviewer | 
-		|reviewerUser|
-		reviewerUser := reviewer at: #user.
-		(self glhModel allWithType: GLHUser) detect: [ :user | user id = (reviewerUser at: #id) ]	 ifFound: [ :user | user ] ifNone: [ 
-			|glhUser|
-			glhUser := self parseUserIntoGLHUser: reviewerUser.
-			glhModel  add: glhUser.
-			glhUser.		
-		]
-		
-	].
+	reviewers := reviewers collect: [ :reviewer |
+		             | reviewerUser |
+		             reviewerUser := reviewer at: #user.
+		             (self glhModel allWithType: GLHUser)
+			             detect: [ :user | user id = (reviewerUser at: #id) ]
+			             ifFound: [ :user | user ]
+			             ifNone: [
+				             | glhUser |
+				             glhUser := self parseUserIntoGLHUser: reviewerUser.
+				             glhModel add: glhUser.
+				             glhUser ] ].
 
 	repository := toRef at: #repository.
 	project := (self glhModel allWithType: GLHProject)
@@ -511,7 +543,7 @@ BitBucketModelImporter >> parseRepoIntoGLHProject: repositoryDictionary [
 	glhProject := GLHProject new
 		              name: (repositoryDictionary at: #name);
 		              id: (repositoryDictionary at: #slug);
-						  repository: GLHRepository new;
+		              repository: GLHRepository new;
 		              group: group.
 
 	group addProject: glhProject.
@@ -522,10 +554,11 @@ BitBucketModelImporter >> parseRepoIntoGLHProject: repositoryDictionary [
 { #category : #parsing }
 BitBucketModelImporter >> parseUserIntoGLHUser: userDictionnary [
 
-	^ GLHUser new name: (userDictionnary at: #displayName);
-		public_email: (userDictionnary at: #emailAddress);
-		id: (userDictionnary at: #id);
-		username: (userDictionnary at: #name).
+	^ GLHUser new
+		  name: (userDictionnary at: #displayName);
+		  public_email: (userDictionnary at: #emailAddress);
+		  id: (userDictionnary at: #id);
+		  username: (userDictionnary at: #name)
 ]
 
 { #category : #accessing }
