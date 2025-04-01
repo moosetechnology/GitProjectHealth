@@ -2,10 +2,23 @@ Class {
 	#name : #ProjectAnalysisReport,
 	#superclass : #AnalysisReport,
 	#instVars : [
-		'projectName'
+		'projectName',
+		'projectID'
 	],
 	#category : #'GitLabHealth-Model-Analysis'
 }
+
+{ #category : #accessing }
+ProjectAnalysisReport >> projectID [
+
+	^ projectID
+]
+
+{ #category : #accessing }
+ProjectAnalysisReport >> projectID: anObject [
+
+	projectID := anObject
+]
 
 { #category : #accessing }
 ProjectAnalysisReport >> projectName [

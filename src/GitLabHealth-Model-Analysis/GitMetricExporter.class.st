@@ -240,6 +240,10 @@ GitMetricExporter >> exportProjectAnalysesInCSV [
 			addColumnForQuery: [ :groupAnalyses |
 			(groupAnalyses at: 1) projectName ]
 			withName: #'Project name'.
+		exportBrowserModel
+			addColumnForQuery: [ :groupAnalyses |
+			(groupAnalyses at: 1) projectID ]
+			withName: #'Project ID'.
 
 		periods := (group groupedBy: #period) keys.
 
@@ -362,6 +366,7 @@ GitMetricExporter >> generateProjectsAnalysesDuringPeriod: period over: aDateWee
 		| projectAnalysisReport |
 		projectAnalysisReport := ProjectAnalysisReport new
 			projectName: project name;
+			projectID: project id;
 			period: period;
 			over: aDateWeekMonthOrYear.
 			
