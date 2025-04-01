@@ -18,7 +18,7 @@ Class {
 	#instVars : [
 		'#files => FMMany type: #GLHFile opposite: #directoryOwner'
 	],
-	#category : 'GitLabHealth-Model-Entities'
+	#category : #'GitLabHealth-Model-Entities'
 }
 
 { #category : #meta }

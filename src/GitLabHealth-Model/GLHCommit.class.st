@@ -21,8 +21,8 @@ a commit attached to a repository
 | Relation | Origin | Opposite | Type | Comment |
 |---|
 | `childCommits` | `GLHCommit` | `parentCommits` | `GLHCommit` | |
-| `commitedMergeRequest` | `GLHCommit` | `mergedCommit` | `GLHMergeRequest` | |
 | `commitedMergeRequest` | `GLHCommit` | `mergeRequestCommit` | `GLHMergeRequest` | |
+| `commitedMergeRequest` | `GLHCommit` | `mergedCommit` | `GLHMergeRequest` | |
 | `parentCommits` | `GLHCommit` | `childCommits` | `GLHCommit` | |
 | `squashedMergeRequest` | `GLHCommit` | `squashCommit` | `GLHMergeRequest` | |
 
@@ -56,30 +56,30 @@ Class {
 	#traits : 'FamixTNamedEntity',
 	#classTraits : 'FamixTNamedEntity classTrait',
 	#instVars : [
-		'#additions => FMProperty',
-		'#author_email => FMProperty',
-		'#author_name => FMProperty',
-		'#authored_date => FMProperty',
-		'#branch => FMOne type: #GLHBranch opposite: #commits',
-		'#childCommits => FMMany type: #GLHCommit opposite: #parentCommits',
-		'#commitCreator => FMOne type: #GLHUser opposite: #commits',
-		'#commitedMergeRequest => FMOne type: #GLHMergeRequest opposite: #mergedCommit',
-		'#committed_date => FMProperty',
-		'#committer_email => FMProperty',
-		'#committer_name => FMProperty',
-		'#created_at => FMProperty',
-		'#deletions => FMProperty',
-		'#diffs => FMMany type: #GLHDiff opposite: #commit',
+		'#parent_ids => FMProperty defaultValue: \'OrderedCollection new\'',
 		'#id => FMProperty',
-		'#jobs => FMMany type: #GLHJob opposite: #commit',
-		'#message => FMProperty',
-		'#parentCommits => FMMany type: #GLHCommit opposite: #childCommits',
-		'#parent_ids => FMProperty defaultValue: ((OrderedCollection new))',
-		'#repository => FMOne type: #GLHRepository opposite: #commits',
 		'#short_id => FMProperty',
-		'#squashedMergeRequest => FMOne type: #GLHMergeRequest opposite: #squashCommit',
 		'#title => FMProperty',
-		'#web_url => FMProperty'
+		'#author_name => FMProperty',
+		'#author_email => FMProperty',
+		'#authored_date => FMProperty',
+		'#committer_name => FMProperty',
+		'#committer_email => FMProperty',
+		'#committed_date => FMProperty',
+		'#created_at => FMProperty',
+		'#message => FMProperty',
+		'#web_url => FMProperty',
+		'#additions => FMProperty',
+		'#deletions => FMProperty',
+		'#repository => FMOne type: #GLHRepository opposite: #commits',
+		'#branch => FMOne type: #GLHBranch opposite: #commits',
+		'#diffs => FMMany type: #GLHDiff opposite: #commit',
+		'#commitCreator => FMOne type: #GLHUser opposite: #commits',
+		'#parentCommits => FMMany type: #GLHCommit opposite: #childCommits',
+		'#childCommits => FMMany type: #GLHCommit opposite: #parentCommits',
+		'#jobs => FMMany type: #GLHJob opposite: #commit',
+		'#commitedMergeRequest => FMOne type: #GLHMergeRequest opposite: #mergedCommit',
+		'#squashedMergeRequest => FMOne type: #GLHMergeRequest opposite: #squashCommit'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }

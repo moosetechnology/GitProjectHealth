@@ -22,6 +22,7 @@ a gitlab merge request
 | `merge_user` | `GLHMergeRequest` | `usedMerges` | `GLHUser` | |
 | `mergedCommit` | `GLHMergeRequest` | `commitedMergeRequest` | `GLHCommit` | |
 | `merged_by` | `GLHMergeRequest` | `mergerOfMergeRequests` | `GLHUser` | |
+| `note` | `GLHMergeRequest` | `mergeRequest` | `GLHNote` | |
 | `pipeline` | `GLHMergeRequest` | `mergeResquest` | `GLHPipeline` | |
 | `reviewers` | `GLHMergeRequest` | `reviewedMergeResquest` | `GLHUser` | |
 | `squashCommit` | `GLHMergeRequest` | `squashedMergeRequest` | `GLHCommit` | |
@@ -144,6 +145,7 @@ Class {
 		'#latest_build_finished_at => FMProperty',
 		'#first_deployed_to_production_at => FMProperty',
 		'#approved => FMProperty',
+		'#commits => FMProperty',
 		'#author => FMOne type: #GLHUser opposite: #createdMergeRequests',
 		'#approved_by => FMMany type: #GLHUser opposite: #approcheMergeRequests',
 		'#merge_user => FMOne type: #GLHUser opposite: #usedMerges',
@@ -158,9 +160,9 @@ Class {
 		'#squashCommit => FMOne type: #GLHCommit opposite: #squashedMergeRequest',
 		'#diffs => FMMany type: #GLHDiff opposite: #mergeRequest',
 		'#project => FMOne type: #GLHProject opposite: #mergeRequests',
-		'#commits => FMProperty'
+		'#note => FMMany type: #GLHNote opposite: #mergeRequest'
 	],
-	#category : 'GitLabHealth-Model-Entities'
+	#category : #'GitLabHealth-Model-Entities'
 }
 
 { #category : #meta }
@@ -188,6 +190,12 @@ GLHMergeRequest >> addAssignee: anObject [
 GLHMergeRequest >> addDiff: anObject [
 	<generated>
 	^ self diffs add: anObject
+]
+
+{ #category : #adding }
+GLHMergeRequest >> addNote: anObject [
+	<generated>
+	^ self note add: anObject
 ]
 
 { #category : #adding }
@@ -686,11 +694,19 @@ GLHMergeRequest >> milestone: anObject [
 ]
 
 { #category : #accessing }
-GLHMergeRequest >> name [
+GLHMergeRequest >> note [
+	"Relation named: #note type: #GLHNote opposite: #mergeRequest"
 
-	<FMProperty: #name type: #String>
-	<FMComment: 'Basic name of the entity, not full reference.'>
-	^ title
+	<generated>
+	<derived>
+	^ note
+]
+
+{ #category : #accessing }
+GLHMergeRequest >> note: anObject [
+
+	<generated>
+	note value: anObject
 ]
 
 { #category : #accessing }

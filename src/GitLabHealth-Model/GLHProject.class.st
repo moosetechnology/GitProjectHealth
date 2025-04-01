@@ -46,22 +46,22 @@ Class {
 	#traits : 'FamixTNamedEntity',
 	#classTraits : 'FamixTNamedEntity classTrait',
 	#instVars : [
-		'#archived => FMProperty',
-		'#avatar_url => FMProperty',
-		'#contributors => FMMany type: #GLHUser opposite: #contributedProjects',
-		'#creator => FMOne type: #GLHUser opposite: #createdProjects',
-		'#creator_id => FMProperty',
-		'#description => FMProperty',
-		'#group => FMOne type: #GLHGroup opposite: #projects',
 		'#id => FMProperty',
-		'#mergeRequests => FMMany type: #GLHMergeRequest opposite: #project',
-		'#pipelines => FMMany type: #GLHPipeline opposite: #project',
-		'#readme_url => FMProperty',
-		'#repository => FMOne type: #GLHRepository opposite: #project',
 		'#topics => FMProperty',
-		'#web_url => FMProperty'
+		'#archived => FMProperty',
+		'#description => FMProperty',
+		'#readme_url => FMProperty',
+		'#avatar_url => FMProperty',
+		'#web_url => FMProperty',
+		'#creator_id => FMProperty',
+		'#group => FMOne type: #GLHGroup opposite: #projects',
+		'#pipelines => FMMany type: #GLHPipeline opposite: #project',
+		'#creator => FMOne type: #GLHUser opposite: #createdProjects',
+		'#contributors => FMMany type: #GLHUser opposite: #contributedProjects',
+		'#repository => FMOne type: #GLHRepository opposite: #project',
+		'#mergeRequests => FMMany type: #GLHMergeRequest opposite: #project'
 	],
-	#category : 'GitLabHealth-Model-Entities'
+	#category : #'GitLabHealth-Model-Entities'
 }
 
 { #category : #meta }

@@ -959,6 +959,25 @@ GitlabModelImporter >> importMergeResquestMerger: aGLPHEMergeRequest [
 	^aGLPHEMergeRequest merge_user: (self importUser: authorID)
 ]
 
+{ #category : #'import - notes' }
+GitlabModelImporter >> importNotesfromMergeRequest: mergeRequest [
+	| results notes |
+	
+	results := self repoApi notes allInMergeRequest: mergeRequest iid ofProject: mergeRequest project id.
+	
+	notes := results collect: [ :note | 
+		self parseNoteJson: note ].
+	"notes := self parseNoteJson: results."
+	notes do: [ :tabNotes | tabNotes do: [ :note |
+			note author: (self importUser: (note author at: #id)).
+			note name: note id asString]. ].
+	notes := notes flattened.
+	notes := self glhModel addAll: notes unless: self blockOnIdEquality. 
+	notes := mergeRequest note addAll: notes unless: self blockOnIdEquality. 
+	^notes
+	
+]
+
 { #category : #'import - commits' }
 GitlabModelImporter >> importParentCommitsOfCommit: aGLHCommit since: aDate [
 
@@ -1409,6 +1428,39 @@ GitlabModelImporter >> parseMergeRequestResult: result [
 ]
 
 { #category : #'private - parsing' }
+GitlabModelImporter >> parseNoteJson: results [  
+    | reader |  
+
+    "Créer un lecteur JSON"
+    reader := NeoJSONReader on: results readStream.    
+
+    "Définir le mapping pour l'objet GLHNote"
+    reader for: GLHNote do: [ :mapping |  
+        mapping mapInstVars: #(id noteable_id attachment system confidential internal  
+                               noteable_iid resolvable imported imported_from  
+                               author body project_id noteable_type).  
+
+        (mapping mapInstVar: #created_at) valueSchema: DateAndTime.  
+        (mapping mapInstVar: #updated_at) valueSchema: DateAndTime.  
+    ].    
+
+    "Corriger la conversion des dates"
+    reader for: DateAndTime customDo: [ :mapping |  
+        mapping decoder: [ :string | DateAndTime readFrom: string readStream ] ].
+
+	reader
+		for: #ArrayOfNote
+		customDo: [ :customMappting | 
+		customMappting listOfElementSchema: GLHNote ].
+	 ^ reader nextAs: #ArrayOfNote
+
+    "Retourner la Note"
+    "^ reader nextAs: GLHNote"
+
+
+]
+
+{ #category : #'private - parsing' }
 GitlabModelImporter >> parsePipelinesResult: result [
 
 	| reader |
@@ -1485,6 +1537,12 @@ GitlabModelImporter >> pipelinesOf: aProjectID [
 
 	^ (result collect: [ :pipelinesJson |
 			   self parsePipelinesResult: pipelinesJson ]) flattened
+]
+
+{ #category : #accessing }
+GitlabModelImporter >> repoApi: anObject [
+	super repoApi: anObject.
+	self repoApi output: 'json'
 ]
 
 { #category : #private }

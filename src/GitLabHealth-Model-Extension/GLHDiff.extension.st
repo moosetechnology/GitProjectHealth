@@ -4,5 +4,5 @@ Extension { #name : #GLHDiff }
 GLHDiff >> name [
 
 	<FMProperty: #name type: #String>
-	^ new_path contractTo: 100
+	^ new_path ifNotNil: [:string | string contractTo: 100]
 ]

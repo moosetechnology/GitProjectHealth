@@ -31,15 +31,15 @@ Class {
 	#traits : 'FamixTNamedEntity',
 	#classTraits : 'FamixTNamedEntity classTrait',
 	#instVars : [
-		'#allow_failure => FMProperty',
-		'#commit => FMOne type: #GLHCommit opposite: #jobs',
-		'#duration => FMProperty',
 		'#id => FMProperty',
+		'#allow_failure => FMProperty',
+		'#web_url => FMProperty',
+		'#duration => FMProperty',
+		'#commit => FMOne type: #GLHCommit opposite: #jobs',
 		'#pipeline => FMOne type: #GLHPipeline opposite: #jobs',
-		'#user => FMOne type: #GLHUser opposite: #jobs',
-		'#web_url => FMProperty'
+		'#user => FMOne type: #GLHUser opposite: #jobs'
 	],
-	#category : 'GitLabHealth-Model-Entities'
+	#category : #'GitLabHealth-Model-Entities'
 }
 
 { #category : #meta }
