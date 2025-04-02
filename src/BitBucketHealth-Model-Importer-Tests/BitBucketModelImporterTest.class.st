@@ -268,7 +268,9 @@ BitBucketModelImporterTest >> testImportCommitsOfProjectSinceUntil [
 
 	self assert: project repository commits size equals: 1.
 	firstCommit := project repository commits first.
-	self assert: firstCommit additions equals: 1
+	self assert: firstCommit additions equals: 1.
+	"ensure the a commit has a title at least base on its message"
+	self assert: firstCommit title equals: 'WIP on feature 1'
 ]
 
 { #category : #tests }

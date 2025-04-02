@@ -429,6 +429,7 @@ BitBucketModelImporter >> parseCommitIntoGLHCommit: commitDictionary ofProject: 
 	^ GLHCommit new
 		  id: (commitDictionary at: #id);
 		  message: (commitDictionary at: #message);
+		  title: (commitDictionary at: #message) lines first;
 		  author_email: (author at: #emailAddress);
 		  author_name: (author at: #name);
 		  authored_date: (DateAndTime fromUnixTime:
