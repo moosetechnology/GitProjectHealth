@@ -119,6 +119,50 @@ CodeAdditionDuringAndByMergeRequestProjectMetricTest >> testCalculateNoMergeRequ
 ]
 
 { #category : #'as yet unclassified' }
+CodeAdditionDuringAndByMergeRequestProjectMetricTest >> testCalculateWithMergeRequestCommit [
+
+	| result glhImporter codeAddition commit |
+	glhImporter := GLPHImporterMock new.
+	commit := GLHCommit new
+		                id: 4;
+		                additions: 42;
+		                deletions: 78.
+	glhImporter mergeRequests: { (GLHMergeRequest new
+			 project: project2;
+			 created_at: createdAt;
+			 merged_at: mergedAt;
+			 mergeRequestCommit: commit;
+			 state: #merged) }.
+
+	glhImporter commits: {
+			(GLHCommit new
+				 id: 1;
+				 additions: 7;
+				 deletions: 5).
+			(GLHCommit new
+				 id: 2;
+				 additions: 3;
+				 deletions: 5).
+			(GLHCommit new
+				 id: 3;
+				 additions: 3;
+				 deletions: 5) }.
+
+
+	codeAddition := CodeAdditionDuringAndByMergeRequestProjectMetric new
+		                project: project2;
+		                glhImporter: glhImporter;
+		                setPeriodSince: since until: until;
+		                over: Week.
+
+	"When"
+	result := codeAddition calculate.
+
+	"Then"
+	self assert: result equals: 13
+]
+
+{ #category : #'as yet unclassified' }
 CodeAdditionDuringAndByMergeRequestProjectMetricTest >> testCalculateWithSquashCommit [
 
 	| result glhImporter codeAddition squashCommit |

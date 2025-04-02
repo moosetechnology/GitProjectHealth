@@ -76,6 +76,50 @@ CodeDeletionByMergeRequestProjectMetricTest >> testCalculateMROpenOnly [
 ]
 
 { #category : #tests }
+CodeDeletionByMergeRequestProjectMetricTest >> testCalculateMergedWithMergeRequestCommit [
+
+	| result glhImporter codeDeletion commit |
+	glhImporter := GLPHImporterMock new.
+	commit := GLHCommit new
+		                id: 4;
+		                additions: 42;
+		                deletions: 78.
+	glhImporter mergeRequests: { (GLHMergeRequest new
+			 project: project2;
+			 created_at: createdAt;
+			 merged_at: mergedAt;
+			 mergeRequestCommit: commit;
+			 state: #merged) }.
+
+	glhImporter commits: {
+			(GLHCommit new
+				 id: 1;
+				 additions: 7;
+				 deletions: 5).
+			(GLHCommit new
+				 id: 2;
+				 additions: 3;
+				 deletions: 5).
+			(GLHCommit new
+				 id: 3;
+				 additions: 3;
+				 deletions: 5) }.
+
+
+	codeDeletion := CodeDeletionByMergeRequestProjectMetric new
+		                project: project2;
+		                glhImporter: glhImporter;
+		                setPeriodSince: since until: until;
+		                over: Week.
+
+	"When"
+	result := codeDeletion calculate.
+
+	"Then"
+	self assert: result equals: 78
+]
+
+{ #category : #tests }
 CodeDeletionByMergeRequestProjectMetricTest >> testCalculateNoCommits [
 
 	| result glhImporter codeDeletion |
