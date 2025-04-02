@@ -33,4 +33,16 @@ jobs:
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Generate a token
+        id: generate-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.AUTO_RENERAKU_APP_ID }}
+          private-key: ${{ secrets.AUTO_RENERAKU_PRIVATE_KEY }}
+      - name: AutoReneraku
+        uses: badetitou/AutoReneraku@v1.0.8
+        if: matrix.smalltalk == 'Moose64-12'
+        with:
+          pat:  ${{ steps.generate-token.outputs.token }}
 
