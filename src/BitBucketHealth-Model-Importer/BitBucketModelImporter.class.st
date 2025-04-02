@@ -301,7 +301,7 @@ BitBucketModelImporter >> importGroup: aGroupID [
 		ifFound: [ :group | ^ group ].
 	"group are named projects in bitbucket"
 	result := self repoApi projects get: aGroupID.
-	projectResult := self parseProjectResult: result.
+	projectResult := self parseGroupResult: result.
 
 	^ self glhModel add: projectResult unless: self blockOnIdEquality
 ]
@@ -381,6 +381,17 @@ BitBucketModelImporter >> importProject: aProjectID [
 		'Bitbucket api cannot import directly a project (in the sens of GPH). One need to import a group, then the projects of this group.'
 ]
 
+{ #category : #'import - projects' }
+BitBucketModelImporter >> importProject: aProjectID ofGroup: aGroup [
+
+	| repoOfProject project |
+	repoOfProject := self repoApi repositories
+		                 repo: aProjectID
+		                 ofProject: aGroup id.
+	project := self parseRepoIntoGLHProject: repoOfProject.
+	^ project
+]
+
 { #category : #'import - users' }
 BitBucketModelImporter >> importUserByUsername: username [
 
@@ -434,16 +445,7 @@ BitBucketModelImporter >> parseCommitIntoGLHCommit: commitDictionary ofProject: 
 ]
 
 { #category : #parsing }
-BitBucketModelImporter >> parseProjectIntoGLHGroup: projectRepository [
-
-	^ GLHGroup new
-		  name: (projectRepository at: #name);
-		  id: (projectRepository at: #key);
-		  description: (projectRepository at: #description)
-]
-
-{ #category : #parsing }
-BitBucketModelImporter >> parseProjectResult: aDictionary [
+BitBucketModelImporter >> parseGroupResult: aDictionary [
 
 	^ GLHGroup new
 		  id: (aDictionary at: #key);
@@ -452,6 +454,15 @@ BitBucketModelImporter >> parseProjectResult: aDictionary [
 		  name: (aDictionary at: #name);
 		  web_url: ((aDictionary at: #links at: #self) anyOne at: #href);
 		  yourself
+]
+
+{ #category : #parsing }
+BitBucketModelImporter >> parseProjectIntoGLHGroup: projectRepository [
+
+	^ GLHGroup new
+		  name: (projectRepository at: #name);
+		  id: (projectRepository at: #key);
+		  description: (projectRepository at: #description)
 ]
 
 { #category : #parsing }
