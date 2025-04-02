@@ -367,6 +367,28 @@ BitBucketModelImporterTest >> testImportCreatorOfCommitIfAlreadyExist [
 ]
 
 { #category : #tests }
+BitBucketModelImporterTest >> testImportGroup [
+
+	| bitBucketApi glphModel bitBucketImporter group |
+	bitBucketApi := BitBucketApiMock new.
+
+	glphModel := GLHModel new name: 'test'.
+
+	bitBucketImporter := BitBucketModelImporter new
+		                     repoApi: bitBucketApi;
+		                     glhModel: glphModel.
+
+	"When"
+	group := bitBucketImporter importGroup: 'cs'.
+
+	"Then"
+	self assert: (glphModel allWithType: GLHGroup) size equals: 1.
+	self
+		assertCollection: (glphModel allWithType: GLHGroup)
+		hasSameElements: { group }
+]
+
+{ #category : #tests }
 BitBucketModelImporterTest >> testImportMergeRequestCommits [
 
 	| bitBucketApi glphModel bitBucketImporter mergeRequest commits |
@@ -538,28 +560,6 @@ BitBucketModelImporterTest >> testImportMergeResquestMerger [
 	"Then"
 	self deny: mergeRequest merge_user equals: nil.
 	self assert: mergeRequest merge_user equals: mergeUser
-]
-
-{ #category : #tests }
-BitBucketModelImporterTest >> testImportProject [
-
-	| bitBucketApi glphModel bitBucketImporter project |
-	bitBucketApi := BitBucketApiMock new.
-
-	glphModel := GLHModel new name: 'test'.
-
-	bitBucketImporter := BitBucketModelImporter new
-		                     repoApi: bitBucketApi;
-		                     glhModel: glphModel.
-
-	"When"
-	project := bitBucketImporter importProject: 'carlsource'.
-
-	"Then"
-	self assert: (glphModel allWithType: GLHProject) size equals: 1.
-	self
-		assertCollection: (glphModel allWithType: GLHProject)
-		hasSameElements: { project }
 ]
 
 { #category : #tests }

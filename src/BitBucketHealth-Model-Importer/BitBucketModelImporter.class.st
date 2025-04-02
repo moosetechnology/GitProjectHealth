@@ -290,6 +290,22 @@ BitBucketModelImporter >> importDiffOfCommit: aCommit [
 	^ diffsResult
 ]
 
+{ #category : #'import - groups' }
+BitBucketModelImporter >> importGroup: aGroupID [
+
+	| result projectResult |
+	('Import group with id:  ' , aGroupID printString) recordInfo.
+
+	(glhModel allWithType: GLHGroup)
+		detect: [ :group | group id = aGroupID ]
+		ifFound: [ :group | ^ group ].
+	"group are named projects in bitbucket"
+	result := self repoApi projects get: aGroupID.
+	projectResult := self parseProjectResult: result.
+
+	^ self glhModel add: projectResult unless: self blockOnIdEquality
+]
+
 { #category : #'import - merge-requests' }
 BitBucketModelImporter >> importMergeRequestCommits: mergeRequest [
 
@@ -361,19 +377,8 @@ BitBucketModelImporter >> importMergeResquestMerger: mergeRequest [
 { #category : #'import - projects' }
 BitBucketModelImporter >> importProject: aProjectID [
 
-	| result projectResult |
-	('Import project with id:  ' , aProjectID printString) recordInfo.
-
-	(glhModel allWithType: GLHProject)
-		detect: [ :project | project id = aProjectID ]
-		ifFound: [ :project | ^ project ].
-
-	result := self repoApi projects get: aProjectID.
-	projectResult := self parseProjectResult: result.
-
-	self glhModel add: projectResult unless: self blockOnIdEquality.
-
-	^ self completeImportProject: projectResult
+	Error signal:
+		'Bitbucket api cannot import directly a project (in the sens of GPH). One need to import a group, then the projects of this group.'
 ]
 
 { #category : #'import - users' }
@@ -440,11 +445,12 @@ BitBucketModelImporter >> parseProjectIntoGLHGroup: projectRepository [
 { #category : #parsing }
 BitBucketModelImporter >> parseProjectResult: aDictionary [
 
-	^ GLHProject new
+	^ GLHGroup new
 		  id: (aDictionary at: #key);
 		  "use key instead of id because key is use everywhere else for API"
 		  description: (aDictionary at: #description);
 		  name: (aDictionary at: #name);
+		  web_url: ((aDictionary at: #links at: #self) anyOne at: #href);
 		  yourself
 ]
 
