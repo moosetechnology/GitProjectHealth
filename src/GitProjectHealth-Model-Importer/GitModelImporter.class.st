@@ -164,6 +164,12 @@ GitModelImporter >> importGroup: aGroupID [
 	self subclassResponsibility
 ]
 
+{ #category : #'import - notes' }
+GitModelImporter >> importNotesfromMergeRequest: mergeRequest [
+
+	self subclassResponsibility
+]
+
 { #category : #'import - projects' }
 GitModelImporter >> importProject: id [
 	"id can be a string or an integer depending on the APi implementation"

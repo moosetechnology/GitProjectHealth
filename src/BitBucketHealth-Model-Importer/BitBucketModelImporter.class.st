@@ -118,6 +118,18 @@ BitBucketModelImporter >> convertBitBucketDiffToGitDiff: response [
 	^ result
 ]
 
+{ #category : #'as yet unclassified' }
+BitBucketModelImporter >> extractNoteFromComment: aDictionary [
+
+	^ GLHNote new
+		  created_at:
+			  (DateAndTime fromUnixTime: (aDictionary at: #createdDate) / 1000);
+		  id: (aDictionary at: #id);
+		  author: (aDictionary at: #user);
+		  body: (aDictionary at: #comment at: #text);
+		  yourself
+]
+
 { #category : #'private - api' }
 BitBucketModelImporter >> getContributionFromDiffs: diffs [
 
@@ -372,6 +384,30 @@ BitBucketModelImporter >> importMergeResquestMerger: mergeRequest [
 
 	mergeRequest merge_user: mergeUser.
 	^ mergeUser
+]
+
+{ #category : #'import - notes' }
+BitBucketModelImporter >> importNotesfromMergeRequest: mergeRequest [
+
+	| results notes |
+	results := self repoApi pullRequests
+		           activitiesInPullRequest: mergeRequest id
+		           inRepository: mergeRequest project id
+		           ofProject: mergeRequest project group id.
+	notes := results
+		         select: [ :activity | (activity at: #action) = 'COMMENTED' ]
+		         thenCollect: [ :commentActivity |
+		         self extractNoteFromComment: commentActivity ].
+	"notes := self parseNoteJson: results."
+	notes do: [ :note |
+			note author: (self importUserByUsername: (note author at: #displayName)).
+			note name: note id asString ].
+	notes := notes flattened.
+	notes := self glhModel addAll: notes unless: self blockOnIdEquality.
+	notes := mergeRequest note
+		         addAll: notes
+		         unless: self blockOnIdEquality.
+	^ notes
 ]
 
 { #category : #'import - projects' }
