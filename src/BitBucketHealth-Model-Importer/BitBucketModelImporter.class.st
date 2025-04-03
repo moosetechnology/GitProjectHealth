@@ -391,7 +391,7 @@ BitBucketModelImporter >> importNotesfromMergeRequest: mergeRequest [
 
 	| results notes |
 	results := self repoApi pullRequests
-		           activitiesInPullRequest: mergeRequest id
+		           activitiesOf: mergeRequest id
 		           inRepository: mergeRequest project id
 		           ofProject: mergeRequest project group id.
 	notes := results
@@ -400,8 +400,9 @@ BitBucketModelImporter >> importNotesfromMergeRequest: mergeRequest [
 		         self extractNoteFromComment: commentActivity ].
 	"notes := self parseNoteJson: results."
 	notes do: [ :note |
-			note author: (self importUserByUsername: (note author at: #displayName)).
-			note name: note id asString ].
+		note author:
+			(self importUserByUsername: (note author at: #displayName)).
+		note name: note id asString ].
 	notes := notes flattened.
 	notes := self glhModel addAll: notes unless: self blockOnIdEquality.
 	notes := mergeRequest note
@@ -422,7 +423,7 @@ BitBucketModelImporter >> importProject: aProjectID ofGroup: aGroup [
 
 	| repoOfProject project |
 	repoOfProject := self repoApi repositories
-		                 repo: aProjectID
+		                 get: aProjectID
 		                 ofProject: aGroup id.
 	project := self parseRepoIntoGLHProject: repoOfProject.
 	^ project
