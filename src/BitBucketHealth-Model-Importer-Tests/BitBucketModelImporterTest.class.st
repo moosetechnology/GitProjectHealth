@@ -268,7 +268,9 @@ BitBucketModelImporterTest >> testImportCommitsOfProjectSinceUntil [
 
 	self assert: project repository commits size equals: 1.
 	firstCommit := project repository commits first.
-	self assert: firstCommit additions equals: 1
+	self assert: firstCommit additions equals: 1.
+	"ensure the a commit has a title at least base on its message"
+	self assert: firstCommit title equals: 'WIP on feature 1'
 ]
 
 { #category : #tests }
@@ -364,6 +366,28 @@ BitBucketModelImporterTest >> testImportCreatorOfCommitIfAlreadyExist [
 		equals:
 		(bitBucketImporter parseUserIntoGLHUser: bitBucketApi userMock) id.
 	self assert: commit commitCreator equals: creator
+]
+
+{ #category : #tests }
+BitBucketModelImporterTest >> testImportGroup [
+
+	| bitBucketApi glphModel bitBucketImporter group |
+	bitBucketApi := BitBucketApiMock new.
+
+	glphModel := GLHModel new name: 'test'.
+
+	bitBucketImporter := BitBucketModelImporter new
+		                     repoApi: bitBucketApi;
+		                     glhModel: glphModel.
+
+	"When"
+	group := bitBucketImporter importGroup: 'cs'.
+
+	"Then"
+	self assert: (glphModel allWithType: GLHGroup) size equals: 1.
+	self
+		assertCollection: (glphModel allWithType: GLHGroup)
+		hasSameElements: { group }
 ]
 
 { #category : #tests }
