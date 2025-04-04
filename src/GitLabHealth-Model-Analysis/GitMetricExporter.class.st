@@ -144,6 +144,13 @@ GitMetricExporter >> csvMetricsFor: metricCollection at: date [
 ]
 
 { #category : #accessing }
+GitMetricExporter >> entities [
+	"You should use `setupAnalysisForProjectsWithIds:` and `setupAnalysisForUsersWithNames:` to fill entities and not directly the instance"
+
+	^ entities
+]
+
+{ #category : #accessing }
 GitMetricExporter >> entities: aCollection [ 
 	entities := aCollection
 ]
