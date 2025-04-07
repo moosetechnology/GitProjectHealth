@@ -10,7 +10,7 @@ Class {
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
-{ #category : #tests }
+{ #category : #running }
 GitMetricExporterTest >> setUp [
 
 	| period |
@@ -35,7 +35,7 @@ GitMetricExporterTest >> setUp [
 				 yourself) }
 ]
 
-{ #category : #tests }
+{ #category : #running }
 GitMetricExporterTest >> tearDown [
 	GitMetricExporter recoverFromGHMutation.
 	super tearDown.
