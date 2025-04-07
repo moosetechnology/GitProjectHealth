@@ -237,7 +237,7 @@ GitMetricExporter >> exportProjectAnalysesInCSV [
 		groupOver := groupAssociation key.
 
 
-		groupByName := group groupedBy: #projectName.
+		groupByName := group groupedBy: #projectID.
 		exportBrowserModel entitiesList: groupByName.
 
 		exportBrowserModel removeColumnForQueryNamed: #Type.
