@@ -111,6 +111,18 @@ GitMetricExporter >> addEntitiesFromUserNamesAndProjects: usersWithProjects [
 	^ self 
 ]
 
+{ #category : #accessing }
+GitMetricExporter >> analyses [
+
+	^ analyses
+]
+
+{ #category : #accessing }
+GitMetricExporter >> analyses: anObject [
+
+	^ analyses := anObject
+]
+
 { #category : #utilities }
 GitMetricExporter >> constructFilePathFor: runningOver andEntities: entitiesName [
 
@@ -264,7 +276,6 @@ GitMetricExporter >> exportProjectAnalysesInCSV [
 				exportBrowserModel
 					addColumnForQuery: association value
 					withName: association key ] ].
-
 		file := self constructFilePathFor: groupOver andEntities: 'projects'.
 		file writeStreamDo: [ :aStream |
 			exportBrowserModel writeCSVOn: aStream ] ]
