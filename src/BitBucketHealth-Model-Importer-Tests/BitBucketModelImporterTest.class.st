@@ -43,7 +43,7 @@ BitBucketModelImporterTest >> testConvertBitBucketDiffToGitDiff [
 	glhModel := GLHModel new name: 'test'.
 	
 	bitBucketImporter := BitBucketModelImporter new
-		                     bitBucketApi: bitBucketApi;
+		                     repoApi: bitBucketApi;
 		                     glhModel: glhModel.
 	
 	diffs := bitBucketApi diffs.
@@ -74,7 +74,7 @@ BitBucketModelImporterTest >> testConvertBitBucketDiffToGitDiffNoHunks [
 	glhModel := GLHModel new name: 'test'.
 	
 	bitBucketImporter := BitBucketModelImporter new
-		                     bitBucketApi: bitBucketApi;
+		                     repoApi: bitBucketApi;
 		                     glhModel: glhModel.
 	
 	diffs := bitBucketApi diffsNohunks.
