@@ -456,6 +456,43 @@ BitBucketModelImporterTest >> testImportMergeRequestsSinceUntil [
 ]
 
 { #category : #tests }
+BitBucketModelImporterTest >> testImportMergeRequestsSinceUntilAttachedToGoodProject [
+
+	| bitBucketApi glphModel bitBucketImporter group repo project mergeRequests |
+	"Given"
+	bitBucketApi := BitBucketApiMock new.
+
+	glphModel := GLHModel new name: 'test'.
+
+	bitBucketImporter := BitBucketModelImporter new
+		                     repoApi: bitBucketApi;
+		                     glhModel: glphModel.
+
+	group := GLHGroup new id: 1.
+	repo := GLHRepository new.
+	project := GLHProject new
+		           group: group;
+		           id: 'repo-slug';
+		           repository: repo.
+	glphModel add: project.
+
+	"When"
+	mergeRequests := bitBucketImporter
+		                 importMergeRequests: project
+		                 since: '09-23-2024'
+		                 until: '09-25-2024'.
+
+	"Then"
+	self
+		assert:
+		(bitBucketImporter glhModel allWithType: GLHMergeRequest) size
+		equals: 1.
+
+	self assert: project mergeRequests size equals: 1.
+
+]
+
+{ #category : #tests }
 BitBucketModelImporterTest >> testImportMergeRequestsSinceUntilClosedMR [
 
 	| bitBucketApi glphModel bitBucketImporter group repo project mergeRequests mergeRequest |
