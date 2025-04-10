@@ -426,6 +426,7 @@ BitBucketModelImporter >> importProject: aProjectID ofGroup: aGroup [
 		                 get: aProjectID
 		                 ofProject: aGroup id.
 	project := self parseRepoIntoGLHProject: repoOfProject.
+	self glhModel add: project.
 	^ project
 ]
 
