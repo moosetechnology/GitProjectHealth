@@ -526,7 +526,7 @@ BitBucketModelImporter >> parsePullRequestIntoGLPHEMergeRequest: pullRequestDict
 	repository := toRef at: #repository.
 	project := (self glhModel allWithType: GLHProject)
 		           detect: [ :glhProject |
-		           glhProject id = (repository at: #id) ]
+		           glhProject id = (repository at: #slug) ]
 		           ifFound: [ :glhProject | glhProject ]
 		           ifNone: [
 			           project := self parseRepoIntoGLHProject: repository.
