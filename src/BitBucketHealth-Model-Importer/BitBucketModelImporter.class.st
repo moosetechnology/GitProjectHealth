@@ -659,7 +659,7 @@ BitBucketModelImporter >> parseUserIntoGLHUser: userDictionnary [
 
 	^ GLHUser new
 		  name: (userDictionnary at: #displayName);
-		  public_email: (userDictionnary at: #emailAddress);
+		  public_email: (userDictionnary at: #emailAddress ifAbsent: [ nil ]);
 		  id: (userDictionnary at: #id);
 		  username: (userDictionnary at: #name)
 ]
