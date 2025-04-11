@@ -554,7 +554,7 @@ BitBucketModelImporter >> parsePullRequestIntoGLPHEMergeRequest: pullRequestDict
 		                     target_project_id:
 			                     ((toRef at: #repository) at: #id);
 		                     source_branch: (fromRef at: #id);
-		                     target_project_id:
+		                     source_project_id:
 			                     ((fromRef at: #repository) at: #id);
 		                     updated_at: (DateAndTime fromUnixTime:
 					                      (pullRequestDictionary at: #updatedDate)
