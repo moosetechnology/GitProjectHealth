@@ -334,6 +334,34 @@ BitBucketModelImporter >> importMergeRequestCommits: mergeRequest [
 	^ commits
 ]
 
+{ #category : #'import - merge request' }
+BitBucketModelImporter >> importMergeRequestMergeCommits: aGLHMergeRequest [
+
+	aGLHMergeRequest mergedCommit ifNotNil: [
+		^ { aGLHMergeRequest mergedCommit } ].
+
+	aGLHMergeRequest project repository commits
+		detect: [ :c |
+		c parent_ids includes: aGLHMergeRequest commits last id ]
+		ifFound: [ :found |
+			aGLHMergeRequest mergedCommit: found.
+			aGLHMergeRequest merge_commit_sha: found id.
+			^ { found } ].
+
+	self
+		importCommitsOfProject: aGLHMergeRequest project
+		since: aGLHMergeRequest created_at
+		until: aGLHMergeRequest merged_at.
+	self chainsCommitsFrom: aGLHMergeRequest project repository commits.
+	aGLHMergeRequest project repository commits
+		detect: [ :c |
+		c parent_ids includes: aGLHMergeRequest commits last id ]
+		ifFound: [ :found |
+			aGLHMergeRequest mergedCommit: found.
+			aGLHMergeRequest merge_commit_sha: found id.
+			^ { found } ]
+]
+
 { #category : #'import - merge-requests' }
 BitBucketModelImporter >> importMergeRequests: aGLHProject since: fromDate until: toDate [
 

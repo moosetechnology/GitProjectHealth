@@ -40,6 +40,19 @@ CodeDeletionByMergeRequestProjectMetric >> description [
 CodeDeletionByMergeRequestProjectMetric >> load [
 
 	projectMergeRequests := self
-		                  loadProjectCompleteMergeRequestsSince: (period at: #since)
-		                  until: (period at: #until)
+		                        loadProjectCompleteMergeRequestsSince:
+		                        (period at: #since)
+		                        until: (period at: #until).
+
+	projectMergeRequests := projectMergeRequests select: [ :mr |
+		                        mr state = #merged ].
+
+	projectMergeRequests do: [ :mr |
+		glhImporter importMergeRequestMergeCommits: mr ].
+
+	self flag:
+		'Should not happens, but sometimes with branch renaming of bitbucket it happens'.
+	projectMergeRequests := projectMergeRequests select: [ :mr |
+		                        mr mergedCommit isNotNil or: [
+			                        mr squashCommit isNotNil ] ]
 ]
