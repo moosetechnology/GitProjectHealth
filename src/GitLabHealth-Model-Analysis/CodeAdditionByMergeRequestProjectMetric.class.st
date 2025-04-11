@@ -24,7 +24,8 @@ CodeAdditionByMergeRequestProjectMetric >> calculate [
 		                 group ifEmpty: [ 0 ] ifNotEmpty: [
 			                 (group collect: [ :mergeRequest |
 				                  (mergeRequest mergedCommit ifNil: [
-					                   mergeRequest squashCommit ]) additions ])
+					                   mergeRequest mergeRequestCommit ifNil: [
+						                   mergeRequest squashCommit ] ]) additions ])
 				                 average ] ].
 
 	^ groupedByDate average asFloat
