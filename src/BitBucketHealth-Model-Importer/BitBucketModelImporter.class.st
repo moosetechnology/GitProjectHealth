@@ -187,6 +187,25 @@ BitBucketModelImporter >> importAndLoadLatestsCommitsOfProject: aGLHProject [
 ]
 
 { #category : #'import - commits' }
+BitBucketModelImporter >> importCommit: aCommitID ofProject: aGLHProject [
+
+	| result parsedResult |
+	(self glhModel allWithType: GLHCommit) asOrderedCollection
+		detect: [ :commit | commit id = aCommitID ]
+		ifFound: [ :commit | ^ commit ].
+	result := self repoApi commits
+		          get: aCommitID
+		          inRepository: aGLHProject id
+		          ofProject: aGLHProject group id.
+	parsedResult := self
+		                parseCommitIntoGLHCommit: result
+		                ofProject: aGLHProject.
+
+	self glhModel addAll: { parsedResult } unless: self blockOnIdEquality.
+	^ parsedResult
+]
+
+{ #category : #'import - commits' }
 BitBucketModelImporter >> importCommitsOfProject: aGLHProject since: since until: until [
 
 	| commits |
@@ -334,6 +353,34 @@ BitBucketModelImporter >> importMergeRequestCommits: mergeRequest [
 	^ commits
 ]
 
+{ #category : #'import - merge request' }
+BitBucketModelImporter >> importMergeRequestMergeCommits: aGLHMergeRequest [
+
+	aGLHMergeRequest mergedCommit ifNotNil: [
+		^ { aGLHMergeRequest mergedCommit } ].
+
+	aGLHMergeRequest project repository commits
+		detect: [ :c |
+		c parent_ids includes: aGLHMergeRequest commits last id ]
+		ifFound: [ :found |
+			aGLHMergeRequest mergedCommit: found.
+			aGLHMergeRequest merge_commit_sha: found id.
+			^ { found } ].
+
+	self
+		importCommitsOfProject: aGLHMergeRequest project
+		since: aGLHMergeRequest created_at
+		until: aGLHMergeRequest merged_at.
+	self chainsCommitsFrom: aGLHMergeRequest project repository commits.
+	aGLHMergeRequest project repository commits
+		detect: [ :c |
+		c parent_ids includes: aGLHMergeRequest commits last id ]
+		ifFound: [ :found |
+			aGLHMergeRequest mergedCommit: found.
+			aGLHMergeRequest merge_commit_sha: found id.
+			^ { found } ]
+]
+
 { #category : #'import - merge-requests' }
 BitBucketModelImporter >> importMergeRequests: aGLHProject since: fromDate until: toDate [
 
@@ -426,6 +473,7 @@ BitBucketModelImporter >> importProject: aProjectID ofGroup: aGroup [
 		                 get: aProjectID
 		                 ofProject: aGroup id.
 	project := self parseRepoIntoGLHProject: repoOfProject.
+	self glhModel add: project.
 	^ project
 ]
 
@@ -553,7 +601,7 @@ BitBucketModelImporter >> parsePullRequestIntoGLPHEMergeRequest: pullRequestDict
 		                     target_project_id:
 			                     ((toRef at: #repository) at: #id);
 		                     source_branch: (fromRef at: #id);
-		                     target_project_id:
+		                     source_project_id:
 			                     ((fromRef at: #repository) at: #id);
 		                     updated_at: (DateAndTime fromUnixTime:
 					                      (pullRequestDictionary at: #updatedDate)
