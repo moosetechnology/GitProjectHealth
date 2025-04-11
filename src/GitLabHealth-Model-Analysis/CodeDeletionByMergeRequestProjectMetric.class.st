@@ -55,5 +55,6 @@ CodeDeletionByMergeRequestProjectMetric >> load [
 		'Should not happens, but sometimes with branch renaming of bitbucket it happens'.
 	projectMergeRequests := projectMergeRequests select: [ :mr |
 		                        mr mergedCommit isNotNil or: [
-			                        mr squashCommit isNotNil ] ]
+			                        mr squashCommit isNotNil or: [
+				                        mr mergeRequestCommit isNotNil ] ] ]
 ]
