@@ -187,6 +187,25 @@ BitBucketModelImporter >> importAndLoadLatestsCommitsOfProject: aGLHProject [
 ]
 
 { #category : #'import - commits' }
+BitBucketModelImporter >> importCommit: aCommitID ofProject: aGLHProject [
+
+	| result parsedResult |
+	(self glhModel allWithType: GLHCommit) asOrderedCollection
+		detect: [ :commit | commit id = aCommitID ]
+		ifFound: [ :commit | ^ commit ].
+	result := self repoApi commits
+		          get: aCommitID
+		          inRepository: aGLHProject id
+		          ofProject: aGLHProject group id.
+	parsedResult := self
+		                parseCommitIntoGLHCommit: result
+		                ofProject: aGLHProject.
+
+	self glhModel addAll: { parsedResult } unless: self blockOnIdEquality.
+	^ parsedResult
+]
+
+{ #category : #'import - commits' }
 BitBucketModelImporter >> importCommitsOfProject: aGLHProject since: since until: until [
 
 	| commits |
