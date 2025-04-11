@@ -27,7 +27,7 @@ CreatedNotesByACRByProjectMetric >> calculate [
 
     " filter note over ACR bot Id"
     groupedByDate := groupedByDate collect: [ :notesGroup |  
-        (notesGroup select: [ :note | note author id = self class acrBotId ]) size.  
+        (notesGroup select: [ :note | note author isNotNil and: [ note author id = self class acrBotId ] ]) size.  
     ].  
 
     "Retourner le total des notes filtrées"
