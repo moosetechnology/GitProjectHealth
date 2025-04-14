@@ -341,7 +341,10 @@ BitBucketModelImporter >> importGroup: aGroupID [
 BitBucketModelImporter >> importMergeRequestCommits: mergeRequest [
 
 	| commits |
-	commits := self repoApi pullRequests commitsOf: mergeRequest id inRepository: mergeRequest project id ofProject: mergeRequest project group id.
+	commits := self repoApi pullRequests
+		           commitsOf: mergeRequest id
+		           inRepository: mergeRequest project id
+		           ofProject: mergeRequest project group id.
 
 	commits := commits collect: [ :commit |
 		           self
@@ -358,13 +361,13 @@ BitBucketModelImporter >> importMergeRequestMergeCommits: aGLHMergeRequest [
 
 	aGLHMergeRequest mergedCommit ifNotNil: [
 		^ { aGLHMergeRequest mergedCommit } ].
-
 	aGLHMergeRequest project repository commits
 		detect: [ :c |
 		c parent_ids includes: aGLHMergeRequest commits last id ]
 		ifFound: [ :found |
 			aGLHMergeRequest mergedCommit: found.
 			aGLHMergeRequest merge_commit_sha: found id.
+			self importMergeRequestStats: aGLHMergeRequest.
 			^ { found } ].
 
 	self
@@ -378,7 +381,30 @@ BitBucketModelImporter >> importMergeRequestMergeCommits: aGLHMergeRequest [
 		ifFound: [ :found |
 			aGLHMergeRequest mergedCommit: found.
 			aGLHMergeRequest merge_commit_sha: found id.
+			self importMergeRequestStats: aGLHMergeRequest.
 			^ { found } ]
+]
+
+{ #category : #'import - merge request' }
+BitBucketModelImporter >> importMergeRequestStats: aMergeRequest [
+
+	| commitDiffs contribution |
+	"can not recompute diff of mergedcommit if none"
+	aMergeRequest mergedCommit ifNil: [ ^ self ].
+	(aMergeRequest mergedCommit additions isNotNil and: [
+		 aMergeRequest mergedCommit deletions isNotNil ]) ifTrue: [ ^ self ].
+
+	commitDiffs := self repoApi pullRequests
+		               diffOf: aMergeRequest id
+		               inRepository: aMergeRequest project id
+		               ofProject: aMergeRequest project group id.
+
+	contribution := self getContributionFromDiffs:
+		                (commitDiffs at: #diffs).
+
+	^ aMergeRequest mergedCommit
+		  additions: (contribution at: #additions);
+		  deletions: (contribution at: #deletions)
 ]
 
 { #category : #'import - merge-requests' }
