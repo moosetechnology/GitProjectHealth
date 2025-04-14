@@ -392,7 +392,10 @@ BitBucketModelImporter >> importMergeRequestStats: aMergeRequest [
 	"can not recompute diff of mergedcommit if none"
 	aMergeRequest mergedCommit ifNil: [ ^ self ].
 	(aMergeRequest mergedCommit additions isNotNil and: [
-		 aMergeRequest mergedCommit deletions isNotNil ]) ifTrue: [ ^ self ].
+		 aMergeRequest mergedCommit deletions isNotNil and: [
+			 aMergeRequest mergedCommit additions ~= 0 or: [
+				 aMergeRequest mergedCommit deletions ~= 0 ] ] ]) ifTrue: [
+		^ self ].
 
 	commitDiffs := self repoApi pullRequests
 		               diffOf: aMergeRequest id
