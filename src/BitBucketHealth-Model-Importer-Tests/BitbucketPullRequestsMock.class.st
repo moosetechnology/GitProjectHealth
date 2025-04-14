@@ -21,3 +21,9 @@ BitbucketPullRequestsMock >> commitsOf: pullRequestId inRepository: repositorySl
 
 		^ commitsMock
 ]
+
+{ #category : #'api - get' }
+BitbucketPullRequestsMock >> diffOf: commitId inRepository: repositorySlug ofProject: projectKey [
+
+		^ diffs
+]
