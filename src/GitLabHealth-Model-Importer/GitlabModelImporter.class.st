@@ -345,22 +345,6 @@ GitlabModelImporter >> importAndLoadLatestsCommitsOfProject: aGLHProject [
 	^ commits
 ]
 
-{ #category : #'import-gitblame' }
-GitlabModelImporter >> importBlame: aGLHFile [ 
-	| results  params   jsonObject  result |
-			params := { 
-		    #ref ->   aGLHFile branch name  .
-	       } asDictionary.
-	           results := self repoApi blames getBlameFile: aGLHFile path ofProject: aGLHFile branch repository project id withParams: params      .
-              jsonObject := NeoJSONReader fromString: results .
-              result:= (jsonObject isArray ifTrue: [jsonObject ] ifFalse: [nil]).
-"              result:= result reject: [:item | item isNil]."
-   ^result 
-	
-
-	
-]
-
 { #category : #'import - repositories' }
 GitlabModelImporter >> importBranches: aGLHProject [ 
 	"Fetches all branches of the given project"
@@ -738,11 +722,9 @@ GitlabModelImporter >> importFilesOfBranch: aBranch [
 		          ofBranch: aBranch name
 		          andPath: nil."
 	apiFiles := (result collect: [ :filesJson | self parseFileTreeResult: filesJson  ]) flattened.
-	files := apiFiles collect: [ :apiFile | 
-		         self convertApiFileAsFile: apiFile ].
-	files do: [ :file | 
-		self glhModel add: file.
-		aBranch addFile: file ].
+	files := apiFiles collect: [ :apiFile |  self convertApiFileAsFile: apiFile ].
+   files := self glhModel addAll: files unless: [:f1 :f2 | f1 branch = f2 branch and: [f1 path = f2 path]].
+   files := aBranch addAll: files unless: [:f1 :f2 | f1 branch = f2 branch and: [f1 path = f2 path]].
 	files
 		select: [ :file | file isKindOf: GLHFileDirectory ]
 		thenCollect: [ :file | 
