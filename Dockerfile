@@ -25,5 +25,5 @@ RUN rm -rf ${IMAGE_NAME}/vm
 # EXPOSE 8080
 
 # Set the command to run your Smalltalk application
-CMD ["/root/smalltalkCI-master/_cache/vms/Moose64-11/pharo", "--headless", "PharoServer/PharoServer.image", "st", "./launchAnalyze.st"]
+CMD ["/root/smalltalkCI-master/_cache/vms/Moose64-11/pharo", "--headless", "PharoServer/PharoServer.image", "st", "./docs/launchAnalyze.st"]
 # the output csv files will be under /root/*.csv

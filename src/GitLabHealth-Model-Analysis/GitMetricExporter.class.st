@@ -111,6 +111,18 @@ GitMetricExporter >> addEntitiesFromUserNamesAndProjects: usersWithProjects [
 	^ self 
 ]
 
+{ #category : #accessing }
+GitMetricExporter >> analyses [
+
+	^ analyses
+]
+
+{ #category : #accessing }
+GitMetricExporter >> analyses: anObject [
+
+	^ analyses := anObject
+]
+
 { #category : #utilities }
 GitMetricExporter >> constructFilePathFor: runningOver andEntities: entitiesName [
 
@@ -141,6 +153,13 @@ GitMetricExporter >> csvMetricsFor: metricCollection at: date [
 				              ifNotNil: [ analysis metrics at: metric new name ] ] ].
 
 	^ csvMetrics asOrderedDictionary
+]
+
+{ #category : #accessing }
+GitMetricExporter >> entities [
+	"You should use `setupAnalysisForProjectsWithIds:` and `setupAnalysisForUsersWithNames:` to fill entities and not directly the instance"
+
+	^ entities
 ]
 
 { #category : #accessing }
@@ -230,7 +249,7 @@ GitMetricExporter >> exportProjectAnalysesInCSV [
 		groupOver := groupAssociation key.
 
 
-		groupByName := group groupedBy: #projectName.
+		groupByName := group groupedBy: #projectID.
 		exportBrowserModel entitiesList: groupByName.
 
 		exportBrowserModel removeColumnForQueryNamed: #Type.
@@ -240,6 +259,10 @@ GitMetricExporter >> exportProjectAnalysesInCSV [
 			addColumnForQuery: [ :groupAnalyses |
 			(groupAnalyses at: 1) projectName ]
 			withName: #'Project name'.
+		exportBrowserModel
+			addColumnForQuery: [ :groupAnalyses |
+			(groupAnalyses at: 1) projectID ]
+			withName: #'Project ID'.
 
 		periods := (group groupedBy: #period) keys.
 
@@ -253,7 +276,6 @@ GitMetricExporter >> exportProjectAnalysesInCSV [
 				exportBrowserModel
 					addColumnForQuery: association value
 					withName: association key ] ].
-
 		file := self constructFilePathFor: groupOver andEntities: 'projects'.
 		file writeStreamDo: [ :aStream |
 			exportBrowserModel writeCSVOn: aStream ] ]
@@ -362,6 +384,7 @@ GitMetricExporter >> generateProjectsAnalysesDuringPeriod: period over: aDateWee
 		| projectAnalysisReport |
 		projectAnalysisReport := ProjectAnalysisReport new
 			projectName: project name;
+			projectID: project id;
 			period: period;
 			over: aDateWeekMonthOrYear.
 			

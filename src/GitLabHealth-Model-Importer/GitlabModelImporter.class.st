@@ -1077,13 +1077,6 @@ GitlabModelImporter >> importProjects [
 	^ projects
 ]
 
-{ #category : #'import - projects' }
-GitlabModelImporter >> importProjects: aCollectionOfProjectID [
-
-
-	^ aCollectionOfProjectID collect: [ :id | self importProject: id ]
-]
-
 { #category : #imports }
 GitlabModelImporter >> importProjectsSince: since [
 	"heavy import of all projects"

@@ -50,12 +50,12 @@ BaselineOfGitLabHealth >> defineDependencies: spec [
 	spec
 		baseline: 'GitlabAPI'
 		with: [
-		spec repository: 'github://Evref-BL/Gitlab-Pharo-API:develop' ].
-	
-		spec baseline: 'BitbucketPharoAPI'
-		with: [
-		spec repository: 'github://Evref-BL/Bitbucket-Pharo-API:develop' ].
+		spec repository: 'github://Evref-BL/Gitlab-Pharo-API:main' ].
 
+	spec
+		baseline: 'BitbucketPharoAPI'
+		with: [
+		spec repository: 'github://Evref-BL/Bitbucket-Pharo-API:main' ]
 ]
 
 { #category : #baselines }

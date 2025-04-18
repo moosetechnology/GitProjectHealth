@@ -23,7 +23,10 @@ CodeDeletionByMergeRequestProjectMetric >> calculate [
 	groupedByDate := groupedByDate collect: [ :group |
 		                 group ifEmpty: [ 0 ] ifNotEmpty: [
 			                 (group collect: [ :mergeRequest |
-				                  mergeRequest mergedCommit deletions ]) average ] ].
+				                  (mergeRequest mergedCommit ifNil: [
+					                   mergeRequest mergeRequestCommit ifNil: [
+						                   mergeRequest squashCommit ] ]) deletions ])
+				                 average ] ].
 
 	^ groupedByDate average asFloat
 ]
@@ -38,6 +41,20 @@ CodeDeletionByMergeRequestProjectMetric >> description [
 CodeDeletionByMergeRequestProjectMetric >> load [
 
 	projectMergeRequests := self
-		                  loadProjectCompleteMergeRequestsSince: (period at: #since)
-		                  until: (period at: #until)
+		                        loadProjectCompleteMergeRequestsSince:
+		                        (period at: #since)
+		                        until: (period at: #until).
+
+	projectMergeRequests := projectMergeRequests select: [ :mr |
+		                        mr state = #merged ].
+
+	projectMergeRequests do: [ :mr |
+		glhImporter importMergeRequestMergeCommits: mr ].
+
+	self flag:
+		'Should not happens, but sometimes with branch renaming of bitbucket it happens'.
+	projectMergeRequests := projectMergeRequests select: [ :mr |
+		                        mr mergedCommit isNotNil or: [
+			                        mr squashCommit isNotNil or: [
+				                        mr mergeRequestCommit isNotNil ] ] ]
 ]

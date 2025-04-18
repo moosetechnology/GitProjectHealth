@@ -14,7 +14,7 @@ CodeAdditionByMergeRequestProjectMetric >> calculate [
 	projectMergeRequests ifEmpty: [ ^ 0 ].
 
 
-	projectMergeRequests  do: [ :mr |
+	projectMergeRequests do: [ :mr |
 		dateOver := self transformDate: mr created_at to: over.
 		groupedByDate
 			at: dateOver printString
@@ -23,7 +23,10 @@ CodeAdditionByMergeRequestProjectMetric >> calculate [
 	groupedByDate := groupedByDate collect: [ :group |
 		                 group ifEmpty: [ 0 ] ifNotEmpty: [
 			                 (group collect: [ :mergeRequest |
-				                  mergeRequest mergedCommit additions ]) average ] ].
+				                  (mergeRequest mergedCommit ifNil: [
+					                   mergeRequest mergeRequestCommit ifNil: [
+						                   mergeRequest squashCommit ] ]) additions ])
+				                 average ] ].
 
 	^ groupedByDate average asFloat
 ]
@@ -38,12 +41,20 @@ CodeAdditionByMergeRequestProjectMetric >> description [
 CodeAdditionByMergeRequestProjectMetric >> load [
 
 	projectMergeRequests := self
-		                  loadProjectCompleteMergeRequestsSince: (period at: #since)
-		                  until: (period at: #until).
-		
-	projectMergeRequests := projectMergeRequests select: [ :mr |
-		                        mr state = #merged ]. 
-		
-	projectMergeRequests do: [:mr | glhImporter importMergeRequestMergeCommits: mr].
+		                        loadProjectCompleteMergeRequestsSince:
+		                        (period at: #since)
+		                        until: (period at: #until).
 
+	projectMergeRequests := projectMergeRequests select: [ :mr |
+		                        mr state = #merged ].
+
+	projectMergeRequests do: [ :mr |
+		glhImporter importMergeRequestMergeCommits: mr ].
+
+	self flag:
+		'Should not happens, but sometimes with branch renaming of bitbucket it happens'.
+	projectMergeRequests := projectMergeRequests select: [ :mr |
+		                        mr mergedCommit isNotNil or: [
+			                        mr squashCommit isNotNil or: [
+				                        mr mergeRequestCommit isNotNil ] ] ]
 ]
