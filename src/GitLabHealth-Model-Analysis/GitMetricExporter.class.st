@@ -557,7 +557,7 @@ GitMetricExporter >> setupAnalysisForUsersWithNames: userNames [
 
 	| users |
 	users := userNames collect: [ :username |
-		         glhImporter importUserByUsername: username ].
+		         glhImporter importUserByUsername: username ] thenReject: [ :user | user isNil ] .
 
 	glhImporter userCatalogue ifNotNil: [
 		glhImporter userCatalogue scrapeAuthorNamesForUsers: users ].
