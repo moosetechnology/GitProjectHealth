@@ -41,7 +41,7 @@ jobs:
           app-id: ${{ secrets.AUTO_RENERAKU_APP_ID }}
           private-key: ${{ secrets.AUTO_RENERAKU_PRIVATE_KEY }}
       - name: AutoReneraku
-        uses: badetitou/AutoReneraku@v1.0.8
+        uses: badetitou/AutoReneraku@v1.0.10
         if: matrix.smalltalk == 'Moose64-12'
         with:
           pat:  ${{ steps.generate-token.outputs.token }}

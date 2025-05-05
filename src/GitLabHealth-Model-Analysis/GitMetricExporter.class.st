@@ -111,6 +111,18 @@ GitMetricExporter >> addEntitiesFromUserNamesAndProjects: usersWithProjects [
 	^ self 
 ]
 
+{ #category : #accessing }
+GitMetricExporter >> analyses [
+
+	^ analyses
+]
+
+{ #category : #accessing }
+GitMetricExporter >> analyses: anObject [
+
+	^ analyses := anObject
+]
+
 { #category : #utilities }
 GitMetricExporter >> constructFilePathFor: runningOver andEntities: entitiesName [
 
@@ -141,6 +153,13 @@ GitMetricExporter >> csvMetricsFor: metricCollection at: date [
 				              ifNotNil: [ analysis metrics at: metric new name ] ] ].
 
 	^ csvMetrics asOrderedDictionary
+]
+
+{ #category : #accessing }
+GitMetricExporter >> entities [
+	"You should use `setupAnalysisForProjectsWithIds:` and `setupAnalysisForUsersWithNames:` to fill entities and not directly the instance"
+
+	^ entities
 ]
 
 { #category : #accessing }
@@ -230,7 +249,7 @@ GitMetricExporter >> exportProjectAnalysesInCSV [
 		groupOver := groupAssociation key.
 
 
-		groupByName := group groupedBy: #projectName.
+		groupByName := group groupedBy: #projectID.
 		exportBrowserModel entitiesList: groupByName.
 
 		exportBrowserModel removeColumnForQueryNamed: #Type.
@@ -257,7 +276,6 @@ GitMetricExporter >> exportProjectAnalysesInCSV [
 				exportBrowserModel
 					addColumnForQuery: association value
 					withName: association key ] ].
-
 		file := self constructFilePathFor: groupOver andEntities: 'projects'.
 		file writeStreamDo: [ :aStream |
 			exportBrowserModel writeCSVOn: aStream ] ]
@@ -539,7 +557,7 @@ GitMetricExporter >> setupAnalysisForUsersWithNames: userNames [
 
 	| users |
 	users := userNames collect: [ :username |
-		         glhImporter importUserByUsername: username ].
+		         glhImporter importUserByUsername: username ] thenReject: [ :user | user isNil ] .
 
 	glhImporter userCatalogue ifNotNil: [
 		glhImporter userCatalogue scrapeAuthorNamesForUsers: users ].
