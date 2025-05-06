@@ -5,7 +5,8 @@ Class {
 		'period',
 		'over',
 		'glhImporter',
-		'jiraImporter'
+		'jiraImporter',
+		'ruleID'
 	],
 	#category : #'GitLabHealth-Model-Analysis'
 }
@@ -88,6 +89,12 @@ Metric >> name [
 Metric >> over: anObject [
 
 	over := anObject
+]
+
+{ #category : #'as yet unclassified' }
+Metric >> ruleID: anObject [
+
+	ruleID := anObject.
 ]
 
 { #category : #initialization }
