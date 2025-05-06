@@ -345,6 +345,25 @@ GitlabModelImporter >> importAndLoadLatestsCommitsOfProject: aGLHProject [
 	^ commits
 ]
 
+{ #category : #'import - repositories' }
+GitlabModelImporter >> importBranches: aGLHProject [ 
+	"Fetches all branches of the given project"
+	| results parsedResults |
+
+	"Fetch branches from the repository API"
+	results := self repoApi branches getAllFromProject: aGLHProject id.
+
+	"Parse the retrieved branches"
+	parsedResults := (results collect: [ :branchJson | self parseBranchesResult: branchJson ]) flattened.
+
+	"Add branches to the model (if not blocked by name equality)"
+	self glhModel addAll: parsedResults unless: self blockOnNameEquality.
+
+	"Return the list of parsed branches"
+	^ parsedResults.
+
+]
+
 { #category : #'import - commits' }
 GitlabModelImporter >> importCommit: aCommitID ofProject: aGLHProject [
 
@@ -703,15 +722,14 @@ GitlabModelImporter >> importFilesOfBranch: aBranch [
 		          ofBranch: aBranch name
 		          andPath: nil."
 	apiFiles := (result collect: [ :filesJson | self parseFileTreeResult: filesJson  ]) flattened.
-	files := apiFiles collect: [ :apiFile | 
-		         self convertApiFileAsFile: apiFile ].
-	files do: [ :file | 
-		self glhModel add: file.
-		aBranch addFile: file ].
+	files := apiFiles collect: [ :apiFile |  self convertApiFileAsFile: apiFile ].
+   files := self glhModel addAll: files unless: [:f1 :f2 | f1 branch = f2 branch and: [f1 path = f2 path]].
+   files := aBranch addAll: files unless: [:f1 :f2 | f1 branch = f2 branch and: [f1 path = f2 path]].
 	files
 		select: [ :file | file isKindOf: GLHFileDirectory ]
 		thenCollect: [ :file | 
-		self importDirectoryFiles: file OfBranch: aBranch ]
+		self importDirectoryFiles: file OfBranch: aBranch ] .
+	^ files 
 ]
 
 { #category : #'import - groups' }
