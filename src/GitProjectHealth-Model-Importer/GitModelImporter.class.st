@@ -158,6 +158,13 @@ GitModelImporter >> importDiffRangesForDiff: aGLHDiff [
 		  unless: self blockForDiffRangeEquality
 ]
 
+{ #category : #pipelines }
+GitModelImporter >> importLatestPipelinesOfProject: aGLHProject [ 
+	(self pipelinesOf: aGLHProject id withLimit:30) do: [ :pipeline |
+		self glhModel add: pipeline unless: self blockOnIdEquality .
+		aGLHProject pipelines add: pipeline unless: self blockOnIdEquality]
+]
+
 { #category : #initialization }
 GitModelImporter >> initialize [
 

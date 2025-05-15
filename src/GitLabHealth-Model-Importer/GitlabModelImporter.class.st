@@ -92,7 +92,7 @@ GitlabModelImporter >> completeImportProject: aGLHProject [
 		                   add: aGLHProject
 		                   unless: self blockOnIdEquality.
 
-	self importPipelinesOfProject: importedProject.
+	self importLatestPipelinesOfProject: importedProject.
 
 	"aGLHProject creator: (self importUser: aGLHProject creator_id)."
 
@@ -1527,12 +1527,44 @@ GitlabModelImporter >> parseUsersResult: result [
 	^ reader nextAs: #ArrayOfUser
 ]
 
+{ #category : #'import - projects' }
+GitlabModelImporter >> partiallyImportProject: aProjectID [
+
+	| result projectResult |
+	('Import project with id:  ' , aProjectID printString) recordInfo.
+
+	(glhModel allWithType: GLHProject)
+		detect: [ :project | project id = aProjectID ]
+		ifFound: [ :project | ^ project ].
+
+	result := self repoApi projects get: aProjectID.
+	projectResult := self parseProjectResult: result.
+
+	projectResult repository: GLHRepository new.
+	self glhModel add: projectResult repository.
+	self importRepository: projectResult repository.
+
+	^ projectResult
+]
+
 { #category : #'imports - pipelines' }
 GitlabModelImporter >> pipelinesOf: aProjectID [
 
 	| result |
 	('Search pipelines of: ' , aProjectID printString) recordInfo.
 	result := self repoApi pipelines getAllInProject: aProjectID.
+	result isString ifTrue: [ ^ self parsePipelinesResult: result ].
+
+	^ (result collect: [ :pipelinesJson |
+			   self parsePipelinesResult: pipelinesJson ]) flattened
+]
+
+{ #category : #'imports - pipelines' }
+GitlabModelImporter >> pipelinesOf: aProjectID withLimit: aLimit [
+
+	| result |
+	('Search pipelines of: ' , aProjectID printString) recordInfo.
+	result := self repoApi pipelines getByPage: aLimit perPage: aLimit inProject: aProjectID.
 	result isString ifTrue: [ ^ self parsePipelinesResult: result ].
 
 	^ (result collect: [ :pipelinesJson |
