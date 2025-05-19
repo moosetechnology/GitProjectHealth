@@ -875,6 +875,22 @@ GitlabModelImporter >> importMergeRequestMergeCommits: aGLPHEMergeRequest [
 	^ foundCommits
 ]
 
+{ #category : #'importer - pipelines' }
+GitlabModelImporter >> importMergeRequestPipelines: aGLHMergeRequest [ 
+	"default limit to one page with last 20 pipelines"
+	
+	|results parseResults|
+	
+	results := self repoApi pipelines getByPage: 1 perPage: 20 inProject: aGLHMergeRequest project id forMergerRequestIid: aGLHMergeRequest iid. 
+	
+	parseResults := self parsePipelinesResult: results.
+	
+	parseResults := glhModel addAll: parseResults unless: self blockOnIdEquality.
+	parseResults := aGLHMergeRequest pipelines addAll: parseResults unless: self blockOnIdEquality.
+	
+	^ parseResults. 
+]
+
 { #category : #'import - merge request' }
 GitlabModelImporter >> importMergeRequests: aGLHProject [
 

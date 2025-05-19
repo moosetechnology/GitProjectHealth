@@ -193,15 +193,7 @@ GLHMetamodelGenerator >> defineProperties [
 	project property: #web_url type: #String.
 	project property: #creator_id type: #Number.
 
-	"Pipelines properties"
-	(pipeline property: #status type: #String) comment:
-		'#success or #failure'.
-	(pipeline property: #runDate type: #Object) comment:
-		'Date this pipeline was run'.
-	(pipeline property: #id type: #String) comment:
-		'The id of the pipeline'.
-
-
+	self pipelinesProperties.
 	self userProperties.
 	self branchProperties.
 	self fileProperties.
@@ -264,8 +256,8 @@ GLHMetamodelGenerator >> defineRelations [
 	(mergeRequest property: #reviewers)
 	*-* (user property: #reviewedMergeResquest).
 
-	(mergeRequest property: #pipeline)
-	- (pipeline property: #mergeResquest).
+	(mergeRequest property: #pipelines)
+	<>-* (pipeline property: #mergeResquest).
 
 	(mergeRequest property: #mergedCommit)
 	- (commit property: #commitedMergeRequest).
@@ -428,6 +420,33 @@ GLHMetamodelGenerator >> noteProperties [
  
  
  
+
+]
+
+{ #category : #'as yet unclassified' }
+GLHMetamodelGenerator >> pipelinesProperties [
+	
+	"Pipelines properties"
+	
+	(pipeline property: #id type: #String) comment:
+		'The id of the pipeline'.
+	(pipeline property: #name type: #String) comment:
+		'name of the pipeline'.	
+			
+	(pipeline property: #status type: #String) comment:
+		'#success or #failure'.	
+	(pipeline property: #status type: #String) comment:
+		'#success or #failure'.	
+	
+	(pipeline property: #sourceEvent type: #String) comment: 'triggering event from where the pipeline originate, such as #push #fork, etc.'.
+	
+	(pipeline property: #runDate type: #Object) comment:
+		'Date this pipeline was run'.
+	(pipeline property: #created_at type: #Object) comment: 'creation date of the pipeline'.
+	(pipeline property: #updated_at type: #Object) comment: 'update date of the pipeline'.
+	(pipeline property: #started_at type: #Object) comment: 'start date of the pipeline'.
+	(pipeline property: #finished_at type: #Object) comment: 'finish date of the pipeline'.	
+	(pipeline property: #duration type: #Object) comment: 'the running duration of a pipeline'.
 
 ]
 
