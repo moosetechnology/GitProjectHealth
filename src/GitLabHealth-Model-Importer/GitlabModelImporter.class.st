@@ -147,6 +147,8 @@ GitlabModelImporter >> completeImportedCommit: aCommit [
 GitlabModelImporter >> completeImportedPipeline: aGLHPipeline [ 
 	|result parsedResult|
 	
+	aGLHPipeline duration ifNotNil: [ ^ aGLHPipeline ].
+	
 	result := self repoApi pipelines get: aGLHPipeline id inProject: aGLHPipeline project id. 
 	parsedResult := self parsePipelineResult: result. 
 	
