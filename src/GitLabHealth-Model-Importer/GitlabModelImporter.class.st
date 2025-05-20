@@ -322,28 +322,28 @@ GitlabModelImporter >> configureReaderForPipeline: reader [
 			mapProperty: #created_at
 			getter: [ :object | #ignore ]
 			setter: [ :object :value |
-			object created_at: (DateAndTime fromString: value).
-			object runDate: (DateAndTime fromString: value) ].
+			object created_at: (value ifNotNil: [DateAndTime fromString: value]).
+			object runDate: (value ifNotNil: [DateAndTime fromString: value]) ].
 		
 		mapping
 			mapProperty: #updated_at
 			getter: [ :object | #ignore ]
 			setter: [ :object :value |
-			object updated_at: (DateAndTime fromString: value).
+			object updated_at: (value ifNotNil: [DateAndTime fromString: value]).
 			].
 		
 		mapping
 			mapProperty: #finished_at
 			getter: [ :object | #ignore ]
 			setter: [ :object :value |
-			object finished_at: (DateAndTime fromString: value).
+				object finished_at: (value ifNotNil: [DateAndTime fromString: value]).
 			].
 		
 		mapping
 			mapProperty: #started_at  
 			getter: [ :object | #ignore ]
 			setter: [ :object :value |
-			object started_at: (DateAndTime fromString: value).
+			object started_at: (value ifNotNil: [DateAndTime fromString: value]).
 			].
 		
 		mapping
@@ -357,7 +357,7 @@ GitlabModelImporter >> configureReaderForPipeline: reader [
 			mapProperty: #duration
 			getter: [ :object | #ignore ]
 			setter: [ :object :value |
-			object duration: value asDuration .
+			object duration: (value ifNotNil: [value asDuration]) .
 			].
 		
 		mapping
@@ -1209,6 +1209,18 @@ GitlabModelImporter >> importPipeline: pipelineId OfProject: aGLHProject [
 	^ self completeImportedPipeline: pipeline. 
 ]
 
+{ #category : #'import - pipelines' }
+GitlabModelImporter >> importPipelinesOfProject: aGLHProject after: after andBefore: before [
+
+	^ (self pipelinesOf: aGLHProject id after: after andBefore: before) collect: [ :pipeline |
+		|pip|
+		pip := self glhModel add: pipeline unless: self blockOnIdEquality .
+		pip := aGLHProject pipelines add: pip unless: self blockOnIdEquality.
+		self completeImportedPipeline: pip. 
+		].
+	
+]
+
 { #category : #'import - projects' }
 GitlabModelImporter >> importProject: aProjectID [
 
@@ -1240,7 +1252,7 @@ GitlabModelImporter >> importProjects [
 	^ projects
 ]
 
-{ #category : #imports }
+{ #category : #'import - projects' }
 GitlabModelImporter >> importProjectsSince: since [
 	"heavy import of all projects"
 
@@ -1259,7 +1271,7 @@ GitlabModelImporter >> importProjectsSince: since [
 		page := page + 1.
 		('import projects page #' , page printString) recordInfo.
 
-		results := self repoApi projects: amount since: since page: page.
+		results := self repoApi projects allWithParams: {#since -> since} asDictionary .
 
 		newlyFoundProjects := self glhModel
 			                      addAll: (self parseArrayOfProject: results)
@@ -1740,6 +1752,21 @@ GitlabModelImporter >> partiallyImportProject: aProjectID [
 	self importRepository: projectResult repository.
 
 	^ projectResult
+]
+
+{ #category : #'import - pipelines' }
+GitlabModelImporter >> pipelinesOf: aProjectID after: after andBefore: before [
+
+	| result |
+	('Search pipelines of: ' , aProjectID printString) recordInfo.
+	
+	result := self repoApi pipelines getAllInProject: aProjectID 
+												withParams: {	#updated_before -> before.
+																	#updated_after -> after} asDictionary .
+	result isString ifTrue: [ ^ self parsePipelinesResult: result ].
+
+	^ (result collect: [ :pipelinesJson |
+			   self parsePipelinesResult: pipelinesJson ]) flattened
 ]
 
 { #category : #'import - pipelines' }
