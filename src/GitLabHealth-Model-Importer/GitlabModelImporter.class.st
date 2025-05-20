@@ -36,7 +36,7 @@ GitlabModelImporter >> addGroupResultToModel: groupResult [
 	^ group 
 ]
 
-{ #category : #'imports - pipelines' }
+{ #category : #'import - pipelines' }
 GitlabModelImporter >> allPipelinesOf: aProjectID [
 
 	| result |
@@ -143,7 +143,7 @@ GitlabModelImporter >> completeImportedCommit: aCommit [
 	^ aCommit
 ]
 
-{ #category : #'imports - pipelines' }
+{ #category : #'import - pipelines' }
 GitlabModelImporter >> completeImportedPipeline: aGLHPipeline [ 
 	|result parsedResults|
 	
@@ -151,7 +151,7 @@ GitlabModelImporter >> completeImportedPipeline: aGLHPipeline [
 	parsedResults := self parsePipelineResult: result. 
 	
 	"aGLHPipeline methods".
-	{ #'created_at:' . #'status:' . #'finished_at:' . #'duration:' . #'started_at:' . #'updated_at:'} do: [ :m |
+	{ #'created_at:' . #'status:' . #'finished_at:' . #'duration:' . #'started_at:' . #'updated_at:' . "#'ref:'" } do: [ :m |
 		aGLHPipeline perform: m asSymbol with: (parsedResults perform: (m withoutSuffix: ':') asSymbol )
 		 ].
 	
@@ -313,11 +313,50 @@ GitlabModelImporter >> configureReaderForPipeline: reader [
 	reader mapInstVarsFor: GLHPipeline.
 	
 	reader for: GLHPipeline do: [ :mapping |
+
 		mapping
 			mapProperty: #created_at
 			getter: [ :object | #ignore ]
 			setter: [ :object :value |
-			object runDate: (DateAndTime fromString: value) ] ].
+			object created_at: (DateAndTime fromString: value).
+			object runDate: (DateAndTime fromString: value) ].
+		
+		mapping
+			mapProperty: #updated_at
+			getter: [ :object | #ignore ]
+			setter: [ :object :value |
+			object updated_at: (DateAndTime fromString: value).
+			].
+		
+		mapping
+			mapProperty: #finished_at
+			getter: [ :object | #ignore ]
+			setter: [ :object :value |
+			object finished_at: (DateAndTime fromString: value).
+			].
+		
+		mapping
+			mapProperty: #started_at  
+			getter: [ :object | #ignore ]
+			setter: [ :object :value |
+			object started_at: (DateAndTime fromString: value).
+			].
+		
+		mapping
+			mapProperty: #source
+			getter: [ :object | #ignore ]
+			setter: [ :object :value |
+			object sourceEvent: value.
+			].
+		
+		mapping
+			mapProperty: #duration
+			getter: [ :object | #ignore ]
+			setter: [ :object :value |
+			object duration: value asDuration .
+			].
+		
+		 ].
 	
 	reader
 		for: #ArrayOfPipelines
@@ -415,12 +454,17 @@ GitlabModelImporter >> importAllGroups [
 	^ groups
 ]
 
-{ #category : #'imports - pipelines' }
+{ #category : #'import - pipelines' }
 GitlabModelImporter >> importAllPipelinesOfProject: aGLHProject [
 
 	(self allPipelinesOf: aGLHProject id) do: [ :pipeline |
-		self glhModel add: pipeline unless: self blockOnIdEquality .
-		aGLHProject pipelines add: pipeline unless: self blockOnIdEquality]
+		|pip|
+		pip := self glhModel add: pipeline unless: self blockOnIdEquality .
+		pip := aGLHProject pipelines add: pip unless: self blockOnIdEquality.
+		self completeImportedPipeline: pip. 
+		].
+	
+	^ aGLHProject pipelines
 ]
 
 { #category : #'import - commits' }
@@ -882,11 +926,16 @@ GitlabModelImporter >> importLatestMergeRequestsOfProject: aGLHProject [
 	^ parsedResults.
 ]
 
-{ #category : #pipelines }
+{ #category : #'import - pipelines' }
 GitlabModelImporter >> importLatestPipelinesOfProject: aGLHProject [ 
 	(self pipelinesOf: aGLHProject id withLimit:30) do: [ :pipeline |
-		self glhModel add: pipeline unless: self blockOnIdEquality .
-		aGLHProject pipelines add: pipeline unless: self blockOnIdEquality]
+		|pip|
+		pip := self glhModel add: pipeline unless: self blockOnIdEquality .
+		pip := aGLHProject pipelines add: pip unless: self blockOnIdEquality.
+		self completeImportedPipeline: pip. 
+		].
+	
+	^ aGLHProject pipelines 
 ]
 
 { #category : #'import - merge request' }
@@ -938,7 +987,7 @@ GitlabModelImporter >> importMergeRequestMergeCommits: aGLPHEMergeRequest [
 	^ foundCommits
 ]
 
-{ #category : #'importer - pipelines' }
+{ #category : #'import - pipelines' }
 GitlabModelImporter >> importMergeRequestPipelines: aGLHMergeRequest [ 
 	"default limit to one page with last 20 pipelines"
 	
@@ -950,8 +999,8 @@ GitlabModelImporter >> importMergeRequestPipelines: aGLHMergeRequest [
 	
 	parseResults := glhModel addAll: parseResults unless: self blockOnIdEquality.
 	parseResults := aGLHMergeRequest pipelines addAll: parseResults unless: self blockOnIdEquality.
+	^ parseResults collect: [ :pip | self completeImportedPipeline: pip ]  .
 	
-	^ parseResults. 
 ]
 
 { #category : #'import - merge request' }
@@ -1129,7 +1178,7 @@ GitlabModelImporter >> importParentCommitsOfCommit: aGLHCommit since: aDate [
 		  flatten
 ]
 
-{ #category : #'imports - pipelines' }
+{ #category : #'import - pipelines' }
 GitlabModelImporter >> importPipeline: pipelineId OfProject: aGLHProject [
 
 	
@@ -1143,8 +1192,10 @@ GitlabModelImporter >> importPipeline: pipelineId OfProject: aGLHProject [
 
 	pipeline :=  self parsePipelineResult: result.
 
-	self glhModel add: pipeline unless: self blockOnIdEquality .
-	^ aGLHProject pipelines add: pipeline unless: self blockOnIdEquality.
+	pipeline := self glhModel add: pipeline unless: self blockOnIdEquality .
+	pipeline := aGLHProject pipelines add: pipeline unless: self blockOnIdEquality.
+	
+	^ self completeImportedPipeline: pipeline. 
 ]
 
 { #category : #'import - projects' }
@@ -1680,7 +1731,7 @@ GitlabModelImporter >> partiallyImportProject: aProjectID [
 	^ projectResult
 ]
 
-{ #category : #'imports - pipelines' }
+{ #category : #'import - pipelines' }
 GitlabModelImporter >> pipelinesOf: aProjectID withLimit: aLimit [
 
 	| result |
