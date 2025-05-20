@@ -78,7 +78,7 @@ GitMetricExporter >> addEntitiesFromUserNames: userNames [
 							   size.
 							   ']' }) recordInfo.
 
-					  p id -> (glhImporter completeImportProject: p) ]) asDictionary.
+					  p id -> (glhImporter completeImportedProject: p) ]) asDictionary.
 
 			 metrics ]).
 
@@ -549,7 +549,7 @@ GitMetricExporter >> setupAnalysisForUsersWithNames: userNames [
 		projects := glhImporter importContributedProjectsOfUser: user.
 
 		projects do: [ :project |
-			glhImporter completeImportProject: project ] ].
+			glhImporter completeImportedProject: project ] ].
 
 	entities addAll: users.
 

@@ -143,6 +143,57 @@ GitlabModelImporter >> completeImportedCommit: aCommit [
 	^ aCommit
 ]
 
+{ #category : #'imports - pipelines' }
+GitlabModelImporter >> completeImportedPipeline: aGLHPipeline [ 
+	|result parsedResults|
+	
+	result := self repoApi pipelines get: aGLHPipeline id inProject: aGLHPipeline project id. 
+	parsedResults := self parsePipelineResult: result. 
+	
+	"aGLHPipeline methods".
+	{ #'created_at:' . #'status:' . #'finished_at:' . #'duration:' . #'started_at:' . #'updated_at:'} do: [ :m |
+		aGLHPipeline perform: m asSymbol with: (parsedResults perform: (m withoutSuffix: ':') asSymbol )
+		 ].
+	
+	aGLHPipeline. 
+]
+
+{ #category : #'import - projects' }
+GitlabModelImporter >> completeImportedProject: aGLHProject [
+
+	| importedProject |
+	('Complete import of project: ' , aGLHProject id printString)
+		recordInfo.
+	aGLHProject repository ifNotNil: [ ^ aGLHProject ].
+
+	importedProject := self glhModel
+		                   add: aGLHProject
+		                   unless: self blockOnIdEquality.
+
+	self importLatestPipelinesOfProject: importedProject.
+
+	"aGLHProject creator: (self importUser: aGLHProject creator_id)."
+
+	(self importUser: importedProject creator_id) addCreatedProject:
+		importedProject.
+
+
+	importedProject repository: GLHRepository new.
+	self glhModel add: importedProject repository.
+	self importRepository: importedProject repository.
+
+
+	withInitialMergeRequest ifTrue: [
+		self
+			importMergeRequests: importedProject
+			since: DateAndTime today
+			until: DateAndTime now ].
+
+	^ importedProject
+	
+
+]
+
 { #category : #'private - configure reader' }
 GitlabModelImporter >> configureReaderForCommit: reader [
 
@@ -376,7 +427,7 @@ GitlabModelImporter >> importAllPipelinesOfProject: aGLHProject [
 GitlabModelImporter >> importAndLoadLatestsCommitsOfProject: aGLHProject [
 
 	| commits completedProject |
-	completedProject := self completeImportProject: aGLHProject.
+	completedProject := self completeImportedProject: aGLHProject.
 	commits := self importLastestCommitsOfProject: completedProject.
 	commits do: [ :commit | self completeImportedCommit: commit ].
 	self chainsCommitsFrom: commits.
@@ -765,7 +816,7 @@ GitlabModelImporter >> importGroup: aGroupID [
 	groupResult := self addGroupResultToModel: groupResult.
 
 	groupResult projects do: [ :project |
-		self completeImportProject: project ].
+		self completeImportedProject: project ].
 
 	(self subGroupsOf: aGroupID) do: [ :subGroup |
 		
@@ -817,6 +868,18 @@ GitlabModelImporter >> importLastestCommitsOfProject: aGLHProject [
 		parsedResults do: [ :commit | self importDiffOfCommit: commit ] ].
 
 	^ parsedResults
+]
+
+{ #category : #'import - merge request' }
+GitlabModelImporter >> importLatestMergeRequestsOfProject: aGLHProject [ 
+	
+	|results parsedResults|
+	results := self repoApi mergeRequests getByPage: 1 perPage: 20  inProject: aGLHProject id. 
+	parsedResults := self parseMergeRequestsResult: results. 
+	
+	parsedResults := glhModel addAll: parsedResults unless: self blockOnIdEquality.
+	parsedResults := aGLHProject mergeRequests addAll: parsedResults unless: self blockOnIdEquality.
+	^ parsedResults.
 ]
 
 { #category : #pipelines }
@@ -899,7 +962,7 @@ GitlabModelImporter >> importMergeRequests: aGLHProject [
 		recordInfo.
 
 	results := self repoApi mergeRequests allOfProject: aGLHProject id.
-	parsedResults := (results collect: [ :projectsJson | self parseMergeRequestResult: projectsJson ]) flattened. 
+	parsedResults := (results collect: [ :projectsJson | self parseMergeRequestsResult: projectsJson ]) flattened. 
 
 	aGLHProject mergeRequests
 		addAll: parsedResults
@@ -944,7 +1007,7 @@ GitlabModelImporter >> importMergeRequests: aGLHProject since: fromDate until: t
 		          allOfProject: aGLHProject id
 		          withParams: params.
 	mergeRequests := (result collect: [ :mergeRequestsJson |
-		                  self parseMergeRequestResult: mergeRequestsJson ])
+		                  self parseMergeRequestsResult: mergeRequestsJson ])
 		                 flattened.
 
 	aGLHProject mergeRequests
@@ -1097,7 +1160,7 @@ GitlabModelImporter >> importProject: aProjectID [
 	result := self repoApi projects get: aProjectID.
 	projectResult := self parseProjectResult: result.
 
-	^ self completeImportProject: projectResult
+	^ self completeImportedProject: projectResult
 ]
 
 { #category : #'import - projects' }
@@ -1496,7 +1559,7 @@ GitlabModelImporter >> parseJobsResult: result ofProject: aProject [
 ]
 
 { #category : #'private - parsing' }
-GitlabModelImporter >> parseMergeRequestResult: result [
+GitlabModelImporter >> parseMergeRequestsResult: result [
 
 	generalReader on: result readStream.
 	^ generalReader nextAs: #ArrayOfMergeRequest
