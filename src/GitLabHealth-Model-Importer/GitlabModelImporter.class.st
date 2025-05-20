@@ -145,15 +145,19 @@ GitlabModelImporter >> completeImportedCommit: aCommit [
 
 { #category : #'import - pipelines' }
 GitlabModelImporter >> completeImportedPipeline: aGLHPipeline [ 
-	|result parsedResults|
+	|result parsedResult|
 	
 	result := self repoApi pipelines get: aGLHPipeline id inProject: aGLHPipeline project id. 
-	parsedResults := self parsePipelineResult: result. 
+	parsedResult := self parsePipelineResult: result. 
 	
 	"aGLHPipeline methods".
-	{ #'created_at:' . #'status:' . #'finished_at:' . #'duration:' . #'started_at:' . #'updated_at:' . "#'ref:'" } do: [ :m |
-		aGLHPipeline perform: m asSymbol with: (parsedResults perform: (m withoutSuffix: ':') asSymbol )
+	{ #'created_at:' . #'status:' . #'finished_at:' . #'duration:' . #'started_at:' . #'updated_at:' . #'ref:' } do: [ :m |
+		aGLHPipeline perform: m asSymbol with: (parsedResult perform: (m withoutSuffix: ':') asSymbol )
 		 ].
+	
+	parsedResult cacheAt: #userID ifPresent: [:id |
+		aGLHPipeline user: (self importUser: id). 
+		].
 	
 	aGLHPipeline. 
 ]
@@ -354,6 +358,13 @@ GitlabModelImporter >> configureReaderForPipeline: reader [
 			getter: [ :object | #ignore ]
 			setter: [ :object :value |
 			object duration: value asDuration .
+			].
+		
+		mapping
+			mapProperty: #user
+			getter: [ :object | #ignore ]
+			setter: [ :object :value |
+			(object cacheAt: #userID put: (value at: #id)) .
 			].
 		
 		 ].
