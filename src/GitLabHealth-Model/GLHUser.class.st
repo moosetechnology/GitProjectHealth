@@ -20,6 +20,7 @@ A GitLab User
 | `createdMergeRequests` | `GLHUser` | `author` | `GLHMergeRequest` | |
 | `createdProjects` | `GLHUser` | `creator` | `GLHProject` | |
 | `currentlyAssignedMergeRequest` | `GLHUser` | `assignee` | `GLHMergeRequest` | |
+| `launchedPipelines` | `GLHUser` | `user` | `GLHPipeline` | |
 | `mergerOfMergeRequests` | `GLHUser` | `merged_by` | `GLHMergeRequest` | |
 | `reviewedMergeResquest` | `GLHUser` | `reviewers` | `GLHMergeRequest` | |
 | `usedMerges` | `GLHUser` | `merge_user` | `GLHMergeRequest` | |
@@ -88,6 +89,7 @@ Class {
 		'#createdProjects => FMMany type: #GLHProject opposite: #creator',
 		'#contributedProjects => FMMany type: #GLHProject opposite: #contributors',
 		'#commits => FMMany type: #GLHCommit opposite: #commitCreator',
+		'#launchedPipelines => FMMany type: #GLHPipeline opposite: #user',
 		'#jobs => FMMany type: #GLHJob opposite: #user',
 		'#createdMergeRequests => FMMany type: #GLHMergeRequest opposite: #author',
 		'#approcheMergeRequests => FMMany type: #GLHMergeRequest opposite: #approved_by',
@@ -162,6 +164,12 @@ GLHUser >> addCurrentlyAssignedMergeRequest: anObject [
 GLHUser >> addJob: anObject [
 	<generated>
 	^ self jobs add: anObject
+]
+
+{ #category : #adding }
+GLHUser >> addLaunchedPipeline: anObject [
+	<generated>
+	^ self launchedPipelines add: anObject
 ]
 
 { #category : #adding }
@@ -475,6 +483,22 @@ GLHUser >> jobsGroup [
 	<generated>
 	<navigation: 'Jobs'>
 	^ MooseSpecializedGroup withAll: self jobs asSet
+]
+
+{ #category : #accessing }
+GLHUser >> launchedPipelines [
+	"Relation named: #launchedPipelines type: #GLHPipeline opposite: #user"
+
+	<generated>
+	<derived>
+	^ launchedPipelines
+]
+
+{ #category : #accessing }
+GLHUser >> launchedPipelines: anObject [
+
+	<generated>
+	launchedPipelines value: anObject
 ]
 
 { #category : #accessing }

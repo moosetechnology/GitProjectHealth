@@ -15,6 +15,11 @@ A GitLab Pipeline execution
 |---|
 | `jobs` | `GLHPipeline` | `pipeline` | `GLHJob` | |
 
+### Other
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `user` | `GLHPipeline` | `launchedPipelines` | `GLHUser` | |
+
 
 ## Properties
 ======================
@@ -26,10 +31,11 @@ A GitLab Pipeline execution
 | `finished_at` | `Object` | nil | finish date of the pipeline|
 | `id` | `String` | nil | The id of the pipeline|
 | `name` | `String` | nil | name of the pipeline|
+| `ref` | `String` | nil | reference its emmited source (merge request or else)|
 | `runDate` | `Object` | nil | Date this pipeline was run|
+| `sha` | `String` | nil | sha of its emmited source|
 | `sourceEvent` | `String` | nil | triggering event from where the pipeline originate, such as #push #fork, etc.|
 | `started_at` | `Object` | nil | start date of the pipeline|
-| `status` | `String` | nil | #success or #failure|
 | `status` | `String` | nil | #success or #failure|
 | `updated_at` | `Object` | nil | update date of the pipeline|
 
@@ -41,6 +47,8 @@ Class {
 		'#id => FMProperty',
 		'#name => FMProperty',
 		'#status => FMProperty',
+		'#ref => FMProperty',
+		'#sha => FMProperty',
 		'#sourceEvent => FMProperty',
 		'#runDate => FMProperty',
 		'#created_at => FMProperty',
@@ -50,6 +58,7 @@ Class {
 		'#duration => FMProperty',
 		'#project => FMOne type: #GLHProject opposite: #pipelines',
 		'#jobs => FMMany type: #GLHJob opposite: #pipeline',
+		'#user => FMOne type: #GLHUser opposite: #launchedPipelines',
 		'#mergeResquest => FMOne type: #GLHMergeRequest opposite: #pipelines'
 	],
 	#category : #'GitLabHealth-Model-Entities'
@@ -215,6 +224,21 @@ GLHPipeline >> projectGroup [
 ]
 
 { #category : #accessing }
+GLHPipeline >> ref [
+
+	<FMProperty: #ref type: #String>
+	<generated>
+	<FMComment: 'reference its emmited source (merge request or else)'>
+	^ ref
+]
+
+{ #category : #accessing }
+GLHPipeline >> ref: anObject [
+	<generated>
+	ref := anObject
+]
+
+{ #category : #accessing }
 GLHPipeline >> runDate [
 
 	<FMProperty: #runDate type: #Object>
@@ -227,6 +251,21 @@ GLHPipeline >> runDate [
 GLHPipeline >> runDate: anObject [
 	<generated>
 	runDate := anObject
+]
+
+{ #category : #accessing }
+GLHPipeline >> sha [
+
+	<FMProperty: #sha type: #String>
+	<generated>
+	<FMComment: 'sha of its emmited source'>
+	^ sha
+]
+
+{ #category : #accessing }
+GLHPipeline >> sha: anObject [
+	<generated>
+	sha := anObject
 ]
 
 { #category : #accessing }
@@ -287,4 +326,19 @@ GLHPipeline >> updated_at [
 GLHPipeline >> updated_at: anObject [
 	<generated>
 	updated_at := anObject
+]
+
+{ #category : #accessing }
+GLHPipeline >> user [
+	"Relation named: #user type: #GLHUser opposite: #launchedPipelines"
+
+	<generated>
+	^ user
+]
+
+{ #category : #accessing }
+GLHPipeline >> user: anObject [
+
+	<generated>
+	user := anObject
 ]
