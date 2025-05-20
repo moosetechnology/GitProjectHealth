@@ -230,6 +230,8 @@ GLHMetamodelGenerator >> defineRelations [
 	*-* (commit property: #childCommits).
 	(commit property: #jobs) <>-* (job property: #commit).
 	(pipeline property: #jobs) <>-* (job property: #pipeline).
+	(pipeline property: #user) *- (user property: #launchedPipelines).
+
 	(user property: #jobs) <>-* (job property: #user).
 
 	"MERGE REQUEST RELATIONS"
@@ -435,8 +437,10 @@ GLHMetamodelGenerator >> pipelinesProperties [
 			
 	(pipeline property: #status type: #String) comment:
 		'#success or #failure'.	
-	(pipeline property: #status type: #String) comment:
-		'#success or #failure'.	
+	(pipeline property: #ref type: #String) comment:
+		'reference its emmited source (merge request or else)'.	
+	(pipeline property: #sha type: #String) comment:
+		'sha of its emmited source'.	
 	
 	(pipeline property: #sourceEvent type: #String) comment: 'triggering event from where the pipeline originate, such as #push #fork, etc.'.
 	
