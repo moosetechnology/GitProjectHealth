@@ -237,7 +237,7 @@ GithubModelImporter >> importFilesOfBranch: aBranch [
 ]
 
 { #category : #api }
-GithubModelImporter >> importGroup: aGroupName [
+{ #category : 'import - groups' }
 
 	| result groupResult |
 	result := self repoApi organization: aGroupName.
