@@ -161,7 +161,12 @@ GitlabModelImporter >> completeImportedPipeline: aGLHPipeline [
 		aGLHPipeline user: (self importUser: id). 
 		].
 	
-	aGLHPipeline. 
+	^ aGLHPipeline. 
+]
+
+{ #category : #'import - pipelines' }
+GitlabModelImporter >> completeImportedPipelines: aCollectionOfGLHPipeline [
+	^ aCollectionOfGLHPipeline collect: [ :pipeline | self completeImportedPipeline: pipeline ].  
 ]
 
 { #category : #'import - projects' }
@@ -941,7 +946,7 @@ GitlabModelImporter >> importLatestMergeRequestsOfProject: aGLHProject [
 
 { #category : #'import - pipelines' }
 GitlabModelImporter >> importLatestPipelinesOfProject: aGLHProject [ 
-	(self pipelinesOf: aGLHProject id withLimit:30) do: [ :pipeline |
+	(self pipelinesOf: aGLHProject id withLimit:20) do: [ :pipeline |
 		|pip|
 		pip := self glhModel add: pipeline unless: self blockOnIdEquality .
 		pip := aGLHProject pipelines add: pip unless: self blockOnIdEquality.
@@ -1002,11 +1007,11 @@ GitlabModelImporter >> importMergeRequestMergeCommits: aGLPHEMergeRequest [
 
 { #category : #'import - pipelines' }
 GitlabModelImporter >> importMergeRequestPipelines: aGLHMergeRequest [ 
-	"default limit to one page with last 20 pipelines"
+	"default limit to one page with last 100 pipelines"
 	
 	|results parseResults|
 	
-	results := self repoApi pipelines getByPage: 1 perPage: 20 inProject: aGLHMergeRequest project id forMergerRequestIid: aGLHMergeRequest iid. 
+	results := self repoApi pipelines getByPage: 1 perPage: 100 inProject: aGLHMergeRequest project id forMergerRequestIid: aGLHMergeRequest iid. 
 	
 	parseResults := self parsePipelinesResult: results.
 	
@@ -1213,12 +1218,34 @@ GitlabModelImporter >> importPipeline: pipelineId OfProject: aGLHProject [
 
 { #category : #'import - pipelines' }
 GitlabModelImporter >> importPipelinesOfProject: aGLHProject after: after andBefore: before [
-
 	^ (self pipelinesOf: aGLHProject id after: after andBefore: before) collect: [ :pipeline |
 		|pip|
 		pip := self glhModel add: pipeline unless: self blockOnIdEquality .
 		pip := aGLHProject pipelines add: pip unless: self blockOnIdEquality.
-		self completeImportedPipeline: pip. 
+		
+		].
+	
+]
+
+{ #category : #'import - pipelines' }
+GitlabModelImporter >> importPipelinesOfProject: aGLHProject after: after andBefore: before onBranch: aBranch [
+	| result parsedResults|
+	('Search pipelines of: ' , aGLHProject id printString) recordInfo.
+	
+	result := self repoApi pipelines getAllInProject: aGLHProject id 
+												withParams: {	#updated_before -> before.
+																	#updated_after -> after.
+																	#ref -> aBranch name} asDictionary .
+	result isString ifTrue: [ ^ self parsePipelinesResult: result ].
+
+	parsedResults := (result collect: [ :pipelinesJson |
+			   self parsePipelinesResult: pipelinesJson ]) flattened.
+	
+
+	^ parsedResults collect: [ :pipeline |
+		|pip|
+		pip := self glhModel add: pipeline unless: self blockOnIdEquality .
+		aGLHProject pipelines add: pip unless: self blockOnIdEquality.
 		].
 	
 ]
