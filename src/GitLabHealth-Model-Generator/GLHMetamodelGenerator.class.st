@@ -329,7 +329,8 @@ GLHMetamodelGenerator >> jobProperties [
 	job property: #allow_failure type: #Boolean.
 	job property: #web_url type: #String.
 	job property: #duration type: #Object.
-	job property: #allow_failure type: #Boolean
+	job property: #name type: #String. 
+	job property: #ref type: #String.
 ]
 
 { #category : #definition }
