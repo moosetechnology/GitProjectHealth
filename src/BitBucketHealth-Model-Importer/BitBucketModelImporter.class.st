@@ -31,15 +31,6 @@ BitBucketModelImporter >> bitBucketApi: anObject [
 	repoApi := anObject
 ]
 
-{ #category : #'import - projects' }
-BitBucketModelImporter >> completeImportProject: aGLHProject [
-
-	aGLHProject repository: GLHRepository new.
-	self glhModel add: aGLHProject repository.
-	"TODO: import repository"
-	^ aGLHProject
-]
-
 { #category : #commit }
 BitBucketModelImporter >> completeImportedCommit: aCommit [ 
 	
@@ -53,6 +44,15 @@ BitBucketModelImporter >> completeImportedCommit: aCommit [
 			self glhModel addAll: diffs unless: self blockForDiffEquality ] ].
 
 	^ aCommit
+]
+
+{ #category : #'import - projects' }
+BitBucketModelImporter >> completeImportedProject: aGLHProject [
+
+	aGLHProject repository: GLHRepository new.
+	self glhModel add: aGLHProject repository.
+	"TODO: import repository"
+	^ aGLHProject
 ]
 
 { #category : #'private - api' }
@@ -173,7 +173,7 @@ BitBucketModelImporter >> getContributionFromDiffs: diffs [
 BitBucketModelImporter >> importAndLoadLatestsCommitsOfProject: aGLHProject [
 
 	| commits |
-	self completeImportProject: aGLHProject.
+	self completeImportedProject: aGLHProject.
 
 	commits := self
 		           importCommitsOfProject: aGLHProject
