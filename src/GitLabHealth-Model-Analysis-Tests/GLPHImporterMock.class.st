@@ -6,7 +6,8 @@ Class {
 		'commitDiffs',
 		'mergeRequests',
 		'glhModel',
-		'notes'
+		'notes',
+		'pipelines'
 	],
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
@@ -112,6 +113,7 @@ GLPHImporterMock >> initialize [
 
 	commits := OrderedCollection new.
 	mergeRequests := OrderedCollection new.
+	pipelines := OrderedCollection new.
 
 	glhModel := GLHModel new name: 'model'
 ]
@@ -138,6 +140,23 @@ GLPHImporterMock >> notes [
 GLPHImporterMock >> notes: anObject [
 
 	notes := anObject 
+]
+
+{ #category : #accessing }
+GLPHImporterMock >> pipelines [
+	^ pipelines
+]
+
+{ #category : #accessing }
+GLPHImporterMock >> pipelines: anOrderedCollection [
+	pipelines := anOrderedCollection
+]
+
+{ #category : #'import - pipelines' }
+GLPHImporterMock >> importPipelinesOfProject: aProject since: aDate until: anotherDate [
+	self flag: 'Adds pipelines regardless of their creation date!'.
+	"In a real importer, filtering by project and date range would happen here."
+	^ pipelines ifNil: [ OrderedCollection new ]
 ]
 
 { #category : #accessing }
