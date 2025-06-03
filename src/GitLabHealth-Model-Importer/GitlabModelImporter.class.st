@@ -1028,7 +1028,7 @@ GitlabModelImporter >> importMergeRequests: aGLHProject [
 	('Import merge request of Project: ' , aGLHProject id printString)
 		recordInfo.
 
-	results := self repoApi mergeRequests allOfProject: aGLHProject id.
+	results := self repoApi mergeRequests getAllOfProject: aGLHProject id.
 	parsedResults := (results collect: [ :projectsJson | self parseMergeRequestsResult: projectsJson ]) flattened. 
 
 	aGLHProject mergeRequests
@@ -1071,7 +1071,7 @@ GitlabModelImporter >> importMergeRequests: aGLHProject since: fromDate until: t
 		          (#scope -> 'all') } asDictionary.
 
 	result := self repoApi mergeRequests
-		          allOfProject: aGLHProject id
+		          getAllOfProject: aGLHProject id
 		          withParams: params.
 	mergeRequests := (result collect: [ :mergeRequestsJson |
 		                  self parseMergeRequestsResult: mergeRequestsJson ])
