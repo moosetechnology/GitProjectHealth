@@ -1816,6 +1816,19 @@ GitlabModelImporter >> repoApi: anObject [
 	self repoApi output: 'json'
 ]
 
+{ #category : #'search - merge request' }
+GitlabModelImporter >> searchMergeRequestMentionning: aString [ 
+	|mergeRequests results|
+	results := repoApi mergeRequests search: aString.
+	mergeRequests := self parseMergeRequestsResult: results.
+	mergeRequests :=	mergeRequests collect: [ :mr |
+		mr project: (self importProject: mr project_id).
+		mr
+		 ].
+	
+	^ glhModel addAll: mergeRequests unless: self blockOnIdEquality. 
+]
+
 { #category : #private }
 GitlabModelImporter >> selectEntityType: aType overAttribut: aSelector equalTo: value [
 
