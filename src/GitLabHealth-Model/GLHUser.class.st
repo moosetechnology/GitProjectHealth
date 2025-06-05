@@ -9,6 +9,7 @@ A GitLab User
 |---|
 | `commits` | `GLHUser` | `commitCreator` | `GLHCommit` | |
 | `jobs` | `GLHUser` | `user` | `GLHJob` | |
+| `releases` | `GLHUser` | `author` | `GLHRelease` | |
 
 ### Other
 | Relation | Origin | Opposite | Type | Comment |
@@ -43,8 +44,8 @@ A GitLab User
 | `job_title` | `String` | nil | |
 | `linkedin` | `String` | nil | |
 | `location` | `String` | nil | |
-| `name` | `String` | nil | |
 | `name` | `String` | nil | Basic name of the entity, not full reference.|
+| `name` | `String` | nil | |
 | `organization` | `String` | nil | |
 | `pronouns` | `String` | nil | |
 | `public_email` | `String` | nil | |
@@ -98,7 +99,8 @@ Class {
 		'#mergerOfMergeRequests => FMMany type: #GLHMergeRequest opposite: #merged_by',
 		'#assignedMergeRequests => FMMany type: #GLHMergeRequest opposite: #assignees',
 		'#currentlyAssignedMergeRequest => FMMany type: #GLHMergeRequest opposite: #assignee',
-		'#reviewedMergeResquest => FMMany type: #GLHMergeRequest opposite: #reviewers'
+		'#reviewedMergeResquest => FMMany type: #GLHMergeRequest opposite: #reviewers',
+		'#releases => FMMany type: #GLHRelease opposite: #author'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }
@@ -176,6 +178,12 @@ GLHUser >> addLaunchedPipeline: anObject [
 GLHUser >> addMergerOfMergeRequest: anObject [
 	<generated>
 	^ self mergerOfMergeRequests add: anObject
+]
+
+{ #category : #adding }
+GLHUser >> addRelease: anObject [
+	<generated>
+	^ self releases add: anObject
 ]
 
 { #category : #adding }
@@ -599,6 +607,29 @@ GLHUser >> public_email [
 GLHUser >> public_email: anObject [
 	<generated>
 	public_email := anObject
+]
+
+{ #category : #accessing }
+GLHUser >> releases [
+	"Relation named: #releases type: #GLHRelease opposite: #author"
+
+	<generated>
+	<derived>
+	^ releases
+]
+
+{ #category : #accessing }
+GLHUser >> releases: anObject [
+
+	<generated>
+	releases value: anObject
+]
+
+{ #category : #navigation }
+GLHUser >> releasesGroup [
+	<generated>
+	<navigation: 'Releases'>
+	^ MooseSpecializedGroup withAll: self releases asSet
 ]
 
 { #category : #accessing }

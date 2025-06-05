@@ -194,10 +194,24 @@ GLHTEntityCreator >> newProjectNamed: aName [
 ]
 
 { #category : #'entity creation' }
+GLHTEntityCreator >> newRelease [
+
+	<generated>
+	^ self add: GLHRelease new
+]
+
+{ #category : #'entity creation' }
 GLHTEntityCreator >> newRepository [
 
 	<generated>
 	^ self add: GLHRepository new
+]
+
+{ #category : #'entity creation' }
+GLHTEntityCreator >> newTag [
+
+	<generated>
+	^ self add: GLHTag new
 ]
 
 { #category : #'entity creation' }
