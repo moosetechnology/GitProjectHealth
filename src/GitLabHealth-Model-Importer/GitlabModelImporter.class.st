@@ -1363,13 +1363,25 @@ GitlabModelImporter >> importRepository: aGLHRepository [
 
 { #category : #'import - tag' }
 GitlabModelImporter >> importTagsForProject: aProject [ 
-	|results tags|
+	|results tags commits|
 	results  := repoApi tags getAllOfProject: aProject id.
 	"get a group of tags"
 	tags := results flatCollect: [ :result |
 			self parseTags: result. 
 		 ].
-	1 halt. 
+
+	tags := glhModel addAll: tags unless: self blockOnNameEquality.
+	tags := aProject repository tags addAll: tags unless: self blockOnNameEquality.
+	
+		"update tags commit if already imported"
+	tags do: [ :tag |
+		|commit|
+		commit := glhModel add: tag commit unless: self blockOnIdEquality.
+		commit := aProject repository commits add: tag commit unless: self blockOnIdEquality.
+		tag commit: commit. 
+		 ].
+	
+	^ tags
 ]
 
 { #category : #'import - users' }
