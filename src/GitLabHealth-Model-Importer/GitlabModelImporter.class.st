@@ -383,6 +383,17 @@ GitlabModelImporter >> configureReaderForPipeline: reader [
 ]
 
 { #category : #'private - configure reader' }
+GitlabModelImporter >> configureReaderForReleases: reader [
+
+	reader mapInstVarsFor: GLHRelease .
+	
+	reader
+		for: #ArrayOfReleases
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHRelease ].
+]
+
+{ #category : #'private - configure reader' }
 GitlabModelImporter >> configureReaderForTags: reader [
 
 	reader mapInstVarsFor: GLHTag .
@@ -390,8 +401,15 @@ GitlabModelImporter >> configureReaderForTags: reader [
 	reader for: GLHTag do: [ :mapping |
 			
 		(mapping mapInstVar: #commit) valueSchema: GLHCommit .
+"		(mapping mapInstVar: #release) valueSchema: GLHRelease ."
 		(mapping mapInstVar: #created_at) valueSchema: DateAndTime .
 		
+		mapping
+			mapProperty: #release
+			getter: [ :object | #ignore ]
+			setter: [ :object :value |
+			object release: (value ifNotNil: [GLHRelease new description: (value at:#description); tag_name: (value at: #tag_name); yourself ]).
+			].
 		 ].
 	
 	reader
@@ -1363,22 +1381,32 @@ GitlabModelImporter >> importRepository: aGLHRepository [
 
 { #category : #'import - tag' }
 GitlabModelImporter >> importTagsForProject: aProject [ 
-	|results tags commits|
+	|results tags |
 	results  := repoApi tags getAllOfProject: aProject id.
 	"get a group of tags"
 	tags := results flatCollect: [ :result |
-			self parseTags: result. 
+			self parseTagsResult: result. 
 		 ].
 
 	tags := glhModel addAll: tags unless: self blockOnNameEquality.
 	tags := aProject repository tags addAll: tags unless: self blockOnNameEquality.
 	
-		"update tags commit if already imported"
+	"update tag's commit if already imported"
 	tags do: [ :tag |
 		|commit|
 		commit := glhModel add: tag commit unless: self blockOnIdEquality.
 		commit := aProject repository commits add: tag commit unless: self blockOnIdEquality.
 		tag commit: commit. 
+		 ].
+	
+	"update tag's release if already imported"
+	tags do: [ :tag |
+		|release|
+		release ifNotNil: [ 
+			release := glhModel add: tag release unless: (self blockEqualityOn: #tag_name).
+			release := aProject releases add: tag release unless: (self blockEqualityOn: #tag_name).
+			tag release: release. 
+			 ].
 		 ].
 	
 	^ tags
@@ -1466,6 +1494,7 @@ GitlabModelImporter >> initReader [
 	self configureReaderForMergeRequest: generalReader.
 	self configureReaderForPipeline: generalReader. 
 	self configureReaderForTags: generalReader. 
+	self configureReaderForReleases: generalReader. 
 ]
 
 { #category : #initialization }
@@ -1771,6 +1800,22 @@ GitlabModelImporter >> parseProjectResult: aResult [
 	^ reader nextAs: GLHProject
 ]
 
+{ #category : #parsing }
+GitlabModelImporter >> parseReleaseResult: result [
+	|reader|
+	reader := generalReader on: result readStream.
+	
+	^ reader nextAs: GLHRelease 
+]
+
+{ #category : #parsing }
+GitlabModelImporter >> parseReleasesResult: result [
+	|reader|
+	reader := generalReader on: result readStream.
+	
+	^ reader nextAs: #ArrayOfReleases
+]
+
 { #category : #'private - parsing' }
 GitlabModelImporter >> parseSubGroupResult: aResult [
 
@@ -1781,7 +1826,7 @@ GitlabModelImporter >> parseSubGroupResult: aResult [
 ]
 
 { #category : #parsing }
-GitlabModelImporter >> parseTags: result [
+GitlabModelImporter >> parseTagsResult: result [
 	|reader|
 	reader := generalReader on: result readStream.
 	

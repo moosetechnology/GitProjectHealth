@@ -123,14 +123,6 @@ GLHRelease >> description: anObject [
 ]
 
 { #category : #accessing }
-GLHRelease >> name [
-
-	<FMProperty: #name type: #String>
-	<generated>
-	^ name
-]
-
-{ #category : #accessing }
 GLHRelease >> name: anObject [
 	<generated>
 	name := anObject
