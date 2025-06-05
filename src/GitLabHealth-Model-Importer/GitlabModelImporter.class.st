@@ -387,6 +387,13 @@ GitlabModelImporter >> configureReaderForReleases: reader [
 
 	reader mapInstVarsFor: GLHRelease .
 	
+	
+	reader for: GLHRelease do: [ :mapping |
+			
+		(mapping mapInstVar: #author) valueSchema: GLHUser .
+		 ].
+	
+	
 	reader
 		for: #ArrayOfReleases
 		customDo: [ :customMappting |
@@ -416,6 +423,18 @@ GitlabModelImporter >> configureReaderForTags: reader [
 		for: #ArrayOfTags
 		customDo: [ :customMappting |
 		customMappting listOfElementSchema: GLHTag ].
+]
+
+{ #category : #'private - configure reader' }
+GitlabModelImporter >> configureReaderForUsers: reader [
+
+	reader mapInstVarsFor: GLHUser.
+
+	reader
+		for: #ArrayOfUser
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHUser ].
+
 ]
 
 { #category : #private }
@@ -992,6 +1011,21 @@ GitlabModelImporter >> importLatestPipelinesOfProject: aGLHProject [
 	^ aGLHProject pipelines 
 ]
 
+{ #category : #'import - release' }
+GitlabModelImporter >> importLatestReleaseOfProject: aGLHProject [ 
+	
+	|result foundRelease|
+	result := repoApi releases getLatestOfProject: aGLHProject id.
+	foundRelease := self parseReleaseResult: result. 
+
+	foundRelease := glhModel add: foundRelease unless: self blockOnNameEquality.
+	foundRelease := aGLHProject releases add: foundRelease unless: self blockOnNameEquality.
+
+	foundRelease author: (glhModel add: foundRelease author unless: self blockOnIdEquality). 
+	
+	^ foundRelease.
+]
+
 { #category : #'import - merge request' }
 GitlabModelImporter >> importMergeRequestCommits: aGLPHEMergeRequest [
 
@@ -1495,6 +1529,7 @@ GitlabModelImporter >> initReader [
 	self configureReaderForPipeline: generalReader. 
 	self configureReaderForTags: generalReader. 
 	self configureReaderForReleases: generalReader. 
+	self configureReaderForUsers: generalReader. 
 ]
 
 { #category : #initialization }
@@ -1837,25 +1872,24 @@ GitlabModelImporter >> parseTagsResult: result [
 GitlabModelImporter >> parseUserResult: result [
 
 	| reader |
-	reader := NeoJSONReader on: result readStream.
-	reader mapInstVarsFor: GLHUser.
+	
+	reader := generalReader on: result readStream.
+	
 	^ reader nextAs: GLHUser
+
+	
+
 ]
 
 { #category : #'private - parsing' }
 GitlabModelImporter >> parseUsersResult: result [
 
 	| reader |
-	reader := NeoJSONReader on: result readStream.
-
-	reader mapInstVarsFor: GLHUser.
-
-	reader
-		for: #ArrayOfUser
-		customDo: [ :customMappting |
-		customMappting listOfElementSchema: GLHUser ].
-
+	
+	reader := generalReader on: result readStream.
+	
 	^ reader nextAs: #ArrayOfUser
+	
 ]
 
 { #category : #'import - projects' }
