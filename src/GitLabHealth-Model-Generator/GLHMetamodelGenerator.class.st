@@ -22,7 +22,9 @@ Class {
 		'deletion',
 		'lineOfCode',
 		'note',
-		'entity'
+		'entity',
+		'release',
+		'tag'
 	],
 	#category : #'GitLabHealth-Model-Generator'
 }
@@ -146,6 +148,21 @@ GLHMetamodelGenerator >> defineClasses [
 		             newClassNamed: #Note
 		             comment:
 		             'a note (a diff) proposed in a Merge Request; can be accepted, modified or deleted'.
+		
+	
+	tag := builder
+		             newClassNamed: #Tag
+		             comment:
+		             'a Tag is a reference to a specific point in the repository''s history'.
+	
+	release := builder
+		             newClassNamed: #Release
+		             comment:
+		             'a Release is typically associated with a tag and provide additional metadata and assets that can be distributed to users'.
+
+
+
+
 ]
 
 { #category : #definition }
@@ -280,7 +297,14 @@ GLHMetamodelGenerator >> defineRelations [
 	"DIFF"
 	(diff property: #file) <>-* (file property: #diffs).
 	(diff property: #diffRanges) <>-* (diffRange property: #diff).
-	(diffRange property: #changes) -* (change property: #diffRange)
+	(diffRange property: #changes) -* (change property: #diffRange).
+	
+
+	"TAG AND RELEASE"
+	(tag property: #commit ) - (commit property: #tag). 
+	(tag property: #release ) - (release property: #tag). 
+	(release property: #author ) *-<> (user property: #releases). 
+
 ]
 
 { #category : #definition }
@@ -452,6 +476,30 @@ GLHMetamodelGenerator >> pipelinesProperties [
 	(pipeline property: #started_at type: #Object) comment: 'start date of the pipeline'.
 	(pipeline property: #finished_at type: #Object) comment: 'finish date of the pipeline'.	
 	(pipeline property: #duration type: #Object) comment: 'the running duration of a pipeline'.
+
+]
+
+{ #category : #definition }
+GLHMetamodelGenerator >> releaseProperties [
+
+	release property: #description type: #String.
+	release property: #tag_name type: #String.
+	release property: #name type: #String.
+	
+	release property: #created_at type: #Object.
+	release property: #released_at type: #Object.
+	release property: #commit_path type: #String.
+	release property: #tag_path type: #String.
+]
+
+{ #category : #definition }
+GLHMetamodelGenerator >> tagProperties [
+
+	tag property: #name type: #String.
+	tag property: #message type: #String.
+	tag property: #target type: #String.
+	tag property: #protected type: #Boolean.
+	tag property: #created_at type: #Object.
 
 ]
 
