@@ -4,6 +4,11 @@ a Tag is a reference to a specific point in the repository's history
 ## Relations
 ======================
 
+### Parents
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `repository` | `GLHTag` | `tags` | `GLHRepository` | |
+
 ### Other
 | Relation | Origin | Opposite | Type | Comment |
 |---|
@@ -33,7 +38,8 @@ Class {
 		'#protected => FMProperty',
 		'#created_at => FMProperty',
 		'#commit => FMOne type: #GLHCommit opposite: #tag',
-		'#release => FMOne type: #GLHRelease opposite: #tag'
+		'#release => FMOne type: #GLHRelease opposite: #tag',
+		'#repository => FMOne type: #GLHRepository opposite: #tags'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }
@@ -131,6 +137,29 @@ GLHTag >> release: anObject [
 
 	<generated>
 	release := anObject
+]
+
+{ #category : #accessing }
+GLHTag >> repository [
+	"Relation named: #repository type: #GLHRepository opposite: #tags"
+
+	<generated>
+	<container>
+	^ repository
+]
+
+{ #category : #accessing }
+GLHTag >> repository: anObject [
+
+	<generated>
+	repository := anObject
+]
+
+{ #category : #navigation }
+GLHTag >> repositoryGroup [
+	<generated>
+	<navigation: 'Repository'>
+	^ MooseSpecializedGroup with: self repository
 ]
 
 { #category : #accessing }

@@ -8,6 +8,7 @@ a Release is typically associated with a tag and provide additional metadata and
 | Relation | Origin | Opposite | Type | Comment |
 |---|
 | `author` | `GLHRelease` | `releases` | `GLHUser` | |
+| `project` | `GLHRelease` | `releases` | `GLHProject` | |
 
 ### Other
 | Relation | Origin | Opposite | Type | Comment |
@@ -41,7 +42,8 @@ Class {
 		'#commit_path => FMProperty',
 		'#tag_path => FMProperty',
 		'#tag => FMOne type: #GLHTag opposite: #release',
-		'#author => FMOne type: #GLHUser opposite: #releases'
+		'#author => FMOne type: #GLHUser opposite: #releases',
+		'#project => FMOne type: #GLHProject opposite: #releases'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }
@@ -132,6 +134,29 @@ GLHRelease >> name [
 GLHRelease >> name: anObject [
 	<generated>
 	name := anObject
+]
+
+{ #category : #accessing }
+GLHRelease >> project [
+	"Relation named: #project type: #GLHProject opposite: #releases"
+
+	<generated>
+	<container>
+	^ project
+]
+
+{ #category : #accessing }
+GLHRelease >> project: anObject [
+
+	<generated>
+	project := anObject
+]
+
+{ #category : #navigation }
+GLHRelease >> projectGroup [
+	<generated>
+	<navigation: 'Project'>
+	^ MooseSpecializedGroup with: self project
 ]
 
 { #category : #accessing }
