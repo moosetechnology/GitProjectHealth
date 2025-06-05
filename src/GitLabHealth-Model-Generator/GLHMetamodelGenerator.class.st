@@ -305,7 +305,10 @@ GLHMetamodelGenerator >> defineRelations [
 	"TAG AND RELEASE"
 	(tag property: #commit ) - (commit property: #tag). 
 	(tag property: #release ) - (release property: #tag). 
+	(tag property: #repository ) *-<> (repository property: #tags).
 	(release property: #author ) *-<> (user property: #releases). 
+	(release property: #project ) *-<> (project property: #releases). 
+	 
 
 ]
 

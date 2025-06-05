@@ -1363,9 +1363,12 @@ GitlabModelImporter >> importRepository: aGLHRepository [
 
 { #category : #'import - tag' }
 GitlabModelImporter >> importTagsForProject: aProject [ 
-	|results|
+	|results tags|
 	results  := repoApi tags getAllOfProject: aProject id.
-	self parseTags: results. 
+	"get a group of tags"
+	tags := results flatCollect: [ :result |
+			self parseTags: result. 
+		 ].
 	1 halt. 
 ]
 
@@ -1768,7 +1771,6 @@ GitlabModelImporter >> parseSubGroupResult: aResult [
 { #category : #parsing }
 GitlabModelImporter >> parseTags: result [
 	|reader|
-	1 halt. 
 	reader := generalReader on: result readStream.
 	
 	^ reader nextAs: #ArrayOfTags
