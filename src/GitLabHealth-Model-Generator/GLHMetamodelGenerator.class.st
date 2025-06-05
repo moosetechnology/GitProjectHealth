@@ -221,6 +221,8 @@ GLHMetamodelGenerator >> defineProperties [
 	self mergeRequestProperties.
 	self diffRangeProperties.
 	self noteProperties.
+	self tagProperties.
+	self releaseProperties.
 ]
 
 { #category : #definition }

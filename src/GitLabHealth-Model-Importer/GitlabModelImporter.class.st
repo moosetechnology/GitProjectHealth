@@ -382,6 +382,24 @@ GitlabModelImporter >> configureReaderForPipeline: reader [
 		customMappting listOfElementSchema: GLHPipeline ].
 ]
 
+{ #category : #'private - configure reader' }
+GitlabModelImporter >> configureReaderForTags: reader [
+
+	reader mapInstVarsFor: GLHTag .
+	
+	reader for: GLHTag do: [ :mapping |
+			
+		(mapping mapInstVar: #commit) valueSchema: GLHCommit .
+		(mapping mapInstVar: #created_at) valueSchema: DateAndTime .
+		
+		 ].
+	
+	reader
+		for: #ArrayOfTags
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHTag ].
+]
+
 { #category : #private }
 GitlabModelImporter >> convertApiFileAsFile: aAPIFile [
 
@@ -1343,6 +1361,14 @@ GitlabModelImporter >> importRepository: aGLHRepository [
 			self importCommitsOfBranch: branch ] ]
 ]
 
+{ #category : #'import - tag' }
+GitlabModelImporter >> importTagsForProject: aProject [ 
+	|results|
+	results  := repoApi tags getAllOfProject: aProject id.
+	self parseTags: results. 
+	1 halt. 
+]
+
 { #category : #'import - users' }
 GitlabModelImporter >> importUser: aUserID [
 
@@ -1424,6 +1450,7 @@ GitlabModelImporter >> initReader [
 	self configureReaderForDiffs: generalReader.
 	self configureReaderForMergeRequest: generalReader.
 	self configureReaderForPipeline: generalReader. 
+	self configureReaderForTags: generalReader. 
 ]
 
 { #category : #initialization }
@@ -1736,6 +1763,15 @@ GitlabModelImporter >> parseSubGroupResult: aResult [
 	reader := NeoJSONReader on: aResult readStream.
 	self configureReaderForGroup: reader.
 	^ reader nextAs: #ArrayOfGroups
+]
+
+{ #category : #parsing }
+GitlabModelImporter >> parseTags: result [
+	|reader|
+	1 halt. 
+	reader := generalReader on: result readStream.
+	
+	^ reader nextAs: #ArrayOfTags
 ]
 
 { #category : #'private - parsing' }
