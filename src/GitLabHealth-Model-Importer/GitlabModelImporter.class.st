@@ -1021,7 +1021,7 @@ GitlabModelImporter >> importLatestReleaseOfProject: aGLHProject [
 	foundRelease := glhModel add: foundRelease unless: self blockOnNameEquality.
 	foundRelease := aGLHProject releases add: foundRelease unless: self blockOnNameEquality.
 
-	foundRelease author: (glhModel add: foundRelease author unless: self blockOnIdEquality). 
+	foundRelease author: (self importUser: foundRelease author id). 
 	
 	^ foundRelease.
 ]
