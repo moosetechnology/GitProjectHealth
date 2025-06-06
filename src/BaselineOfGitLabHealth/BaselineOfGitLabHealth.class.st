@@ -107,7 +107,7 @@ BaselineOfGitLabHealth >> defineJiraConnector: spec [
 
 	spec
 		package: 'GitProject-JiraConnector-Model'
-		with: [ spec requires: #( 'JiraPharoAPI' ) ];
+		with: [ spec requires: #( 'JiraPharoAPI' 'GitLabHealth-Model' ) ];
 		package: 'GitProject-JiraConnector' with: [
 			spec requires: #( 'GitProject-JiraConnector-Model'
 				   'JiraPharoAPI' ) ];
