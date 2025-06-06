@@ -14,6 +14,7 @@ A git repository
 |---|
 | `branches` | `GLHRepository` | `repository` | `GLHBranch` | |
 | `commits` | `GLHRepository` | `repository` | `GLHCommit` | |
+| `tags` | `GLHRepository` | `repository` | `GLHTag` | |
 
 
 
@@ -24,7 +25,8 @@ Class {
 	#instVars : [
 		'#project => FMOne type: #GLHProject opposite: #repository',
 		'#branches => FMMany type: #GLHBranch opposite: #repository',
-		'#commits => FMMany type: #GLHCommit opposite: #repository'
+		'#commits => FMMany type: #GLHCommit opposite: #repository',
+		'#tags => FMMany type: #GLHTag opposite: #repository'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }
@@ -48,6 +50,12 @@ GLHRepository >> addBranch: anObject [
 GLHRepository >> addCommit: anObject [
 	<generated>
 	^ self commits add: anObject
+]
+
+{ #category : #adding }
+GLHRepository >> addTag: anObject [
+	<generated>
+	^ self tags add: anObject
 ]
 
 { #category : #accessing }
@@ -118,4 +126,27 @@ GLHRepository >> projectGroup [
 	<generated>
 	<navigation: 'Project'>
 	^ MooseSpecializedGroup with: self project
+]
+
+{ #category : #accessing }
+GLHRepository >> tags [
+	"Relation named: #tags type: #GLHTag opposite: #repository"
+
+	<generated>
+	<derived>
+	^ tags
+]
+
+{ #category : #accessing }
+GLHRepository >> tags: anObject [
+
+	<generated>
+	tags value: anObject
+]
+
+{ #category : #navigation }
+GLHRepository >> tagsGroup [
+	<generated>
+	<navigation: 'Tags'>
+	^ MooseSpecializedGroup withAll: self tags asSet
 ]

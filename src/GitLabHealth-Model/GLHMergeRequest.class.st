@@ -9,6 +9,11 @@ a gitlab merge request
 |---|
 | `project` | `GLHMergeRequest` | `mergeRequests` | `GLHProject` | |
 
+### Children
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `pipelines` | `GLHMergeRequest` | `mergeResquest` | `GLHPipeline` | |
+
 ### Other
 | Relation | Origin | Opposite | Type | Comment |
 |---|
@@ -23,7 +28,6 @@ a gitlab merge request
 | `mergedCommit` | `GLHMergeRequest` | `commitedMergeRequest` | `GLHCommit` | |
 | `merged_by` | `GLHMergeRequest` | `mergerOfMergeRequests` | `GLHUser` | |
 | `note` | `GLHMergeRequest` | `mergeRequest` | `GLHNote` | |
-| `pipeline` | `GLHMergeRequest` | `mergeResquest` | `GLHPipeline` | |
 | `reviewers` | `GLHMergeRequest` | `reviewedMergeResquest` | `GLHUser` | |
 | `squashCommit` | `GLHMergeRequest` | `squashedMergeRequest` | `GLHCommit` | |
 
@@ -154,7 +158,7 @@ Class {
 		'#assignees => FMMany type: #GLHUser opposite: #assignedMergeRequests',
 		'#assignee => FMOne type: #GLHUser opposite: #currentlyAssignedMergeRequest',
 		'#reviewers => FMMany type: #GLHUser opposite: #reviewedMergeResquest',
-		'#pipeline => FMOne type: #GLHPipeline opposite: #mergeResquest',
+		'#pipelines => FMMany type: #GLHPipeline opposite: #mergeResquest',
 		'#mergedCommit => FMOne type: #GLHCommit opposite: #commitedMergeRequest',
 		'#mergeRequestCommit => FMOne type: #GLHCommit opposite: #commitedMergeRequest',
 		'#squashCommit => FMOne type: #GLHCommit opposite: #squashedMergeRequest',
@@ -196,6 +200,12 @@ GLHMergeRequest >> addDiff: anObject [
 GLHMergeRequest >> addNote: anObject [
 	<generated>
 	^ self note add: anObject
+]
+
+{ #category : #adding }
+GLHMergeRequest >> addPipeline: anObject [
+	<generated>
+	^ self pipelines add: anObject
 ]
 
 { #category : #adding }
@@ -710,18 +720,26 @@ GLHMergeRequest >> note: anObject [
 ]
 
 { #category : #accessing }
-GLHMergeRequest >> pipeline [
-	"Relation named: #pipeline type: #GLHPipeline opposite: #mergeResquest"
+GLHMergeRequest >> pipelines [
+	"Relation named: #pipelines type: #GLHPipeline opposite: #mergeResquest"
 
 	<generated>
-	^ pipeline
+	<derived>
+	^ pipelines
 ]
 
 { #category : #accessing }
-GLHMergeRequest >> pipeline: anObject [
+GLHMergeRequest >> pipelines: anObject [
 
 	<generated>
-	pipeline := anObject
+	pipelines value: anObject
+]
+
+{ #category : #navigation }
+GLHMergeRequest >> pipelinesGroup [
+	<generated>
+	<navigation: 'Pipelines'>
+	^ MooseSpecializedGroup withAll: self pipelines asSet
 ]
 
 { #category : #accessing }

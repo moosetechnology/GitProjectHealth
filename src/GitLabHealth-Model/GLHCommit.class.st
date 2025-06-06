@@ -25,6 +25,7 @@ a commit attached to a repository
 | `commitedMergeRequest` | `GLHCommit` | `mergedCommit` | `GLHMergeRequest` | |
 | `parentCommits` | `GLHCommit` | `childCommits` | `GLHCommit` | |
 | `squashedMergeRequest` | `GLHCommit` | `squashCommit` | `GLHMergeRequest` | |
+| `tag` | `GLHCommit` | `commit` | `GLHTag` | |
 
 
 ## Properties
@@ -79,7 +80,8 @@ Class {
 		'#childCommits => FMMany type: #GLHCommit opposite: #parentCommits',
 		'#jobs => FMMany type: #GLHJob opposite: #commit',
 		'#commitedMergeRequest => FMOne type: #GLHMergeRequest opposite: #mergedCommit',
-		'#squashedMergeRequest => FMOne type: #GLHMergeRequest opposite: #squashCommit'
+		'#squashedMergeRequest => FMOne type: #GLHMergeRequest opposite: #squashCommit',
+		'#tag => FMOne type: #GLHTag opposite: #commit'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }
@@ -469,6 +471,22 @@ GLHCommit >> squashedMergeRequest: anObject [
 
 	<generated>
 	squashedMergeRequest := anObject
+]
+
+{ #category : #accessing }
+GLHCommit >> tag [
+	"Relation named: #tag type: #GLHTag opposite: #commit"
+
+	<generated>
+	<derived>
+	^ tag
+]
+
+{ #category : #accessing }
+GLHCommit >> tag: anObject [
+
+	<generated>
+	tag := anObject
 ]
 
 { #category : #accessing }

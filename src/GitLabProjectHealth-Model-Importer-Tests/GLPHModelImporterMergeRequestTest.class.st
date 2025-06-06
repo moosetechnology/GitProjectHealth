@@ -116,7 +116,7 @@ GLPHModelImporterMergeRequestTest >> setUp [
 GLPHModelImporterMergeRequestTest >> testParseMergeRequestMergeUserAlreadySet [
 
 	| mergeRequest user |
-	mergeRequest := (glhImporter parseMergeRequestResult: gitlabMergeData) anyOne.
+	mergeRequest := (glhImporter parseMergeRequestsResult: gitlabMergeData) anyOne.
 	user := GLHUser new.
 	mergeRequest merge_user: user.
 	glhImporter importMergeResquestMerger: mergeRequest.
@@ -127,7 +127,7 @@ GLPHModelImporterMergeRequestTest >> testParseMergeRequestMergeUserAlreadySet [
 GLPHModelImporterMergeRequestTest >> testParseMergeRequestMergeUserExistInModelAndCacheID [
 
 	| mergeRequest user |
-	mergeRequest := (glhImporter parseMergeRequestResult: gitlabMergeData)
+	mergeRequest := (glhImporter parseMergeRequestsResult: gitlabMergeData)
 		                anyOne.
 	user := glhModel newUser.
 	user id: 12.
@@ -139,7 +139,7 @@ GLPHModelImporterMergeRequestTest >> testParseMergeRequestMergeUserExistInModelA
 GLPHModelImporterMergeRequestTest >> testParseMergeRequestMergeUserIsNil [
 
 	| mergeRequest |
-	mergeRequest := (glhImporter parseMergeRequestResult: '[{"id":46074}]') anyOne.
+	mergeRequest := (glhImporter parseMergeRequestsResult: '[{"id":46074}]') anyOne.
 	self assert: mergeRequest merge_user equals: nil
 ]
 
@@ -147,7 +147,7 @@ GLPHModelImporterMergeRequestTest >> testParseMergeRequestMergeUserIsNil [
 GLPHModelImporterMergeRequestTest >> testParseMergeRequestMergeUserWithoutCache [
 
 	| mergeRequest user |
-	mergeRequest := (glhImporter parseMergeRequestResult: gitlabMergeData) anyOne.
+	mergeRequest := (glhImporter parseMergeRequestsResult: gitlabMergeData) anyOne.
 	mergeRequest flush.
 	user := glhModel newUser.
 	user id: 12.
@@ -159,7 +159,7 @@ GLPHModelImporterMergeRequestTest >> testParseMergeRequestMergeUserWithoutCache 
 GLPHModelImporterMergeRequestTest >> testParseMergeRequestResult [
 
 	| parseRes |
-	parseRes := glhImporter parseMergeRequestResult: gitlabMergeData.
+	parseRes := glhImporter parseMergeRequestsResult: gitlabMergeData.
 	self assert: parseRes size equals: 1.
 	self assert: parseRes anyOne id equals: 46074
 ]
@@ -168,7 +168,7 @@ GLPHModelImporterMergeRequestTest >> testParseMergeRequestResult [
 GLPHModelImporterMergeRequestTest >> testParseMergeRequestUserAlreadySet [
 
 	| mergeRequest user |
-	mergeRequest := (glhImporter parseMergeRequestResult: gitlabMergeData) anyOne.
+	mergeRequest := (glhImporter parseMergeRequestsResult: gitlabMergeData) anyOne.
 	user := GLHUser new.
 	mergeRequest author: user.
 	glhImporter importMergeResquestAuthor: mergeRequest.
@@ -179,7 +179,7 @@ GLPHModelImporterMergeRequestTest >> testParseMergeRequestUserAlreadySet [
 GLPHModelImporterMergeRequestTest >> testParseMergeRequestUserExistInModelAndCacheID [
 
 	| mergeRequest user |
-	mergeRequest := (glhImporter parseMergeRequestResult: gitlabMergeData)
+	mergeRequest := (glhImporter parseMergeRequestsResult: gitlabMergeData)
 		                anyOne.
 	user := glhModel newUser.
 	user id: 12.
@@ -191,7 +191,7 @@ GLPHModelImporterMergeRequestTest >> testParseMergeRequestUserExistInModelAndCac
 GLPHModelImporterMergeRequestTest >> testParseMergeRequestWithoutCache [
 
 	| mergeRequest user |
-	mergeRequest := (glhImporter parseMergeRequestResult: gitlabMergeData)
+	mergeRequest := (glhImporter parseMergeRequestsResult: gitlabMergeData)
 		                anyOne.
 	mergeRequest flush.
 	user := glhModel newUser.
