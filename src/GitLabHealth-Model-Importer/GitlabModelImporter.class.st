@@ -382,6 +382,61 @@ GitlabModelImporter >> configureReaderForPipeline: reader [
 		customMappting listOfElementSchema: GLHPipeline ].
 ]
 
+{ #category : #'private - configure reader' }
+GitlabModelImporter >> configureReaderForReleases: reader [
+
+	reader mapInstVarsFor: GLHRelease .
+	
+	
+	reader for: GLHRelease do: [ :mapping |
+			
+		(mapping mapInstVar: #author) valueSchema: GLHUser .
+		 ].
+	
+	
+	reader
+		for: #ArrayOfReleases
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHRelease ].
+]
+
+{ #category : #'private - configure reader' }
+GitlabModelImporter >> configureReaderForTags: reader [
+
+	reader mapInstVarsFor: GLHTag .
+	
+	reader for: GLHTag do: [ :mapping |
+			
+		(mapping mapInstVar: #commit) valueSchema: GLHCommit .
+"		(mapping mapInstVar: #release) valueSchema: GLHRelease ."
+		(mapping mapInstVar: #created_at) valueSchema: DateAndTime .
+		
+		mapping
+			mapProperty: #release
+			getter: [ :object | #ignore ]
+			setter: [ :object :value |
+			object release: (value ifNotNil: [GLHRelease new description: (value at:#description); tag_name: (value at: #tag_name); yourself ]).
+			].
+		 ].
+	
+	reader
+		for: #ArrayOfTags
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHTag ].
+]
+
+{ #category : #'private - configure reader' }
+GitlabModelImporter >> configureReaderForUsers: reader [
+
+	reader mapInstVarsFor: GLHUser.
+
+	reader
+		for: #ArrayOfUser
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHUser ].
+
+]
+
 { #category : #private }
 GitlabModelImporter >> convertApiFileAsFile: aAPIFile [
 
@@ -956,6 +1011,21 @@ GitlabModelImporter >> importLatestPipelinesOfProject: aGLHProject [
 	^ aGLHProject pipelines 
 ]
 
+{ #category : #'import - release' }
+GitlabModelImporter >> importLatestReleaseOfProject: aGLHProject [ 
+	
+	|result foundRelease|
+	result := repoApi releases getLatestOfProject: aGLHProject id.
+	foundRelease := self parseReleaseResult: result. 
+
+	foundRelease := glhModel add: foundRelease unless: self blockOnNameEquality.
+	foundRelease := aGLHProject releases add: foundRelease unless: self blockOnNameEquality.
+
+	foundRelease author: (self importUser: foundRelease author id). 
+	
+	^ foundRelease.
+]
+
 { #category : #'import - merge request' }
 GitlabModelImporter >> importMergeRequestCommits: aGLPHEMergeRequest [
 
@@ -1028,7 +1098,7 @@ GitlabModelImporter >> importMergeRequests: aGLHProject [
 	('Import merge request of Project: ' , aGLHProject id printString)
 		recordInfo.
 
-	results := self repoApi mergeRequests allOfProject: aGLHProject id.
+	results := self repoApi mergeRequests getAllOfProject: aGLHProject id.
 	parsedResults := (results collect: [ :projectsJson | self parseMergeRequestsResult: projectsJson ]) flattened. 
 
 	aGLHProject mergeRequests
@@ -1071,7 +1141,7 @@ GitlabModelImporter >> importMergeRequests: aGLHProject since: fromDate until: t
 		          (#scope -> 'all') } asDictionary.
 
 	result := self repoApi mergeRequests
-		          allOfProject: aGLHProject id
+		          getAllOfProject: aGLHProject id
 		          withParams: params.
 	mergeRequests := (result collect: [ :mergeRequestsJson |
 		                  self parseMergeRequestsResult: mergeRequestsJson ])
@@ -1343,6 +1413,39 @@ GitlabModelImporter >> importRepository: aGLHRepository [
 			self importCommitsOfBranch: branch ] ]
 ]
 
+{ #category : #'import - tag' }
+GitlabModelImporter >> importTagsForProject: aProject [ 
+	|results tags |
+	results  := repoApi tags getAllOfProject: aProject id.
+	"get a group of tags"
+	tags := results flatCollect: [ :result |
+			self parseTagsResult: result. 
+		 ].
+
+	tags := glhModel addAll: tags unless: self blockOnNameEquality.
+	tags := aProject repository tags addAll: tags unless: self blockOnNameEquality.
+	
+	"update tag's commit if already imported"
+	tags do: [ :tag |
+		|commit|
+		commit := glhModel add: tag commit unless: self blockOnIdEquality.
+		commit := aProject repository commits add: tag commit unless: self blockOnIdEquality.
+		tag commit: commit. 
+		 ].
+	
+	"update tag's release if already imported"
+	tags do: [ :tag |
+		|release|
+		release ifNotNil: [ 
+			release := glhModel add: tag release unless: (self blockEqualityOn: #tag_name).
+			release := aProject releases add: tag release unless: (self blockEqualityOn: #tag_name).
+			tag release: release. 
+			 ].
+		 ].
+	
+	^ tags
+]
+
 { #category : #'import - users' }
 GitlabModelImporter >> importUser: aUserID [
 
@@ -1424,6 +1527,9 @@ GitlabModelImporter >> initReader [
 	self configureReaderForDiffs: generalReader.
 	self configureReaderForMergeRequest: generalReader.
 	self configureReaderForPipeline: generalReader. 
+	self configureReaderForTags: generalReader. 
+	self configureReaderForReleases: generalReader. 
+	self configureReaderForUsers: generalReader. 
 ]
 
 { #category : #initialization }
@@ -1729,6 +1835,22 @@ GitlabModelImporter >> parseProjectResult: aResult [
 	^ reader nextAs: GLHProject
 ]
 
+{ #category : #parsing }
+GitlabModelImporter >> parseReleaseResult: result [
+	|reader|
+	reader := generalReader on: result readStream.
+	
+	^ reader nextAs: GLHRelease 
+]
+
+{ #category : #parsing }
+GitlabModelImporter >> parseReleasesResult: result [
+	|reader|
+	reader := generalReader on: result readStream.
+	
+	^ reader nextAs: #ArrayOfReleases
+]
+
 { #category : #'private - parsing' }
 GitlabModelImporter >> parseSubGroupResult: aResult [
 
@@ -1738,29 +1860,36 @@ GitlabModelImporter >> parseSubGroupResult: aResult [
 	^ reader nextAs: #ArrayOfGroups
 ]
 
+{ #category : #parsing }
+GitlabModelImporter >> parseTagsResult: result [
+	|reader|
+	reader := generalReader on: result readStream.
+	
+	^ reader nextAs: #ArrayOfTags
+]
+
 { #category : #'private - parsing' }
 GitlabModelImporter >> parseUserResult: result [
 
 	| reader |
-	reader := NeoJSONReader on: result readStream.
-	reader mapInstVarsFor: GLHUser.
+	
+	reader := generalReader on: result readStream.
+	
 	^ reader nextAs: GLHUser
+
+	
+
 ]
 
 { #category : #'private - parsing' }
 GitlabModelImporter >> parseUsersResult: result [
 
 	| reader |
-	reader := NeoJSONReader on: result readStream.
-
-	reader mapInstVarsFor: GLHUser.
-
-	reader
-		for: #ArrayOfUser
-		customDo: [ :customMappting |
-		customMappting listOfElementSchema: GLHUser ].
-
+	
+	reader := generalReader on: result readStream.
+	
 	^ reader nextAs: #ArrayOfUser
+	
 ]
 
 { #category : #'import - projects' }
@@ -1814,6 +1943,19 @@ GitlabModelImporter >> pipelinesOf: aProjectID withLimit: aLimit [
 GitlabModelImporter >> repoApi: anObject [
 	super repoApi: anObject.
 	self repoApi output: 'json'
+]
+
+{ #category : #'search - merge request' }
+GitlabModelImporter >> searchMergeRequestMentionning: aString [ 
+	|mergeRequests results|
+	results := repoApi mergeRequests search: aString.
+	mergeRequests := self parseMergeRequestsResult: results.
+	mergeRequests :=	mergeRequests collect: [ :mr |
+		mr project: (self importProject: mr project_id).
+		mr
+		 ].
+	
+	^ glhModel addAll: mergeRequests unless: self blockOnIdEquality. 
 ]
 
 { #category : #private }
