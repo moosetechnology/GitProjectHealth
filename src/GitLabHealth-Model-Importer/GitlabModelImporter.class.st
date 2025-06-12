@@ -371,7 +371,7 @@ GitlabModelImporter >> configureReaderForPipeline: reader [
 			mapProperty: #user
 			getter: [ :object | #ignore ]
 			setter: [ :object :value |
-			(object cacheAt: #userID put: (value at: #id)) .
+			value ifNotNil: [object cacheAt: #userID put: (value at: #id)].
 			].
 		
 		 ].
