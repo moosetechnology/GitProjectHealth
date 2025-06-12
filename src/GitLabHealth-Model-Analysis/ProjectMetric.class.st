@@ -87,7 +87,7 @@ ProjectMetric >> loadProjectCompleteMergeRequestsSince: since until: until [
 	^ mergeRequests
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #loading }
 ProjectMetric >> loadProjectMergeRequestsSince: since until: until [
 
 	| mergeRequests |

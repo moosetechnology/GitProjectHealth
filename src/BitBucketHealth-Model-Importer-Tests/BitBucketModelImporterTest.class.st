@@ -24,7 +24,7 @@ BitBucketModelImporterTest >> testCompleteImportProject [
 		                     glhModel: glphModel.
 
 	"When"
-	project := bitBucketImporter completeImportProject: project.
+	project := bitBucketImporter completeImportedProject: project.
 
 	"Then"
 	self deny: project repository equals: nil.

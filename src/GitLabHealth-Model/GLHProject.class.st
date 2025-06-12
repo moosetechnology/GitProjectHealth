@@ -14,6 +14,7 @@ A GitLab Project
 |---|
 | `mergeRequests` | `GLHProject` | `project` | `GLHMergeRequest` | |
 | `pipelines` | `GLHProject` | `project` | `GLHPipeline` | |
+| `releases` | `GLHProject` | `project` | `GLHRelease` | |
 | `repository` | `GLHProject` | `project` | `GLHRepository` | |
 
 ### Other
@@ -59,7 +60,8 @@ Class {
 		'#creator => FMOne type: #GLHUser opposite: #createdProjects',
 		'#contributors => FMMany type: #GLHUser opposite: #contributedProjects',
 		'#repository => FMOne type: #GLHRepository opposite: #project',
-		'#mergeRequests => FMMany type: #GLHMergeRequest opposite: #project'
+		'#mergeRequests => FMMany type: #GLHMergeRequest opposite: #project',
+		'#releases => FMMany type: #GLHRelease opposite: #project'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }
@@ -89,6 +91,12 @@ GLHProject >> addMergeRequest: anObject [
 GLHProject >> addPipeline: anObject [
 	<generated>
 	^ self pipelines add: anObject
+]
+
+{ #category : #adding }
+GLHProject >> addRelease: anObject [
+	<generated>
+	^ self releases add: anObject
 ]
 
 { #category : #accessing }
@@ -273,6 +281,29 @@ GLHProject >> readme_url [
 GLHProject >> readme_url: anObject [
 	<generated>
 	readme_url := anObject
+]
+
+{ #category : #accessing }
+GLHProject >> releases [
+	"Relation named: #releases type: #GLHRelease opposite: #project"
+
+	<generated>
+	<derived>
+	^ releases
+]
+
+{ #category : #accessing }
+GLHProject >> releases: anObject [
+
+	<generated>
+	releases value: anObject
+]
+
+{ #category : #navigation }
+GLHProject >> releasesGroup [
+	<generated>
+	<navigation: 'Releases'>
+	^ MooseSpecializedGroup withAll: self releases asSet
 ]
 
 { #category : #accessing }

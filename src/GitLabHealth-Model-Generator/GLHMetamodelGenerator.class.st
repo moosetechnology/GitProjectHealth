@@ -22,7 +22,9 @@ Class {
 		'deletion',
 		'lineOfCode',
 		'note',
-		'entity'
+		'entity',
+		'release',
+		'tag'
 	],
 	#category : #'GitLabHealth-Model-Generator'
 }
@@ -146,6 +148,21 @@ GLHMetamodelGenerator >> defineClasses [
 		             newClassNamed: #Note
 		             comment:
 		             'a note (a diff) proposed in a Merge Request; can be accepted, modified or deleted'.
+		
+	
+	tag := builder
+		             newClassNamed: #Tag
+		             comment:
+		             'a Tag is a reference to a specific point in the repository''s history'.
+	
+	release := builder
+		             newClassNamed: #Release
+		             comment:
+		             'a Release is typically associated with a tag and provide additional metadata and assets that can be distributed to users'.
+
+
+
+
 ]
 
 { #category : #definition }
@@ -193,15 +210,7 @@ GLHMetamodelGenerator >> defineProperties [
 	project property: #web_url type: #String.
 	project property: #creator_id type: #Number.
 
-	"Pipelines properties"
-	(pipeline property: #status type: #String) comment:
-		'#success or #failure'.
-	(pipeline property: #runDate type: #Object) comment:
-		'Date this pipeline was run'.
-	(pipeline property: #id type: #String) comment:
-		'The id of the pipeline'.
-
-
+	self pipelinesProperties.
 	self userProperties.
 	self branchProperties.
 	self fileProperties.
@@ -212,6 +221,8 @@ GLHMetamodelGenerator >> defineProperties [
 	self mergeRequestProperties.
 	self diffRangeProperties.
 	self noteProperties.
+	self tagProperties.
+	self releaseProperties.
 ]
 
 { #category : #definition }
@@ -238,6 +249,8 @@ GLHMetamodelGenerator >> defineRelations [
 	*-* (commit property: #childCommits).
 	(commit property: #jobs) <>-* (job property: #commit).
 	(pipeline property: #jobs) <>-* (job property: #pipeline).
+	(pipeline property: #user) *- (user property: #launchedPipelines).
+
 	(user property: #jobs) <>-* (job property: #user).
 
 	"MERGE REQUEST RELATIONS"
@@ -264,8 +277,8 @@ GLHMetamodelGenerator >> defineRelations [
 	(mergeRequest property: #reviewers)
 	*-* (user property: #reviewedMergeResquest).
 
-	(mergeRequest property: #pipeline)
-	- (pipeline property: #mergeResquest).
+	(mergeRequest property: #pipelines)
+	<>-* (pipeline property: #mergeResquest).
 
 	(mergeRequest property: #mergedCommit)
 	- (commit property: #commitedMergeRequest).
@@ -286,7 +299,17 @@ GLHMetamodelGenerator >> defineRelations [
 	"DIFF"
 	(diff property: #file) <>-* (file property: #diffs).
 	(diff property: #diffRanges) <>-* (diffRange property: #diff).
-	(diffRange property: #changes) -* (change property: #diffRange)
+	(diffRange property: #changes) -* (change property: #diffRange).
+	
+
+	"TAG AND RELEASE"
+	(tag property: #commit ) - (commit property: #tag). 
+	(tag property: #release ) - (release property: #tag). 
+	(tag property: #repository ) *-<> (repository property: #tags).
+	(release property: #author ) *-<> (user property: #releases). 
+	(release property: #project ) *-<> (project property: #releases). 
+	 
+
 ]
 
 { #category : #definition }
@@ -335,7 +358,8 @@ GLHMetamodelGenerator >> jobProperties [
 	job property: #allow_failure type: #Boolean.
 	job property: #web_url type: #String.
 	job property: #duration type: #Object.
-	job property: #allow_failure type: #Boolean
+	job property: #name type: #String. 
+	job property: #ref type: #String.
 ]
 
 { #category : #definition }
@@ -428,6 +452,59 @@ GLHMetamodelGenerator >> noteProperties [
  
  
  
+
+]
+
+{ #category : #'as yet unclassified' }
+GLHMetamodelGenerator >> pipelinesProperties [
+	
+	"Pipelines properties"
+	
+	(pipeline property: #id type: #String) comment:
+		'The id of the pipeline'.
+	(pipeline property: #name type: #String) comment:
+		'name of the pipeline'.	
+			
+	(pipeline property: #status type: #String) comment:
+		'#success or #failure'.	
+	(pipeline property: #ref type: #String) comment:
+		'reference its emmited source (merge request or else)'.	
+	(pipeline property: #sha type: #String) comment:
+		'sha of its emmited source'.	
+	
+	(pipeline property: #sourceEvent type: #String) comment: 'triggering event from where the pipeline originate, such as #push #fork, etc.'.
+	
+	(pipeline property: #runDate type: #Object) comment:
+		'Date this pipeline was run'.
+	(pipeline property: #created_at type: #Object) comment: 'creation date of the pipeline'.
+	(pipeline property: #updated_at type: #Object) comment: 'update date of the pipeline'.
+	(pipeline property: #started_at type: #Object) comment: 'start date of the pipeline'.
+	(pipeline property: #finished_at type: #Object) comment: 'finish date of the pipeline'.	
+	(pipeline property: #duration type: #Object) comment: 'the running duration of a pipeline'.
+
+]
+
+{ #category : #definition }
+GLHMetamodelGenerator >> releaseProperties [
+
+	release property: #description type: #String.
+	release property: #tag_name type: #String.
+	release property: #name type: #String.
+	
+	release property: #created_at type: #Object.
+	release property: #released_at type: #Object.
+	release property: #commit_path type: #String.
+	release property: #tag_path type: #String.
+]
+
+{ #category : #definition }
+GLHMetamodelGenerator >> tagProperties [
+
+	tag property: #name type: #String.
+	tag property: #message type: #String.
+	tag property: #target type: #String.
+	tag property: #protected type: #Boolean.
+	tag property: #created_at type: #Object.
 
 ]
 

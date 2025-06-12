@@ -9,6 +9,7 @@ A GitLab User
 |---|
 | `commits` | `GLHUser` | `commitCreator` | `GLHCommit` | |
 | `jobs` | `GLHUser` | `user` | `GLHJob` | |
+| `releases` | `GLHUser` | `author` | `GLHRelease` | |
 
 ### Other
 | Relation | Origin | Opposite | Type | Comment |
@@ -20,6 +21,7 @@ A GitLab User
 | `createdMergeRequests` | `GLHUser` | `author` | `GLHMergeRequest` | |
 | `createdProjects` | `GLHUser` | `creator` | `GLHProject` | |
 | `currentlyAssignedMergeRequest` | `GLHUser` | `assignee` | `GLHMergeRequest` | |
+| `launchedPipelines` | `GLHUser` | `user` | `GLHPipeline` | |
 | `mergerOfMergeRequests` | `GLHUser` | `merged_by` | `GLHMergeRequest` | |
 | `reviewedMergeResquest` | `GLHUser` | `reviewers` | `GLHMergeRequest` | |
 | `usedMerges` | `GLHUser` | `merge_user` | `GLHMergeRequest` | |
@@ -42,8 +44,8 @@ A GitLab User
 | `job_title` | `String` | nil | |
 | `linkedin` | `String` | nil | |
 | `location` | `String` | nil | |
-| `name` | `String` | nil | Basic name of the entity, not full reference.|
 | `name` | `String` | nil | |
+| `name` | `String` | nil | Basic name of the entity, not full reference.|
 | `organization` | `String` | nil | |
 | `pronouns` | `String` | nil | |
 | `public_email` | `String` | nil | |
@@ -88,6 +90,7 @@ Class {
 		'#createdProjects => FMMany type: #GLHProject opposite: #creator',
 		'#contributedProjects => FMMany type: #GLHProject opposite: #contributors',
 		'#commits => FMMany type: #GLHCommit opposite: #commitCreator',
+		'#launchedPipelines => FMMany type: #GLHPipeline opposite: #user',
 		'#jobs => FMMany type: #GLHJob opposite: #user',
 		'#createdMergeRequests => FMMany type: #GLHMergeRequest opposite: #author',
 		'#approcheMergeRequests => FMMany type: #GLHMergeRequest opposite: #approved_by',
@@ -96,7 +99,8 @@ Class {
 		'#mergerOfMergeRequests => FMMany type: #GLHMergeRequest opposite: #merged_by',
 		'#assignedMergeRequests => FMMany type: #GLHMergeRequest opposite: #assignees',
 		'#currentlyAssignedMergeRequest => FMMany type: #GLHMergeRequest opposite: #assignee',
-		'#reviewedMergeResquest => FMMany type: #GLHMergeRequest opposite: #reviewers'
+		'#reviewedMergeResquest => FMMany type: #GLHMergeRequest opposite: #reviewers',
+		'#releases => FMMany type: #GLHRelease opposite: #author'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }
@@ -165,9 +169,21 @@ GLHUser >> addJob: anObject [
 ]
 
 { #category : #adding }
+GLHUser >> addLaunchedPipeline: anObject [
+	<generated>
+	^ self launchedPipelines add: anObject
+]
+
+{ #category : #adding }
 GLHUser >> addMergerOfMergeRequest: anObject [
 	<generated>
 	^ self mergerOfMergeRequests add: anObject
+]
+
+{ #category : #adding }
+GLHUser >> addRelease: anObject [
+	<generated>
+	^ self releases add: anObject
 ]
 
 { #category : #adding }
@@ -478,6 +494,22 @@ GLHUser >> jobsGroup [
 ]
 
 { #category : #accessing }
+GLHUser >> launchedPipelines [
+	"Relation named: #launchedPipelines type: #GLHPipeline opposite: #user"
+
+	<generated>
+	<derived>
+	^ launchedPipelines
+]
+
+{ #category : #accessing }
+GLHUser >> launchedPipelines: anObject [
+
+	<generated>
+	launchedPipelines value: anObject
+]
+
+{ #category : #accessing }
 GLHUser >> linkedin [
 
 	<FMProperty: #linkedin type: #String>
@@ -575,6 +607,29 @@ GLHUser >> public_email [
 GLHUser >> public_email: anObject [
 	<generated>
 	public_email := anObject
+]
+
+{ #category : #accessing }
+GLHUser >> releases [
+	"Relation named: #releases type: #GLHRelease opposite: #author"
+
+	<generated>
+	<derived>
+	^ releases
+]
+
+{ #category : #accessing }
+GLHUser >> releases: anObject [
+
+	<generated>
+	releases value: anObject
+]
+
+{ #category : #navigation }
+GLHUser >> releasesGroup [
+	<generated>
+	<navigation: 'Releases'>
+	^ MooseSpecializedGroup withAll: self releases asSet
 ]
 
 { #category : #accessing }
