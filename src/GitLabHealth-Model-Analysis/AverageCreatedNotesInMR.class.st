@@ -21,7 +21,7 @@ AverageCreatedNotesInMR >> calculate [
     groupedByDate := groupedByDate collect: [ :notesGroup |  
         notesGroup size.  
     ].   
-    ^ groupedByDate sum asFloat / projectMergeRequests size.
+    ^ groupedByDate average asFloat .
 ]
 
 { #category : #accessing }
