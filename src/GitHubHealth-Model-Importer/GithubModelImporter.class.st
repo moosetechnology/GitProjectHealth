@@ -28,17 +28,6 @@ GithubModelImporter >> api: anObject [
 	repoApi := anObject
 ]
 
-{ #category : #api }
-GithubModelImporter >> completeImportProject: aGLHProject [
-
-	self importPipelinesOf: aGLHProject.
-	self importBranchesOf: aGLHProject.
-	self withCommitsSince ifNotNil: [ :withCommitSince | "If not nil, it means we have to import commit"
-		| commits |
-		commits := self importCommitsOfProject: aGLHProject.
-		self chainsCommitsFrom: commits ]
-]
-
 { #category : #commit }
 GithubModelImporter >> completeImportedCommit: aGLHCommit [
 
@@ -70,6 +59,17 @@ GithubModelImporter >> completeImportedCommit: aGLHCommit [
 			diffs do: [ :diff | self importDiffRangesForDiff: diff ] ] ].
 
 	^ aGLHCommit 
+]
+
+{ #category : #api }
+GithubModelImporter >> completeImportedProject: aGLHProject [
+
+	self importPipelinesOf: aGLHProject.
+	self importBranchesOf: aGLHProject.
+	self withCommitsSince ifNotNil: [ :withCommitSince | "If not nil, it means we have to import commit"
+		| commits |
+		commits := self importCommitsOfProject: aGLHProject.
+		self chainsCommitsFrom: commits ]
 ]
 
 { #category : #private }
@@ -253,7 +253,7 @@ GithubModelImporter >> importMergeRequests: aProject [
 	response := self repoApi 
 			mergeRequestsOfRepo: aProject group name 
 			ofProject: aProject name.
-	mergeRequests := self parseMergeRequestResult: response. 
+	mergeRequests := self parseMergeRequestsResult: response. 
 	
 	mergeRequests := aProject mergeRequests addAll:mergeRequests unless: self blockOnIdEquality.
 	^ mergeRequests
@@ -283,7 +283,7 @@ GithubModelImporter >> importProject: aProjectName ofGroup: aGroupName [
 	projectResult := self parseProjectResult: result.
 	projectResult group: group.
 	self glhModel add: projectResult.
-	self completeImportProject: projectResult.
+	self completeImportedProject: projectResult.
 	^ projectResult
 ]
 
@@ -317,7 +317,7 @@ GithubModelImporter >> importRepositoriesOfGroup: groupResult [
 	groupResult projects addAll: reposFound.
 	self glhModel addAll: groupResult projects.
 	groupResult projects do: [ :project |
-		self completeImportProject: project ].
+		self completeImportedProject: project ].
 	^ groupResult
 ]
 
@@ -476,7 +476,7 @@ GithubModelImporter >> parseGroupResult: aResult [
 ]
 
 { #category : #parsing }
-GithubModelImporter >> parseMergeRequestResult: response [
+GithubModelImporter >> parseMergeRequestsResult: response [
 
 	| result |
 	self flag: 'temp version, must remade using NeoJsonReader'.
@@ -504,13 +504,16 @@ GithubModelImporter >> parsePipelinesResult: pipelineOverview [
 
 	| reader |
 	reader := NeoJSONReader on: pipelineOverview readStream.
+	
 	reader for: GHAPIPipelineOverview do: [ :mapping |
 		mapping mapInstVar: #total_count to: #total_count.
 		(mapping mapInstVar: #workflow_runs) valueSchema: #ArrayOfPipelines ].
+	
 	reader
 		for: #ArrayOfPipelines
 		customDo: [ :customMappting |
 		customMappting listOfElementSchema: GLHPipeline ].
+	
 	reader for: GLHPipeline do: [ :mapping |
 		mapping
 			mapInstVar: #status to: #conclusion;
@@ -518,6 +521,7 @@ GithubModelImporter >> parsePipelinesResult: pipelineOverview [
 			getter: [ :object | #ignore ]
 			setter: [ :object :value |
 				object runDate: (DateAndTime fromString: value) ] ].
+	
 	^ reader nextAs: GHAPIPipelineOverview
 ]
 

@@ -164,6 +164,13 @@ GitModelImporter >> importGroup: aGroupID [
 	self subclassResponsibility
 ]
 
+{ #category : #pipelines }
+GitModelImporter >> importLatestPipelinesOfProject: aGLHProject [ 
+	(self pipelinesOf: aGLHProject id withLimit:30) do: [ :pipeline |
+		self glhModel add: pipeline unless: self blockOnIdEquality .
+		aGLHProject pipelines add: pipeline unless: self blockOnIdEquality]
+]
+
 { #category : #'import - notes' }
 GitModelImporter >> importNotesfromMergeRequest: mergeRequest [
 

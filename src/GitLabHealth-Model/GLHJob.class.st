@@ -18,10 +18,11 @@ A CI Job
 | Name | Type | Default value | Comment |
 |---|
 | `allow_failure` | `Boolean` | nil | |
-| `allow_failure` | `Boolean` | nil | |
 | `duration` | `Object` | nil | |
 | `id` | `Number` | nil | |
 | `name` | `String` | nil | Basic name of the entity, not full reference.|
+| `name` | `String` | nil | |
+| `ref` | `String` | nil | |
 | `web_url` | `String` | nil | |
 
 "
@@ -35,6 +36,8 @@ Class {
 		'#allow_failure => FMProperty',
 		'#web_url => FMProperty',
 		'#duration => FMProperty',
+		'#name => FMProperty',
+		'#ref => FMProperty',
 		'#commit => FMOne type: #GLHCommit opposite: #jobs',
 		'#pipeline => FMOne type: #GLHPipeline opposite: #jobs',
 		'#user => FMOne type: #GLHUser opposite: #jobs'
@@ -117,6 +120,20 @@ GLHJob >> id: anObject [
 ]
 
 { #category : #accessing }
+GLHJob >> name [
+
+	<FMProperty: #name type: #String>
+	<generated>
+	^ name
+]
+
+{ #category : #accessing }
+GLHJob >> name: anObject [
+	<generated>
+	name := anObject
+]
+
+{ #category : #accessing }
 GLHJob >> pipeline [
 	"Relation named: #pipeline type: #GLHPipeline opposite: #jobs"
 
@@ -137,6 +154,20 @@ GLHJob >> pipelineGroup [
 	<generated>
 	<navigation: 'Pipeline'>
 	^ MooseSpecializedGroup with: self pipeline
+]
+
+{ #category : #accessing }
+GLHJob >> ref [
+
+	<FMProperty: #ref type: #String>
+	<generated>
+	^ ref
+]
+
+{ #category : #accessing }
+GLHJob >> ref: anObject [
+	<generated>
+	ref := anObject
 ]
 
 { #category : #accessing }
