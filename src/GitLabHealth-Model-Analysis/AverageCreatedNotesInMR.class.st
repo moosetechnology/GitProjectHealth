@@ -5,23 +5,23 @@ Class {
 }
 
 { #category : #calculating }
-AverageCreatedNotesInMR >> calculate [  
-    | groupedByDate |  
+AverageCreatedNotesInMR >> calculate [
 
-    projectMergeRequests ifNil: [ self load ].  
-    groupedByDate := self setupGroupedDate.  
+	| groupedByDate |
+	projectMergeRequests ifNil: [ self load ].
+	groupedByDate := self setupGroupedDate.
 
-    projectMergeRequests do: [ :mr |  
-        mr note do: [ :note |  
-            | dateOver |  
-            dateOver := self transformDate: note created_at to: over.  
-            groupedByDate at: dateOver printString ifPresent: [ :v | v add: note ].  
-        ]  
-    ].  
-    groupedByDate := groupedByDate collect: [ :notesGroup |  
-        notesGroup size.  
-    ].   
-    ^ groupedByDate average asFloat .
+	projectMergeRequests do: [ :mr |
+		mr note do: [ :note |
+			| dateOver |
+			dateOver := self transformDate: note created_at to: over.
+			groupedByDate
+				at: dateOver printString
+				ifPresent: [ :v | v add: note ] ] ].
+	groupedByDate := groupedByDate collect: [ :notesGroup |
+		                 notesGroup size ].
+	projectMergeRequests ifEmpty: [ ^ 0 ].
+	^ (groupedByDate average / projectMergeRequests size) asFloat
 ]
 
 { #category : #accessing }
