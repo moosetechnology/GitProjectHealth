@@ -11,6 +11,9 @@ AverageCreatedNotesInMR >> calculate [
 	projectMergeRequests ifNil: [ self load ].
 	groupedByDate := self setupGroupedDate.
 
+	projectMergeRequests := projectMergeRequests select: [ :mr |
+		                        mr state = #closed or: [ mr state = #merged ] ].
+
 	projectMergeRequests do: [ :mr |
 		mr note do: [ :note |
 			| dateOver |
