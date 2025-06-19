@@ -29,7 +29,7 @@ CreatedNoteInMergedOrClosedMergeRequest >> calculate [
 { #category : #accessing }
 CreatedNoteInMergedOrClosedMergeRequest >> description [
 
-	^ 'Average number of comments/notes by MR for a project'
+	^ 'Created Note In Merged Or Closed Merge Request'
 ]
 
 { #category : #loading }
