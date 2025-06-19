@@ -1,11 +1,11 @@
 Class {
-	#name : #AverageCreatedNotesInMR,
+	#name : #CreatedNoteInMergedOrClosedMergeRequest,
 	#superclass : #ProjectMetric,
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
 { #category : #calculating }
-AverageCreatedNotesInMR >> calculate [
+CreatedNoteInMergedOrClosedMergeRequest >> calculate [
 
 	| groupedByDate |
 	projectMergeRequests ifNil: [ self load ].
@@ -13,28 +13,27 @@ AverageCreatedNotesInMR >> calculate [
 
 	projectMergeRequests := projectMergeRequests select: [ :mr |
 		                        mr state = #closed or: [ mr state = #merged ] ].
+	
+	projectMergeRequests do: [ :mergeRequest |
+		| dateOver mrDate  |
+		mrDate := mergeRequest state = #closed ifTrue: [ mergeRequest closed_at ] ifFalse: [ mergeRequest merged_at ].
+		dateOver := self transformDate: mrDate to: over.
+		groupedByDate at: dateOver printString ifPresent: [ :v | v add: mergeRequest ] ].
 
-	projectMergeRequests do: [ :mr |
-		mr note do: [ :note |
-			| dateOver |
-			dateOver := self transformDate: note created_at to: over.
-			groupedByDate
-				at: dateOver printString
-				ifPresent: [ :v | v add: note ] ] ].
-	groupedByDate := groupedByDate collect: [ :notesGroup |
-		                 notesGroup size ].
+	groupedByDate := groupedByDate collect: [ :mergeRequestGroup |
+		                 mergeRequestGroup sum: [ :mr | mr note size ] ].
 	projectMergeRequests ifEmpty: [ ^ 0 ].
 	^ (groupedByDate average / projectMergeRequests size) asFloat
 ]
 
 { #category : #accessing }
-AverageCreatedNotesInMR >> description [
+CreatedNoteInMergedOrClosedMergeRequest >> description [
 
-	^ 'Average number of comments/notes by MR for a project'
+	^ 'Created Note In Merged Or Closed Merge Request'
 ]
 
 { #category : #loading }
-AverageCreatedNotesInMR >> load [
+CreatedNoteInMergedOrClosedMergeRequest >> load [
 	projectMergeRequests := self
 	                      loadMergeRequestsSince:  (period at: #since)
 	                      until:  (period at: #until) .

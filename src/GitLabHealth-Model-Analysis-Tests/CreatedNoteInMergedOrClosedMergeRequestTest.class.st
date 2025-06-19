@@ -1,11 +1,11 @@
 Class {
-	#name : #AverageCreatedNotesInMRTest,
+	#name : #CreatedNoteInMergedOrClosedMergeRequestTest,
 	#superclass : #ProjectMetricTest,
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }
-AverageCreatedNotesInMRTest >> testCalculate [
+CreatedNoteInMergedOrClosedMergeRequestTest >> testCalculate [
 	| glhImporter result nbNotes notes acrBot |
 	"Given"
 	glhImporter := GLPHImporterMock new.
@@ -29,13 +29,14 @@ AverageCreatedNotesInMRTest >> testCalculate [
 			
 	glhImporter mergeRequests: { (GLHMergeRequest new
 			 created_at: createdAt ;
+			closed_at: closedAt;
 			 iid: 2002;
 			 state: 'closed';
 			 project: project;
 			 note: notes notes) }.
 	
 
-	nbNotes := AverageCreatedNotesInMR new
+	nbNotes := CreatedNoteInMergedOrClosedMergeRequest new
 		                  project: project;
 		                  glhImporter: glhImporter;
 		                  setPeriodSince: since until: until;
@@ -48,7 +49,7 @@ AverageCreatedNotesInMRTest >> testCalculate [
 ]
 
 { #category : #tests }
-AverageCreatedNotesInMRTest >> testCalculateMergedMergeRequest [
+CreatedNoteInMergedOrClosedMergeRequestTest >> testCalculateMergedMergeRequest [
 
 	| glhImporter result nbNotes notes acrBot |
 	"Given"
@@ -78,13 +79,14 @@ AverageCreatedNotesInMRTest >> testCalculateMergedMergeRequest [
 
 	glhImporter mergeRequests: { (GLHMergeRequest new
 			 created_at: createdAt;
+			 merged_at: mergedAt;
 			 iid: 2002;
 			 state: 'merged';
 			 project: project;
 			 note: notes notes) }.
 
 
-	nbNotes := AverageCreatedNotesInMR new
+	nbNotes := CreatedNoteInMergedOrClosedMergeRequest new
 		           project: project;
 		           glhImporter: glhImporter;
 		           setPeriodSince: since until: until;
@@ -97,7 +99,57 @@ AverageCreatedNotesInMRTest >> testCalculateMergedMergeRequest [
 ]
 
 { #category : #tests }
-AverageCreatedNotesInMRTest >> testCalculateMultipleMR [
+CreatedNoteInMergedOrClosedMergeRequestTest >> testCalculateMergedMergeRequestNoteBeforePeriod [
+
+	| glhImporter result nbNotes notes acrBot |
+	"Given"
+	glhImporter := GLPHImporterMock new.
+
+	acrBot := GLHUser new
+		          id: 2661;
+		          username: 'AutoCodeReview';
+		          yourself.
+
+	notes := glhImporter notes: {
+			         (GLHNote new
+				          noteable_iid: 2002;
+				          created_at: createdAt;
+				          updated_at: updatedAt;
+				          author: (GLHUser new
+						           id: 123;
+						           yourself);
+				          body: 'n importe quoi').
+			         (GLHNote new
+				          created_at: (createdAt - 3 week) asDateAndTime;
+				          updated_at: (updatedAt - 3 week) asDateAndTime;
+				          noteable_iid: 2002;
+				          author: acrBot;
+				          body:
+					          'The automated review has been completed. No modifications were found based on the current analysis rules.') }.
+
+	glhImporter mergeRequests: { (GLHMergeRequest new
+			 created_at: createdAt;
+			 merged_at: mergedAt;
+			 iid: 2002;
+			 state: 'merged';
+			 project: project;
+			 note: notes notes) }.
+
+
+	nbNotes := CreatedNoteInMergedOrClosedMergeRequest new
+		           project: project;
+		           glhImporter: glhImporter;
+		           setPeriodSince: since until: until;
+		           over: Week.
+	"When"
+	result := nbNotes calculate.
+
+	"Then"
+	self assert: result equals: 2
+]
+
+{ #category : #tests }
+CreatedNoteInMergedOrClosedMergeRequestTest >> testCalculateMultipleMR [
 
 	| glhImporter result nbNotes notes acrBot notes2 |
 	"Given"
@@ -123,7 +175,8 @@ AverageCreatedNotesInMRTest >> testCalculateMultipleMR [
 				          noteable_iid: 2002;
 				          author: acrBot;
 				          body:
-					          'The automated review has been completed. No modifications were found based on the current analysis rules.') } asOrderedCollection.
+					          'The automated review has been completed. No modifications were found based on the current analysis rules.') }
+			         asOrderedCollection.
 
 	notes2 := glhImporter notes addAll: {
 			          (GLHNote new
@@ -147,17 +200,19 @@ AverageCreatedNotesInMRTest >> testCalculateMultipleMR [
 				 created_at: createdAt;
 				 iid: 2002;
 				 state: 'closed';
+				 closed_at: closedAt;
 				 project: project;
 				 note: notes notes).
 			(GLHMergeRequest new
 				 created_at: createdAt;
+				 closed_at: closedAt;
 				 iid: 2005;
 				 state: 'closed';
 				 project: project;
 				 note: notes2) }.
 
 
-	nbNotes := AverageCreatedNotesInMR new
+	nbNotes := CreatedNoteInMergedOrClosedMergeRequest new
 		           project: project;
 		           glhImporter: glhImporter;
 		           setPeriodSince: since until: until;
@@ -170,7 +225,7 @@ AverageCreatedNotesInMRTest >> testCalculateMultipleMR [
 ]
 
 { #category : #tests }
-AverageCreatedNotesInMRTest >> testCalculateMultipleMRDifferentNumberOfNotes [
+CreatedNoteInMergedOrClosedMergeRequestTest >> testCalculateMultipleMRDifferentNumberOfNotes [
 
 	| glhImporter result nbNotes notes acrBot notes2 |
 	"Given"
@@ -213,16 +268,18 @@ AverageCreatedNotesInMRTest >> testCalculateMultipleMRDifferentNumberOfNotes [
 				 created_at: createdAt;
 				 iid: 2002;
 				 state: 'closed';
+				 closed_at: closedAt;
 				 project: project;
 				 note: notes notes).
 			(GLHMergeRequest new
 				 created_at: createdAt;
 				 iid: 2005;
 				 state: 'closed';
+				 closed_at: closedAt;
 				 project: project;
 				 note: notes2) }.
 
-	nbNotes := AverageCreatedNotesInMR new
+	nbNotes := CreatedNoteInMergedOrClosedMergeRequest new
 		           project: project;
 		           glhImporter: glhImporter;
 		           setPeriodSince: since until: until;
@@ -235,7 +292,7 @@ AverageCreatedNotesInMRTest >> testCalculateMultipleMRDifferentNumberOfNotes [
 ]
 
 { #category : #tests }
-AverageCreatedNotesInMRTest >> testCalculateMultipleMRMerged [
+CreatedNoteInMergedOrClosedMergeRequestTest >> testCalculateMultipleMRMerged [
 
 	| glhImporter result nbNotes notes acrBot notes2 |
 	"Given"
@@ -261,7 +318,8 @@ AverageCreatedNotesInMRTest >> testCalculateMultipleMRMerged [
 				          noteable_iid: 2002;
 				          author: acrBot;
 				          body:
-					          'The automated review has been completed. No modifications were found based on the current analysis rules.') } asOrderedCollection.
+					          'The automated review has been completed. No modifications were found based on the current analysis rules.') }
+			         asOrderedCollection.
 
 	notes2 := glhImporter notes addAll: {
 			          (GLHNote new
@@ -285,17 +343,19 @@ AverageCreatedNotesInMRTest >> testCalculateMultipleMRMerged [
 				 created_at: createdAt;
 				 iid: 2002;
 				 state: 'merged';
+				 merged_at: mergedAt;
 				 project: project;
 				 note: notes notes).
 			(GLHMergeRequest new
 				 created_at: createdAt;
+				 merged_at: mergedAt;
 				 iid: 2005;
 				 state: 'merged';
 				 project: project;
 				 note: notes2) }.
 
 
-	nbNotes := AverageCreatedNotesInMR new
+	nbNotes := CreatedNoteInMergedOrClosedMergeRequest new
 		           project: project;
 		           glhImporter: glhImporter;
 		           setPeriodSince: since until: until;
@@ -308,7 +368,7 @@ AverageCreatedNotesInMRTest >> testCalculateMultipleMRMerged [
 ]
 
 { #category : #tests }
-AverageCreatedNotesInMRTest >> testCalculateMultipleMRMixCloseAndMerged [
+CreatedNoteInMergedOrClosedMergeRequestTest >> testCalculateMultipleMRMixCloseAndMerged [
 
 	| glhImporter result nbNotes notes acrBot notes2 |
 	"Given"
@@ -351,17 +411,19 @@ AverageCreatedNotesInMRTest >> testCalculateMultipleMRMixCloseAndMerged [
 				 created_at: createdAt;
 				 iid: 2002;
 				 state: 'merged';
+				 merged_at: mergedAt;
 				 project: project;
 				 note: notes notes).
 			(GLHMergeRequest new
 				 created_at: createdAt;
 				 iid: 2005;
-				state: 'closed';
+				 state: 'closed';
+				 closed_at: closedAt;
 				 project: project;
 				 note: notes2) }.
 
 
-	nbNotes := AverageCreatedNotesInMR new
+	nbNotes := CreatedNoteInMergedOrClosedMergeRequest new
 		           project: project;
 		           glhImporter: glhImporter;
 		           setPeriodSince: since until: until;
@@ -374,7 +436,7 @@ AverageCreatedNotesInMRTest >> testCalculateMultipleMRMixCloseAndMerged [
 ]
 
 { #category : #tests }
-AverageCreatedNotesInMRTest >> testCalculateMultipleMRMixOpenAndClose [
+CreatedNoteInMergedOrClosedMergeRequestTest >> testCalculateMultipleMRMixOpenAndClose [
 
 	| glhImporter result nbNotes notes acrBot notes2 |
 	"Given"
@@ -417,6 +479,7 @@ AverageCreatedNotesInMRTest >> testCalculateMultipleMRMixOpenAndClose [
 				 created_at: createdAt;
 				 iid: 2002;
 				 state: 'closed';
+				 closed_at: closedAt;
 				 project: project;
 				 note: notes notes).
 			(GLHMergeRequest new
@@ -426,7 +489,7 @@ AverageCreatedNotesInMRTest >> testCalculateMultipleMRMixOpenAndClose [
 				 note: notes2) }.
 
 
-	nbNotes := AverageCreatedNotesInMR new
+	nbNotes := CreatedNoteInMergedOrClosedMergeRequest new
 		           project: project;
 		           glhImporter: glhImporter;
 		           setPeriodSince: since until: until;
@@ -439,7 +502,7 @@ AverageCreatedNotesInMRTest >> testCalculateMultipleMRMixOpenAndClose [
 ]
 
 { #category : #tests }
-AverageCreatedNotesInMRTest >> testCalculateMultipleMRMixOpenAndMerged [
+CreatedNoteInMergedOrClosedMergeRequestTest >> testCalculateMultipleMRMixOpenAndMerged [
 
 	| glhImporter result nbNotes notes acrBot notes2 |
 	"Given"
@@ -482,6 +545,7 @@ AverageCreatedNotesInMRTest >> testCalculateMultipleMRMixOpenAndMerged [
 				 created_at: createdAt;
 				 iid: 2002;
 				 state: 'merged';
+				 merged_at: mergedAt;
 				 project: project;
 				 note: notes notes).
 			(GLHMergeRequest new
@@ -491,7 +555,7 @@ AverageCreatedNotesInMRTest >> testCalculateMultipleMRMixOpenAndMerged [
 				 note: notes2) }.
 
 
-	nbNotes := AverageCreatedNotesInMR new
+	nbNotes := CreatedNoteInMergedOrClosedMergeRequest new
 		           project: project;
 		           glhImporter: glhImporter;
 		           setPeriodSince: since until: until;
@@ -504,7 +568,7 @@ AverageCreatedNotesInMRTest >> testCalculateMultipleMRMixOpenAndMerged [
 ]
 
 { #category : #tests }
-AverageCreatedNotesInMRTest >> testCalculateNoMR [
+CreatedNoteInMergedOrClosedMergeRequestTest >> testCalculateNoMR [
 
 	| glhImporter result nbNotes acrBot |
 	"Given"
@@ -518,7 +582,7 @@ AverageCreatedNotesInMRTest >> testCalculateNoMR [
 
 	glhImporter mergeRequests: { }.
 
-	nbNotes := AverageCreatedNotesInMR new
+	nbNotes := CreatedNoteInMergedOrClosedMergeRequest new
 		           project: project;
 		           glhImporter: glhImporter;
 		           setPeriodSince: since until: until;
@@ -531,7 +595,7 @@ AverageCreatedNotesInMRTest >> testCalculateNoMR [
 ]
 
 { #category : #tests }
-AverageCreatedNotesInMRTest >> testCalculateOnlyOpenMergeRequest [
+CreatedNoteInMergedOrClosedMergeRequestTest >> testCalculateOnlyOpenMergeRequest [
 
 	| glhImporter result nbNotes notes acrBot |
 	"Given"
@@ -566,7 +630,7 @@ AverageCreatedNotesInMRTest >> testCalculateOnlyOpenMergeRequest [
 			 note: notes notes) }.
 
 
-	nbNotes := AverageCreatedNotesInMR new
+	nbNotes := CreatedNoteInMergedOrClosedMergeRequest new
 		           project: project;
 		           glhImporter: glhImporter;
 		           setPeriodSince: since until: until;
