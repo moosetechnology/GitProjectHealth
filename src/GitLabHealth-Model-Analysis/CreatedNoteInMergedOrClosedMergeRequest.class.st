@@ -1,11 +1,11 @@
 Class {
-	#name : #AverageCreatedNotesInMR,
+	#name : #CreatedNoteInMergedOrClosedMergeRequest,
 	#superclass : #ProjectMetric,
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
 { #category : #calculating }
-AverageCreatedNotesInMR >> calculate [
+CreatedNoteInMergedOrClosedMergeRequest >> calculate [
 
 	| groupedByDate |
 	projectMergeRequests ifNil: [ self load ].
@@ -27,13 +27,13 @@ AverageCreatedNotesInMR >> calculate [
 ]
 
 { #category : #accessing }
-AverageCreatedNotesInMR >> description [
+CreatedNoteInMergedOrClosedMergeRequest >> description [
 
 	^ 'Average number of comments/notes by MR for a project'
 ]
 
 { #category : #loading }
-AverageCreatedNotesInMR >> load [
+CreatedNoteInMergedOrClosedMergeRequest >> load [
 	projectMergeRequests := self
 	                      loadMergeRequestsSince:  (period at: #since)
 	                      until:  (period at: #until) .

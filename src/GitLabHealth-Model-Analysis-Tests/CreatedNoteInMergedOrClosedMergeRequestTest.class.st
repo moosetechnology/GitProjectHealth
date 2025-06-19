@@ -1,11 +1,11 @@
 Class {
-	#name : #AverageCreatedNotesInMRTest,
+	#name : #CreatedNoteInMergedOrClosedMergeRequestTest,
 	#superclass : #ProjectMetricTest,
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }
-AverageCreatedNotesInMRTest >> testCalculate [
+CreatedNoteInMergedOrClosedMergeRequestTest >> testCalculate [
 	| glhImporter result nbNotes notes acrBot |
 	"Given"
 	glhImporter := GLPHImporterMock new.
@@ -36,7 +36,7 @@ AverageCreatedNotesInMRTest >> testCalculate [
 			 note: notes notes) }.
 	
 
-	nbNotes := AverageCreatedNotesInMR new
+	nbNotes := CreatedNoteInMergedOrClosedMergeRequest new
 		                  project: project;
 		                  glhImporter: glhImporter;
 		                  setPeriodSince: since until: until;
@@ -49,7 +49,7 @@ AverageCreatedNotesInMRTest >> testCalculate [
 ]
 
 { #category : #tests }
-AverageCreatedNotesInMRTest >> testCalculateMergedMergeRequest [
+CreatedNoteInMergedOrClosedMergeRequestTest >> testCalculateMergedMergeRequest [
 
 	| glhImporter result nbNotes notes acrBot |
 	"Given"
@@ -86,7 +86,7 @@ AverageCreatedNotesInMRTest >> testCalculateMergedMergeRequest [
 			 note: notes notes) }.
 
 
-	nbNotes := AverageCreatedNotesInMR new
+	nbNotes := CreatedNoteInMergedOrClosedMergeRequest new
 		           project: project;
 		           glhImporter: glhImporter;
 		           setPeriodSince: since until: until;
@@ -99,7 +99,7 @@ AverageCreatedNotesInMRTest >> testCalculateMergedMergeRequest [
 ]
 
 { #category : #tests }
-AverageCreatedNotesInMRTest >> testCalculateMergedMergeRequestNoteBeforePeriod [
+CreatedNoteInMergedOrClosedMergeRequestTest >> testCalculateMergedMergeRequestNoteBeforePeriod [
 
 	| glhImporter result nbNotes notes acrBot |
 	"Given"
@@ -136,7 +136,7 @@ AverageCreatedNotesInMRTest >> testCalculateMergedMergeRequestNoteBeforePeriod [
 			 note: notes notes) }.
 
 
-	nbNotes := AverageCreatedNotesInMR new
+	nbNotes := CreatedNoteInMergedOrClosedMergeRequest new
 		           project: project;
 		           glhImporter: glhImporter;
 		           setPeriodSince: since until: until;
@@ -149,7 +149,7 @@ AverageCreatedNotesInMRTest >> testCalculateMergedMergeRequestNoteBeforePeriod [
 ]
 
 { #category : #tests }
-AverageCreatedNotesInMRTest >> testCalculateMultipleMR [
+CreatedNoteInMergedOrClosedMergeRequestTest >> testCalculateMultipleMR [
 
 	| glhImporter result nbNotes notes acrBot notes2 |
 	"Given"
@@ -212,7 +212,7 @@ AverageCreatedNotesInMRTest >> testCalculateMultipleMR [
 				 note: notes2) }.
 
 
-	nbNotes := AverageCreatedNotesInMR new
+	nbNotes := CreatedNoteInMergedOrClosedMergeRequest new
 		           project: project;
 		           glhImporter: glhImporter;
 		           setPeriodSince: since until: until;
@@ -225,7 +225,7 @@ AverageCreatedNotesInMRTest >> testCalculateMultipleMR [
 ]
 
 { #category : #tests }
-AverageCreatedNotesInMRTest >> testCalculateMultipleMRDifferentNumberOfNotes [
+CreatedNoteInMergedOrClosedMergeRequestTest >> testCalculateMultipleMRDifferentNumberOfNotes [
 
 	| glhImporter result nbNotes notes acrBot notes2 |
 	"Given"
@@ -279,7 +279,7 @@ AverageCreatedNotesInMRTest >> testCalculateMultipleMRDifferentNumberOfNotes [
 				 project: project;
 				 note: notes2) }.
 
-	nbNotes := AverageCreatedNotesInMR new
+	nbNotes := CreatedNoteInMergedOrClosedMergeRequest new
 		           project: project;
 		           glhImporter: glhImporter;
 		           setPeriodSince: since until: until;
@@ -292,7 +292,7 @@ AverageCreatedNotesInMRTest >> testCalculateMultipleMRDifferentNumberOfNotes [
 ]
 
 { #category : #tests }
-AverageCreatedNotesInMRTest >> testCalculateMultipleMRMerged [
+CreatedNoteInMergedOrClosedMergeRequestTest >> testCalculateMultipleMRMerged [
 
 	| glhImporter result nbNotes notes acrBot notes2 |
 	"Given"
@@ -355,7 +355,7 @@ AverageCreatedNotesInMRTest >> testCalculateMultipleMRMerged [
 				 note: notes2) }.
 
 
-	nbNotes := AverageCreatedNotesInMR new
+	nbNotes := CreatedNoteInMergedOrClosedMergeRequest new
 		           project: project;
 		           glhImporter: glhImporter;
 		           setPeriodSince: since until: until;
@@ -368,7 +368,7 @@ AverageCreatedNotesInMRTest >> testCalculateMultipleMRMerged [
 ]
 
 { #category : #tests }
-AverageCreatedNotesInMRTest >> testCalculateMultipleMRMixCloseAndMerged [
+CreatedNoteInMergedOrClosedMergeRequestTest >> testCalculateMultipleMRMixCloseAndMerged [
 
 	| glhImporter result nbNotes notes acrBot notes2 |
 	"Given"
@@ -423,7 +423,7 @@ AverageCreatedNotesInMRTest >> testCalculateMultipleMRMixCloseAndMerged [
 				 note: notes2) }.
 
 
-	nbNotes := AverageCreatedNotesInMR new
+	nbNotes := CreatedNoteInMergedOrClosedMergeRequest new
 		           project: project;
 		           glhImporter: glhImporter;
 		           setPeriodSince: since until: until;
@@ -436,7 +436,7 @@ AverageCreatedNotesInMRTest >> testCalculateMultipleMRMixCloseAndMerged [
 ]
 
 { #category : #tests }
-AverageCreatedNotesInMRTest >> testCalculateMultipleMRMixOpenAndClose [
+CreatedNoteInMergedOrClosedMergeRequestTest >> testCalculateMultipleMRMixOpenAndClose [
 
 	| glhImporter result nbNotes notes acrBot notes2 |
 	"Given"
@@ -489,7 +489,7 @@ AverageCreatedNotesInMRTest >> testCalculateMultipleMRMixOpenAndClose [
 				 note: notes2) }.
 
 
-	nbNotes := AverageCreatedNotesInMR new
+	nbNotes := CreatedNoteInMergedOrClosedMergeRequest new
 		           project: project;
 		           glhImporter: glhImporter;
 		           setPeriodSince: since until: until;
@@ -502,7 +502,7 @@ AverageCreatedNotesInMRTest >> testCalculateMultipleMRMixOpenAndClose [
 ]
 
 { #category : #tests }
-AverageCreatedNotesInMRTest >> testCalculateMultipleMRMixOpenAndMerged [
+CreatedNoteInMergedOrClosedMergeRequestTest >> testCalculateMultipleMRMixOpenAndMerged [
 
 	| glhImporter result nbNotes notes acrBot notes2 |
 	"Given"
@@ -555,7 +555,7 @@ AverageCreatedNotesInMRTest >> testCalculateMultipleMRMixOpenAndMerged [
 				 note: notes2) }.
 
 
-	nbNotes := AverageCreatedNotesInMR new
+	nbNotes := CreatedNoteInMergedOrClosedMergeRequest new
 		           project: project;
 		           glhImporter: glhImporter;
 		           setPeriodSince: since until: until;
@@ -568,7 +568,7 @@ AverageCreatedNotesInMRTest >> testCalculateMultipleMRMixOpenAndMerged [
 ]
 
 { #category : #tests }
-AverageCreatedNotesInMRTest >> testCalculateNoMR [
+CreatedNoteInMergedOrClosedMergeRequestTest >> testCalculateNoMR [
 
 	| glhImporter result nbNotes acrBot |
 	"Given"
@@ -582,7 +582,7 @@ AverageCreatedNotesInMRTest >> testCalculateNoMR [
 
 	glhImporter mergeRequests: { }.
 
-	nbNotes := AverageCreatedNotesInMR new
+	nbNotes := CreatedNoteInMergedOrClosedMergeRequest new
 		           project: project;
 		           glhImporter: glhImporter;
 		           setPeriodSince: since until: until;
@@ -595,7 +595,7 @@ AverageCreatedNotesInMRTest >> testCalculateNoMR [
 ]
 
 { #category : #tests }
-AverageCreatedNotesInMRTest >> testCalculateOnlyOpenMergeRequest [
+CreatedNoteInMergedOrClosedMergeRequestTest >> testCalculateOnlyOpenMergeRequest [
 
 	| glhImporter result nbNotes notes acrBot |
 	"Given"
@@ -630,7 +630,7 @@ AverageCreatedNotesInMRTest >> testCalculateOnlyOpenMergeRequest [
 			 note: notes notes) }.
 
 
-	nbNotes := AverageCreatedNotesInMR new
+	nbNotes := CreatedNoteInMergedOrClosedMergeRequest new
 		           project: project;
 		           glhImporter: glhImporter;
 		           setPeriodSince: since until: until;
