@@ -21,9 +21,9 @@ CreatedNoteInMergedOrClosedMergeRequest >> calculate [
 		groupedByDate at: dateOver printString ifPresent: [ :v | v add: mergeRequest ] ].
 
 	groupedByDate := groupedByDate collect: [ :mergeRequestGroup |
-		                 mergeRequestGroup sum: [ :mr | mr note size ] ].
+		                 (mergeRequestGroup sum: [ :mr | mr note size ]) / mergeRequestGroup size ].
 	projectMergeRequests ifEmpty: [ ^ 0 ].
-	^ (groupedByDate average / projectMergeRequests size) asFloat
+	^ groupedByDate average 
 ]
 
 { #category : #accessing }
