@@ -13,17 +13,25 @@ CreatedNoteInMergedOrClosedMergeRequest >> calculate [
 
 	projectMergeRequests := projectMergeRequests select: [ :mr |
 		                        mr state = #closed or: [ mr state = #merged ] ].
-	
+
 	projectMergeRequests do: [ :mergeRequest |
-		| dateOver mrDate  |
-		mrDate := mergeRequest state = #closed ifTrue: [ mergeRequest closed_at ] ifFalse: [ mergeRequest merged_at ].
+		| dateOver mrDate |
+		mrDate := mergeRequest state = #closed
+			          ifTrue: [ mergeRequest closed_at ]
+			          ifFalse: [ mergeRequest merged_at ].
 		dateOver := self transformDate: mrDate to: over.
-		groupedByDate at: dateOver printString ifPresent: [ :v | v add: mergeRequest ] ].
+		groupedByDate
+			at: dateOver printString
+			ifPresent: [ :v | v add: mergeRequest ] ].
 
 	groupedByDate := groupedByDate collect: [ :mergeRequestGroup |
-		                 (mergeRequestGroup sum: [ :mr | mr note size ]) / mergeRequestGroup size ].
-	projectMergeRequests ifEmpty: [ ^ 0 ].
-	^ groupedByDate average 
+		                 mergeRequestGroup
+			                 ifEmpty: [ 0 ]
+			                 ifNotEmpty: [
+				                 (mergeRequestGroup sum: [ :mr | mr note size ])
+				                 / mergeRequestGroup size ] ].
+
+	^ groupedByDate average
 ]
 
 { #category : #accessing }
