@@ -854,7 +854,7 @@ GitlabModelImporter >> importDiffOfMergeRequest: aMergeRequest [
 		recordInfo.
 	result := self repoApi mergeRequests diffsOf: aMergeRequest iid inProject: aMergeRequest project_id.
 
-	diffsResult := self newParseDiffResult: result.
+	diffsResult := self newParseDiffResult: result anyOne.
 
 
 	aMergeRequest diffs
