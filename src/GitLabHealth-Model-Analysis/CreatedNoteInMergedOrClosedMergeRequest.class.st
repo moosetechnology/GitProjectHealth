@@ -13,7 +13,6 @@ CreatedNoteInMergedOrClosedMergeRequest >> calculate [
 
 	projectMergeRequests := projectMergeRequests select: [ :mr |
 		                        mr state = #closed or: [ mr state = #merged ] ].
-
 	projectMergeRequests do: [ :mergeRequest |
 		| dateOver mrDate |
 		mrDate := mergeRequest state = #closed
@@ -31,7 +30,7 @@ CreatedNoteInMergedOrClosedMergeRequest >> calculate [
 				                 (mergeRequestGroup sum: [ :mr | mr note size ])
 				                 / mergeRequestGroup size ] ].
 
-	^ groupedByDate average
+	^ groupedByDate average asFloat
 ]
 
 { #category : #accessing }
