@@ -93,6 +93,11 @@ GLHDiffRange >> diffGroup [
 ]
 
 { #category : #accessing }
+GLHDiffRange >> end [
+ ^	(self newLineRange copyFrom: (self newLineRange indexOf:$,)+1 to: self newLineRange size) asNumber 
+]
+
+{ #category : #accessing }
 GLHDiffRange >> lineOfCode [
 
 	<FMProperty: #lineOfCode type: #String>
@@ -132,4 +137,9 @@ GLHDiffRange >> originalLineRange [
 GLHDiffRange >> originalLineRange: anObject [
 	<generated>
 	originalLineRange := anObject
+]
+
+{ #category : #accessing }
+GLHDiffRange >> start [
+	^ (self newLineRange copyFrom: 2 to: (self newLineRange indexOf:$,)-1) asNumber 
 ]
