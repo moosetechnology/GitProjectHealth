@@ -27,7 +27,7 @@ GLHCommitDistributionVisualization >> forCommits: aCommitsCollection [
 			                        (assoc value select: [ :commit |
 												"weird, but only way I know to compare two dates with different timezone."
 				                         commit committed_date asDate asString  = date asString ]) ]) ].
-
+	 
 	alreadyAdded := dates collect: [ :d | 0 ].
 	groupToCommitByDate do: [ :assocGroupToCommitByDate |
 		| chart |
@@ -35,11 +35,11 @@ GLHCommitDistributionVisualization >> forCommits: aCommitsCollection [
 			          (assocGroupToCommitByDate value collect: [ :dateToCommit |
 				           dateToCommit value size ])) bottom: alreadyAdded.
 		c add: chart.
-		alreadyAdded := chart yValues ].
+		alreadyAdded := alreadyAdded + chart yValues ].
 
 	horizontal := c horizontalTick fromNames:
 		              (dates collect: [ :date | date printString ]).
-	horizontal configuration fontSize: 2.
+	horizontal configuration fontSize: 10.
 	horizontal useDiagonalLabel.
 	c verticalTick integer.
 	c ylabel: 'Number of commits'.
