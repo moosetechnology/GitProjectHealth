@@ -101,16 +101,23 @@ GHApi >> commitsOfProject: aProjectId ofOrganization: organisationName [
 ]
 
 { #category : #'api - commits' }
-GHApi >> commitsOfProject: aProjectId ofOrganization: organisationName since: aSinceDate perPage: itemPerPage page: pageNumber [
+GHApi >> commitsOfProject: aProjectId ofOrganization: organisationName ofShaOrBranch: shaOrBranch since: aSinceDate perPage: itemPerPage page: pageNumber [
 
 	self client url:
 		self baseAPIUrl , '/repos/' , organisationName , '/' , aProjectId
 		, '/commits'.
+	shaOrBranch ifNotNil: [ self client queryAt: #sha put: shaOrBranch ].
 	aSinceDate ifNotNil: [ self client queryAt: #since put: aSinceDate ].
 	itemPerPage ifNotNil: [
 		self client queryAt: #per_page put: itemPerPage ].
 	pageNumber ifNotNil: [ self client queryAt: #page put: pageNumber ].
 	^ self client get
+]
+
+{ #category : #'api - commits' }
+GHApi >> commitsOfProject: aProjectId ofOrganization: organisationName since: aSinceDate perPage: itemPerPage page: pageNumber [
+
+	^ self commitsOfProject: aProjectId ofOrganization: organisationName ofShaOrBranch: nil since: aSinceDate perPage: itemPerPage page: pageNumber
 ]
 
 { #category : #api }

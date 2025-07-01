@@ -28,7 +28,7 @@ GithubModelImporter >> api: anObject [
 	repoApi := anObject
 ]
 
-{ #category : #commit }
+{ #category : #'import - commits' }
 GithubModelImporter >> completeImportedCommit: aGLHCommit [
 
 	| result |
@@ -112,7 +112,7 @@ GithubModelImporter >> importBranchesOf: project [
 		self withFiles ifTrue: [ self importFilesOfBranch: branch ] ]
 ]
 
-{ #category : #api }
+{ #category : #'import - commits' }
 GithubModelImporter >> importCommitsOfProject: aGLHProject [
 
 	| itemByPage foundCommits tmp pageNumber |
@@ -157,6 +157,52 @@ GithubModelImporter >> importCommitsOfProject: aGLHProject [
 ]
 
 { #category : #'import - commits' }
+GithubModelImporter >> importCommitsOfProject: aGLHProject forShaOrBranch: shaOrBranchString [
+
+	| itemByPage foundCommits tmp pageNumber |
+	itemByPage := 100.
+	pageNumber := 1.
+	('Extract all commits of ' , aGLHProject name) recordInfo.
+	foundCommits := OrderedCollection new.
+	('Extract commits from ' , foundCommits size printString , ' to '
+	 , (foundCommits size + itemByPage) printString) recordInfo.
+	"also check that there is at least one commit with the error handling"
+	[
+	tmp := self parseCommitsResult: (self repoApi
+			        commitsOfProject: aGLHProject name
+			        ofOrganization: aGLHProject group name
+					  ofShaOrBranch: shaOrBranchString
+			        since: self withCommitsSince
+			        perPage: itemByPage
+			        page: pageNumber) ]
+		on: GHRepositoryEmptyError
+		do: [ ^ {  } ].
+
+	foundCommits addAll: tmp.
+	[ tmp size = itemByPage ] whileTrue: [
+		pageNumber := pageNumber + 1.
+		('Extract issues from ' , foundCommits size printString , ' to '
+		 , (foundCommits size + itemByPage) printString) recordInfo.
+		tmp := self parseCommitsResult: (self repoApi
+				        commitsOfProject: aGLHProject name
+				        ofOrganization: aGLHProject group name
+						  ofShaOrBranch: shaOrBranchString
+				        since: self withCommitsSince
+				        perPage: itemByPage
+				        page: pageNumber).
+		foundCommits addAll: tmp ].
+
+	"add the imported commits (unless they are already added to this repository)"
+	aGLHProject repository commits
+		addAll: foundCommits
+		unless: [ :existing :new | existing id = new id ].
+	"add the imported commits to the model unles they are already added to the model"
+	^ self glhModel
+		  addAll: foundCommits
+		  unless: [ :existing :new | existing id = new id ]
+]
+
+{ #category : #'import - commits' }
 GithubModelImporter >> importCreatorOfCommit: aGLHCommit [
 
 	| creator |
@@ -172,7 +218,7 @@ GithubModelImporter >> importCreatorOfCommit: aGLHCommit [
 	^ creator
 ]
 
-{ #category : #api }
+{ #category : #'import - commits' }
 GithubModelImporter >> importDiffOfCommit: aGLHCommit [
 
 	| result diffsResult |
