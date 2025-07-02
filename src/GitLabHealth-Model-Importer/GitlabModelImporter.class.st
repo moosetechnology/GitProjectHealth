@@ -1413,6 +1413,26 @@ GitlabModelImporter >> importRepository: aGLHRepository [
 			self importCommitsOfBranch: branch ] ]
 ]
 
+{ #category : #'as yet unclassified' }
+GitlabModelImporter >> importSZZFromCommit: aCommit [
+
+	| result diffRanges diffs szzCommits|
+	szzCommits := Set new. 
+	diffs := (self importDiffOfCommit: aCommit).
+	diffRanges := diffs flatCollect: #diffRanges.
+	diffRanges do: [ :range |
+		|blames|
+		
+			blames := NeoJSONReader fromString:( self repoApi repositories getBlameOf: range diff new_path  inRef: aCommit id start: range start end:range end ofProject: (aCommit repository project id)).
+			blames collect: [ :blame |
+			 szzCommits add: 	(self importCommit:(blame at: #commit at: #id) ofProject: aCommit repository project).
+				 ]
+			
+		 ].
+	^ szzCommits .
+
+]
+
 { #category : #'import - tag' }
 GitlabModelImporter >> importTagsForProject: aProject [ 
 	|results tags |
