@@ -24,7 +24,8 @@ Class {
 		'note',
 		'entity',
 		'release',
-		'tag'
+		'tag',
+		'issue'
 	],
 	#category : #'GitLabHealth-Model-Generator'
 }
@@ -90,7 +91,7 @@ GLHMetamodelGenerator >> commitProperties [
 GLHMetamodelGenerator >> defineClasses [
 
 	super defineClasses.
-	entity := (builder ensureClassNamed: #Entity).
+	entity := builder ensureClassNamed: #Entity.
 	group := builder newClassNamed: #Group comment: 'A GitLab Group'.
 	group withGroup.
 	project := builder
@@ -113,9 +114,9 @@ GLHMetamodelGenerator >> defineClasses [
 		          newClassNamed: #Commit
 		          comment: 'a commit attached to a repository'.
 	diff := builder newClassNamed: #Diff comment: 'The diff of a commit'.
-	
+
 	job := builder newClassNamed: #Job comment: 'A CI Job'.
-	
+
 	mergeRequest := builder
 		                newClassNamed: #MergeRequest
 		                comment: 'a gitlab merge request'.
@@ -143,26 +144,27 @@ GLHMetamodelGenerator >> defineClasses [
 		             newClassNamed: #DiffRange
 		             comment:
 		             'a indicate on which line of code are concerned by a diff (usually declared with @@ oldRange, newRange @@) '.
-		
+
 	note := builder
-		             newClassNamed: #Note
-		             comment:
-		             'a note (a diff) proposed in a Merge Request; can be accepted, modified or deleted'.
-		
-	
+		        newClassNamed: #Note
+		        comment:
+		        'a note (a diff) proposed in a Merge Request; can be accepted, modified or deleted'.
+
+
 	tag := builder
-		             newClassNamed: #Tag
-		             comment:
-		             'a Tag is a reference to a specific point in the repository''s history'.
-	
+		       newClassNamed: #Tag
+		       comment:
+		       'a Tag is a reference to a specific point in the repository''s history'.
+		
+	issue := builder
+		       newClassNamed: #Issue
+		       comment:
+		       'an Issues help collaboration within a team to plan, track, and deliver work'.
+
 	release := builder
-		             newClassNamed: #Release
-		             comment:
-		             'a Release is typically associated with a tag and provide additional metadata and assets that can be distributed to users'.
-
-
-
-
+		           newClassNamed: #Release
+		           comment:
+		           'a Release is typically associated with a tag and provide additional metadata and assets that can be distributed to users'
 ]
 
 { #category : #definition }
