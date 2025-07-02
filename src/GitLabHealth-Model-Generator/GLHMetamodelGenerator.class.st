@@ -155,16 +155,17 @@ GLHMetamodelGenerator >> defineClasses [
 		       newClassNamed: #Tag
 		       comment:
 		       'a Tag is a reference to a specific point in the repository''s history'.
-		
-	issue := builder
-		       newClassNamed: #Issue
-		       comment:
-		       'an Issues help collaboration within a team to plan, track, and deliver work'.
+
 
 	release := builder
 		           newClassNamed: #Release
 		           comment:
-		           'a Release is typically associated with a tag and provide additional metadata and assets that can be distributed to users'
+		           'a Release is typically associated with a tag and provide additional metadata and assets that can be distributed to users'.
+		
+	issue := builder
+		         newClassNamed: #Issue
+		         comment:
+		         'an Issues help collaboration within a team to plan, track, and deliver work'.
 ]
 
 { #category : #definition }
@@ -187,7 +188,9 @@ GLHMetamodelGenerator >> defineHierarchy [
 	change <|-- addition.
 	change <|-- deletion.
 	change <|-- lineOfCode.
-	mergeRequest --|> #TNamedEntity
+	mergeRequest --|> #TNamedEntity.
+	
+	issue --|> #TNamedEntity. 
 ]
 
 { #category : #definition }
@@ -303,6 +306,7 @@ GLHMetamodelGenerator >> issueProperties [
 	issue property: #description type: #String.
 	issue property: #state type: #String.
 	issue property: #id type: #Number.
+	
 	issue property: #created_at type: #Object.
 	issue property: #updated_at type: #Object.
 	issue property: #closed_at type: #Object.
@@ -312,9 +316,10 @@ GLHMetamodelGenerator >> issueProperties [
 { #category : #issues }
 GLHMetamodelGenerator >> issueRelations [
 
-	(issue property: #project)  *-<> (project property: #issue).
-	(issue property: #assignee) *- (user property: #assignedIssue). 
-	(issue property: #author) *- (user property: #createdIssue). 
+	(issue property: #project) *-<> (project property: #issue).
+	(issue property: #assignees) <>-* (user property: #assignedIssue).
+	(issue property: #author) <>- (user property: #createdIssue).
+	
 ]
 
 { #category : #jobs }
