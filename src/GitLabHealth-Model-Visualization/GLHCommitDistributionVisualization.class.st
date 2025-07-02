@@ -8,14 +8,16 @@ Class {
 }
 
 { #category : #'instance creation' }
-GLHCommitDistributionVisualization >> forCommits: commits [
+GLHCommitDistributionVisualization >> forCommits: aCommitsCollection [
 
-	| c lb oldestCommit horizontal commitGroups groupToCommitByDate alreadyAdded dates |
+	| c lb horizontal commitGroups groupToCommitByDate alreadyAdded dates commits|
 	c := RSCompositeChart new.
-	commits ifEmpty: [ ^ c canvas].
-	oldestCommit := commits last.
-	dates := (oldestCommit committed_date to: Date today) dates.
+	aCommitsCollection ifEmpty: [ ^ c canvas].
+	commits := (aCommitsCollection sort: [ :c1 :c2 | c1 committed_date  > c2 committed_date  ]).
+	"collect dates from oldest to youngest among commits"
+	dates := (commits last committed_date to: commits first committed_date) dates.
 
+	"default is group by commitCreator (initialize)"
 	commitGroups := commits groupedBy: self groupCommitBlock.
 
 	groupToCommitByDate := commitGroups associations collect: [ :assoc |
@@ -23,8 +25,9 @@ GLHCommitDistributionVisualization >> forCommits: commits [
 			                        date
 			                        ->
 			                        (assoc value select: [ :commit |
-				                         commit committed_date asDate = date ]) ]) ].
-
+												"weird, but only way I know to compare two dates with different timezone."
+				                         commit committed_date asDate asString  = date asString ]) ]) ].
+	 
 	alreadyAdded := dates collect: [ :d | 0 ].
 	groupToCommitByDate do: [ :assocGroupToCommitByDate |
 		| chart |
@@ -32,11 +35,11 @@ GLHCommitDistributionVisualization >> forCommits: commits [
 			          (assocGroupToCommitByDate value collect: [ :dateToCommit |
 				           dateToCommit value size ])) bottom: alreadyAdded.
 		c add: chart.
-		alreadyAdded := chart yValues ].
+		alreadyAdded := alreadyAdded + chart yValues ].
 
 	horizontal := c horizontalTick fromNames:
 		              (dates collect: [ :date | date printString ]).
-	horizontal configuration fontSize: 2.
+	horizontal configuration fontSize: 10.
 	horizontal useDiagonalLabel.
 	c verticalTick integer.
 	c ylabel: 'Number of commits'.
