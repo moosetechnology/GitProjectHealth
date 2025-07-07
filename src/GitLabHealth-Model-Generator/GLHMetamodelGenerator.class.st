@@ -25,7 +25,8 @@ Class {
 		'entity',
 		'release',
 		'tag',
-		'issue'
+		'issue',
+		'milestone'
 	],
 	#category : #'GitLabHealth-Model-Generator'
 }
@@ -166,6 +167,11 @@ GLHMetamodelGenerator >> defineClasses [
 		         newClassNamed: #Issue
 		         comment:
 		         'an Issues help collaboration within a team to plan, track, and deliver work'.
+		
+	milestone := builder
+		         newClassNamed: #Milestone
+		         comment:
+		         'a Milestone is use to track progress on groups of issues or pull requests in a repository'.
 ]
 
 { #category : #definition }
@@ -189,14 +195,15 @@ GLHMetamodelGenerator >> defineHierarchy [
 	change <|-- deletion.
 	change <|-- lineOfCode.
 	mergeRequest --|> #TNamedEntity.
-	
-	issue --|> #TNamedEntity. 
+
+	issue --|> #TNamedEntity.
+	milestone --|> #TNamedEntity. 
 ]
 
 { #category : #definition }
 GLHMetamodelGenerator >> defineProperties [
-
 	"Group properties"
+
 	super defineProperties.
 	self groupProperties.
 	self projectProperties.
@@ -213,7 +220,8 @@ GLHMetamodelGenerator >> defineProperties [
 	self noteProperties.
 	self tagProperties.
 	self releaseProperties.
-	self issueProperties
+	self issueProperties.
+	self milestoneProperties.
 ]
 
 { #category : #definition }
@@ -241,13 +249,14 @@ GLHMetamodelGenerator >> defineRelations [
 	(diff property: #file) <>-* (file property: #diffs).
 	(diff property: #diffRanges) <>-* (diffRange property: #diff).
 	(diffRange property: #changes) -* (change property: #diffRange).
-	
+
 	self projectRelations.
 	self tagRelations.
 	self releaseRelations.
 	self issueRelations.
 	self mergeRequestsRelations.
-	self noteRelations
+	self noteRelations.
+	self milestoneRelations. 
 ]
 
 { #category : #diffs }
@@ -426,6 +435,32 @@ GLHMetamodelGenerator >> mergeRequestsRelations [
 	(project property: #mergeRequests)
 	<>-* (mergeRequest property: #project).
 
+]
+
+{ #category : #milestones }
+GLHMetamodelGenerator >> milestoneProperties [
+
+	milestone property: #id type: #Number.
+	milestone property: #title type: #String.
+	milestone property: #description type: #String.
+	
+	milestone property: #open_issues type: #Number .
+	milestone property: #closed_issues type: #Number.
+
+	milestone property: #created_at type: #Object.
+	milestone property: #updated_at type: #Object.
+	milestone property: #closed_at type: #Object.
+	milestone property: #due_date type: #Object
+]
+
+{ #category : #milestones }
+GLHMetamodelGenerator >> milestoneRelations [
+
+	(milestone property: #project) *-<> (project property: #milestone).
+	(milestone property: #author) <>- (user property: #createdMilestone).
+	
+	(milestone property: #issue) <>-* (issue property: #milestone).
+	(milestone property: #mergeRequest) <>-* (mergeRequest property: #milestone).
 ]
 
 { #category : #notes }
