@@ -96,7 +96,6 @@ BaselineOfGitLabHealth >> defineGroups: spec [
 			   'GitLabHealth-Model-Analysis' 'GitLabHealth-Model-Analysis-Tests'
 			   'GitLabHealth-Visualization'
 			   'GitLabProjectHealth-Model-Importer'
-			   'GitLabProjectHealth-Model-Importer-Tests'
 			   'BitBucketHealth-Model-Importer'
 			   'BitBucketHealth-Model-Importer-Tests' ).
 	spec group: 'default' with: #( 'Core' )
@@ -175,7 +174,5 @@ BaselineOfGitLabHealth >> definePackages: spec [
 		package: 'GitLabHealth-Model-Analysis-Tests'
 		with: [ spec requires: #( 'GitLabHealth-Model-Analysis' ) ];
 		package: 'GitLabHealth-Visualization';
-		package: 'GitLabProjectHealth-Model-Importer';
-		package: 'GitLabProjectHealth-Model-Importer-Tests'
-		with: [ spec requires: #( 'GitLabProjectHealth-Model-Importer' ) ]
+		package: 'GitLabProjectHealth-Model-Importer'
 ]

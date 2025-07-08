@@ -8,7 +8,7 @@ Class {
 		'gitlabMergeData',
 		'glhModel'
 	],
-	#category : #'GitLabProjectHealth-Model-Importer-Tests'
+	#category : #'GitLabHealth-Model-Importer-Tests'
 }
 
 { #category : #running }
@@ -16,7 +16,7 @@ GLPHModelImporterMergeRequestTest >> setUp [
 
 	super setUp.
 	glhImporter := GitlabModelImporter new.
-	glhImporter repoApi: GLPHApiMock new.
+	glhImporter repoApi: GLHApiMock new.
 	glhModel := GLHModel new.
 	glhImporter glhModel: glhModel.
 	gitlabMergeData := '[
