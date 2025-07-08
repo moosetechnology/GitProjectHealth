@@ -2,7 +2,7 @@
 A GLHModelImporterTest is a test class for testing the behavior of GLHModelImporter
 "
 Class {
-	#name : #GLHModelImporterTest,
+	#name : #GitlabModelImporterRemoteTest,
 	#superclass : #TestCase,
 	#instVars : [
 		'glphModel',
@@ -14,25 +14,25 @@ Class {
 }
 
 { #category : #accessing }
-GLHModelImporterTest class >> resources [
+GitlabModelImporterRemoteTest class >> resources [
 
 	^ Array with: GLHModelImporterTestResource
 ]
 
 { #category : #running }
-GLHModelImporterTest >> glhImporter [
+GitlabModelImporterRemoteTest >> glhImporter [
 
 	^ self class resources first current glhImporter
 ]
 
 { #category : #running }
-GLHModelImporterTest >> model [
+GitlabModelImporterRemoteTest >> model [
 
 	^ self class resources first current model
 ]
 
 { #category : #test }
-GLHModelImporterTest >> testFilterCommitChanges [
+GitlabModelImporterRemoteTest >> testFilterCommitChanges [
 
 	| importer collection resultCollection |
 	importer := GitlabModelImporter new.
@@ -53,7 +53,7 @@ GLHModelImporterTest >> testFilterCommitChanges [
 ]
 
 { #category : #tests }
-GLHModelImporterTest >> testImportBranch [
+GitlabModelImporterRemoteTest >> testImportBranch [
 
 	| testCodeChurnRepository |
 	testCodeChurnRepository := (self model allWithType: GLHGroup) anyOne
@@ -62,7 +62,7 @@ GLHModelImporterTest >> testImportBranch [
 ]
 
 { #category : #tests }
-GLHModelImporterTest >> testImportCommits [
+GitlabModelImporterRemoteTest >> testImportCommits [
 
 	| projectTestCodeChurn |
 	projectTestCodeChurn := (self model allWithType: GLHProject) detect: [
@@ -75,7 +75,7 @@ GLHModelImporterTest >> testImportCommits [
 ]
 
 { #category : #tests }
-GLHModelImporterTest >> testImportGroup [
+GitlabModelImporterRemoteTest >> testImportGroup [
 
 	| evrefGroup |
 	self assert: (self model allWithType: GLHGroup) size equals: 1.
@@ -87,7 +87,7 @@ GLHModelImporterTest >> testImportGroup [
 ]
 
 { #category : #tests }
-GLHModelImporterTest >> testImportProject [
+GitlabModelImporterRemoteTest >> testImportProject [
 
 	self assert: (self model allWithType: GLHProject) size equals: 1.
 	self assert:
