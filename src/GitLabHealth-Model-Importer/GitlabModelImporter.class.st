@@ -852,9 +852,11 @@ GitlabModelImporter >> importDiffOfMergeRequest: aMergeRequest [
 		^ aMergeRequest diffs ].
 	('Import diff commits of MR ' , aMergeRequest iid printString)
 		recordInfo.
-	result := self repoApi mergeRequests diffsOf: aMergeRequest iid inProject: aMergeRequest project_id.
-
-	diffsResult := self newParseDiffResult: result.
+	result := self repoApi mergeRequests
+		          diffsOf: aMergeRequest iid
+		          inProject: aMergeRequest project_id.
+	diffsResult := result flatCollect: [ :aResult |
+		               self newParseDiffResult: aResult ].
 
 
 	aMergeRequest diffs
@@ -1411,6 +1413,26 @@ GitlabModelImporter >> importRepository: aGLHRepository [
 	withInitialCommits ifTrue: [
 		aGLHRepository branches do: [ :branch |
 			self importCommitsOfBranch: branch ] ]
+]
+
+{ #category : #'as yet unclassified' }
+GitlabModelImporter >> importSZZFromCommit: aCommit [
+
+	| result diffRanges diffs szzCommits|
+	szzCommits := Set new. 
+	diffs := (self importDiffOfCommit: aCommit).
+	diffRanges := diffs flatCollect: #diffRanges.
+	diffRanges do: [ :range |
+		|blames|
+		
+			blames := NeoJSONReader fromString:( self repoApi repositories getBlameOf: range diff new_path  inRef: aCommit id start: range start end:range end ofProject: (aCommit repository project id)).
+			blames collect: [ :blame |
+			 szzCommits add: 	(self importCommit:(blame at: #commit at: #id) ofProject: aCommit repository project).
+				 ]
+			
+		 ].
+	^ szzCommits .
+
 ]
 
 { #category : #'import - tag' }
