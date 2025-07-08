@@ -409,6 +409,22 @@ GLHUserCatalogueV2 >> searchName: aName [
 ]
 
 { #category : #search }
+GLHUserCatalogueV2 >> searchNames: aCollection [
+	|cat|
+	cat := self class new.
+	
+	aCollection do: [ :name | 
+		|res| 
+		
+		res := (self searchName: name). 
+		res do: [:entry |
+					cat addUser: (entry at: #user) withNames: (entry at: #names) withProjects: (entry at: #contributedProjects) ]
+			 ].
+		^ cat
+
+]
+
+{ #category : #search }
 GLHUserCatalogueV2 >> searchUserWithName: aName [
 
 	^ (self searchName: aName) users

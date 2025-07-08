@@ -551,6 +551,14 @@ GitlabModelImporter >> importAndLoadLatestsCommitsOfProject: aGLHProject [
 	^ commits
 ]
 
+{ #category : #'import - user' }
+GitlabModelImporter >> importAuthorOfCommit: aGLHCommit [ 
+		|user|
+	user:= (self importUserByUsername: aGLHCommit author_name) .
+	aGLHCommit commitCreator: user. 
+	^ user
+]
+
 { #category : #'import - commits' }
 GitlabModelImporter >> importCommit: aCommitID ofProject: aGLHProject [
 
