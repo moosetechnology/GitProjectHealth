@@ -10,6 +10,12 @@ GLHApiMock >> commits [
 ]
 
 { #category : #accessing }
+GLHApiMock >> mergeRequests [
+
+	^ GitlabMergeRequestsMock new
+]
+
+{ #category : #accessing }
 GLHApiMock >> output: aString [ 
 	^ self 
 ]
