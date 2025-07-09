@@ -4,6 +4,13 @@ A GitLab User
 ## Relations
 ======================
 
+### Parents
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `assignedIssue` | `GLHUser` | `assignees` | `GLHIssue` | |
+| `createdIssue` | `GLHUser` | `author` | `GLHIssue` | |
+| `createdMilestone` | `GLHUser` | `author` | `GLHMilestone` | |
+
 ### Children
 | Relation | Origin | Opposite | Type | Comment |
 |---|
@@ -44,8 +51,8 @@ A GitLab User
 | `job_title` | `String` | nil | |
 | `linkedin` | `String` | nil | |
 | `location` | `String` | nil | |
-| `name` | `String` | nil | |
 | `name` | `String` | nil | Basic name of the entity, not full reference.|
+| `name` | `String` | nil | |
 | `organization` | `String` | nil | |
 | `pronouns` | `String` | nil | |
 | `public_email` | `String` | nil | |
@@ -87,11 +94,14 @@ Class {
 		'#work_information => FMProperty',
 		'#followers => FMProperty',
 		'#following => FMProperty',
-		'#createdProjects => FMMany type: #GLHProject opposite: #creator',
-		'#contributedProjects => FMMany type: #GLHProject opposite: #contributors',
 		'#commits => FMMany type: #GLHCommit opposite: #commitCreator',
 		'#launchedPipelines => FMMany type: #GLHPipeline opposite: #user',
 		'#jobs => FMMany type: #GLHJob opposite: #user',
+		'#createdProjects => FMMany type: #GLHProject opposite: #creator',
+		'#contributedProjects => FMMany type: #GLHProject opposite: #contributors',
+		'#releases => FMMany type: #GLHRelease opposite: #author',
+		'#assignedIssue => FMOne type: #GLHIssue opposite: #assignees',
+		'#createdIssue => FMOne type: #GLHIssue opposite: #author',
 		'#createdMergeRequests => FMMany type: #GLHMergeRequest opposite: #author',
 		'#approcheMergeRequests => FMMany type: #GLHMergeRequest opposite: #approved_by',
 		'#usedMerges => FMMany type: #GLHMergeRequest opposite: #merge_user',
@@ -100,7 +110,7 @@ Class {
 		'#assignedMergeRequests => FMMany type: #GLHMergeRequest opposite: #assignees',
 		'#currentlyAssignedMergeRequest => FMMany type: #GLHMergeRequest opposite: #assignee',
 		'#reviewedMergeResquest => FMMany type: #GLHMergeRequest opposite: #reviewers',
-		'#releases => FMMany type: #GLHRelease opposite: #author'
+		'#createdMilestone => FMOne type: #GLHMilestone opposite: #author'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }
@@ -211,6 +221,29 @@ GLHUser >> approcheMergeRequests: anObject [
 
 	<generated>
 	approcheMergeRequests value: anObject
+]
+
+{ #category : #accessing }
+GLHUser >> assignedIssue [
+	"Relation named: #assignedIssue type: #GLHIssue opposite: #assignees"
+
+	<generated>
+	<container>
+	^ assignedIssue
+]
+
+{ #category : #accessing }
+GLHUser >> assignedIssue: anObject [
+
+	<generated>
+	assignedIssue := anObject
+]
+
+{ #category : #navigation }
+GLHUser >> assignedIssueGroup [
+	<generated>
+	<navigation: 'AssignedIssue'>
+	^ MooseSpecializedGroup with: self assignedIssue
 ]
 
 { #category : #accessing }
@@ -339,6 +372,30 @@ GLHUser >> contributedProjects: anObject [
 ]
 
 { #category : #accessing }
+GLHUser >> createdIssue [
+	"Relation named: #createdIssue type: #GLHIssue opposite: #author"
+
+	<generated>
+	<container>
+	<derived>
+	^ createdIssue
+]
+
+{ #category : #accessing }
+GLHUser >> createdIssue: anObject [
+
+	<generated>
+	createdIssue := anObject
+]
+
+{ #category : #navigation }
+GLHUser >> createdIssueGroup [
+	<generated>
+	<navigation: 'CreatedIssue'>
+	^ MooseSpecializedGroup with: self createdIssue
+]
+
+{ #category : #accessing }
 GLHUser >> createdMergeRequests [
 	"Relation named: #createdMergeRequests type: #GLHMergeRequest opposite: #author"
 
@@ -352,6 +409,30 @@ GLHUser >> createdMergeRequests: anObject [
 
 	<generated>
 	createdMergeRequests value: anObject
+]
+
+{ #category : #accessing }
+GLHUser >> createdMilestone [
+	"Relation named: #createdMilestone type: #GLHMilestone opposite: #author"
+
+	<generated>
+	<container>
+	<derived>
+	^ createdMilestone
+]
+
+{ #category : #accessing }
+GLHUser >> createdMilestone: anObject [
+
+	<generated>
+	createdMilestone := anObject
+]
+
+{ #category : #navigation }
+GLHUser >> createdMilestoneGroup [
+	<generated>
+	<navigation: 'CreatedMilestone'>
+	^ MooseSpecializedGroup with: self createdMilestone
 ]
 
 { #category : #accessing }

@@ -1,6 +1,11 @@
 Extension { #name : #GLHDiffRange }
 
 { #category : #'*GitLabHealth-Model-Extension' }
+GLHDiffRange >> end [
+ ^	(self newLineRange copyFrom: (self newLineRange indexOf:$,)+1 to: self newLineRange size) asNumber 
+]
+
+{ #category : #'*GitLabHealth-Model-Extension' }
 GLHDiffRange >> name [
 
 	^ '[ OG: ' , originalLineRange , ' | NEW: ' , newLineRange , ']'
@@ -17,4 +22,9 @@ GLHDiffRange class >> newFrom: aLine [
 	range newLineRange: rangesInfo second.
 
 	^ range
+]
+
+{ #category : #'*GitLabHealth-Model-Extension' }
+GLHDiffRange >> start [
+	^ (self newLineRange copyFrom: 2 to: (self newLineRange indexOf:$,)-1) asNumber 
 ]

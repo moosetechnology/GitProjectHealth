@@ -56,9 +56,9 @@ Class {
 		'#started_at => FMProperty',
 		'#finished_at => FMProperty',
 		'#duration => FMProperty',
-		'#project => FMOne type: #GLHProject opposite: #pipelines',
 		'#jobs => FMMany type: #GLHJob opposite: #pipeline',
 		'#user => FMOne type: #GLHUser opposite: #launchedPipelines',
+		'#project => FMOne type: #GLHProject opposite: #pipelines',
 		'#mergeResquest => FMOne type: #GLHMergeRequest opposite: #pipelines'
 	],
 	#category : #'GitLabHealth-Model-Entities'

@@ -124,6 +124,20 @@ GLHTEntityCreator >> newGroupNamed: aName [
 ]
 
 { #category : #'entity creation' }
+GLHTEntityCreator >> newIssue [
+
+	<generated>
+	^ self add: GLHIssue new
+]
+
+{ #category : #'entity creation' }
+GLHTEntityCreator >> newIssueNamed: aName [
+
+	<generated>
+	^ self add: (GLHIssue named: aName)
+]
+
+{ #category : #'entity creation' }
 GLHTEntityCreator >> newJob [
 
 	<generated>
@@ -156,6 +170,20 @@ GLHTEntityCreator >> newMergeRequestNamed: aName [
 
 	<generated>
 	^ self add: (GLHMergeRequest named: aName)
+]
+
+{ #category : #'entity creation' }
+GLHTEntityCreator >> newMilestone [
+
+	<generated>
+	^ self add: GLHMilestone new
+]
+
+{ #category : #'entity creation' }
+GLHTEntityCreator >> newMilestoneNamed: aName [
+
+	<generated>
+	^ self add: (GLHMilestone named: aName)
 ]
 
 { #category : #'entity creation' }

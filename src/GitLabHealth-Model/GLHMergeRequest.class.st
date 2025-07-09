@@ -7,6 +7,7 @@ a gitlab merge request
 ### Parents
 | Relation | Origin | Opposite | Type | Comment |
 |---|
+| `milestone` | `GLHMergeRequest` | `mergeRequest` | `GLHMilestone` | |
 | `project` | `GLHMergeRequest` | `mergeRequests` | `GLHProject` | |
 
 ### Children
@@ -701,6 +702,13 @@ GLHMergeRequest >> milestone [
 GLHMergeRequest >> milestone: anObject [
 	<generated>
 	milestone := anObject
+]
+
+{ #category : #navigation }
+GLHMergeRequest >> milestoneGroup [
+	<generated>
+	<navigation: 'Milestone'>
+	^ MooseSpecializedGroup with: self milestone
 ]
 
 { #category : #accessing }
