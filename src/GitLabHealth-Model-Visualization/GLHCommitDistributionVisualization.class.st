@@ -10,12 +10,14 @@ Class {
 { #category : #'instance creation' }
 GLHCommitDistributionVisualization >> forCommits: aCommitsCollection [
 
-	| c lb horizontal commitGroups groupToCommitByDate alreadyAdded dates commits|
+	| c lb horizontal commitGroups groupToCommitByDate alreadyAdded dates commits |
 	c := RSCompositeChart new.
-	aCommitsCollection ifEmpty: [ ^ c canvas].
-	commits := (aCommitsCollection sort: [ :c1 :c2 | c1 committed_date  > c2 committed_date  ]).
+	aCommitsCollection ifEmpty: [ ^ c canvas ].
+	commits := aCommitsCollection sort: [ :c1 :c2 |
+		           c1 committed_date > c2 committed_date ].
 	"collect dates from oldest to youngest among commits"
-	dates := (commits last committed_date to: commits first committed_date) dates.
+	dates := (commits last committed_date to:
+	          commits first committed_date) dates.
 
 	"default is group by commitCreator (initialize)"
 	commitGroups := commits groupedBy: self groupCommitBlock.
@@ -24,10 +26,10 @@ GLHCommitDistributionVisualization >> forCommits: aCommitsCollection [
 		                       assoc key -> (dates collect: [ :date |
 			                        date
 			                        ->
-			                        (assoc value select: [ :commit |
-												"weird, but only way I know to compare two dates with different timezone."
-				                         commit committed_date asDate asString  = date asString ]) ]) ].
-	 
+				                        (assoc value select: [ :commit | "weird, but only way I know to compare two dates with different timezone."
+					                         commit committed_date asDate asString
+					                         = date asString ]) ]) ].
+
 	alreadyAdded := dates collect: [ :d | 0 ].
 	groupToCommitByDate do: [ :assocGroupToCommitByDate |
 		| chart |

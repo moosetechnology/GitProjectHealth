@@ -211,6 +211,11 @@ GLHUserCatalogueV2 >> collectUsernames [
 	^ username2User
 ]
 
+{ #category : #user }
+GLHUserCatalogueV2 >> collectUsers [
+	^ self associations collect: [ :entry | entry value at: #user ]
+]
+
 { #category : #completion }
 GLHUserCatalogueV2 >> completeAuthorNameOfUser: aGLHUser with: authorName [
 

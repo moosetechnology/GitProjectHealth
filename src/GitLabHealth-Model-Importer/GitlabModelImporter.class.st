@@ -1433,7 +1433,8 @@ GitlabModelImporter >> importSZZFromCommit: aCommit [
 		
 			blames := NeoJSONReader fromString:( self repoApi repositories getBlameOf: range diff new_path  inRef: aCommit id start: range start end:range end ofProject: (aCommit repository project id)).
 			blames collect: [ :blame |
-			 szzCommits add: 	(self importCommit:(blame at: #commit at: #id) ofProject: aCommit repository project).
+			blame isDictionary ifTrue: [ szzCommits add: 	(self importCommit:(blame at: #commit at: #id) ofProject: aCommit repository project). ]
+			 
 				 ]
 			
 		 ].
