@@ -79,9 +79,9 @@ Class {
 		'#parentCommits => FMMany type: #GLHCommit opposite: #childCommits',
 		'#childCommits => FMMany type: #GLHCommit opposite: #parentCommits',
 		'#jobs => FMMany type: #GLHJob opposite: #commit',
+		'#tag => FMOne type: #GLHTag opposite: #commit',
 		'#commitedMergeRequest => FMOne type: #GLHMergeRequest opposite: #mergedCommit',
-		'#squashedMergeRequest => FMOne type: #GLHMergeRequest opposite: #squashCommit',
-		'#tag => FMOne type: #GLHTag opposite: #commit'
+		'#squashedMergeRequest => FMOne type: #GLHMergeRequest opposite: #squashCommit'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }

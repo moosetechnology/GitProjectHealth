@@ -551,6 +551,14 @@ GitlabModelImporter >> importAndLoadLatestsCommitsOfProject: aGLHProject [
 	^ commits
 ]
 
+{ #category : #'import - user' }
+GitlabModelImporter >> importAuthorOfCommit: aGLHCommit [ 
+		|user|
+	user:= (self importUserByUsername: aGLHCommit author_name) .
+	aGLHCommit commitCreator: user. 
+	^ user
+]
+
 { #category : #'import - commits' }
 GitlabModelImporter >> importCommit: aCommitID ofProject: aGLHProject [
 
@@ -1427,7 +1435,8 @@ GitlabModelImporter >> importSZZFromCommit: aCommit [
 		
 			blames := NeoJSONReader fromString:( self repoApi repositories getBlameOf: range diff new_path  inRef: aCommit id start: range start end:range end ofProject: (aCommit repository project id)).
 			blames collect: [ :blame |
-			 szzCommits add: 	(self importCommit:(blame at: #commit at: #id) ofProject: aCommit repository project).
+			blame isDictionary ifTrue: [ szzCommits add: 	(self importCommit:(blame at: #commit at: #id) ofProject: aCommit repository project). ]
+			 
 				 ]
 			
 		 ].

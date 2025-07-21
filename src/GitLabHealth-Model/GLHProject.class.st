@@ -12,7 +12,9 @@ A GitLab Project
 ### Children
 | Relation | Origin | Opposite | Type | Comment |
 |---|
+| `issue` | `GLHProject` | `project` | `GLHIssue` | |
 | `mergeRequests` | `GLHProject` | `project` | `GLHMergeRequest` | |
+| `milestone` | `GLHProject` | `project` | `GLHMilestone` | |
 | `pipelines` | `GLHProject` | `project` | `GLHPipeline` | |
 | `releases` | `GLHProject` | `project` | `GLHRelease` | |
 | `repository` | `GLHProject` | `project` | `GLHRepository` | |
@@ -60,8 +62,10 @@ Class {
 		'#creator => FMOne type: #GLHUser opposite: #createdProjects',
 		'#contributors => FMMany type: #GLHUser opposite: #contributedProjects',
 		'#repository => FMOne type: #GLHRepository opposite: #project',
+		'#releases => FMMany type: #GLHRelease opposite: #project',
+		'#issue => FMMany type: #GLHIssue opposite: #project',
 		'#mergeRequests => FMMany type: #GLHMergeRequest opposite: #project',
-		'#releases => FMMany type: #GLHRelease opposite: #project'
+		'#milestone => FMMany type: #GLHMilestone opposite: #project'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }
@@ -82,9 +86,21 @@ GLHProject >> addContributor: anObject [
 ]
 
 { #category : #adding }
+GLHProject >> addIssue: anObject [
+	<generated>
+	^ self issue add: anObject
+]
+
+{ #category : #adding }
 GLHProject >> addMergeRequest: anObject [
 	<generated>
 	^ self mergeRequests add: anObject
+]
+
+{ #category : #adding }
+GLHProject >> addMilestone: anObject [
+	<generated>
+	^ self milestone add: anObject
 ]
 
 { #category : #adding }
@@ -224,6 +240,29 @@ GLHProject >> id: anObject [
 ]
 
 { #category : #accessing }
+GLHProject >> issue [
+	"Relation named: #issue type: #GLHIssue opposite: #project"
+
+	<generated>
+	<derived>
+	^ issue
+]
+
+{ #category : #accessing }
+GLHProject >> issue: anObject [
+
+	<generated>
+	issue value: anObject
+]
+
+{ #category : #navigation }
+GLHProject >> issueGroup [
+	<generated>
+	<navigation: 'Issue'>
+	^ MooseSpecializedGroup withAll: self issue asSet
+]
+
+{ #category : #accessing }
 GLHProject >> mergeRequests [
 	"Relation named: #mergeRequests type: #GLHMergeRequest opposite: #project"
 
@@ -244,6 +283,29 @@ GLHProject >> mergeRequestsGroup [
 	<generated>
 	<navigation: 'MergeRequests'>
 	^ MooseSpecializedGroup withAll: self mergeRequests asSet
+]
+
+{ #category : #accessing }
+GLHProject >> milestone [
+	"Relation named: #milestone type: #GLHMilestone opposite: #project"
+
+	<generated>
+	<derived>
+	^ milestone
+]
+
+{ #category : #accessing }
+GLHProject >> milestone: anObject [
+
+	<generated>
+	milestone value: anObject
+]
+
+{ #category : #navigation }
+GLHProject >> milestoneGroup [
+	<generated>
+	<navigation: 'Milestone'>
+	^ MooseSpecializedGroup withAll: self milestone asSet
 ]
 
 { #category : #accessing }

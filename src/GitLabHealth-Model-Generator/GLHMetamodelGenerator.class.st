@@ -24,7 +24,9 @@ Class {
 		'note',
 		'entity',
 		'release',
-		'tag'
+		'tag',
+		'issue',
+		'milestone'
 	],
 	#category : #'GitLabHealth-Model-Generator'
 }
@@ -45,13 +47,13 @@ GLHMetamodelGenerator class >> submetamodels [
 	^ { FamixMooseQueryGenerator . FamixGenerator }
 ]
 
-{ #category : #definition }
+{ #category : #branches }
 GLHMetamodelGenerator >> branchProperties [
 
 	branch property: #name type: #String
 ]
 
-{ #category : #definition }
+{ #category : #changes }
 GLHMetamodelGenerator >> changeProperties [
 
 	change property: #index type: #Number.
@@ -61,7 +63,7 @@ GLHMetamodelGenerator >> changeProperties [
 	deletion property: #delimiter type: #String defaultValue: '#-'
 ]
 
-{ #category : #definition }
+{ #category : #commits }
 GLHMetamodelGenerator >> commitProperties [
 
 	commit property: #parent_ids type: #Object defaultValue: 'OrderedCollection new'.
@@ -90,7 +92,7 @@ GLHMetamodelGenerator >> commitProperties [
 GLHMetamodelGenerator >> defineClasses [
 
 	super defineClasses.
-	entity := (builder ensureClassNamed: #Entity).
+	entity := builder ensureClassNamed: #Entity.
 	group := builder newClassNamed: #Group comment: 'A GitLab Group'.
 	group withGroup.
 	project := builder
@@ -113,9 +115,9 @@ GLHMetamodelGenerator >> defineClasses [
 		          newClassNamed: #Commit
 		          comment: 'a commit attached to a repository'.
 	diff := builder newClassNamed: #Diff comment: 'The diff of a commit'.
-	
+
 	job := builder newClassNamed: #Job comment: 'A CI Job'.
-	
+
 	mergeRequest := builder
 		                newClassNamed: #MergeRequest
 		                comment: 'a gitlab merge request'.
@@ -143,26 +145,33 @@ GLHMetamodelGenerator >> defineClasses [
 		             newClassNamed: #DiffRange
 		             comment:
 		             'a indicate on which line of code are concerned by a diff (usually declared with @@ oldRange, newRange @@) '.
-		
+
 	note := builder
-		             newClassNamed: #Note
-		             comment:
-		             'a note (a diff) proposed in a Merge Request; can be accepted, modified or deleted'.
-		
-	
+		        newClassNamed: #Note
+		        comment:
+		        'a note (a diff) proposed in a Merge Request; can be accepted, modified or deleted'.
+
+
 	tag := builder
-		             newClassNamed: #Tag
-		             comment:
-		             'a Tag is a reference to a specific point in the repository''s history'.
-	
+		       newClassNamed: #Tag
+		       comment:
+		       'a Tag is a reference to a specific point in the repository''s history'.
+
+
 	release := builder
-		             newClassNamed: #Release
-		             comment:
-		             'a Release is typically associated with a tag and provide additional metadata and assets that can be distributed to users'.
-
-
-
-
+		           newClassNamed: #Release
+		           comment:
+		           'a Release is typically associated with a tag and provide additional metadata and assets that can be distributed to users'.
+		
+	issue := builder
+		         newClassNamed: #Issue
+		         comment:
+		         'an Issues help collaboration within a team to plan, track, and deliver work'.
+		
+	milestone := builder
+		         newClassNamed: #Milestone
+		         comment:
+		         'a Milestone is use to track progress on groups of issues or pull requests in a repository'.
 ]
 
 { #category : #definition }
@@ -185,31 +194,19 @@ GLHMetamodelGenerator >> defineHierarchy [
 	change <|-- addition.
 	change <|-- deletion.
 	change <|-- lineOfCode.
-	mergeRequest --|> #TNamedEntity
+	mergeRequest --|> #TNamedEntity.
+
+	issue --|> #TNamedEntity.
+	milestone --|> #TNamedEntity. 
 ]
 
 { #category : #definition }
 GLHMetamodelGenerator >> defineProperties [
+	"Group properties"
 
 	super defineProperties.
-	"Group properties"
-	group property: #id type: #Number.
-	group property: #web_url type: #String.
-	group property: #description type: #String.
-	group property: #visibility type: #String.
-	group property: #avatar_url type: #String.
-
-	"Project properties"
-	project property: #id type: #Number.
-	project property: #topics type: #Object.
-	project property: #archived type: #Boolean.
-	project property: #archived type: #Boolean.
-	project property: #description type: #String.
-	project property: #readme_url type: #String.
-	project property: #avatar_url type: #String.
-	project property: #web_url type: #String.
-	project property: #creator_id type: #Number.
-
+	self groupProperties.
+	self projectProperties.
 	self pipelinesProperties.
 	self userProperties.
 	self branchProperties.
@@ -223,26 +220,24 @@ GLHMetamodelGenerator >> defineProperties [
 	self noteProperties.
 	self tagProperties.
 	self releaseProperties.
+	self issueProperties.
+	self milestoneProperties.
 ]
 
 { #category : #definition }
 GLHMetamodelGenerator >> defineRelations [
+	"MERGE REQUEST RELATIONS""DIFF""TAG AND RELEASE"
 
 	super defineRelations.
 	(group property: #projects) <>-* (project property: #group).
 	(group property: #subGroups) <>-* (group property: #group).
-	(project property: #pipelines) <>-* (pipeline property: #project).
-	(project property: #creator) *- (user property: #createdProjects).
-	(project property: #contributors)
-	*-* (user property: #contributedProjects).
-	(project property: #repository) <>- (repository property: #project).
+
 	(repository property: #branches) <>-* (branch property: #repository).
 	(branch property: #files) <>-* (file property: #branch).
 	(fileDirectory property: #files)
 	<>-* (file property: #directoryOwner).
 	(repository property: #commits) <>-* (commit property: #repository).
 	(branch property: #commits) <>-* (commit property: #branch).
-
 	(commit property: #diffs) <>-* (diff property: #commit).
 	(user property: #commits) <>-* (commit property: #commitCreator).
 	(commit property: #parentCommits)
@@ -250,69 +245,21 @@ GLHMetamodelGenerator >> defineRelations [
 	(commit property: #jobs) <>-* (job property: #commit).
 	(pipeline property: #jobs) <>-* (job property: #pipeline).
 	(pipeline property: #user) *- (user property: #launchedPipelines).
-
 	(user property: #jobs) <>-* (job property: #user).
-
-	"MERGE REQUEST RELATIONS"
-	(mergeRequest property: #author)
-	*- (user property: #createdMergeRequests).
-
-	(mergeRequest property: #approved_by)
-	*-* (user property: #approcheMergeRequests).
-
-	(mergeRequest property: #merge_user) *- (user property: #usedMerges).
-
-	(mergeRequest property: #closed_by)
-	*- (user property: #closedMergeRequests).
-
-	(mergeRequest property: #merged_by)
-	*- (user property: #mergerOfMergeRequests).
-
-	(mergeRequest property: #assignees)
-	*-* (user property: #assignedMergeRequests).
-
-	(mergeRequest property: #assignee)
-	*- (user property: #currentlyAssignedMergeRequest).
-
-	(mergeRequest property: #reviewers)
-	*-* (user property: #reviewedMergeResquest).
-
-	(mergeRequest property: #pipelines)
-	<>-* (pipeline property: #mergeResquest).
-
-	(mergeRequest property: #mergedCommit)
-	- (commit property: #commitedMergeRequest).
-
-	(mergeRequest property: #mergeRequestCommit)
-	- (commit property: #commitedMergeRequest).
-
-	(mergeRequest property: #squashCommit)
-	- (commit property: #squashedMergeRequest).
-
-	(mergeRequest property: #diffs) -* (diff property: #mergeRequest).
-
-	(project property: #mergeRequests)
-	<>-* (mergeRequest property: #project).
-	
-	(note property: #mergeRequest) *- (mergeRequest property: #note).
-
-	"DIFF"
 	(diff property: #file) <>-* (file property: #diffs).
 	(diff property: #diffRanges) <>-* (diffRange property: #diff).
 	(diffRange property: #changes) -* (change property: #diffRange).
-	
 
-	"TAG AND RELEASE"
-	(tag property: #commit ) - (commit property: #tag). 
-	(tag property: #release ) - (release property: #tag). 
-	(tag property: #repository ) *-<> (repository property: #tags).
-	(release property: #author ) *-<> (user property: #releases). 
-	(release property: #project ) *-<> (project property: #releases). 
-	 
-
+	self projectRelations.
+	self tagRelations.
+	self releaseRelations.
+	self issueRelations.
+	self mergeRequestsRelations.
+	self noteRelations.
+	self milestoneRelations. 
 ]
 
-{ #category : #definition }
+{ #category : #diffs }
 GLHMetamodelGenerator >> diffProperties [
 
 	(diff property: #diffString type: #String) comment:
@@ -335,7 +282,7 @@ GLHMetamodelGenerator >> diffProperties [
 		comment: 'Is the file of the diff has been removed'
 ]
 
-{ #category : #definition }
+{ #category : #diffs }
 GLHMetamodelGenerator >> diffRangeProperties [
 "must parse the range. 
 	originalLineRange = '-120,5' --> change starts at line #120
@@ -345,13 +292,46 @@ GLHMetamodelGenerator >> diffRangeProperties [
 	diffRange property: #lineOfCode type: #String
 ]
 
-{ #category : #definition }
+{ #category : #files }
 GLHMetamodelGenerator >> fileProperties [
 
 	file property: #name type: #String
 ]
 
-{ #category : #definition }
+{ #category : #groups }
+GLHMetamodelGenerator >> groupProperties [
+
+	group property: #id type: #Number. "Group properties"
+	group property: #web_url type: #String.
+	group property: #description type: #String.
+	group property: #visibility type: #String.
+	group property: #avatar_url type: #String
+]
+
+{ #category : #issues }
+GLHMetamodelGenerator >> issueProperties [
+
+	issue property: #name type: #String.
+	issue property: #description type: #String.
+	issue property: #state type: #String.
+	issue property: #id type: #Number.
+	
+	issue property: #created_at type: #Object.
+	issue property: #updated_at type: #Object.
+	issue property: #closed_at type: #Object.
+	issue property: #due_date type: #Object.
+]
+
+{ #category : #issues }
+GLHMetamodelGenerator >> issueRelations [
+
+	(issue property: #project) *-<> (project property: #issue).
+	(issue property: #assignees) <>-* (user property: #assignedIssue).
+	(issue property: #author) <>- (user property: #createdIssue).
+	
+]
+
+{ #category : #jobs }
 GLHMetamodelGenerator >> jobProperties [
 
 	job property: #id type: #Number.
@@ -362,7 +342,7 @@ GLHMetamodelGenerator >> jobProperties [
 	job property: #ref type: #String.
 ]
 
-{ #category : #definition }
+{ #category : #'merge requests' }
 GLHMetamodelGenerator >> mergeRequestProperties [
 
 	mergeRequest property: #id type: #Number.
@@ -425,7 +405,65 @@ GLHMetamodelGenerator >> mergeRequestProperties [
 	mergeRequest property: #commits type: #Object
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'merge requests' }
+GLHMetamodelGenerator >> mergeRequestsRelations [
+
+	(mergeRequest property: #author)
+	*- (user property: #createdMergeRequests).
+	(mergeRequest property: #approved_by)
+	*-* (user property: #approcheMergeRequests).
+	(mergeRequest property: #merge_user) *- (user property: #usedMerges).
+	(mergeRequest property: #closed_by)
+	*- (user property: #closedMergeRequests).
+	(mergeRequest property: #merged_by)
+	*- (user property: #mergerOfMergeRequests).
+	(mergeRequest property: #assignees)
+	*-* (user property: #assignedMergeRequests).
+	(mergeRequest property: #assignee)
+	*- (user property: #currentlyAssignedMergeRequest).
+	(mergeRequest property: #reviewers)
+	*-* (user property: #reviewedMergeResquest).
+	(mergeRequest property: #pipelines)
+	<>-* (pipeline property: #mergeResquest).
+	(mergeRequest property: #mergedCommit)
+	- (commit property: #commitedMergeRequest).
+	(mergeRequest property: #mergeRequestCommit)
+	- (commit property: #commitedMergeRequest).
+	(mergeRequest property: #squashCommit)
+	- (commit property: #squashedMergeRequest).
+	(mergeRequest property: #diffs) -* (diff property: #mergeRequest).
+	(project property: #mergeRequests)
+	<>-* (mergeRequest property: #project).
+
+]
+
+{ #category : #milestones }
+GLHMetamodelGenerator >> milestoneProperties [
+
+	milestone property: #id type: #Number.
+	milestone property: #title type: #String.
+	milestone property: #description type: #String.
+	
+	milestone property: #open_issues type: #Number .
+	milestone property: #closed_issues type: #Number.
+
+	milestone property: #created_at type: #Object.
+	milestone property: #updated_at type: #Object.
+	milestone property: #closed_at type: #Object.
+	milestone property: #due_date type: #Object
+]
+
+{ #category : #milestones }
+GLHMetamodelGenerator >> milestoneRelations [
+
+	(milestone property: #project) *-<> (project property: #milestone).
+	(milestone property: #author) <>- (user property: #createdMilestone).
+	
+	(milestone property: #issue) <>-* (issue property: #milestone).
+	(milestone property: #mergeRequest) <>-* (mergeRequest property: #milestone).
+]
+
+{ #category : #notes }
 GLHMetamodelGenerator >> noteProperties [ 
 	note property: #id type: #Number.
 	note property: #body type: #String. 
@@ -455,7 +493,13 @@ GLHMetamodelGenerator >> noteProperties [
 
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'merge requests' }
+GLHMetamodelGenerator >> noteRelations [
+
+	(note property: #mergeRequest) *- (mergeRequest property: #note)
+]
+
+{ #category : #pipelines }
 GLHMetamodelGenerator >> pipelinesProperties [
 	
 	"Pipelines properties"
@@ -484,7 +528,31 @@ GLHMetamodelGenerator >> pipelinesProperties [
 
 ]
 
-{ #category : #definition }
+{ #category : #projects }
+GLHMetamodelGenerator >> projectProperties [
+
+	project property: #id type: #Number. "Project properties"
+	project property: #topics type: #Object.
+	project property: #archived type: #Boolean.
+	project property: #archived type: #Boolean.
+	project property: #description type: #String.
+	project property: #readme_url type: #String.
+	project property: #avatar_url type: #String.
+	project property: #web_url type: #String.
+	project property: #creator_id type: #Number
+]
+
+{ #category : #projects }
+GLHMetamodelGenerator >> projectRelations [
+
+	(project property: #pipelines) <>-* (pipeline property: #project).
+	(project property: #creator) *- (user property: #createdProjects).
+	(project property: #contributors)
+	*-* (user property: #contributedProjects).
+	(project property: #repository) <>- (repository property: #project)
+]
+
+{ #category : #releases }
 GLHMetamodelGenerator >> releaseProperties [
 
 	release property: #description type: #String.
@@ -497,7 +565,14 @@ GLHMetamodelGenerator >> releaseProperties [
 	release property: #tag_path type: #String.
 ]
 
-{ #category : #definition }
+{ #category : #releases }
+GLHMetamodelGenerator >> releaseRelations [
+
+	(release property: #author) *-<> (user property: #releases).
+	(release property: #project) *-<> (project property: #releases)
+]
+
+{ #category : #tags }
 GLHMetamodelGenerator >> tagProperties [
 
 	tag property: #name type: #String.
@@ -508,7 +583,14 @@ GLHMetamodelGenerator >> tagProperties [
 
 ]
 
-{ #category : #definition }
+{ #category : #tags }
+GLHMetamodelGenerator >> tagRelations [
+	(tag property: #commit) - (commit property: #tag).
+	(tag property: #release) - (release property: #tag).
+	(tag property: #repository) *-<> (repository property: #tags).
+]
+
+{ #category : #users }
 GLHMetamodelGenerator >> userProperties [
 
 	user property: #id type: #Number.
