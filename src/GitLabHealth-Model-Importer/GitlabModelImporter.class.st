@@ -562,9 +562,9 @@ GitlabModelImporter >> importCommit: aCommitID ofProject: aGLHProject [
 	
 	parsedResult := self parseCommitResult: result.
 	
-	self
-		addCommits: { parsedResult }
-		toRepository: aGLHProject repository.
+	parsedResult := self glhModel add: parsedResult unless: self blockOnIdEquality.
+	parsedResult := aGLHProject repository commits add: parsedResult unless: self blockOnIdEquality.
+		
 	^ parsedResult
 ]
 
@@ -585,7 +585,7 @@ GitlabModelImporter >> importCommitOfProject: anProject withId: anID [
 		          commit := (self parseCommitsResult: '[' , result , ']')
 			                    first.
 
-		          self glhModel add: commit unless: self blockOnIdEquality.
+		          commit := self glhModel add: commit unless: self blockOnIdEquality.
 		          commit repository: anProject repository.
 
 		          commit ].
@@ -627,9 +627,29 @@ GitlabModelImporter >> importCommitsFollowing: aCommit upToDays: aNumberOfDay [
 
 	^ self
 		  importCommitsOfBranch: aCommit branch
-		  forRefName: aCommit branch name
 		  since: date
-		  until: (date + aNumberOfDay day)
+		  until: date + aNumberOfDay day
+]
+
+{ #category : #'import - commits' }
+GitlabModelImporter >> importCommitsFromTag: fromTag toTag: toTag [ 
+	| results commits project|
+		
+
+	project := fromTag repository project.
+	results := self repoApi repositories compareInProject: (project id) from: fromTag name to: toTag name.
+	
+	commits := (NeoJSONReader fromString: results ) at: #commits ifAbsent: ['[]'].
+	
+	
+	commits := self parseCommitsResult: (NeoJSONWriter toString: commits).
+ 	commits := glhModel addAll: commits unless: self blockOnIdEquality.
+	commits := project repository commits addAll: commits unless: self blockOnIdEquality.
+	
+	self chainsCommitsFrom: commits. 
+	
+	^ commits. 
+	
 ]
 
 { #category : #commit }
@@ -686,29 +706,41 @@ GitlabModelImporter >> importCommitsOfBranch: aGLHBranch [
 		          forRefName: aGLHBranch name."
 	commits := self
 		           importCommitsOfBranch: aGLHBranch
-		           forRefName: aGLHBranch name
 		           since: withCommitsSince.
 
 	self chainsCommitsFrom: commits.
 
 	commits do: [ :aCommit |
 		aCommit repository: aGLHBranch repository.
-		self completeImportedCommit: aCommit. 
-		 ]
+		self completeImportedCommit: aCommit ].
+	^ commits
 ]
 
 { #category : #'import - commits' }
-GitlabModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName since: fromDate [
+GitlabModelImporter >> importCommitsOfBranch: aGLHBranch fromCommit: anInitialCommit [
 
-	^ self
-		  importCommitsOfBranch: aGLHBranch
-		  forRefName: aGLHBranch name
-		  since: fromDate
-		  until: nil
+	| commits |
+	"	result := self glhApi
+		          commitsOfProject: aGLHBranch repository project id
+		          forRefName: aGLHBranch name."
+	commits := self
+		           importCommitsOfBranch: aGLHBranch
+		           since: anInitialCommit committed_date.
+
+	commits do: [ :aCommit |
+		aCommit repository: aGLHBranch repository.
+		self completeImportedCommit: aCommit ].
+	^ commits
 ]
 
 { #category : #'import - commits' }
-GitlabModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName since: fromDate until: toDate [
+GitlabModelImporter >> importCommitsOfBranch: aGLHBranch since: fromDate [
+
+	^ self importCommitsOfBranch: aGLHBranch since: fromDate until: nil
+]
+
+{ #category : #'import - commits' }
+GitlabModelImporter >> importCommitsOfBranch: aGLHBranch since: fromDate until: toDate [
 
 	| params result allCommits |
 	params := { 
@@ -728,18 +760,16 @@ GitlabModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName sin
 	self glhModel
 		addAll: aGLHBranch commits
 		unless: self blockOnIdEquality.
+		
+	self chainsCommitsFrom: allCommits. 
 
 	^ allCommits
 ]
 
 { #category : #'import - commits' }
-GitlabModelImporter >> importCommitsOfBranch: aGLHBranch forRefName: refName until: toDate [
+GitlabModelImporter >> importCommitsOfBranch: aGLHBranch until: toDate [
 
-	^ self
-		  importCommitsOfBranch: aGLHBranch
-		  forRefName: aGLHBranch name
-		  since: nil
-		  until: toDate
+	^ self importCommitsOfBranch: aGLHBranch since: nil until: toDate
 ]
 
 { #category : #'import - commits' }
@@ -771,6 +801,38 @@ GitlabModelImporter >> importCommitsOfProject: aProject since: fromDate until: t
 		unless: self blockOnIdEquality.
 
 	^ self glhModel addAll: allCommits unless: self blockOnIdEquality
+]
+
+{ #category : #'import - commits' }
+GitlabModelImporter >> importCommitsOfTag: aGLHTag [
+
+	| taggedCommit tags commits date |
+	self
+		deprecated: 'Use importCommitsFromTag:toTag: instead of current one'
+		on: '21 July 2025'
+		in:
+		'Pharo-12.0.0+SNAPSHOT.build.1571.sha.cf5fcd22e66957962c97dffc58b0393b7f368147 (64 Bit)'.
+	
+	
+	tags := self importTagsForProject: aGLHTag repository project.
+
+
+	taggedCommit := aGLHTag commit ifNil: [
+		                self
+			                importCommit: aGLHTag target
+			                ofProject: aGLHTag repository project ].
+
+	date := (tags isEmptyOrNil and: [ tags size < 2 ])
+		        ifTrue: [ aGLHTag created_at ]
+		        ifFalse: [ tags second commit committed_date ].
+
+	commits := self
+		           importParentCommitsOfCommit: taggedCommit
+		           since: tags third created_at.
+	commits add: taggedCommit.
+	self chainsCommitsFrom: commits.
+
+	^ commits
 ]
 
 { #category : #'import - projects' }
@@ -1248,7 +1310,7 @@ GitlabModelImporter >> importNotesfromMergeRequest: mergeRequest [
 GitlabModelImporter >> importParentCommitsOfCommit: aGLHCommit since: aDate [
 
 	| parentsIds commits |
-	commits := OrderedCollection new.
+	commits := Set new.
 	aGLHCommit created_at asDateAndTime < aDate asDateAndTime ifTrue: [
 		 
 		^ commits
@@ -1259,13 +1321,13 @@ GitlabModelImporter >> importParentCommitsOfCommit: aGLHCommit since: aDate [
 
 	commits addAll: (parentsIds collect: [ :id |
 			 self
-				 importCommitOfProject: aGLHCommit repository project
-				 withId: id ]).
+				 importCommit: id ofProject: aGLHCommit repository project  ]).
 
+	
+	commits addAll: (commits collect: [ :parentCommit |
+		   self importParentCommitsOfCommit: parentCommit since: aDate ]).
 
-	^ (commits collect: [ :parentCommit |
-		   self importParentCommitsOfCommit: parentCommit since: aDate ])
-		  flatten
+	^ commits flattened asSet. 
 ]
 
 { #category : #'import - pipelines' }
@@ -1444,6 +1506,7 @@ GitlabModelImporter >> importTagsForProject: aProject [
 			self parseTagsResult: result. 
 		 ].
 
+	"add the tags inside the model"
 	tags := glhModel addAll: tags unless: self blockOnNameEquality.
 	tags := aProject repository tags addAll: tags unless: self blockOnNameEquality.
 	

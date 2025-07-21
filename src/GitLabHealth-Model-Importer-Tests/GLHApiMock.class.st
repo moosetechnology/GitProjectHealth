@@ -21,6 +21,12 @@ GLHApiMock >> output: aString [
 ]
 
 { #category : #accessing }
+GLHApiMock >> repositories [
+
+	^ GitlabRepositoryMock new
+]
+
+{ #category : #accessing }
 GLHApiMock >> users [
 	^GitlabUsersMock new
 ]
