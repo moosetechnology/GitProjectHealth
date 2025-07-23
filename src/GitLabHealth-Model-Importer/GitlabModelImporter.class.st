@@ -635,6 +635,7 @@ GitlabModelImporter >> importCommitsFollowing: aCommit upToDays: aNumberOfDay [
 GitlabModelImporter >> importCommitsFromTag: fromTag toTag: toTag [ 
 	| results commits project|
 		
+	(fromTag isNil or: [ toTag isNil ] ) ifTrue: [ ^ OrderedCollection new.  ] .
 
 	project := fromTag repository project.
 	results := self repoApi repositories compareInProject: (project id) from: fromTag name to: toTag name.
@@ -1477,7 +1478,7 @@ GitlabModelImporter >> importRepository: aGLHRepository [
 			self importCommitsOfBranch: branch ] ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'import - commits' }
 GitlabModelImporter >> importSZZFromCommit: aCommit [
 
 	| result diffRanges diffs szzCommits|
