@@ -4,7 +4,9 @@ Class {
 	#instVars : [
 		'project',
 		'projectCommits',
-		'projectMergeRequests'
+		'projectMergeRequests',
+		'projectTags',
+		'filteredTags'
 	],
 	#category : #'GitLabHealth-Model-Analysis'
 }

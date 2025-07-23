@@ -201,7 +201,7 @@ BitBucketModelImporter >> importCommit: aCommitID ofProject: aGLHProject [
 		                parseCommitIntoGLHCommit: result
 		                ofProject: aGLHProject.
 
-	self glhModel addAll: { parsedResult } unless: self blockOnIdEquality.
+	parsedResult := self glhModel addAll: { parsedResult } unless: self blockOnIdEquality.
 	^ parsedResult
 ]
 

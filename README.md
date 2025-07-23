@@ -9,7 +9,7 @@ This project includes a model, an importer, and some visulization to evaluate th
 
 ## Installation
 
-Download a [Moose image](https://modularmoose.org/moose-wiki/Beginners/InstallMoose).
+Download a [Moose image](https://modularmoose.org/beginners/install-moose/).
 
 In the Moose image, in a playground (`Ctrl+O`, `Ctrl+W`), perform:
 
