@@ -41,6 +41,17 @@ GLHMetamodelGenerator class >> prefix [
 	^ #GLH
 ]
 
+{ #category : #initialization }
+GLHMetamodelGenerator class >> resetModel [ 
+	<example>
+	Smalltalk image garbageCollect.
+	Smalltalk image garbageCollectMost.
+
+	"GLHMetamodelGenerator new generateWithCleaning". 
+	"GLHMetamodelGenerator generate"
+
+]
+
 { #category : #accessing }
 GLHMetamodelGenerator class >> submetamodels [
 
