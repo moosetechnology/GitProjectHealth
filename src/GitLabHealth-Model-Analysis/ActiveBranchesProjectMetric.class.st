@@ -9,9 +9,12 @@ ActiveBranchesProjectMetric >> calculate [
 
 	| groupedByDate |
 	
-	1 halt. 
+
+
+	projectBranches ifNil:[ self load].
 	
-	projectCommits ifNil: [ self load ].
+		
+		1 halt. 
 	
 	groupedByDate := self setupGroupedDate.
 	
@@ -19,10 +22,13 @@ ActiveBranchesProjectMetric >> calculate [
 	groupedByDate keys do: [ :key |  groupedByDate at: key put: Set new].
 	
 
-	projectCommits do: [ :commit |
-		| dateOver |
+	projectBranches do: [ :branch |
+		| dateOver commit|
+		"sort commits by ASC date"
+		commit := (branch commits sort: [ :c1 :c2 | c1 created_at > c2 created_at]) first.
+		 
 		dateOver := self transformDate: commit created_at to: over.
-		groupedByDate at: dateOver printString ifPresent: [ :v | v add: commit commitCreator ] ].
+		groupedByDate at: dateOver printString ifPresent: [ :v | v add: commit created_at ] ].
 
 	groupedByDate := groupedByDate collect: [ :group | group size ].
 
@@ -38,7 +44,7 @@ ActiveBranchesProjectMetric >> description [
 { #category : #loading }
 ActiveBranchesProjectMetric >> load [
 
-	^ projectCommits := self
+	^ projectBranches := self
 		                  loadBranchesSince: (period at: #since)
 		                  until: (period at: #until)
 ]

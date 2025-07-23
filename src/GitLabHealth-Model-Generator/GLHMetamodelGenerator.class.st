@@ -248,7 +248,8 @@ GLHMetamodelGenerator >> defineRelations [
 	(fileDirectory property: #files)
 	<>-* (file property: #directoryOwner).
 	(repository property: #commits) <>-* (commit property: #repository).
-	(branch property: #commits) <>-* (commit property: #branch).
+	"commit can appears in multiple branches. And a branch"
+	(branch property: #commits) *-* (commit property: #branch).
 	(commit property: #diffs) <>-* (diff property: #commit).
 	(user property: #commits) <>-* (commit property: #commitCreator).
 	(commit property: #parentCommits)

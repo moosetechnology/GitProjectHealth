@@ -188,11 +188,11 @@ GitlabModelImporter >> completeImportedProject: aGLHProject [
 	(self importUser: importedProject creator_id) addCreatedProject:
 		importedProject.
 
-
+	
 	importedProject repository: GLHRepository new.
 	self glhModel add: importedProject repository.
 	self importRepository: importedProject repository.
-
+	
 
 	withInitialMergeRequest ifTrue: [
 		self
@@ -557,6 +557,41 @@ GitlabModelImporter >> importAuthorOfCommit: aGLHCommit [
 	user:= (self importUserByUsername: aGLHCommit author_name) .
 	aGLHCommit commitCreator: user. 
 	^ user
+]
+
+{ #category : #'import - repositories' }
+GitlabModelImporter >> importBranchesOf: aGLHProject [
+
+	| resultBranches branches foundBranches|
+	
+	"aGLHProject repository branches removeAll "
+	
+	resultBranches := self repoApi branches getAllFromProject:
+		                  aGLHProject id.
+
+	foundBranches := (resultBranches collect: [ :branchesJson |
+		             self parseBranchesResult: branchesJson ]) flattened.
+
+	'import the branches of project ' recordInfo.
+
+	"WARNING: always add branch first into repository, than into model !"
+	branches := aGLHProject repository branches
+		            addAll: foundBranches
+		            unless: self blockOnNameEquality.
+	foundBranches do: [ :fb |
+		branches do: [ :b |
+			fb name = b name ifTrue: [ 
+				b commits addAll: fb commits unless: self blockOnIdEquality. ]
+			 ]
+		 ].
+	
+
+	branches := self glhModel
+		            addAll: branches
+		            unless: self blockForBranchEquality.
+
+
+	^ branches
 ]
 
 { #category : #'import - commits' }
@@ -1454,39 +1489,23 @@ GitlabModelImporter >> importProjectsSince: since [
 { #category : #'import - repositories' }
 GitlabModelImporter >> importRepository: aGLHRepository [
 
-	| resultBranches branches |
+	| branches |
 	[
 	('import the repository of project ' , aGLHRepository project name)
 		recordInfo.
-
-	resultBranches := self repoApi branches getAllFromProject:
-		                  aGLHRepository project id.
-
-	branches := (resultBranches collect: [ :branchesJson |
-		             self parseBranchesResult: branchesJson ]) flattened.
-
-	'import the branches of project ' recordInfo.
-
-	branches := aGLHRepository branches
-		            addAll: branches
-		            unless: self blockOnNameEquality.
-	branches := self glhModel
-		            addAll: branches
-		            unless: self blockOnNameEquality.
-
-
+	branches := self importBranchesOf: aGLHRepository project.
 	self withFiles ifTrue: [
 		branches do: [ :branch | self importFilesOfBranch: branch ] ] ]
 		on: NeoJSONParseError
 		do: [
 		self inform: aGLHRepository project name , ' has no repository' ].
-	
+
 	withInitialCommits ifTrue: [
 		aGLHRepository branches do: [ :branch |
 			self importCommitsOfBranch: branch ] ]
 ]
 
-{ #category : #'import - commits' }
+{ #category : #'as yet unclassified' }
 GitlabModelImporter >> importSZZFromCommit: aCommit [
 
 	| result diffRanges diffs szzCommits|
@@ -1498,7 +1517,8 @@ GitlabModelImporter >> importSZZFromCommit: aCommit [
 		
 			blames := NeoJSONReader fromString:( self repoApi repositories getBlameOf: range diff new_path  inRef: aCommit id start: range start end:range end ofProject: (aCommit repository project id)).
 			blames collect: [ :blame |
-			 szzCommits add: 	(self importCommit:(blame at: #commit at: #id) ofProject: aCommit repository project).
+			blame isDictionary ifTrue: [ szzCommits add: 	(self importCommit:(blame at: #commit at: #id) ofProject: aCommit repository project). ]
+			 
 				 ]
 			
 		 ].
@@ -1692,10 +1712,22 @@ GitlabModelImporter >> parseBranchesResult: result [
 	| reader |
 	reader := NeoJSONReader on: result readStream.
 	reader mapInstVarsFor: GLHBranch.
+	
+	reader for: GLHBranch do: [ :mapping |
+	mapping
+			mapProperty: #commit
+			getter: [  ]
+			setter: [ :branch :rawCommit |
+				|commit|
+			commit := glhModel add: (self parseCommitResult: (NeoJSONWriter toString: rawCommit)) unless: self blockOnIdEquality.
+			branch commits add: commit unless: self blockOnIdEquality  ].
+	].
+	
 	reader
 		for: #ArrayOfBranch
 		customDo: [ :customMappting | 
 		customMappting listOfElementSchema: GLHBranch ].
+	
 	^ reader nextAs: #ArrayOfBranch
 ]
 
