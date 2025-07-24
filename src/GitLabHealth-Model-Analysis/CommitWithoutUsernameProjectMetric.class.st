@@ -13,7 +13,8 @@ CommitWithoutUsernameProjectMetric >> calculate [
 	groupedByDate := self setupGroupedDate.
 	
 	filteredCommits := projectCommits select: [ :c |
-		c commitCreator isFakeUser 
+		"if no user found, we assume it's like having a fake user" 
+		c commitCreator ifNil: [ true ] ifNotNil: [:v | v isFakeUser] 
 		 ].
 	
 	filteredCommits do: [ :c |

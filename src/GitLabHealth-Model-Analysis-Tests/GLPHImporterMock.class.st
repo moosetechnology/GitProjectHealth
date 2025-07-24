@@ -7,7 +7,8 @@ Class {
 		'mergeRequests',
 		'glhModel',
 		'notes',
-		'tags'
+		'tags',
+		'branches'
 	],
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
@@ -51,6 +52,11 @@ GLPHImporterMock >> glhModel [
 GLPHImporterMock >> glhModel: anObject [
 
 	glhModel := anObject
+]
+
+{ #category : #'import - repositories' }
+GLPHImporterMock >> importBranchesOf: aGLHProject [ 
+	^ aGLHProject repository branches . 
 ]
 
 { #category : #'import - commits' }
