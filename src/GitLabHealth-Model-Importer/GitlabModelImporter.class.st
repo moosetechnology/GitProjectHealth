@@ -578,6 +578,7 @@ GitlabModelImporter >> importBranchesOf: aGLHProject [
 	branches := aGLHProject repository branches
 		            addAll: foundBranches
 		            unless: self blockOnNameEquality.
+	
 	foundBranches do: [ :fb |
 		branches do: [ :b |
 			fb name = b name ifTrue: [ 
@@ -590,6 +591,11 @@ GitlabModelImporter >> importBranchesOf: aGLHProject [
 		            addAll: branches
 		            unless: self blockForBranchEquality.
 
+	branches do: [ :b|
+		b commits do: [ :c |
+			b repository commits add: c unless: self blockOnIdEquality.
+			].
+		].
 
 	^ branches
 ]
