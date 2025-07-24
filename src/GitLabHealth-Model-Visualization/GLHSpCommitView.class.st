@@ -6,7 +6,9 @@ Class {
 		'shortId',
 		'commitDate',
 		'commitMessage',
-		'diffs'
+		'diffs',
+		'inspectAuthorButton',
+		'commitWebURLLink'
 	],
 	#category : #'GitLabHealth-Model-Visualization'
 }
@@ -18,18 +20,25 @@ GLHSpCommitView >> defaultLayout [
 		  add: (SpBoxLayout newLeftToRight
 				   add: 'Commit ' expand: false;
 				   add: shortId expand: false;
+				   add: commitWebURLLink withConstraints: [ :constraints |
+					   constraints
+						   width: 20;
+						   height: 20 ];
 				   add: ' authored ' expand: false;
 				   add: commitDate expand: false;
 				   add: ' by ' expand: false;
 				   add: commitAuthorCapsule expand: false;
+				   add: inspectAuthorButton withConstraints: [ :constraints |
+				   constraints
+					   width: 20;
+					   height: 20 ];
 				   yourself)
 		  expand: false;
-		add: (SpPanedLayout newTopToBottom
+		  add: (SpPanedLayout newTopToBottom
 				   positionOfSlider: 0.2;
 				   add: commitMessage;
 				   add: diffs;
-				   yourself) 
-		  yourself
+				   yourself) yourself
 ]
 
 { #category : #initialization }
@@ -52,7 +61,16 @@ GLHSpCommitView >> initializePresenters [
 			lines := diff diffString lines.
 			diffs
 				addPageTitle: (lines first splitOn: '/') last
-				provider: [ GLHSpDiffView on: diff ] ] ]
+				provider: [ GLHSpDiffView on: diff ] ] ].
+
+	inspectAuthorButton := self newButton.
+	inspectAuthorButton icon: (self iconNamed: #smallInspectIt).
+	inspectAuthorButton action: [ self model commitCreator inspect ].
+
+	commitWebURLLink := self newButton.
+	commitWebURLLink icon: (self iconNamed: #remote).
+	commitWebURLLink action: [ WebBrowser openOn: self model web_url ].
+	(self model web_url isNil or: [self model web_url isEmpty]) ifTrue: [commitWebURLLink disable]
 ]
 
 { #category : #initialization }
