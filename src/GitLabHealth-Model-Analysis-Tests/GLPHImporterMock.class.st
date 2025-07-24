@@ -8,7 +8,8 @@ Class {
 		'glhModel',
 		'notes',
 		'tags',
-		'branches'
+		'branches',
+		'tags2Commit'
 	],
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
@@ -62,6 +63,14 @@ GLPHImporterMock >> importBranchesOf: aGLHProject [
 { #category : #'import - commits' }
 GLPHImporterMock >> importCommit: aString ofProject: aGLHProject [ 
 	^ self commits detect: [ :c | c id = aString ] ifNone: [nil].
+]
+
+{ #category : #'import - commits' }
+GLPHImporterMock >> importCommitsFromTag: fromTag toTag: toTag [ 
+	(fromTag isNil or: [toTag isNil]) ifTrue: [ ^ OrderedCollection new ]. 
+	^ (tags2Commit at: toTag name) difference: (tags2Commit at: fromTag name)
+	
+
 ]
 
 { #category : #commit }
@@ -150,6 +159,16 @@ GLPHImporterMock >> notes [
 GLPHImporterMock >> notes: anObject [
 
 	notes := anObject 
+]
+
+{ #category : #tag }
+GLPHImporterMock >> tag2Commit [
+	^tags2Commit .
+]
+
+{ #category : #tags }
+GLPHImporterMock >> tag2Commit: aCollection [ 
+	tags2Commit := aCollection.
 ]
 
 { #category : #accessing }
