@@ -27,8 +27,8 @@ an Issues help collaboration within a team to plan, track, and deliver work
 | `description` | `String` | nil | |
 | `due_date` | `Object` | nil | |
 | `id` | `Number` | nil | |
-| `name` | `String` | nil | |
 | `name` | `String` | nil | Basic name of the entity, not full reference.|
+| `name` | `String` | nil | |
 | `state` | `String` | nil | |
 | `updated_at` | `Object` | nil | |
 

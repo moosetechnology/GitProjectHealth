@@ -28,3 +28,13 @@ GLHUser >> computeCommitFrequencySince: since until: until overA: aDateWeekMonth
 		  until: until
 		  overA: aDateWeekMonthOrYear
 ]
+
+{ #category : #'*GitLabHealth-Model-Extension' }
+GLHUser >> isFakeUser [
+	^ self isRealUser not. 
+]
+
+{ #category : #'*GitLabHealth-Model-Extension' }
+GLHUser >> isRealUser [
+	^ self id isNotNil.
+]

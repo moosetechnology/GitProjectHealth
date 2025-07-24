@@ -5,6 +5,7 @@ Class {
 		'project',
 		'projectCommits',
 		'projectMergeRequests',
+		'projectBranches',
 		'projectTags',
 		'filteredTags'
 	],
@@ -15,6 +16,14 @@ Class {
 ProjectMetric class >> isAbstract [
 
 	^ self == ProjectMetric
+]
+
+{ #category : #load }
+ProjectMetric >> loadBranchesSince: since until: until [ 
+
+
+	^	glhImporter importBranchesOf: project.
+	
 ]
 
 { #category : #loading }

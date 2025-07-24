@@ -7,7 +7,6 @@ a commit attached to a repository
 ### Parents
 | Relation | Origin | Opposite | Type | Comment |
 |---|
-| `branch` | `GLHCommit` | `commits` | `GLHBranch` | |
 | `commitCreator` | `GLHCommit` | `commits` | `GLHUser` | |
 | `repository` | `GLHCommit` | `commits` | `GLHRepository` | |
 
@@ -20,6 +19,7 @@ a commit attached to a repository
 ### Other
 | Relation | Origin | Opposite | Type | Comment |
 |---|
+| `branch` | `GLHCommit` | `commits` | `GLHBranch` | |
 | `childCommits` | `GLHCommit` | `parentCommits` | `GLHCommit` | |
 | `commitedMergeRequest` | `GLHCommit` | `mergeRequestCommit` | `GLHMergeRequest` | |
 | `commitedMergeRequest` | `GLHCommit` | `mergedCommit` | `GLHMergeRequest` | |
@@ -73,7 +73,7 @@ Class {
 		'#additions => FMProperty',
 		'#deletions => FMProperty',
 		'#repository => FMOne type: #GLHRepository opposite: #commits',
-		'#branch => FMOne type: #GLHBranch opposite: #commits',
+		'#branch => FMMany type: #GLHBranch opposite: #commits',
 		'#diffs => FMMany type: #GLHDiff opposite: #commit',
 		'#commitCreator => FMOne type: #GLHUser opposite: #commits',
 		'#parentCommits => FMMany type: #GLHCommit opposite: #childCommits',
@@ -93,6 +93,12 @@ GLHCommit class >> annotation [
 	<package: #'GitLabHealth-Model'>
 	<generated>
 	^ self
+]
+
+{ #category : #adding }
+GLHCommit >> addBranch: anObject [
+	<generated>
+	^ self branch add: anObject
 ]
 
 { #category : #adding }
@@ -181,7 +187,6 @@ GLHCommit >> branch [
 	"Relation named: #branch type: #GLHBranch opposite: #commits"
 
 	<generated>
-	<container>
 	^ branch
 ]
 
@@ -189,14 +194,7 @@ GLHCommit >> branch [
 GLHCommit >> branch: anObject [
 
 	<generated>
-	branch := anObject
-]
-
-{ #category : #navigation }
-GLHCommit >> branchGroup [
-	<generated>
-	<navigation: 'Branch'>
-	^ MooseSpecializedGroup with: self branch
+	branch value: anObject
 ]
 
 { #category : #accessing }

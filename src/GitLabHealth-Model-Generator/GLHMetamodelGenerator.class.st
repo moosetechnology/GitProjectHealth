@@ -31,6 +31,30 @@ Class {
 	#category : #'GitLabHealth-Model-Generator'
 }
 
+{ #category : #initialization }
+GLHMetamodelGenerator class >> forceRecreateModel [ 
+	<example>
+
+	(UIManager default 
+	alert: 'You are about to execute a "generateWithCleaning" process on our model. 
+	This method will delete and recreate all the model. It will also delete all entities extensions. 
+	Please ensure you have committed our code first so you will be able to reverte the deleted extensios.' title: 'RESET Model'; 
+	confirm: 'Are you REALLY sure you want to reset all model''s relations and extensions ?' )
+	 ifTrue: [ 
+ 			Smalltalk image garbageCollect.
+			Smalltalk image garbageCollectMost.
+        Transcript show: 'Block executed for GLHMetamodelGenerator new generateWithCleaning'; cr.
+			GLHMetamodelGenerator new generateWithCleaning.
+			"GLHMetamodelGenerator generate"
+    ]
+    ifFalse: [
+        Transcript show: 'Reset operation cancelled'; cr.
+    ].
+
+
+
+]
+
 { #category : #accessing }
 GLHMetamodelGenerator class >> packageName [
 	^ #'GitLabHealth-Model'
@@ -237,7 +261,8 @@ GLHMetamodelGenerator >> defineRelations [
 	(fileDirectory property: #files)
 	<>-* (file property: #directoryOwner).
 	(repository property: #commits) <>-* (commit property: #repository).
-	(branch property: #commits) <>-* (commit property: #branch).
+	"commit can appears in multiple branches. And a branch"
+	(branch property: #commits) *-* (commit property: #branch).
 	(commit property: #diffs) <>-* (diff property: #commit).
 	(user property: #commits) <>-* (commit property: #commitCreator).
 	(commit property: #parentCommits)
