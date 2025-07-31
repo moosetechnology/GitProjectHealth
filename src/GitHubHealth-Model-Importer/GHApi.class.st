@@ -3,13 +3,18 @@ You can use me to extract query [GitHub REST Api](https://docs.github.com/en/res
 "
 Class {
 	#name : #GHApi,
-	#superclass : #Object,
+	#superclass : #GithubApi,
 	#instVars : [
-		'baseAPIUrl',
-		'client'
+		'baseAPIUrl'
 	],
 	#category : #'GitHubHealth-Model-Importer'
 }
+
+{ #category : #testing }
+GHApi class >> isDeprecated [
+		" Uses GithubApi instead of GHApi"
+		^ true
+]
 
 { #category : #api }
 GHApi >> actionsRunOfRepo: aRepoName ofOrganization: anOrganizationName [
@@ -22,13 +27,25 @@ GHApi >> actionsRunOfRepo: aRepoName ofOrganization: anOrganizationName [
 { #category : #accessing }
 GHApi >> baseAPIUrl [
 
-	^ baseAPIUrl
+	self
+		deprecated: 'Use hostUrl instead of current one'
+		on: '31 July 2025'
+		in:
+		'Pharo-12.0.0+SNAPSHOT.build.1571.sha.cf5fcd22e66957962c97dffc58b0393b7f368147 (64 Bit)'.
+
+	^ self hostUrl
 ]
 
 { #category : #accessing }
 GHApi >> baseAPIUrl: anObject [
 
-	baseAPIUrl := anObject
+	self
+		deprecated: 'Use hostUrl: instead of current one'
+		on: '31 July 2025'
+		in:
+		'Pharo-12.0.0+SNAPSHOT.build.1571.sha.cf5fcd22e66957962c97dffc58b0393b7f368147 (64 Bit)'.
+
+	self hostUrl: anObject
 ]
 
 { #category : #api }
@@ -38,18 +55,6 @@ GHApi >> branchesOfRepo: aRepoName ofOrganization: anOrganizationName [
 		self baseAPIUrl , '/repos/' , anOrganizationName , '/' , aRepoName
 		, '/branches'.
 	^ self client get
-]
-
-{ #category : #accessing }
-GHApi >> client [
-
-	^ client
-]
-
-{ #category : #accessing }
-GHApi >> client: anObject [
-
-	client := anObject
 ]
 
 { #category : #'api - commits' }
@@ -123,16 +128,7 @@ GHApi >> contentsOfRepo: aRepoName ofOrganization: anOrganizationName inBranch: 
 	^ self client get
 ]
 
-{ #category : #initialization }
-GHApi >> initialize [
-
-	self baseAPIUrl: 'https://api.github.com'.
-	self client: (ZnClient new
-			 accept: ZnMimeType applicationJson;
-			 yourself)
-]
-
-{ #category : #'as yet unclassified' }
+{ #category : #'merge request' }
 GHApi >> mergeRequestsOfRepo: aRepoName ofProject: aProjectName [
 
 	^ self
@@ -179,18 +175,6 @@ GHApi >> organization: aGroupName repo: aRepoName [
 
 	^ self client get:
 		  self baseAPIUrl , '/repos/' , aGroupName , '/' , aRepoName
-]
-
-{ #category : #accessing }
-GHApi >> privateToken [
-
-		^ self client request headers at: #'Authorization'
-]
-
-{ #category : #accessing }
-GHApi >> privateToken: anObject [
-
-	self client headerAt: #'Authorization' add: ('token ', anObject)
 ]
 
 { #category : #'api - repositories' }
