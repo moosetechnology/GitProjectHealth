@@ -175,7 +175,7 @@ BaselineOfGitLabHealth >> definePackages: spec [
 	"github"
 		spec
 		package: 'GitHubHealth-Model-Importer'
-		with: [ spec requires: #( 'GithubApi' ) ];
+		with: [ spec requires: #( 'GithubAPI' ) ];
 		package: 'GitHubHealth-Model-Importer-Tests'
 		with: [ spec requires: #( 'GitHubHealth-Model-Importer' ) ].
 
