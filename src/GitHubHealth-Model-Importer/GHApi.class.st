@@ -196,6 +196,10 @@ GHApi >> reposOfOrganization: anOrganizationName perPage: itemPerPage page: page
 
 { #category : #'api - users' }
 GHApi >> user: aUserID [
+	
+	"^ self client get: self baseAPIUrl , '/user/' , aUserID asString"
+	
+	^ self users getUserId: aUserID 
 
-	^ self client get: self baseAPIUrl , '/user/' , aUserID asString
+	
 ]
