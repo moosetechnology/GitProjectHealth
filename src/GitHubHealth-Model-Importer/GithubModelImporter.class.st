@@ -1,6 +1,9 @@
 Class {
 	#name : #GithubModelImporter,
 	#superclass : #GitModelImporter,
+	#instVars : [
+		'generalReader'
+	],
 	#category : #'GitHubHealth-Model-Importer'
 }
 
@@ -70,6 +73,25 @@ GithubModelImporter >> completeImportedProject: aGLHProject [
 		| commits |
 		commits := self importCommitsOfProject: aGLHProject.
 		self chainsCommitsFrom: commits ]
+]
+
+{ #category : #'as yet unclassified' }
+GithubModelImporter >> configureReaderForProject: reader [
+
+"	reader mapInstVarsFor: GLHProject. "
+
+	reader for: GLHProject do: [ :mapping | 
+		mapping mapInstVar: #name to: #name.
+		mapping mapInstVar: #description to: #description.
+		mapping mapInstVar: #id to: #id.
+		mapping mapInstVar: #archived to: #archived.
+		mapping mapInstVar: #web_url to: #html_url.
+		mapping mapInstVar: #topics to: #topics ].
+
+	reader
+		for: #ArrayOfProjects 
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHProject ].
 ]
 
 { #category : #private }
@@ -337,24 +359,35 @@ GithubModelImporter >> importUser: userID [
 ]
 
 { #category : #initialization }
+GithubModelImporter >> initReader [
+
+	generalReader := NeoJSONReader new.
+	self configureReaderForProject: generalReader.
+]
+
+{ #category : #initialization }
 GithubModelImporter >> initialize [
 
 	super initialize.
 	self repoApi: GHApi new.
 	self repoApi output: 'json'.
 	self withCommitDiffs: false.
-	withFiles := false
+	withFiles := false.
+	
+	self initReader
 ]
 
 { #category : #parsing }
 GithubModelImporter >> parseArrayOfProject: arrayOfProjects [
 
 	| reader |
-	reader := NeoJSONReader on: arrayOfProjects readStream.
+" reader := NeoJSONReader on: arrayOfProjects readStream.
+	
 	reader
 		for: #ArrayOfProjects
 		customDo: [ :customMappting | 
 		customMappting listOfElementSchema: GLHProject ].
+	
 	reader for: GLHProject do: [ :mapping | 
 		mapping mapInstVar: #name to: #name.
 		mapping mapInstVar: #description to: #description.
@@ -362,6 +395,11 @@ GithubModelImporter >> parseArrayOfProject: arrayOfProjects [
 		mapping mapInstVar: #archived to: #archived.
 		mapping mapInstVar: #web_url to: #html_url.
 		mapping mapInstVar: #topics to: #topics ].
+	^ reader nextAs: #ArrayOfProjects
+	"
+
+	reader := generalReader on: arrayOfProjects readStream.
+	
 	^ reader nextAs: #ArrayOfProjects
 ]
 
@@ -532,7 +570,7 @@ GithubModelImporter >> parsePipelinesResult: pipelineOverview [
 GithubModelImporter >> parseProjectResult: aResult [
 
 	| reader |
-	reader := NeoJSONReader on: aResult readStream.
+"	reader := NeoJSONReader on: aResult readStream.
 	reader for: GLHProject do: [ :mapping |
 		mapping mapInstVar: #name to: #name.
 		mapping mapInstVar: #description to: #description.
@@ -540,6 +578,10 @@ GithubModelImporter >> parseProjectResult: aResult [
 		mapping mapInstVar: #archived to: #archived.
 		mapping mapInstVar: #web_url to: #html_url.
 		mapping mapInstVar: #topics to: #topics ].
+	^ reader nextAs: GLHProject"
+	
+	reader := generalReader on: aResult readStream.
+	
 	^ reader nextAs: GLHProject
 ]
 
