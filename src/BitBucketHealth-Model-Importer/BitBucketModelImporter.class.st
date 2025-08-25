@@ -186,6 +186,25 @@ BitBucketModelImporter >> importAndLoadLatestsCommitsOfProject: aGLHProject [
 	^ commits
 ]
 
+{ #category : #'import - repositories' }
+BitBucketModelImporter >> importBranchesOf: aGLHProject [
+
+	| branches glhBranches |
+	branches := self repoApi branches
+		            allWithParams: {  } asDictionary
+		            inRepository: aGLHProject id
+		            ofProject: aGLHProject group id.
+	glhBranches := branches collect: [ :branch | self parseBranchIntoGLHBranch: branch ].
+
+	glhBranches do: [ :glhBranch | aGLHProject repository addBranch: glhBranch ].
+
+	self glhModel
+		            addAll: glhBranches
+		            unless: self blockForBranchEquality.
+
+	^ glhBranches
+]
+
 { #category : #'import - commits' }
 BitBucketModelImporter >> importCommit: aCommitID ofProject: aGLHProject [
 
@@ -520,6 +539,14 @@ BitBucketModelImporter >> importUserByUsername: username [
 		  self glhModel add: glhUser unless: self blockOnIdEquality.
 		  self userCatalogue addUser: glhUser withName: username.
 		  glhUser ]
+]
+
+{ #category : #parsing }
+BitBucketModelImporter >> parseBranchIntoGLHBranch: branchDictionary [ 
+	^ GLHBranch new
+		name: (branchDictionary at: 'displayId');
+		yourself
+		
 ]
 
 { #category : #parsing }
