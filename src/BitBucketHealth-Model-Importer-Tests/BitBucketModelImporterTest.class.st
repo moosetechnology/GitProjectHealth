@@ -237,6 +237,75 @@ BitBucketModelImporterTest >> testImportAndLoadLatestsCommitsOfProject [
 ]
 
 { #category : #tests }
+BitBucketModelImporterTest >> testImportCommitOfProject [
+
+	| bitBucketApi glphModel bitBucketImporter project commit group repo |
+	"Given"
+	bitBucketApi := BitBucketApiMock new.
+
+	glphModel := GLHModel new name: 'test'.
+
+	bitBucketImporter := BitBucketModelImporter new
+		                     repoApi: bitBucketApi;
+		                     glhModel: glphModel.
+
+	group := GLHGroup new id: 1.
+	repo := GLHRepository new.
+	project := GLHProject new
+		           group: group;
+		           repository: repo.
+
+	"When"
+	commit := bitBucketImporter
+		          importCommit: 'abcdef0123abcdef4567abcdef8987abcdef6543'
+		          ofProject: project.
+
+	"Then"
+	self
+		assert: (bitBucketImporter glhModel allWithType: GLHCommit) size
+		equals: 1.
+
+	self assert: commit class equals: GLHCommit
+]
+
+{ #category : #tests }
+BitBucketModelImporterTest >> testImportCommitOfProjectAlreadyExisting [
+
+	| bitBucketApi glphModel bitBucketImporter project commit group repo initCommit |
+	"Given"
+	bitBucketApi := BitBucketApiMock new.
+
+	glphModel := GLHModel new name: 'test'.
+
+	bitBucketImporter := BitBucketModelImporter new
+		                     repoApi: bitBucketApi;
+		                     glhModel: glphModel.
+
+	group := GLHGroup new id: 1.
+	repo := GLHRepository new.
+	project := GLHProject new
+		           group: group;
+		           repository: repo.
+	initCommit := GLHCommit new
+		              id: 'abcdef0123abcdef4567abcdef8987abcdef6543';
+		              yourself.
+	repo addCommit: initCommit.
+	glphModel add: initCommit.
+
+	"When"
+	commit := bitBucketImporter
+		          importCommit: 'abcdef0123abcdef4567abcdef8987abcdef6543'
+		          ofProject: project.
+
+	"Then"
+	self
+		assert: (bitBucketImporter glhModel allWithType: GLHCommit) size
+		equals: 1.
+
+	self assert: commit class equals: GLHCommit
+]
+
+{ #category : #tests }
 BitBucketModelImporterTest >> testImportCommitsOfProjectSinceUntil [
 
 	| bitBucketApi glphModel bitBucketImporter project commits group repo firstCommit |

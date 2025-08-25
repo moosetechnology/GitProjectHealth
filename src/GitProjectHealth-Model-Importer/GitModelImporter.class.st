@@ -151,6 +151,12 @@ GitModelImporter >> glhModel: anObject [
 	glhModel := anObject
 ]
 
+{ #category : #'import - repositories' }
+GitModelImporter >> importBranchesOf: aGLHProject [
+
+	^ self subclassResponsibility
+]
+
 { #category : #import }
 GitModelImporter >> importDiffRangesForDiff: aGLHDiff [
 
