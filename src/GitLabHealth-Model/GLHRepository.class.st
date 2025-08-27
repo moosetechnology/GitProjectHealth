@@ -23,9 +23,9 @@ Class {
 	#name : #GLHRepository,
 	#superclass : #GLHEntity,
 	#instVars : [
-		'#project => FMOne type: #GLHProject opposite: #repository',
 		'#branches => FMMany type: #GLHBranch opposite: #repository',
 		'#commits => FMMany type: #GLHCommit opposite: #repository',
+		'#project => FMOne type: #GLHProject opposite: #repository',
 		'#tags => FMMany type: #GLHTag opposite: #repository'
 	],
 	#category : #'GitLabHealth-Model-Entities'

@@ -4,7 +4,10 @@ Class {
 	#instVars : [
 		'project',
 		'projectCommits',
-		'projectMergeRequests'
+		'projectMergeRequests',
+		'projectBranches',
+		'projectTags',
+		'filteredTags'
 	],
 	#category : #'GitLabHealth-Model-Analysis'
 }
@@ -13,6 +16,14 @@ Class {
 ProjectMetric class >> isAbstract [
 
 	^ self == ProjectMetric
+]
+
+{ #category : #load }
+ProjectMetric >> loadBranchesSince: since until: until [ 
+
+
+	^	glhImporter importBranchesOf: project.
+	
 ]
 
 { #category : #loading }

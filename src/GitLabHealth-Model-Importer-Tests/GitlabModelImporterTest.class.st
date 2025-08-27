@@ -29,6 +29,52 @@ GitlabModelImporterTest >> setUp [
 ]
 
 { #category : #tests }
+GitlabModelImporterTest >> testImportCommitsFromTagToTagNoCommits [
+
+	| tag1 tag2 hostUrl gitlabApi projectId result client gitlabRepositories from to params |
+	"Given"
+	projectId := 1.
+	from := 'v1.8.1'.
+	to := 'v1.8.1'.
+
+	tag1 := GLHTag new
+		        name: from;
+		        repository: (GLHRepository new
+				         project: (GLHProject new id: 1);
+				         yourself);
+		        yourself.
+	tag2 := GLHTag new
+		        name: to;
+		        repository: (GLHRepository new
+				         project: (GLHProject new id: 1);
+				         yourself);
+		        yourself.
+
+	hostUrl := 'www.url.com'.
+	client := ZnClient new.
+
+	gitlabApi := GitlabApi new
+		             privateToken: 'token';
+		             hostUrl: hostUrl;
+		             client: client.
+	gitlabRepositories := GitlabRepositories new gitlabAPI: gitlabApi.
+
+
+
+	params := {
+		          (#from -> from).
+		          (#to -> to) } asDictionary.
+
+
+
+	"when"
+	result := importer importCommitsFromTag: tag1 toTag: tag2.
+
+	"Then"
+	self assert: result isEmpty
+]
+
+{ #category : #tests }
 GitlabModelImporterTest >> testImportDiffOfCommitWithServerRaiseError [
 
 	| commit repo project |

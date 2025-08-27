@@ -48,9 +48,9 @@ Class {
 		'#renamed_file => FMProperty defaultValue: false',
 		'#deleted_file => FMProperty defaultValue: false',
 		'#commit => FMOne type: #GLHCommit opposite: #diffs',
-		'#mergeRequest => FMOne type: #GLHMergeRequest opposite: #diffs',
 		'#file => FMMany type: #GLHFile opposite: #diffs',
-		'#diffRanges => FMMany type: #GLHDiffRange opposite: #diff'
+		'#diffRanges => FMMany type: #GLHDiffRange opposite: #diff',
+		'#mergeRequest => FMOne type: #GLHMergeRequest opposite: #diffs'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }

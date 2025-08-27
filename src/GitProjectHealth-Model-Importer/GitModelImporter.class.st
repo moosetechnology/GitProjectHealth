@@ -49,6 +49,18 @@ GitModelImporter >> blockEqualityOn: aSymbol [
 	  (existing perform: aSymbol) = (new perform: aSymbol) ]
 ]
 
+{ #category : #'as yet unclassified' }
+GitModelImporter >> blockEqualityOn: aSymbol andOn: aSecondSymbol [
+	^ (self blockEqualityOn: aSymbol) and: [ self blockEqualityOn: aSecondSymbol ]
+]
+
+{ #category : #equality }
+GitModelImporter >> blockForBranchEquality [
+	^ [ :existing :new |
+	  (existing name = new name) and: [ existing repository project id = new repository project id ] ]
+	
+]
+
 { #category : #equality }
 GitModelImporter >> blockForDiffEquality [
 	^ [ :existing :new |
@@ -137,6 +149,12 @@ GitModelImporter >> glhModel [
 GitModelImporter >> glhModel: anObject [
 
 	glhModel := anObject
+]
+
+{ #category : #'import - repositories' }
+GitModelImporter >> importBranchesOf: aGLHProject [
+
+	^ self subclassResponsibility
 ]
 
 { #category : #import }

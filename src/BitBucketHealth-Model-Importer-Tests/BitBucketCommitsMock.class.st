@@ -20,3 +20,9 @@ BitBucketCommitsMock >> diffOf: commitId inRepository: repositorySlug ofProject:
 
 		^ diffs
 ]
+
+{ #category : #'api - get' }
+BitBucketCommitsMock >> get: aCommitID inRepository: repoId ofProject: projectId [
+
+	^ self commit
+]

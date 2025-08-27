@@ -211,6 +211,11 @@ GLHUserCatalogueV2 >> collectUsernames [
 	^ username2User
 ]
 
+{ #category : #user }
+GLHUserCatalogueV2 >> collectUsers [
+	^ self associations collect: [ :entry | entry value at: #user ]
+]
+
 { #category : #completion }
 GLHUserCatalogueV2 >> completeAuthorNameOfUser: aGLHUser with: authorName [
 
@@ -406,6 +411,22 @@ GLHUserCatalogueV2 >> searchName: aName [
 		collectionOfName := entry at: #names.
 		  (' ' join: collectionOfName) asLowercase includesSubstring:
 			  aName asLowercase ]
+]
+
+{ #category : #search }
+GLHUserCatalogueV2 >> searchNames: aCollection [
+	|cat|
+	cat := self class new.
+	
+	aCollection do: [ :name | 
+		|res| 
+		
+		res := (self searchName: name). 
+		res do: [:entry |
+					cat addUser: (entry at: #user) withNames: (entry at: #names) withProjects: (entry at: #contributedProjects) ]
+			 ].
+		^ cat
+
 ]
 
 { #category : #search }

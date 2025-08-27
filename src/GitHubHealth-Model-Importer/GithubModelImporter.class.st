@@ -93,7 +93,7 @@ GithubModelImporter >> ensureGroupNamed: aGroupName [
 		  ifNone: [ self glhModel newGroupNamed: aGroupName ]
 ]
 
-{ #category : #api }
+{ #category : #'import - repositories' }
 GithubModelImporter >> importBranchesOf: project [
 
 	"add the pipeline (actions runs) in the project"
@@ -341,6 +341,7 @@ GithubModelImporter >> initialize [
 
 	super initialize.
 	self repoApi: GHApi new.
+	self repoApi output: 'json'.
 	self withCommitDiffs: false.
 	withFiles := false
 ]
@@ -478,9 +479,11 @@ GithubModelImporter >> parseGroupResult: aResult [
 { #category : #parsing }
 GithubModelImporter >> parseMergeRequestsResult: response [
 
-	| result |
+	| result json|
 	self flag: 'temp version, must remade using NeoJsonReader'.
-	result := response collect: [ :aPull |
+	json := NeoJSONReader fromString: response.
+	
+	result := json collect: [ :aPull |
 		          GLHMergeRequest new
 			          id: (aPull at: #id);
 			          title: (aPull at: #title);

@@ -12,8 +12,12 @@ A git branch
 ### Children
 | Relation | Origin | Opposite | Type | Comment |
 |---|
-| `commits` | `GLHBranch` | `branch` | `GLHCommit` | |
 | `files` | `GLHBranch` | `branch` | `GLHFile` | |
+
+### Other
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `commits` | `GLHBranch` | `branch` | `GLHCommit` | |
 
 
 ## Properties
@@ -71,13 +75,6 @@ GLHBranch >> commits: anObject [
 
 	<generated>
 	commits value: anObject
-]
-
-{ #category : #navigation }
-GLHBranch >> commitsGroup [
-	<generated>
-	<navigation: 'Commits'>
-	^ MooseSpecializedGroup withAll: self commits asSet
 ]
 
 { #category : #accessing }
