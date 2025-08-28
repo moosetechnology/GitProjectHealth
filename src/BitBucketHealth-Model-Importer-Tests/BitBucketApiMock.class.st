@@ -11,6 +11,36 @@ Class {
 }
 
 { #category : #'mock - commits' }
+BitBucketApiMock >> commit [
+
+	| commits1 |
+	commits1 := '{
+      "id": "abcdef0123abcdef4567abcdef8987abcdef6543",
+		"message": "message test",
+      "displayId": "abcdef0123a",
+      "author": {
+        "name": "charlie",
+        "emailAddress": "charlie@example.com"
+      },
+      "authorTimestamp": 1727168151000,
+      "committer": {
+        "name": "charlie",
+        "emailAddress": "charlie@example.com"
+      },
+      "committerTimestamp": 1727168151000,
+      "message": "WIP on feature 1",
+      "parents": [
+        {
+          "id": "abcdef0123abcdef4567abcdef8987abcdef6543",
+          "displayId": "abcdef0"
+        }
+      ]
+    }'.
+
+	^ commits1 := (NeoJSONReader on: commits1 readStream) next
+]
+
+{ #category : #'mock - commits' }
 BitBucketApiMock >> commit2 [
 
 	| commits2 |
