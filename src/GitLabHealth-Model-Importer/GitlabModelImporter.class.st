@@ -406,7 +406,7 @@ GitlabModelImporter >> configureReaderForTags: reader [
 	reader mapInstVarsFor: GLHTag .
 	
 	reader for: GLHTag do: [ :mapping |
-			
+		
 		(mapping mapInstVar: #commit) valueSchema: GLHCommit .
 "		(mapping mapInstVar: #release) valueSchema: GLHRelease ."
 		(mapping mapInstVar: #created_at) valueSchema: DateAndTime .
@@ -415,7 +415,7 @@ GitlabModelImporter >> configureReaderForTags: reader [
 			mapProperty: #release
 			getter: [ :object | #ignore ]
 			setter: [ :object :value |
-			object release: (value ifNotNil: [GLHRelease new description: (value at:#description); tag_name: (value at: #tag_name); yourself ]).
+			object release: (value ifNotNil: [ GLHRelease new description: (value at:#description); tag_name: (value at: #tag_name); yourself ]).
 			].
 		 ].
 	
@@ -816,6 +816,7 @@ GitlabModelImporter >> importCommitsOfProject: aProject since: fromDate until: t
 		           withParams: params.
 
 	allCommits := (results collect: [ :commitsJson |
+							self haltIf: [ (self parseCommitsResult: commitsJson) detect: [ :c | c id = '66be451285533da93283e48c0839935b8c3e9841' ] ifFound: [true] ifNone: [ false ] ].
 		               self parseCommitsResult: commitsJson ]) flattened.
 
 	allCommits:= aProject repository commits
@@ -1519,16 +1520,13 @@ GitlabModelImporter >> importTagsForProject: aProject [
 	
 	"update tag's commit if already imported"
 	tags do: [ :tag |
-		|commit|
-		commit := glhModel add: tag commit unless: self blockOnIdEquality.
-		commit := aProject repository commits add: tag commit unless: self blockOnIdEquality.
-		tag commit: commit. 
+		tag commit: (self importCommit: tag commit id ofProject: aProject).
 		 ].
 	
 	"update tag's release if already imported"
 	tags do: [ :tag |
 		|release|
-		release ifNotNil: [ 
+		tag release ifNotNil: [ 
 			release := glhModel add: tag release unless: (self blockEqualityOn: #tag_name).
 			release := aProject releases add: tag release unless: (self blockEqualityOn: #tag_name).
 			tag release: release. 
