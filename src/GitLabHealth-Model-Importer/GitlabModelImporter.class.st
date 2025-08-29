@@ -406,7 +406,7 @@ GitlabModelImporter >> configureReaderForTags: reader [
 	reader mapInstVarsFor: GLHTag .
 	
 	reader for: GLHTag do: [ :mapping |
-			
+		
 		(mapping mapInstVar: #commit) valueSchema: GLHCommit .
 "		(mapping mapInstVar: #release) valueSchema: GLHRelease ."
 		(mapping mapInstVar: #created_at) valueSchema: DateAndTime .
@@ -415,7 +415,7 @@ GitlabModelImporter >> configureReaderForTags: reader [
 			mapProperty: #release
 			getter: [ :object | #ignore ]
 			setter: [ :object :value |
-			object release: (value ifNotNil: [GLHRelease new description: (value at:#description); tag_name: (value at: #tag_name); yourself ]).
+			object release: (value ifNotNil: [ GLHRelease new description: (value at:#description); tag_name: (value at: #tag_name); yourself ]).
 			].
 		 ].
 	
@@ -562,15 +562,15 @@ GitlabModelImporter >> importAuthorOfCommit: aGLHCommit [
 { #category : #'import - repositories' }
 GitlabModelImporter >> importBranchesOf: aGLHProject [
 
-	| resultBranches branches foundBranches|
-	
+	| resultBranches branches foundBranches |
 	"aGLHProject repository branches removeAll "
-	
 	resultBranches := self repoApi branches getAllFromProject:
 		                  aGLHProject id.
 
 	foundBranches := (resultBranches collect: [ :branchesJson |
-		             self parseBranchesResult: branchesJson ]) flattened.
+		                  self
+			                  parseBranchesResult: branchesJson
+			                  ofProject: aGLHProject ]) flattened.
 
 	'import the branches of project ' recordInfo.
 
@@ -578,24 +578,19 @@ GitlabModelImporter >> importBranchesOf: aGLHProject [
 	branches := aGLHProject repository branches
 		            addAll: foundBranches
 		            unless: self blockOnNameEquality.
-	
+
 	foundBranches do: [ :fb |
 		branches do: [ :b |
-			fb name = b name ifTrue: [ 
-				b commits addAll: fb commits unless: self blockOnIdEquality. ]
-			 ]
-		 ].
-	
+			fb name = b name ifTrue: [
+				b commits addAll: fb commits unless: self blockOnIdEquality ] ] ].
 
 	branches := self glhModel
 		            addAll: branches
 		            unless: self blockForBranchEquality.
 
-	branches do: [ :b|
+	branches do: [ :b |
 		b commits do: [ :c |
-			b repository commits add: c unless: self blockOnIdEquality.
-			].
-		].
+			b repository commits add: c unless: self blockOnIdEquality ] ].
 
 	^ branches
 ]
@@ -607,13 +602,22 @@ GitlabModelImporter >> importCommit: aCommitID ofProject: aGLHProject [
 	(self glhModel allWithType: GLHCommit) asOrderedCollection
 		detect: [ :commit | commit id = aCommitID ]
 		ifFound: [ :commit | ^ commit ].
-	result := self repoApi commits get: aCommitID inProject: aGLHProject id.
-	
+
+	result := self repoApi commits
+		          get: aCommitID
+		          inProject: aGLHProject id.
+
 	parsedResult := self parseCommitResult: result.
-	
-	parsedResult := self glhModel add: parsedResult unless: self blockOnIdEquality.
-	parsedResult := aGLHProject repository commits add: parsedResult unless: self blockOnIdEquality.
-		
+
+	parsedResult := self glhModel
+		                add: parsedResult
+		                unless: self blockOnIdEquality.
+	parsedResult := aGLHProject repository commits
+		                add: parsedResult
+		                unless: self blockOnIdEquality.
+
+	self withCommitDiffs ifTrue: [ self importDiffOfCommit: parsedResult ].
+
 	^ parsedResult
 ]
 
@@ -621,6 +625,11 @@ GitlabModelImporter >> importCommit: aCommitID ofProject: aGLHProject [
 GitlabModelImporter >> importCommitOfProject: anProject withId: anID [
 
 	| commit result |
+self
+		deprecated: 'Use importCommit:ofProject: instead of current one'
+		on: '27 August 2025'
+		in: 'MSR 1.3.0 '
+		transformWith: '`@rcv importCommitOfProject: `arg1 withId: `arg2' -> '`@rcv importCommit: `arg2 ofProject: `arg1'.
 	anID ifNil: [ ^ nil ].
 
 	('looking for commit ' , anID printString , ' in project : '
@@ -630,11 +639,15 @@ GitlabModelImporter >> importCommitOfProject: anProject withId: anID [
 		           detectEntityType: GLHCommit
 		           overAttribut: #id
 		           equalTo: anID) ifNil: [
-		          result := self repoApi commits get: anID inProject: anProject id.
+		          result := self repoApi commits
+			                    get: anID
+			                    inProject: anProject id.
 		          commit := (self parseCommitsResult: '[' , result , ']')
 			                    first.
 
-		          commit := self glhModel add: commit unless: self blockOnIdEquality.
+		          commit := self glhModel
+			                    add: commit
+			                    unless: self blockOnIdEquality.
 		          commit repository: anProject repository.
 
 		          commit ].
@@ -702,51 +715,6 @@ GitlabModelImporter >> importCommitsFromTag: fromTag toTag: toTag [
 	
 ]
 
-{ #category : #commit }
-GitlabModelImporter >> importCommitsOf: aGLHProject withStats: aBoolean until: toDate [
-
-	| newlyFoundCommit page |
-	
-	self deprecated: [  ] .
-	
-	page := 0.
-	newlyFoundCommit := { true }.
-	[ newlyFoundCommit isNotEmpty ] whileTrue: [
-		| results parsedResults existingCommits |
-		page := page + 1.
-		('import commit page ' , page printString) recordInfo.
-		results := self repoApi
-			           commitsOfProject: aGLHProject id
-			           forRefName: nil
-			           since: nil
-			           until: nil
-			           path: nil
-			           author: nil
-			           all: nil
-			           with_stats: aBoolean
-			           firstParent: nil
-			           order: nil
-			           trailers: nil
-			           perPage: 100
-			           page: page.
-		parsedResults := self parseCommitsResult: results.
-		existingCommits := aGLHProject mooseModel allWithType: GLHCommit.
-
-		newlyFoundCommit := parsedResults reject: [ :commitParsed |
-			                    (toDate isNil or: [
-				                     commitParsed committed_date
-				                     < toDate asDateAndTime ]) or: [
-				                    existingCommits anySatisfy: [ :existingCommit |
-					                    existingCommit id = commitParsed id ] ] ].
-		aGLHProject mooseModel addAll: newlyFoundCommit.
-		aGLHProject repository commits addAll: newlyFoundCommit ].
-
-
-	self withCommitDiffs ifTrue: [
-		aGLHProject repository commits do: [ :commit |
-			self importDiffOfCommit: commit ] ]
-]
-
 { #category : #'import - commits' }
 GitlabModelImporter >> importCommitsOfBranch: aGLHBranch [
 
@@ -793,25 +761,29 @@ GitlabModelImporter >> importCommitsOfBranch: aGLHBranch since: fromDate [
 GitlabModelImporter >> importCommitsOfBranch: aGLHBranch since: fromDate until: toDate [
 
 	| params result allCommits |
-	params := { 
-	  #ref_name -> aGLHBranch name.
-	  #since ->  (fromDate ifNotNil: [ fromDate asDate asDateAndTime asString ] ifNil: [ '' ]).
-	  #until -> (toDate ifNotNil: [ toDate asDate asDateAndTime asString ] ifNil: [ '' ]). 
+	params := {
+		          (#ref_name -> aGLHBranch name).
+		          (#since -> (fromDate
+			            ifNotNil: [ fromDate asDate asDateAndTime asString ]
+			            ifNil: [ '' ])).
+		          (#until -> (toDate
+			            ifNotNil: [ toDate asDate asDateAndTime asString ]
+			            ifNil: [ '' ])).
+		          (#with_stats -> 'true') } asDictionary.
+	result := self repoApi commits
+		          getAllInProject: aGLHBranch repository project id
+		          withParams: params.
 
-	} asDictionary.
-	result := self repoApi commits getAllInProject: aGLHBranch repository project id withParams: params.
-	
-	allCommits := (result collect: [ :commitsJson | self parseCommitsResult: commitsJson ]) flattened.
-	
-	aGLHBranch commits
-			addAll: allCommits
-			unless: self blockOnIdEquality.
+	allCommits := (result collect: [ :commitsJson |
+		               self parseCommitsResult: commitsJson ]) flattened.
+
+	aGLHBranch commits addAll: allCommits unless: self blockOnIdEquality.
 
 	self glhModel
 		addAll: aGLHBranch commits
 		unless: self blockOnIdEquality.
-		
-	self chainsCommitsFrom: allCommits. 
+
+	self chainsCommitsFrom: allCommits.
 
 	^ allCommits
 ]
@@ -1547,16 +1519,13 @@ GitlabModelImporter >> importTagsForProject: aProject [
 	
 	"update tag's commit if already imported"
 	tags do: [ :tag |
-		|commit|
-		commit := glhModel add: tag commit unless: self blockOnIdEquality.
-		commit := aProject repository commits add: tag commit unless: self blockOnIdEquality.
-		tag commit: commit. 
+		tag commit: (self importCommit: tag commit id ofProject: aProject).
 		 ].
 	
 	"update tag's release if already imported"
 	tags do: [ :tag |
 		|release|
-		release ifNotNil: [ 
+		tag release ifNotNil: [ 
 			release := glhModel add: tag release unless: (self blockEqualityOn: #tag_name).
 			release := aProject releases add: tag release unless: (self blockEqualityOn: #tag_name).
 			tag release: release. 
@@ -1713,27 +1682,28 @@ GitlabModelImporter >> parseArrayOfProject: arrayOfProjects [
 ]
 
 { #category : #'private - parsing' }
-GitlabModelImporter >> parseBranchesResult: result [
+GitlabModelImporter >> parseBranchesResult: result ofProject: aGLHProject [
 
 	| reader |
 	reader := NeoJSONReader on: result readStream.
 	reader mapInstVarsFor: GLHBranch.
-	
+
 	reader for: GLHBranch do: [ :mapping |
-	mapping
+		mapping
 			mapProperty: #commit
 			getter: [  ]
 			setter: [ :branch :rawCommit |
-				|commit|
-			commit := glhModel add: (self parseCommitResult: (NeoJSONWriter toString: rawCommit)) unless: self blockOnIdEquality.
-			branch commits add: commit unless: self blockOnIdEquality  ].
-	].
-	
+				| commit |
+				commit := self
+					          importCommit: (rawCommit at: #id)
+					          ofProject: aGLHProject.
+				branch commits add: commit unless: self blockOnIdEquality ] ].
+
 	reader
 		for: #ArrayOfBranch
-		customDo: [ :customMappting | 
+		customDo: [ :customMappting |
 		customMappting listOfElementSchema: GLHBranch ].
-	
+
 	^ reader nextAs: #ArrayOfBranch
 ]
 
