@@ -816,7 +816,6 @@ GitlabModelImporter >> importCommitsOfProject: aProject since: fromDate until: t
 		           withParams: params.
 
 	allCommits := (results collect: [ :commitsJson |
-							self haltIf: [ (self parseCommitsResult: commitsJson) detect: [ :c | c id = '66be451285533da93283e48c0839935b8c3e9841' ] ifFound: [true] ifNone: [ false ] ].
 		               self parseCommitsResult: commitsJson ]) flattened.
 
 	allCommits:= aProject repository commits
