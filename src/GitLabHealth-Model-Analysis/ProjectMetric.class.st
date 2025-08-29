@@ -18,6 +18,12 @@ ProjectMetric class >> isAbstract [
 	^ self == ProjectMetric
 ]
 
+{ #category : #loading }
+ProjectMetric >> loadAllTags [
+
+	^ glhImporter importTagsForProject: project
+]
+
 { #category : #load }
 ProjectMetric >> loadBranchesSince: since until: until [ 
 
