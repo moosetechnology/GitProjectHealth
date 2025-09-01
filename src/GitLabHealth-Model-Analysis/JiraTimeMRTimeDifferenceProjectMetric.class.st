@@ -82,11 +82,15 @@ JiraTimeMRTimeDifferenceProjectMetric >> load [
 
 { #category : #issue }
 JiraTimeMRTimeDifferenceProjectMetric >> loadMergeRequestIssues: aMergeRequestCollection [
-	
-	 (aMergeRequestCollection do: [ :mr | 
-		|id|
-		id := GPJCConnector new jiraKeyFromCommitMessage: mr title .
-		jiraImporter importIssue: id.      
-		GPJCConnector new gpModel: glhImporter glhModel; jiraModel: jiraImporter model; connect.
-		 ]).
+
+	| connector |
+	connector := GPJCConnector new
+		             gpModel: glhImporter glhModel;
+		             jiraModel: jiraImporter model;
+		             yourself.
+	aMergeRequestCollection do: [ :mr |
+		| id |
+		id := connector jiraKeyFromCommitMessage: mr title.
+		jiraImporter importIssue: id.
+		connector connectMergeRequest: mr ]
 ]
