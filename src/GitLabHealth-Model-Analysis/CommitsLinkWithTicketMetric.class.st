@@ -42,7 +42,7 @@ CommitsLinkWithTicketMetric >> load [
 	GPJCConnector new
 		gpModel: glhImporter glhModel;
 		jiraModel: jiraImporter model;
-		connect.
+		connectCommits: userCommits.
 
 	^userCommits := userCommits select: [ :commit |
 		  commit jiraIssue isNotNil ]
