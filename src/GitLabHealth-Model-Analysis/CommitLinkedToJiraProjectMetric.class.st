@@ -52,12 +52,14 @@ CommitLinkedToJiraProjectMetric >> load [
 { #category : #issue }
 CommitLinkedToJiraProjectMetric >> loadCommitRequestIssues: aCommitCollection [
 
+	| connector |
+	connector := GPJCConnector new
+		             gpModel: glhImporter glhModel;
+		             jiraModel: jiraImporter model;
+		             yourself.
 	aCommitCollection do: [ :commit |
 		| id |
-		id := GPJCConnector new jiraKeyFromCommitMessage: commit message.
+		id := connector jiraKeyFromCommitMessage: commit message.
 		jiraImporter importIssue: id.
-		GPJCConnector new
-			gpModel: glhImporter glhModel;
-			jiraModel: jiraImporter model;
-			connect ]
+		connector connectCommit: commit ]
 ]
