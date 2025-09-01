@@ -255,7 +255,8 @@ GithubModelImporter >> importFilesOfBranch: aBranch [
 	files
 		select: [ :file | file isKindOf: GLHFileDirectory ]
 		thenCollect: [ :file | 
-		self importDirectoryFiles: file OfBranch: aBranch ]
+		self importDirectoryFiles: file OfBranch: aBranch ].
+	^ files
 ]
 
 { #category : #api }
