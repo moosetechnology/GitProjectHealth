@@ -562,7 +562,7 @@ GitMetricExporter >> setupAnalysisForUsersWithNames: userNames [
 	glhImporter userCatalogue ifNotNil: [
 		glhImporter userCatalogue scrapeAuthorNamesForUsers: users ].
 
-	users do: [ :user |
+	users select: [ :u | u id isNotNil ] thenDo: [ :user |
 		| projects |
 		projects := glhImporter importContributedProjectsOfUser: user.
 
