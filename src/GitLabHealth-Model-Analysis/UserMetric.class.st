@@ -175,7 +175,7 @@ UserMetric >> loadUserCompleteMergeRequestsWithJiraIssueSince: since until: unti
 	GPJCConnector new
 		gpModel: glhImporter glhModel;
 		jiraModel: jiraImporter model;
-		connect.
+		connectMergeRequests: mergeRequests.
 
 	^ mergeRequests select: [ :mergeRequest |
 		  mergeRequest jiraIssue isNotNil ]
@@ -203,7 +203,7 @@ UserMetric >> loadUserMergeRequestsWithJiraIssueSince: since until: until [
 	GPJCConnector new
 		gpModel: glhImporter glhModel;
 		jiraModel: jiraImporter model;
-		connect.
+		connectMergeRequests: mergeRequests.
 
 	^ mergeRequests select: [ :mergeRequest |
 		  mergeRequest jiraIssue isNotNil ]

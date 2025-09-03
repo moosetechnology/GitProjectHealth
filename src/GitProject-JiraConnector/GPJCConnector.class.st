@@ -24,10 +24,10 @@ Class {
 
 { #category : #accessing }
 GPJCConnector >> connect [
-	(self gpModel allWithType: GLHCommit) do: [ :commit |
-		self connectCommit: commit ].
-	(self gpModel allWithType: GLHMergeRequest) do: [ :mergeRequest |
-		self connectMergeRequest: mergeRequest ]
+	"This is slow, if you wanna connect more specific things please consider doing it using helper methods"
+
+	self connectCommits: (self gpModel allWithType: GLHCommit).
+	self connectMergeRequests: (self gpModel allWithType: GLHMergeRequest)
 ]
 
 { #category : #accessing }
@@ -39,11 +39,23 @@ GPJCConnector >> connectCommit: commit [
 ]
 
 { #category : #accessing }
+GPJCConnector >> connectCommits: commits [
+
+	commits do: [ :commit | self connectCommit: commit ]
+]
+
+{ #category : #accessing }
 GPJCConnector >> connectMergeRequest: mergeRequest [
 
 	(jiraModel allWithType: JPIssue)
 		detect: [ :issue | mergeRequest title includesSubstring: issue key ]
 		ifFound: [ :issue | mergeRequest jiraIssue: issue ]
+]
+
+{ #category : #accessing }
+GPJCConnector >> connectMergeRequests: mergeRequests [
+
+	mergeRequests do: [ :mergeRequest | self connectMergeRequest: mergeRequest ]
 ]
 
 { #category : #accessing }

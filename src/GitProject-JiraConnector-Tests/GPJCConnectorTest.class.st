@@ -53,6 +53,30 @@ GPJCConnectorTest >> testConnectCommitDoesNotExist [
 	self assert: commit jiraIssue equals: nil
 ]
 
+{ #category : #tests }
+GPJCConnectorTest >> testConnectCommits [
+
+	| issue commit issue2 commit2 |
+	issue := jiraModel newIssue.
+	issue key: 'HELLO-WORLD'.
+
+	commit := gitProject newCommit.
+	commit message: 'I am a commit for [HELLO-WORLD]'.
+
+	issue2 := jiraModel newIssue.
+	issue2 key: 'HELLO-WORLD2'.
+
+	commit2 := gitProject newCommit.
+	commit2 message: 'I am a commit for [HELLO-WORLD2]'.
+
+	connector connectCommits: { commit }.
+	self assert: issue commits anyOne equals: commit.
+	self assert: commit jiraIssue equals: issue.
+
+	self assert: issue2 commits isEmpty.
+	self assert: commit2 jiraIssue equals: nil
+]
+
 { #category : #test }
 GPJCConnectorTest >> testConnectMergeRequest [
 
@@ -81,6 +105,30 @@ GPJCConnectorTest >> testConnectMergeRequestDoesNotExist [
 	connector connect.
 	self assert: issue mergeRequest equals: nil.
 	self assert: mergeRequest jiraIssue equals: nil
+]
+
+{ #category : #tests }
+GPJCConnectorTest >> testConnectMergeRequests [
+
+	| issue mergeRequest issue2 mergeRequest2 |
+	issue := jiraModel newIssue.
+	issue key: 'HELLO-WORLD'.
+
+	mergeRequest := gitProject newMergeRequest.
+	mergeRequest title: 'I am a merge request for [HELLO-WORLD]'.
+	
+	issue2 := jiraModel newIssue.
+	issue2 key: 'HELLO-WORLD2'.
+
+	mergeRequest2 := gitProject newMergeRequest.
+	mergeRequest2 title: 'I am a merge request for [HELLO-WORLD2]'.
+
+	connector connectMergeRequests: { mergeRequest }.
+	self assert: issue mergeRequest equals: mergeRequest.
+	self assert: mergeRequest jiraIssue equals: issue.
+	
+	self assert: issue2 mergeRequest equals: nil.
+	self assert: mergeRequest2 jiraIssue equals: nil
 ]
 
 { #category : #test }
