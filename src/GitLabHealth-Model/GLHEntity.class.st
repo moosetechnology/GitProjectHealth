@@ -43,3 +43,10 @@ GLHEntity >> isDeletion [
 	<generated>
 	^ false
 ]
+
+{ #category : #testing }
+GLHEntity >> isRef [
+
+	<generated>
+	^ false
+]
