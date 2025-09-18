@@ -26,7 +26,8 @@ Class {
 		'release',
 		'tag',
 		'issue',
-		'milestone'
+		'milestone',
+		'tRef'
 	],
 	#category : #'GitLabHealth-Model-Generator'
 }
@@ -74,7 +75,7 @@ GLHMetamodelGenerator class >> submetamodels [
 { #category : #branches }
 GLHMetamodelGenerator >> branchProperties [
 
-	branch property: #name type: #String
+	
 ]
 
 { #category : #changes }
@@ -213,6 +214,11 @@ GLHMetamodelGenerator >> defineHierarchy [
 	diff --|> #TNamedEntity.
 	job --|> #TNamedEntity.
 	note --|> #TNamedEntity.
+	
+	tRef --|> #TNamedEntity.
+	tRef <|-- commit .
+	tRef <|-- branch .
+	tRef <|-- tag .
 
 	change --|> #TNamedEntity.
 	change <|-- addition.
@@ -246,6 +252,8 @@ GLHMetamodelGenerator >> defineProperties [
 	self releaseProperties.
 	self issueProperties.
 	self milestoneProperties.
+	
+	self tRefProperties. 
 ]
 
 { #category : #definition }
@@ -282,6 +290,15 @@ GLHMetamodelGenerator >> defineRelations [
 	self mergeRequestsRelations.
 	self noteRelations.
 	self milestoneRelations. 
+]
+
+{ #category : #definition }
+GLHMetamodelGenerator >> defineTraits [
+	super defineTraits.
+	
+	tRef := builder newTraitNamed: #TRef comment: 'I''m representing a Git reference, that is a reference point in a repository''s history'.
+	"generate the identity isXXX method (see https://modularmoose.org/developers/create-new-metamodel/#generating-test-method)"
+	tRef withTesting.
 ]
 
 { #category : #diffs }
@@ -597,10 +614,17 @@ GLHMetamodelGenerator >> releaseRelations [
 	(release property: #project) *-<> (project property: #releases)
 ]
 
+{ #category : #'as yet unclassified' }
+GLHMetamodelGenerator >> tRefProperties [
+	"define the properties of a ref instance"
+	
+	tag property: #sha type: #String.
+	tag property: #name type: #String.
+]
+
 { #category : #tags }
 GLHMetamodelGenerator >> tagProperties [
 
-	tag property: #name type: #String.
 	tag property: #message type: #String.
 	tag property: #target type: #String.
 	tag property: #protected type: #Boolean.

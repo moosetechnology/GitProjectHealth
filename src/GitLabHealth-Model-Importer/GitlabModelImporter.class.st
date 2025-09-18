@@ -981,6 +981,12 @@ GitlabModelImporter >> importDirectoryFiles: aDirectoryFile OfBranch: aBranch [
 		self importDirectoryFiles: file OfBranch: aBranch ]
 ]
 
+{ #category : #'import - file' }
+GitlabModelImporter >> importFileWithPath: aPath ofProject: aGLHProject inBranch: aBranch [ 
+	self flag: 'imported file need need to be store inside the model'.
+	^ self repoApi repositories getRawFile: aPath ofProject: aGLHProject id withParams: {#ref -> aBranch name} asDictionary .
+]
+
 { #category : #'import - repositories' }
 GitlabModelImporter >> importFilesOfBranch: aBranch [
 
