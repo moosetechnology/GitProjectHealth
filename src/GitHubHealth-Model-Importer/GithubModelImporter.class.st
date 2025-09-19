@@ -31,7 +31,7 @@ GithubModelImporter >> api: anObject [
 	repoApi := anObject
 ]
 
-{ #category : #commit }
+{ #category : #'import - commits' }
 GithubModelImporter >> completeImportedCommit: aGLHCommit [
 
 	| result |
