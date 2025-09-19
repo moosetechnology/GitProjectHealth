@@ -64,10 +64,10 @@ GithubModelImporter >> completeImportedCommit: aGLHCommit [
 	^ aGLHCommit 
 ]
 
-{ #category : #api }
+{ #category : #'import - projects' }
 GithubModelImporter >> completeImportedProject: aGLHProject [
 
-	self importPipelinesOf: aGLHProject.
+	self importPipelinesOfProject: aGLHProject.
 	self importBranchesOf: aGLHProject.
 	self withCommitsSince ifNotNil: [ :withCommitSince | "If not nil, it means we have to import commit"
 		| commits |
@@ -134,7 +134,7 @@ GithubModelImporter >> importBranchesOf: project [
 		self withFiles ifTrue: [ self importFilesOfBranch: branch ] ]
 ]
 
-{ #category : #api }
+{ #category : #'import - commits' }
 GithubModelImporter >> importCommitsOfProject: aGLHProject [
 
 	| itemByPage foundCommits tmp pageNumber |
@@ -194,7 +194,7 @@ GithubModelImporter >> importCreatorOfCommit: aGLHCommit [
 	^ creator
 ]
 
-{ #category : #api }
+{ #category : #'import - commits' }
 GithubModelImporter >> importDiffOfCommit: aGLHCommit [
 
 	| result diffsResult |
@@ -259,7 +259,7 @@ GithubModelImporter >> importFilesOfBranch: aBranch [
 	^ files
 ]
 
-{ #category : #api }
+{ #category : #'import - groups' }
 GithubModelImporter >> importGroup: aGroupName [
 
 	| result groupResult |
@@ -271,7 +271,7 @@ GithubModelImporter >> importGroup: aGroupName [
 ]
 
 { #category : #'import - merge request' }
-GithubModelImporter >> importMergeRequests: aProject [ 
+GithubModelImporter >> importMergeRequestsOfProject: aProject [ 
 	|response mergeRequests|
 	response := self repoApi 
 			mergeRequestsOfRepo: aProject group name 
@@ -283,8 +283,8 @@ GithubModelImporter >> importMergeRequests: aProject [
 	
 ]
 
-{ #category : #api }
-GithubModelImporter >> importPipelinesOf: project [
+{ #category : #'import - pipelines' }
+GithubModelImporter >> importPipelinesOfProject: project [
 
 	"add the pipeline (actions runs) in the project"
 
@@ -297,7 +297,7 @@ GithubModelImporter >> importPipelinesOf: project [
 		project addPipeline: pipeline ]
 ]
 
-{ #category : #api }
+{ #category : #'import - projects' }
 GithubModelImporter >> importProject: aProjectName ofGroup: aGroupName [
 
 	| result projectResult group |
@@ -310,7 +310,7 @@ GithubModelImporter >> importProject: aProjectName ofGroup: aGroupName [
 	^ projectResult
 ]
 
-{ #category : #api }
+{ #category : #'import - groups' }
 GithubModelImporter >> importRepositoriesOfGroup: groupResult [
 
 	| reposResult itemByPage pageNumber reposFound tmp |
@@ -344,7 +344,7 @@ GithubModelImporter >> importRepositoriesOfGroup: groupResult [
 	^ groupResult
 ]
 
-{ #category : #api }
+{ #category : #'import - users' }
 GithubModelImporter >> importUser: userID [
 
 	| result userResult |

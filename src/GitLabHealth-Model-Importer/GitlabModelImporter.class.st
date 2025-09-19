@@ -48,28 +48,6 @@ GitlabModelImporter >> allPipelinesOf: aProjectID [
 			   self parsePipelinesResult: pipelinesJson ]) flattened
 ]
 
-{ #category : #private }
-GitlabModelImporter >> chainsCommitsFrom: commitsCollection [
-
-	| dic |
-	
-	('Chains ', commitsCollection size printString , ' commits') recordInfo.
-	
-	dic := ((self glhModel allWithType: GLHCommit) collect: [ :commit |
-		        commit id -> commit ]) asSet asDictionary.
-
-	commitsCollection do: [ :commit |
-		commit parent_ids do: [ :parentId | 
-			dic
-				at: parentId
-				ifPresent: [ :parentCommit |
-					parentCommit childCommits
-						add: commit
-						unless: self blockOnIdEquality ]
-				ifAbsent: [  ] ] ].
-	^ commitsCollection
-]
-
 { #category : #'import - commits' }
 GitlabModelImporter >> commitsOfProject: aGLHProject forRefName: refName until: toDate [
 
@@ -119,7 +97,7 @@ GitlabModelImporter >> completeImportProject: aGLHProject [
 
 	withInitialMergeRequest ifTrue: [
 		self
-			importMergeRequests: importedProject
+			importMergeRequestsOfProject: importedProject
 			since: DateAndTime today
 			until: DateAndTime now ].
 
@@ -196,7 +174,7 @@ GitlabModelImporter >> completeImportedProject: aGLHProject [
 
 	withInitialMergeRequest ifTrue: [
 		self
-			importMergeRequests: importedProject
+			importMergeRequestsOfProject: importedProject
 			since: DateAndTime today
 			until: DateAndTime now ].
 
@@ -529,14 +507,13 @@ GitlabModelImporter >> importAllGroups [
 
 { #category : #'import - pipelines' }
 GitlabModelImporter >> importAllPipelinesOfProject: aGLHProject [
-
-	(self allPipelinesOf: aGLHProject id) do: [ :pipeline |
-		|pip|
-		pip := self glhModel add: pipeline unless: self blockOnIdEquality .
-		pip := aGLHProject pipelines add: pip unless: self blockOnIdEquality.
-		self completeImportedPipeline: pip. 
-		].
 	
+	(self allPipelinesOf: aGLHProject id) do: [ :pipeline |
+		| pip |
+		pip := self glhModel add: pipeline unless: self blockOnIdEquality.
+		pip := aGLHProject pipelines add: pip unless: self blockOnIdEquality.
+		self completeImportedPipeline: pip ].
+
 	^ aGLHProject pipelines
 ]
 
@@ -551,11 +528,19 @@ GitlabModelImporter >> importAndLoadLatestsCommitsOfProject: aGLHProject [
 	^ commits
 ]
 
-{ #category : #'import - user' }
-GitlabModelImporter >> importAuthorOfCommit: aGLHCommit [ 
-		|user|
-	user:= (self importUserByUsername: aGLHCommit author_name) .
-	aGLHCommit commitCreator: user. 
+{ #category : #'import - users' }
+GitlabModelImporter >> importAuthorOfCommit: aGLHCommit [
+
+	| user |
+		self
+		deprecated: 'Use importCreatorOfCommit: instead of current one'
+		on: '19 September 2025'
+		in:
+		'Pharo-12.0.0+SNAPSHOT.build.1571.sha.cf5fcd22e66957962c97dffc58b0393b7f368147 (64 Bit)'.
+
+	
+	user := self importUserByUsername: aGLHCommit author_name.
+	aGLHCommit commitCreator: user.
 	^ user
 ]
 
@@ -662,11 +647,20 @@ GitlabModelImporter >> importCommits: aGLHProject [
 	"limited to the last 20 commits"
 
 	| results parsedResults params |
-	params := { 
-	 #with_stats -> 'true'
-	} asDictionary.
-	results := self repoApi commits getByPage: 1 perPage: 20 inProject: aGLHProject id withParams: params.
-	
+	self
+		deprecated:
+		'Use importLatestCommitsOfProject: instead of current one'
+		on: '19 September 2025'
+		in:
+		'Pharo-12.0.0+SNAPSHOT.build.1571.sha.cf5fcd22e66957962c97dffc58b0393b7f368147 (64 Bit)'.
+		
+	params := { (#with_stats -> 'true') } asDictionary.
+	results := self repoApi commits
+		           getByPage: 1
+		           perPage: 20
+		           inProject: aGLHProject id
+		           withParams: params.
+
 	parsedResults := self parseCommitsResult: results.
 	self glhModel addAll: parsedResults unless: self blockOnIdEquality.
 
@@ -675,8 +669,8 @@ GitlabModelImporter >> importCommits: aGLHProject [
 
 	self withCommitDiffs ifTrue: [
 		parsedResults do: [ :commit | self importDiffOfCommit: commit ] ].
-	
-	^ parsedResults. 
+
+	^ parsedResults
 ]
 
 { #category : #'import - commits' }
@@ -889,7 +883,7 @@ GitlabModelImporter >> importContributedProjectsOfUser: aGLHUser [
 	^ projects
 ]
 
-{ #category : #'import - commits' }
+{ #category : #'import - users' }
 GitlabModelImporter >> importCreatorOfCommit: aCommit [
 
 	aCommit commitCreator ifNil: [
@@ -926,7 +920,7 @@ GitlabModelImporter >> importDiffOfCommit: aCommit [
 	^ aCommit diffs
 ]
 
-{ #category : #'import - merge request' }
+{ #category : #'import - merge-requests' }
 GitlabModelImporter >> importDiffOfMergeRequest: aMergeRequest [
 
 	| result diffsResult |
@@ -1081,7 +1075,7 @@ GitlabModelImporter >> importLastestCommitsOfProject: aGLHProject [
 	^ parsedResults
 ]
 
-{ #category : #'import - merge request' }
+{ #category : #'import - merge-requests' }
 GitlabModelImporter >> importLatestMergeRequestsOfProject: aGLHProject [ 
 	
 	|results parsedResults|
@@ -1105,7 +1099,7 @@ GitlabModelImporter >> importLatestPipelinesOfProject: aGLHProject [
 	^ aGLHProject pipelines 
 ]
 
-{ #category : #'import - release' }
+{ #category : #'import - releases' }
 GitlabModelImporter >> importLatestReleaseOfProject: aGLHProject [ 
 	
 	|result foundRelease|
@@ -1120,7 +1114,7 @@ GitlabModelImporter >> importLatestReleaseOfProject: aGLHProject [
 	^ foundRelease.
 ]
 
-{ #category : #'import - merge request' }
+{ #category : #'import - merge-requests' }
 GitlabModelImporter >> importMergeRequestCommits: aGLPHEMergeRequest [
 
 	| commits result |
@@ -1136,7 +1130,7 @@ GitlabModelImporter >> importMergeRequestCommits: aGLPHEMergeRequest [
 	^ commits
 ]
 
-{ #category : #'import - merge request' }
+{ #category : #'import - merge-requests' }
 GitlabModelImporter >> importMergeRequestMergeCommits: aGLPHEMergeRequest [
 
 	| foundCommits |
@@ -1185,8 +1179,8 @@ GitlabModelImporter >> importMergeRequestPipelines: aGLHMergeRequest [
 	
 ]
 
-{ #category : #'import - merge request' }
-GitlabModelImporter >> importMergeRequests: aGLHProject [
+{ #category : #'import - merge-requests' }
+GitlabModelImporter >> importMergeRequestsOfProject: aGLHProject [
 
 	| results parsedResults mrs |
 	('Import merge request of Project: ' , aGLHProject id printString)
@@ -1216,8 +1210,8 @@ GitlabModelImporter >> importMergeRequests: aGLHProject [
 	^ mrs
 ]
 
-{ #category : #'import - merge request' }
-GitlabModelImporter >> importMergeRequests: aGLHProject since: fromDate until: toDate [
+{ #category : #'import - merge-requests' }
+GitlabModelImporter >> importMergeRequestsOfProject: aGLHProject since: fromDate until: toDate [
 
 	| params result mergeRequests |
 	('import MR of Project ' , aGLHProject name) recordInfo.
@@ -1260,7 +1254,7 @@ GitlabModelImporter >> importMergeRequests: aGLHProject since: fromDate until: t
 	^ mergeRequests
 ]
 
-{ #category : #'import - merge request' }
+{ #category : #'import - merge-requests' }
 GitlabModelImporter >> importMergeResquestApprovals: aGLPHEMergeRequest [
 
 	| results parsedResult |
@@ -1280,7 +1274,7 @@ GitlabModelImporter >> importMergeResquestApprovals: aGLPHEMergeRequest [
 	^ aGLPHEMergeRequest
 ]
 
-{ #category : #'import - merge request' }
+{ #category : #'import - merge-requests' }
 GitlabModelImporter >> importMergeResquestAuthor: aGLPHEMergeRequest [
 
 	| authorID |
@@ -1297,7 +1291,7 @@ GitlabModelImporter >> importMergeResquestAuthor: aGLPHEMergeRequest [
 	^aGLPHEMergeRequest author: (self importUser: authorID)
 ]
 
-{ #category : #'import - merge request' }
+{ #category : #'import - merge-requests' }
 GitlabModelImporter >> importMergeResquestMerger: aGLPHEMergeRequest [
 
 	| authorID |
@@ -1318,7 +1312,7 @@ GitlabModelImporter >> importMergeResquestMerger: aGLPHEMergeRequest [
 ]
 
 { #category : #'import - notes' }
-GitlabModelImporter >> importNotesfromMergeRequest: mergeRequest [
+GitlabModelImporter >> importNotesOfMergeRequest: mergeRequest [
 	| results notes |
 	
 	results := self repoApi notes allInMergeRequest: mergeRequest iid ofProject: mergeRequest project id.
@@ -1378,6 +1372,13 @@ GitlabModelImporter >> importPipeline: pipelineId OfProject: aGLHProject [
 	pipeline := aGLHProject pipelines add: pipeline unless: self blockOnIdEquality.
 	
 	^ self completeImportedPipeline: pipeline. 
+]
+
+{ #category : #'import - pipelines' }
+GitlabModelImporter >> importPipelinesOfProject: aGLHProject [
+
+	self flag: 'WARNING: this import ALL the pipelines at ones. Prefered ImportLatestPipleinesOfProject: for faster performance (if possible)'. 
+	^ self importAllPipelinesOfProject: aGLHProject
 ]
 
 { #category : #'import - pipelines' }
@@ -1494,25 +1495,27 @@ GitlabModelImporter >> importRepository: aGLHRepository [
 { #category : #'import - commits' }
 GitlabModelImporter >> importSZZFromCommit: aCommit [
 
-	| result diffRanges diffs szzCommits|
-	szzCommits := Set new. 
-	diffs := (self importDiffOfCommit: aCommit).
+	| diffRanges diffs szzCommits |
+	szzCommits := Set new.
+	diffs := self importDiffOfCommit: aCommit.
 	diffRanges := diffs flatCollect: #diffRanges.
 	diffRanges do: [ :range |
-		|blames|
-		
-			blames := NeoJSONReader fromString:( self repoApi repositories getBlameOf: range diff new_path  inRef: aCommit id start: range start end:range end ofProject: (aCommit repository project id)).
-			blames collect: [ :blame |
-			blame isDictionary ifTrue: [ szzCommits add: 	(self importCommit:(blame at: #commit at: #id) ofProject: aCommit repository project). ]
-			 
-				 ]
-			
-		 ].
-	^ szzCommits .
-
+		| blames |
+		blames := NeoJSONReader fromString: (self repoApi repositories
+				           getBlameOf: range diff new_path
+				           inRef: aCommit id
+				           start: range start
+				           end: range end
+				           ofProject: aCommit repository project id).
+		blames collect: [ :blame |
+			blame isDictionary ifTrue: [
+				szzCommits add: (self
+						 importCommit: (blame at: #commit at: #id)
+						 ofProject: aCommit repository project) ] ] ].
+	^ szzCommits
 ]
 
-{ #category : #'import - tag' }
+{ #category : #'import - tags' }
 GitlabModelImporter >> importTagsForProject: aProject [ 
 	|results tags |
 	results  := repoApi tags getAllOfProject: aProject id.
@@ -1945,7 +1948,7 @@ GitlabModelImporter >> parseProjectResult: aResult [
 	^ reader nextAs: GLHProject
 ]
 
-{ #category : #parsing }
+{ #category : #'private - parsing' }
 GitlabModelImporter >> parseReleaseResult: result [
 	|reader|
 	reader := generalReader on: result readStream.
@@ -1953,7 +1956,7 @@ GitlabModelImporter >> parseReleaseResult: result [
 	^ reader nextAs: GLHRelease 
 ]
 
-{ #category : #parsing }
+{ #category : #'private - parsing' }
 GitlabModelImporter >> parseReleasesResult: result [
 	|reader|
 	reader := generalReader on: result readStream.
@@ -1970,7 +1973,7 @@ GitlabModelImporter >> parseSubGroupResult: aResult [
 	^ reader nextAs: #ArrayOfGroups
 ]
 
-{ #category : #parsing }
+{ #category : #'private - parsing' }
 GitlabModelImporter >> parseTagsResult: result [
 	|reader|
 	reader := generalReader on: result readStream.

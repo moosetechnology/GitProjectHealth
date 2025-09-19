@@ -78,7 +78,7 @@ ProjectMetric >> loadMergeRequestsSince: since until: until [
 		                    ifAbsentPut: [
 			                    | foundMergeRequests |
 			                    foundMergeRequests := glhImporter
-				                                          importMergeRequests:
+				                                          importMergeRequestsOfProject:
 				                                          project
 				                                          since: since
 				                                          until: until.

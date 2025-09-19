@@ -107,13 +107,13 @@ GitModelImporter class >> reset [
 	currentImporter := OrderedDictionary new.
 ]
 
-{ #category : #accessing }
+{ #category : #initialization }
 GitModelImporter >> beWithFiles [
 
 	withFiles := true
 ]
 
-{ #category : #accessing }
+{ #category : #initialization }
 GitModelImporter >> beWithoutFiles [
 
 	withFiles := false
@@ -234,7 +234,19 @@ GitModelImporter >> glhModel: anObject [
 { #category : #'import - commits' }
 GitModelImporter >> importAndLoadLatestsCommitsOfProject: aGLHProject [
 
-	
+	self subclassResponsibility 
+]
+
+{ #category : #'import - users' }
+GitModelImporter >> importAuthorOfCommit: aGLHCommit [
+
+	self
+		deprecated: 'Use importCreatorOfCommit: instead of current one'
+		on: '19 September 2025'
+		in:
+		'Pharo-12.0.0+SNAPSHOT.build.1571.sha.cf5fcd22e66957962c97dffc58b0393b7f368147 (64 Bit)'.
+
+	self subclassResponsibility
 ]
 
 { #category : #'import - repositories' }
@@ -246,27 +258,32 @@ GitModelImporter >> importBranchesOf: aGLHProject [
 { #category : #'import - commits' }
 GitModelImporter >> importCommit: aCommitID ofProject: aGLHProject [
 
+	self subclassResponsibility 
 ]
 
 { #category : #'import - commits' }
 GitModelImporter >> importCommitsOfProject: aGLHProject since: since until: until [
 
+	self subclassResponsibility 
 ]
 
 { #category : #'import - projects' }
 GitModelImporter >> importContributedProjectsOfUser: aGLHUser [
 ]
 
-{ #category : #'import - commits' }
+{ #category : #'import - users' }
 GitModelImporter >> importCreatorOfCommit: aGLHCommit [
 
+	self subclassResponsibility 
 ]
 
 { #category : #'import - commits' }
 GitModelImporter >> importDiffOfCommit: aCommit [
+
+	self subclassResponsibility 
 ]
 
-{ #category : #import }
+{ #category : #'import - commits' }
 GitModelImporter >> importDiffRangesForDiff: aGLHDiff [
 
 	| diffRanges |
@@ -291,19 +308,55 @@ GitModelImporter >> importGroup: aGroupID [
 	self subclassResponsibility
 ]
 
-{ #category : #pipelines }
-GitModelImporter >> importLatestPipelinesOfProject: aGLHProject [ 
-	(self pipelinesOf: aGLHProject id withLimit:30) do: [ :pipeline |
-		self glhModel add: pipeline unless: self blockOnIdEquality .
-		aGLHProject pipelines add: pipeline unless: self blockOnIdEquality]
+{ #category : #'import - issues' }
+GitModelImporter >> importIssuesOfProject: aGLHProject [
+	self subclassResponsibility 
 ]
 
-{ #category : #'import - merge request' }
+{ #category : #'import - jobs' }
+GitModelImporter >> importJobsOf: aGLHPipeline [
+	self subclassResponsibility 
+]
+
+{ #category : #'import - merge-requests' }
+GitModelImporter >> importLastestCommitsOfProject: aGLHProject [
+	"limited to the last 50 commits"
+	self subclassResponsibility 
+]
+
+{ #category : #'import - merge-requests' }
+GitModelImporter >> importLatestMergeRequestsOfProject: aGLHProject [
+	self subclassResponsibility 
+]
+
+{ #category : #'import - pipelines' }
+GitModelImporter >> importLatestPipelinesOfProject: aGLHProject [
+	self subclassResponsibility 
+	
+]
+
+{ #category : #'import - releases' }
+GitModelImporter >> importLatestReleaseOfProject: aGLHProject [
+	^ self subclassResponsibility 
+]
+
+{ #category : #'import - merge-requests' }
 GitModelImporter >> importMergeRequestCommits: mergeRequest [
 ]
 
-{ #category : #'import - merge request' }
+{ #category : #'import - merge-requests' }
 GitModelImporter >> importMergeRequestMergeCommits: aGLHMergeRequest [
+]
+
+{ #category : #'import - merge-requests' }
+GitModelImporter >> importMergeRequestsOfProject: aGLHProject [
+
+	self subclassResponsibility 
+]
+
+{ #category : #'import - merge-requests' }
+GitModelImporter >> importMergeRequestsOfProject: aGLHProject since: fromDate until: toDate [
+	self subclassResponsibility 
 ]
 
 { #category : #'import - merge-requests' }
@@ -314,10 +367,26 @@ GitModelImporter >> importMergeResquestAuthor: mergeRequest [
 GitModelImporter >> importMergeResquestMerger: mergeRequest [
 ]
 
+{ #category : #'import - milestones' }
+GitModelImporter >> importMilestonesOfProject: aGLHProject [
+	self subclassResponsibility 
+]
+
 { #category : #'import - notes' }
-GitModelImporter >> importNotesfromMergeRequest: mergeRequest [
+GitModelImporter >> importNotesOfMergeRequest: mergeRequest [
 
 	self subclassResponsibility
+]
+
+{ #category : #'import - pipelines' }
+GitModelImporter >> importPipeline: aPipelineId OfProject: aGLHProject [
+
+	self subclassResponsibility 
+]
+
+{ #category : #'import - merge-requests' }
+GitModelImporter >> importPipelinesOfProject: aGLHProject [
+	^ self subclassResponsibility 
 ]
 
 { #category : #'import - projects' }
@@ -329,7 +398,7 @@ GitModelImporter >> importProject: id [
 	^ self subclassResponsibility
 ]
 
-{ #category : #api }
+{ #category : #'import - projects' }
 GitModelImporter >> importProject: aProjectID ofGroup: aGroup [
 ]
 
@@ -340,8 +409,32 @@ GitModelImporter >> importProjects: aCollectionOfProjectID [
 	^ aCollectionOfProjectID collect: [ :id | self importProject: id ]
 ]
 
+{ #category : #'import - projects' }
+GitModelImporter >> importProjectsOfUser: aGLHUser [
+	"https://docs.github.com/fr/rest/repos/repos?apiVersion=2022-11-28#list-repositories-for-a-user"
+	
+	self subclassResponsibility 
+]
+
+{ #category : #'import - releases' }
+GitModelImporter >> importRelease: aReleaseID ofProject: aGLHProject [
+	self subclassResponsibility 
+]
+
+{ #category : #'import - tags' }
+GitModelImporter >> importTagsForProject: aGLHProject [
+	self subclassResponsibility 
+]
+
+{ #category : #'import - users' }
+GitModelImporter >> importUser: aUserID [
+	self subclassResponsibility 
+]
+
 { #category : #'import - users' }
 GitModelImporter >> importUserByUsername: username [
+
+	self subclassResponsibility 
 ]
 
 { #category : #initialization }
@@ -354,12 +447,12 @@ GitModelImporter >> initialize [
 		                 yourself.
 ]
 
-{ #category : #import }
+{ #category : #initialization }
 GitModelImporter >> makeGlobal [
 	^ self makeGlobal: DateAndTime now printString.
 ]
 
-{ #category : #import }
+{ #category : #initialization }
 GitModelImporter >> makeGlobal: aLabel [ 
 
 	currentImporter := GithubModelImporter importers ifNil: [ OrderedDictionary new ].

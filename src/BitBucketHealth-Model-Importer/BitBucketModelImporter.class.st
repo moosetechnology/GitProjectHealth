@@ -432,7 +432,7 @@ BitBucketModelImporter >> importMergeRequestStats: aMergeRequest [
 ]
 
 { #category : #'import - merge-requests' }
-BitBucketModelImporter >> importMergeRequests: aGLHProject since: fromDate until: toDate [
+BitBucketModelImporter >> importMergeRequestsOfProject: aGLHProject since: fromDate until: toDate [
 
 	| pullRequests params |
 	params := { 
@@ -484,7 +484,7 @@ BitBucketModelImporter >> importMergeResquestMerger: mergeRequest [
 ]
 
 { #category : #'import - notes' }
-BitBucketModelImporter >> importNotesfromMergeRequest: mergeRequest [
+BitBucketModelImporter >> importNotesOfMergeRequest: mergeRequest [
 
 	| results notes |
 	results := self repoApi pullRequests

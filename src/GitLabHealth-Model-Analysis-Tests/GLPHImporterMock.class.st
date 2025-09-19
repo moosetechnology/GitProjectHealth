@@ -99,7 +99,7 @@ GLPHImporterMock >> importMergeRequestMergeCommits: aGLHMergeRequest [
 ]
 
 { #category : #'import - merge request' }
-GLPHImporterMock >> importMergeRequests: project since: since until: until [
+GLPHImporterMock >> importMergeRequestsOfProject: project since: since until: until [
 
 	self flag: 'Adds MR regardless of their creation date !'.
 	glhModel addAll: mergeRequests .
@@ -118,7 +118,7 @@ GLPHImporterMock >> importMergeResquestMerger: mergeRequest [
 ]
 
 { #category : #'import - notes' }
-GLPHImporterMock >> importNotesfromMergeRequest: mriid [
+GLPHImporterMock >> importNotesOfMergeRequest: mriid [
 
 	^OrderedCollection with: (notes select: [ :note | (note noteable_iid == mriid) ]) 
 ]
