@@ -51,13 +51,14 @@ GitModelImporter class >> forGithubWithToken: anApiToken [
 
 { #category : #github }
 GitModelImporter class >> forGithubWithToken: anApiToken andModel: aGitModel [
-	|githubImport|
+
+	| githubImport |
 	githubImport := GithubModelImporter new
-  	glhModel: aGitModel;
- 	privateToken: anApiToken;
- 	withCommitsSince: (Date today - 10 day) asDateAndTime ;
- yourself.
-	^ githubImport 
+		                glhModel: aGitModel;
+		                privateToken: anApiToken;
+		                withCommitsSince: 3 day;
+		                yourself.
+	^ githubImport
 ]
 
 { #category : #gitlab }
@@ -82,7 +83,7 @@ GitModelImporter class >> forGitlabHostOn: anHostURL withToken: anApiToken andMo
 	 withFiles: false;
 	 withCommitsSince: 3 day;
 	 withCommitDiffs: false.
-	
+		
 	^ gitlabImporter 
 ]
 
