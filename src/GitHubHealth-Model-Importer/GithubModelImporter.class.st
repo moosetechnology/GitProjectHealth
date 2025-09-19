@@ -370,7 +370,7 @@ GithubModelImporter >> initReader [
 GithubModelImporter >> initialize [
 
 	super initialize.
-	self repoApi: GHApi new.
+	self repoApi: GithubApi new.
 	self repoApi output: 'json'.
 	self withCommitDiffs: false.
 	withFiles := false.
