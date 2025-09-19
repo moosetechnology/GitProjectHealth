@@ -119,13 +119,13 @@ GitModelImporter >> beWithoutFiles [
 	withFiles := false
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #equality }
 GitModelImporter >> blockEqualityOn: aSymbol [
 	^ [ :existing :new |
 	  (existing perform: aSymbol) = (new perform: aSymbol) ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #equality }
 GitModelImporter >> blockEqualityOn: aSymbol andOn: aSecondSymbol [
 	^ (self blockEqualityOn: aSymbol) and: [ self blockEqualityOn: aSecondSymbol ]
 ]
@@ -144,7 +144,7 @@ GitModelImporter >> blockForDiffEquality [
 				existing diffString = new diffString ] ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #equality }
 GitModelImporter >> blockForDiffRangeEquality [
 
 	^ [ :existing :new |
@@ -204,7 +204,7 @@ GitModelImporter >> completeImportedCommit: aGLHCommit [
 	^ aGLHCommit
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #utils }
 GitModelImporter >> filterCommitChanges: aCollection [
 
 	^ aCollection reject: [ :line |
@@ -297,12 +297,12 @@ GitModelImporter >> initialize [
 		                 yourself.
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #import }
 GitModelImporter >> makeGlobal [
 	^ self makeGlobal: DateAndTime now printString.
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #import }
 GitModelImporter >> makeGlobal: aLabel [ 
 
 	currentImporter := GithubModelImporter importers ifNil: [ OrderedDictionary new ].
