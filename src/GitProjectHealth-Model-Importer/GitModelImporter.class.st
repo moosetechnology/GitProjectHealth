@@ -21,6 +21,29 @@ Class {
 	#category : #'GitProjectHealth-Model-Importer'
 }
 
+{ #category : #bitbucket }
+GitModelImporter class >> forBitbucketHostOn: anHostURL withToken: anApiToken [
+	
+	^ self forBitbucketHostOn: anHostURL withToken: anApiToken andModel: GLHModel new. 
+]
+
+{ #category : #bitbucket }
+GitModelImporter class >> forBitbucketHostOn: anHostURL withToken: anApiToken andModel: aGitModel [
+	
+	| bitbucketApi bitBucketImporter |
+	bitbucketApi := BitbucketApi new
+                host: anHostURL;
+                bearerToken: anApiToken.
+
+	bitBucketImporter := BitBucketModelImporter new
+                     repoApi: bitbucketApi;
+                     glhModel: aGitModel;
+                     withFiles: false;
+                     withCommitsSince: 3 day;
+                     withCommitDiffs: false.
+	^bitBucketImporter 
+]
+
 { #category : #github }
 GitModelImporter class >> forGithubWithToken: anApiToken [
 	^ self forGithubWithToken: anApiToken andModel: GLHModel new
