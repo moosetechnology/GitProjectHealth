@@ -75,7 +75,7 @@ GithubModelImporter >> completeImportedProject: aGLHProject [
 		self chainsCommitsFrom: commits ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'private - configure reader' }
 GithubModelImporter >> configureReaderForProject: reader [
 
 "	reader mapInstVarsFor: GLHProject. "

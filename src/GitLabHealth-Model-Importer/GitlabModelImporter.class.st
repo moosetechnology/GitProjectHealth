@@ -1491,7 +1491,7 @@ GitlabModelImporter >> importRepository: aGLHRepository [
 			self importCommitsOfBranch: branch ] ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'import - commits' }
 GitlabModelImporter >> importSZZFromCommit: aCommit [
 
 	| result diffRanges diffs szzCommits|

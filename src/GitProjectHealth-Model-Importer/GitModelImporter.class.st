@@ -166,7 +166,7 @@ GitModelImporter >> blockOnNameEquality [
 	^ self blockEqualityOn: #name
 ]
 
-{ #category : #commit }
+{ #category : #'import - commits' }
 GitModelImporter >> chainsCommitsFrom: commitsCollection [
 
 	| dic |
@@ -188,7 +188,7 @@ GitModelImporter >> chainsCommitsFrom: commitsCollection [
 	^ commitsCollection
 ]
 
-{ #category : #commit }
+{ #category : #'import - commits' }
 GitModelImporter >> completeImportedCommit: aGLHCommit [ 
 	
 	
@@ -202,6 +202,10 @@ GitModelImporter >> completeImportedCommit: aGLHCommit [
 			self glhModel addAll: diffs unless: self blockForDiffEquality ] ].
 
 	^ aGLHCommit
+]
+
+{ #category : #'import - projects' }
+GitModelImporter >> completeImportedProject: aGLHProject [
 ]
 
 { #category : #utils }
@@ -227,10 +231,39 @@ GitModelImporter >> glhModel: anObject [
 	glhModel := anObject
 ]
 
+{ #category : #'import - commits' }
+GitModelImporter >> importAndLoadLatestsCommitsOfProject: aGLHProject [
+
+	
+]
+
 { #category : #'import - repositories' }
 GitModelImporter >> importBranchesOf: aGLHProject [
 
 	^ self subclassResponsibility
+]
+
+{ #category : #'import - commits' }
+GitModelImporter >> importCommit: aCommitID ofProject: aGLHProject [
+
+]
+
+{ #category : #'import - commits' }
+GitModelImporter >> importCommitsOfProject: aGLHProject since: since until: until [
+
+]
+
+{ #category : #'import - projects' }
+GitModelImporter >> importContributedProjectsOfUser: aGLHUser [
+]
+
+{ #category : #'import - commits' }
+GitModelImporter >> importCreatorOfCommit: aGLHCommit [
+
+]
+
+{ #category : #'import - commits' }
+GitModelImporter >> importDiffOfCommit: aCommit [
 ]
 
 { #category : #import }
@@ -265,6 +298,22 @@ GitModelImporter >> importLatestPipelinesOfProject: aGLHProject [
 		aGLHProject pipelines add: pipeline unless: self blockOnIdEquality]
 ]
 
+{ #category : #'import - merge request' }
+GitModelImporter >> importMergeRequestCommits: mergeRequest [
+]
+
+{ #category : #'import - merge request' }
+GitModelImporter >> importMergeRequestMergeCommits: aGLHMergeRequest [
+]
+
+{ #category : #'import - merge-requests' }
+GitModelImporter >> importMergeResquestAuthor: mergeRequest [
+]
+
+{ #category : #'import - merge-requests' }
+GitModelImporter >> importMergeResquestMerger: mergeRequest [
+]
+
 { #category : #'import - notes' }
 GitModelImporter >> importNotesfromMergeRequest: mergeRequest [
 
@@ -280,11 +329,19 @@ GitModelImporter >> importProject: id [
 	^ self subclassResponsibility
 ]
 
+{ #category : #api }
+GitModelImporter >> importProject: aProjectID ofGroup: aGroup [
+]
+
 { #category : #'import - projects' }
 GitModelImporter >> importProjects: aCollectionOfProjectID [
 
 
 	^ aCollectionOfProjectID collect: [ :id | self importProject: id ]
+]
+
+{ #category : #'import - users' }
+GitModelImporter >> importUserByUsername: username [
 ]
 
 { #category : #initialization }

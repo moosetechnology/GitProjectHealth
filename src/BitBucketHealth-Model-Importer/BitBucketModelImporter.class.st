@@ -31,7 +31,7 @@ BitBucketModelImporter >> bitBucketApi: anObject [
 	repoApi := anObject
 ]
 
-{ #category : #commit }
+{ #category : #'import - commits' }
 BitBucketModelImporter >> completeImportedCommit: aCommit [ 
 	
 	('completing commit: ' , aCommit short_id printString) recordInfo.
@@ -118,7 +118,7 @@ BitBucketModelImporter >> convertBitBucketDiffToGitDiff: response [
 	^ result
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'import - notes' }
 BitBucketModelImporter >> extractNoteFromComment: aDictionary [
 
 	^ GLHNote new
@@ -186,7 +186,7 @@ BitBucketModelImporter >> importAndLoadLatestsCommitsOfProject: aGLHProject [
 	^ commits
 ]
 
-{ #category : #'import - repositories' }
+{ #category : #'import - branches' }
 BitBucketModelImporter >> importBranchesOf: aGLHProject [
 
 	| branches glhBranches |
@@ -377,7 +377,7 @@ BitBucketModelImporter >> importMergeRequestCommits: mergeRequest [
 	^ commits
 ]
 
-{ #category : #'import - merge request' }
+{ #category : #'import - merge-requests' }
 BitBucketModelImporter >> importMergeRequestMergeCommits: aGLHMergeRequest [
 
 	aGLHMergeRequest mergedCommit ifNotNil: [
@@ -406,7 +406,7 @@ BitBucketModelImporter >> importMergeRequestMergeCommits: aGLHMergeRequest [
 			^ { found } ]
 ]
 
-{ #category : #'import - merge request' }
+{ #category : #'import - merge-requests' }
 BitBucketModelImporter >> importMergeRequestStats: aMergeRequest [
 
 	| commitDiffs contribution |
