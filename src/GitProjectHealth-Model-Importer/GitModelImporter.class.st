@@ -21,6 +21,82 @@ Class {
 	#category : #'GitProjectHealth-Model-Importer'
 }
 
+{ #category : #bitbucket }
+GitModelImporter class >> forBitbucketHostOn: anHostURL withToken: anApiToken [
+	
+	^ self forBitbucketHostOn: anHostURL withToken: anApiToken andModel: GLHModel new. 
+]
+
+{ #category : #bitbucket }
+GitModelImporter class >> forBitbucketHostOn: anHostURL withToken: anApiToken andModel: aGitModel [
+	
+	| bitbucketApi bitBucketImporter |
+	bitbucketApi := BitbucketApi new
+                host: anHostURL;
+                bearerToken: anApiToken.
+
+	bitBucketImporter := BitBucketModelImporter new
+                     repoApi: bitbucketApi;
+                     glhModel: aGitModel;
+                     withFiles: false;
+                     withCommitsSince: 3 day;
+                     withCommitDiffs: false.
+	^bitBucketImporter 
+]
+
+{ #category : #github }
+GitModelImporter class >> forGithubWithToken: anApiToken [
+	^ self forGithubWithToken: anApiToken andModel: GLHModel new
+]
+
+{ #category : #github }
+GitModelImporter class >> forGithubWithToken: anApiToken andModel: aGitModel [
+
+	| githubImport |
+	githubImport := GithubModelImporter new
+		                glhModel: aGitModel;
+		                privateToken: anApiToken;
+		                withCommitsSince: 3 day;
+		                yourself.
+	^ githubImport
+]
+
+{ #category : #gitlab }
+GitModelImporter class >> forGitlabHostOn: anHostURL withToken: anApiToken [ 
+	^ self forGitlabHostOn: anHostURL withToken: anApiToken andModel: GLHModel new. 
+]
+
+{ #category : #gitlab }
+GitModelImporter class >> forGitlabHostOn: anHostURL withToken: anApiToken andModel: aGitModel [
+	"use it when accessing onpremise or custom gitlab platform"
+	| glphApi gitlabImporter |
+	
+	glphApi := GitlabApi new
+    privateToken: anApiToken;
+    hostUrl: anHostURL;
+	 output: 'json';
+    yourself.
+
+	gitlabImporter := GitlabModelImporter new
+    repoApi: glphApi;
+    glhModel: aGitModel;
+	 withFiles: false;
+	 withCommitsSince: 3 day;
+	 withCommitDiffs: false.
+		
+	^ gitlabImporter 
+]
+
+{ #category : #gitlab }
+GitModelImporter class >> forGitlabWithToken: anApiToken [
+	^ self forGitlabHostOn: 'https://gitlab.com/api/v4' withToken: anApiToken andModel: GLHModel new. 
+]
+
+{ #category : #gitlab }
+GitModelImporter class >> forGitlabWithToken: anApiToken andModel: aGitModel [
+	^ self forGitlabHostOn: 'https://gitlab.com/api/v4' withToken: anApiToken andModel: aGitModel
+]
+
 { #category : #'accessing - global variables' }
 GitModelImporter class >> importers [
 	^ currentImporter 
@@ -216,7 +292,7 @@ GitModelImporter >> initialize [
 
 	super initialize.
 	self withCommitsSince: (Date today - 1 week) asDateAndTime.
-		userCatalogue := GLHUserCatalogueV2 new
+	userCatalogue := GLHUserCatalogueV2 new
 		                 anImporter: self;
 		                 yourself.
 ]

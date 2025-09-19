@@ -24,19 +24,24 @@ a Tag is a reference to a specific point in the repository's history
 | `created_at` | `Object` | nil | |
 | `message` | `String` | nil | |
 | `name` | `String` | nil | |
+| `name` | `String` | nil | Basic name of the entity, not full reference.|
 | `protected` | `Boolean` | nil | |
+| `sha` | `String` | nil | |
 | `target` | `String` | nil | |
 
 "
 Class {
 	#name : #GLHTag,
 	#superclass : #GLHEntity,
+	#traits : 'GLHTRef',
+	#classTraits : 'GLHTRef classTrait',
 	#instVars : [
-		'#name => FMProperty',
 		'#message => FMProperty',
 		'#target => FMProperty',
 		'#protected => FMProperty',
 		'#created_at => FMProperty',
+		'#sha => FMProperty',
+		'#name => FMProperty',
 		'#commit => FMOne type: #GLHCommit opposite: #tag',
 		'#release => FMOne type: #GLHRelease opposite: #tag',
 		'#repository => FMOne type: #GLHRepository opposite: #tags'
@@ -160,6 +165,20 @@ GLHTag >> repositoryGroup [
 	<generated>
 	<navigation: 'Repository'>
 	^ MooseSpecializedGroup with: self repository
+]
+
+{ #category : #accessing }
+GLHTag >> sha [
+
+	<FMProperty: #sha type: #String>
+	<generated>
+	^ sha
+]
+
+{ #category : #accessing }
+GLHTag >> sha: anObject [
+	<generated>
+	sha := anObject
 ]
 
 { #category : #accessing }
