@@ -550,8 +550,7 @@ GithubModelImporter >> initialize [
 	self repoApi output: 'json'.
 	self withCommitDiffs: false.
 	withFiles := false.
-	
-	self initReader
+
 ]
 
 { #category : #parsing }
