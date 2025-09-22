@@ -82,7 +82,7 @@ GithubModelImporter >> completeImportedProject: aGLHProject [
 		self chainsCommitsFrom: commits ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'private - configure reader' }
 GithubModelImporter >> configureReaderForBranches: reader [
 
 	reader mapInstVarsFor: GLHBranch.
@@ -151,6 +151,37 @@ GithubModelImporter >> configureReaderForCommit: reader [
 		for: #ArrayOfCommits
 		customDo: [ :customMappting |
 		customMappting listOfElementSchema: GLHCommit ]
+]
+
+{ #category : #'private - configure reader' }
+GithubModelImporter >> configureReaderForMergeRequest: reader [
+	"	reader mapInstVarsFor: GLHProject. "
+
+	reader for: GLHMergeRequest do: [ :mapping |
+
+		(mapping mapInstVar: #created_at) valueSchema: DateAndTime.
+		(mapping mapInstVar: #updated_at) valueSchema: DateAndTime.
+		(mapping mapInstVar: #merged_at) valueSchema: DateAndTime.
+		(mapping mapInstVar: #closed_at) valueSchema: DateAndTime.
+
+		mapping
+			mapProperty: #author
+			getter: [  ]
+			setter: [ :object :value |
+			object cacheAt: #authorID put: (value at: #id) ].
+		mapping
+			mapProperty: #merge_user
+			getter: [  ]
+			setter: [ :object :value |
+				value ifNotNil: [
+					object cacheAt: #mergeUserID put: (value at: #id) ] ]
+		
+		].
+	
+
+	reader for: #ArrayOfMergeRequest customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHMergeRequest ].
+
 ]
 
 { #category : #'private - configure reader' }
@@ -260,12 +291,13 @@ GithubModelImporter >> importCommitsOfProject: aGLHProject [
 	 , (foundCommits size + itemByPage) printString) recordInfo.
 	"also check that there is at least one commit with the error handling"
 	[
-	tmp := self parseCommitsResult: (self repoApi
-			        commitsOfProject: aGLHProject name
-			        ofOrganization: aGLHProject group name
-			        since: self withCommitsSince
-			        perPage: itemByPage
-			        page: pageNumber) ]
+	tmp := self parseCommitsResult: (self repoApi commits
+			        getForRepo: aGLHProject name
+			        ofOwner: aGLHProject group name
+			        withParms: {
+					        (#since -> self withCommitsSince).
+					        (#perPage -> itemByPage).
+					        (#page -> pageNumber) } asDictionary) ]
 		on: GHRepositoryEmptyError
 		do: [ ^ {  } ].
 
@@ -274,12 +306,13 @@ GithubModelImporter >> importCommitsOfProject: aGLHProject [
 		pageNumber := pageNumber + 1.
 		('Extract issues from ' , foundCommits size printString , ' to '
 		 , (foundCommits size + itemByPage) printString) recordInfo.
-		tmp := self parseCommitsResult: (self repoApi
-				        commitsOfProject: aGLHProject name
-				        ofOrganization: aGLHProject group name
-				        since: self withCommitsSince
-				        perPage: itemByPage
-				        page: pageNumber).
+		tmp := self parseCommitsResult: (self repoApi commits
+				        getForRepo: aGLHProject name
+				        ofOwner: aGLHProject group name
+				        withParms: {
+						        (#sine -> self withCommitsSince).
+						        (#perPage -> itemByPage).
+						        (#page -> pageNumber) } asDictionary).
 		foundCommits addAll: tmp ].
 
 	"add the imported commits (unless they are already added to this repository)"
@@ -384,6 +417,28 @@ GithubModelImporter >> importGroup: aGroupName [
 	^ groupResult
 ]
 
+{ #category : #'import - merge-requests' }
+GithubModelImporter >> importLatestMergeRequestsOfProject: aGLHProject [ 
+	
+	| results parsedResults |
+	results := self repoApi pullRequests getLatestForRepo: aGLHProject name ofOwner:  aGLHProject group name.
+	parsedResults := self parseMergeRequestsResult: results.
+
+	parsedResults := glhModel
+		                 addAll: parsedResults
+		                 unless: self blockOnIdEquality.
+	parsedResults := aGLHProject mergeRequests
+		                 addAll: parsedResults
+		                 unless: self blockOnIdEquality.
+	^ parsedResults
+]
+
+{ #category : #'import - merge-requests' }
+GithubModelImporter >> importLatestPullRequestsOfProject: aGLHProject [
+	"alias method since PullRequest = MergeRequest in model"
+	^ self importLatestMergeRequestsOfProject: aGLHProject 
+]
+
 { #category : #'import - merge request' }
 GithubModelImporter >> importMergeRequestsOfProject: aProject [ 
 	|response mergeRequests|
@@ -467,7 +522,7 @@ GithubModelImporter >> importUser: userID [
 		detect: [ :user | user id = userID ]
 		ifFound: [ :user | ^ user ].
 	('Import user: ' , userID printString) recordInfo.
-	result := self repoApi user: userID.
+	result := self repoApi users getUserId: userID.
 	userResult := self parseUserResult: result.
 	^ glhModel
 		  add: userResult
@@ -478,9 +533,16 @@ GithubModelImporter >> importUser: userID [
 GithubModelImporter >> initReader [
 
 	generalReader := NeoJSONReader new.
+	
+	"will be reuse for all reader next"
+	generalReader for: DateAndTime customDo: [ :mapping |
+		mapping decoder: [ :string |
+			string ifNil: [ nil ] ifNotNil: [ DateAndTime fromString: string ] ] ].
+	
+	
 	self configureReaderForProject: generalReader.
 	self configureReaderForCommit: generalReader.
-	self configureReaderForBranches: generalReader. 
+	self configureReaderForBranches: generalReader
 ]
 
 { #category : #initialization }
