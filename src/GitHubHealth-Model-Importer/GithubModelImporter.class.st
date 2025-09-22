@@ -67,12 +67,90 @@ GithubModelImporter >> completeImportedCommit: aGLHCommit [
 { #category : #'import - projects' }
 GithubModelImporter >> completeImportedProject: aGLHProject [
 
+	('Complete import of project: ' , aGLHProject id printString)
+		recordInfo.
+	aGLHProject repository ifNotNil: [ ^ aGLHProject ].
+
+	aGLHProject repository: GLHRepository new.
+	self glhModel add: aGLHProject repository.
+
 	self importPipelinesOfProject: aGLHProject.
 	self importBranchesOf: aGLHProject.
 	self withCommitsSince ifNotNil: [ :withCommitSince | "If not nil, it means we have to import commit"
 		| commits |
 		commits := self importCommitsOfProject: aGLHProject.
 		self chainsCommitsFrom: commits ]
+]
+
+{ #category : #'as yet unclassified' }
+GithubModelImporter >> configureReaderForBranches: reader [
+
+	reader mapInstVarsFor: GLHBranch.
+
+
+	reader for: GLHBranch do: [ :mapping |
+		mapping
+			mapProperty: #sha
+			getter: [ :branch | #ignore ]
+			setter: [ :branch :value |
+							 branch sha: (value at: #sha).
+							]].
+
+
+	reader
+		for: #ArrayOfBranches
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHBranch ]
+]
+
+{ #category : #'private - configure reader' }
+GithubModelImporter >> configureReaderForCommit: reader [
+
+	reader for: GLHCommit do: [ :mapping |
+		mapping mapInstVar: #id to: #sha.
+		mapping mapInstVar: #web_url to: #html_url.
+
+		mapping
+			mapProperty: #commit
+			getter: [ :object | #ignore ]
+			setter: [ :glhCommit :value |
+				glhCommit message: (value at: #message).
+				glhCommit authored_date:
+					(DateAndTime fromString: (value at: #author at: #date)).
+				glhCommit committed_date:
+					(DateAndTime fromString: (value at: #committer at: #date)) ].
+
+		mapping
+			mapProperty: #author
+			getter: [ :object | #ignore ]
+			setter: [ :glhCommit :value |
+				value ifNotNil: [
+					glhCommit author_name: (value at: #login).
+					value
+						at: #id
+						ifPresent: [ :authorId |
+						glhCommit commitCreator: (self importUser: authorId) ] ] ].
+
+		mapping
+			mapProperty: #committer
+			getter: [ :object | #ignore ]
+			setter: [ :glhCommit :value |
+				value ifNotNil: [ glhCommit committer_name: (value at: #login) ] ].
+
+		(mapping mapInstVar: #parent_ids to: #parents) valueSchema:
+			#ArrayOfIds ].
+
+	reader for: DateAndTime customDo: [ :mapping |
+		mapping decoder: [ :string | DateAndTime fromString: string ] ].
+
+	reader for: #ArrayOfIds customDo: [ :mapping |
+		mapping decoder: [ :parents |
+			parents collect: [ :parent | parent at: #sha ] ] ].
+
+	reader
+		for: #ArrayOfCommits
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHCommit ]
 ]
 
 { #category : #'private - configure reader' }
@@ -116,22 +194,58 @@ GithubModelImporter >> ensureGroupNamed: aGroupName [
 ]
 
 { #category : #'import - repositories' }
-GithubModelImporter >> importBranchesOf: project [
-
+GithubModelImporter >> importBranchesOf: aGLHProject [
 	"add the pipeline (actions runs) in the project"
 
-	| branchesResult branches repository |
-	branchesResult := self repoApi
-		                  branchesOfRepo: project name
-		                  ofOrganization: project group name.
-	branches := self parseBranchesResult: branchesResult.
-	self glhModel addAll: branches.
-	repository := GLHRepository new.
-	self glhModel add: repository.
-	project repository: repository.
-	branches do: [ :branch | 
-		repository addBranch: branch.
-		self withFiles ifTrue: [ self importFilesOfBranch: branch ] ]
+	| branchesResults foundBranches branches |
+	branchesResults := self repoApi branches
+		                   getAllForRepo: aGLHProject name
+		                   ofOwner: aGLHProject group name.
+
+	foundBranches := (branchesResults collect: [ :branchesResult |
+		                  self parseBranchesResult: branchesResult ])
+		                 flattened.
+
+
+	"WARNING: always add branch first into repository, than into model !"
+	branches := aGLHProject repository branches
+		            addAll: foundBranches
+		            unless: self blockOnNameEquality.
+
+	"branch HEAD commit is not imported by default. use branch ref (sha) to import it specifically"
+
+	branches := self glhModel
+		            addAll: branches
+		            unless: self blockForBranchEquality.
+
+	self withFiles ifTrue: [
+		branches do: [ :branch | self importFilesOfBranch: branch ] ]
+]
+
+{ #category : #'import - commits' }
+GithubModelImporter >> importCommit: aCommitID ofProject: aGLHProject [
+
+	| result parsedResult |
+	(self glhModel allWithType: GLHCommit) asOrderedCollection
+		detect: [ :commit | commit id = aCommitID ]
+		ifFound: [ :commit | ^ commit ].
+
+	result := self repoApi commits
+		          get: aCommitID
+		          inProject: aGLHProject id.
+
+	parsedResult := self parseCommitResult: result.
+
+	parsedResult := self glhModel
+		                add: parsedResult
+		                unless: self blockOnIdEquality.
+	parsedResult := aGLHProject repository commits
+		                add: parsedResult
+		                unless: self blockOnIdEquality.
+
+	self withCommitDiffs ifTrue: [ self importDiffOfCommit: parsedResult ].
+
+	^ parsedResult
 ]
 
 { #category : #'import - commits' }
@@ -263,7 +377,7 @@ GithubModelImporter >> importFilesOfBranch: aBranch [
 GithubModelImporter >> importGroup: aGroupName [
 
 	| result groupResult |
-	result := self repoApi organization: aGroupName.
+	result := self repoApi organizations get: aGroupName.
 	groupResult := self parseGroupResult: result.
 	self glhModel add: groupResult.
 	self importRepositoriesOfGroup: groupResult.
@@ -289,9 +403,9 @@ GithubModelImporter >> importPipelinesOfProject: project [
 	"add the pipeline (actions runs) in the project"
 
 	| pipelinesResult ghApiPipelineOverview |
-	pipelinesResult := self repoApi
-		                   actionsRunOfRepo: project name
-		                   ofOrganization: project group name.
+	pipelinesResult := self repoApi actions
+		                   getLatestForRepo: project name
+		                   ofOwner: project group name.
 	ghApiPipelineOverview := self parsePipelinesResult: pipelinesResult.
 	ghApiPipelineOverview workflow_runs do: [ :pipeline | 
 		project addPipeline: pipeline ]
@@ -312,6 +426,7 @@ GithubModelImporter >> importProject: aProjectName ofGroup: aGroupName [
 
 { #category : #'import - groups' }
 GithubModelImporter >> importRepositoriesOfGroup: groupResult [
+	"Github Repository = GLHProject"
 
 	| reposResult itemByPage pageNumber reposFound tmp |
 	itemByPage := 100.
@@ -321,7 +436,7 @@ GithubModelImporter >> importRepositoriesOfGroup: groupResult [
 	('Extract commits from ' , reposFound size printString , ' to '
 	 , (reposFound size + itemByPage) printString) recordInfo.
 	tmp := self parseArrayOfProject: (self repoApi
-			        reposOfOrganization: groupResult name
+			        organizations getRepositoriesOfOrganization: groupResult name
 			        perPage: itemByPage
 			        page: pageNumber).
 
@@ -336,7 +451,7 @@ GithubModelImporter >> importRepositoriesOfGroup: groupResult [
 				        page: pageNumber).
 		reposFound addAll: tmp ].
 
-	reposResult := self repoApi reposOfOrganization: groupResult name.
+	reposResult := self repoApi organizations getRepositoriesOfOrganization: groupResult name.
 	groupResult projects addAll: reposFound.
 	self glhModel addAll: groupResult projects.
 	groupResult projects do: [ :project |
@@ -364,6 +479,8 @@ GithubModelImporter >> initReader [
 
 	generalReader := NeoJSONReader new.
 	self configureReaderForProject: generalReader.
+	self configureReaderForCommit: generalReader.
+	self configureReaderForBranches: generalReader. 
 ]
 
 { #category : #initialization }
@@ -408,13 +525,18 @@ GithubModelImporter >> parseArrayOfProject: arrayOfProjects [
 GithubModelImporter >> parseBranchesResult: arrayOfBranch [
 
 	| reader |
-	reader := NeoJSONReader on: arrayOfBranch readStream.
-	reader mapInstVarsFor: GLHBranch.
-	reader
-		for: #ArrayOfBranch
-		customDo: [ :customMappting | 
-		customMappting listOfElementSchema: GLHBranch ].
-	^ reader nextAs: #ArrayOfBranch
+	reader := generalReader on: arrayOfBranch readStream.
+	
+	^ reader nextAs: #ArrayOfBranches
+]
+
+{ #category : #parsing }
+GithubModelImporter >> parseCommitResult: result [
+	| reader |
+	
+	reader := generalReader on: result readStream.
+
+	^ reader nextAs: GLHCommit 
 ]
 
 { #category : #parsing }
@@ -424,56 +546,9 @@ GithubModelImporter >> parseCommitsResult: result [
 	(result includesSubstring: '"status":"409"') ifTrue: [
 		GHRepositoryEmptyError signal: 'Git Repository is empty' ].
 
-	reader := NeoJSONReader on: result readStream.
+	reader := generalReader on: result readStream.
 
-	reader for: GLHCommit do: [ :mapping |
-		mapping mapInstVar: #id to: #sha.
-		mapping mapInstVar: #web_url to: #html_url.
-
-		mapping
-			mapProperty: #commit
-			getter: [ :object | #ignore ]
-			setter: [ :glhCommit :value |
-				glhCommit message: (value at: #message).
-				glhCommit authored_date:
-					(DateAndTime fromString: (value at: #author at: #date)).
-				glhCommit committed_date:
-					(DateAndTime fromString: (value at: #committer at: #date)) ].
-
-		mapping
-			mapProperty: #author
-			getter: [ :object | #ignore ]
-			setter: [ :glhCommit :value |
-				value ifNotNil: [
-					glhCommit author_name: (value at: #login).
-					value
-						at: #id
-						ifPresent: [ :authorId |
-						glhCommit commitCreator: (self importUser: authorId) ] ] ].
-
-		mapping
-			mapProperty: #committer
-			getter: [ :object | #ignore ]
-			setter: [ :glhCommit :value |
-				value ifNotNil: [ glhCommit committer_name: (value at: #login) ] ].
-
-		(mapping mapInstVar: #parent_ids to: #parents) valueSchema:
-			#ArrayOfIds ].
-
-	reader for: DateAndTime customDo: [ :mapping |
-		mapping decoder: [ :string | DateAndTime fromString: string ] ].
-
-	reader for: #ArrayOfIds customDo: [ :mapping |
-		mapping decoder: [ :parents |
-			parents collect: [ :parent | parent at: #sha ] ] ].
-
-	reader
-		for: #ArrayOfCommit
-		customDo: [ :customMappting |
-		customMappting listOfElementSchema: GLHCommit ].
-
-
-	^ reader nextAs: #ArrayOfCommit
+	^ reader nextAs: #ArrayOfCommits
 ]
 
 { #category : #parsing }

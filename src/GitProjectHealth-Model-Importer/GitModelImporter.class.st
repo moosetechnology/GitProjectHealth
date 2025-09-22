@@ -166,7 +166,7 @@ GitModelImporter >> blockOnNameEquality [
 	^ self blockEqualityOn: #name
 ]
 
-{ #category : #'import - commits' }
+{ #category : #utils }
 GitModelImporter >> chainsCommitsFrom: commitsCollection [
 
 	| dic |
@@ -277,13 +277,13 @@ GitModelImporter >> importCreatorOfCommit: aGLHCommit [
 	self subclassResponsibility 
 ]
 
-{ #category : #'import - commits' }
+{ #category : #'import - diffs' }
 GitModelImporter >> importDiffOfCommit: aCommit [
 
 	self subclassResponsibility 
 ]
 
-{ #category : #'import - commits' }
+{ #category : #'import - diffs' }
 GitModelImporter >> importDiffRangesForDiff: aGLHDiff [
 
 	| diffRanges |
