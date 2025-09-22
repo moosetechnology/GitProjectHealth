@@ -1,9 +1,6 @@
 Class {
 	#name : #GithubModelImporter,
 	#superclass : #GitModelImporter,
-	#instVars : [
-		'generalReader'
-	],
 	#category : #'GitHubHealth-Model-Importer'
 }
 

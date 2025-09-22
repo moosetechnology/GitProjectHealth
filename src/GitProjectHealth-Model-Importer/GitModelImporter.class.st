@@ -13,7 +13,8 @@ Class {
 		'glhModel',
 		'userCatalogue',
 		'repoApi',
-		'withCommitDiffs'
+		'withCommitDiffs',
+		'generalReader'
 	],
 	#classVars : [
 		'currentImporter'
@@ -100,6 +101,11 @@ GitModelImporter class >> forGitlabWithToken: anApiToken andModel: aGitModel [
 { #category : #'accessing - global variables' }
 GitModelImporter class >> importers [
 	^ currentImporter 
+]
+
+{ #category : #'class initialization' }
+GitModelImporter class >> initialize [ 
+	currentImporter := Dictionary new. 
 ]
 
 { #category : #initialization }
@@ -206,6 +212,39 @@ GitModelImporter >> completeImportedCommit: aGLHCommit [
 
 { #category : #'import - projects' }
 GitModelImporter >> completeImportedProject: aGLHProject [
+]
+
+{ #category : #'private - configure reader' }
+GitModelImporter >> configureReaderForCommit: reader [
+]
+
+{ #category : #'private - configure reader' }
+GitModelImporter >> configureReaderForDiffs: reader [
+]
+
+{ #category : #'private - configure reader' }
+GitModelImporter >> configureReaderForGroup: reader [
+]
+
+{ #category : #'private - configure reader' }
+GitModelImporter >> configureReaderForMergeRequest: reader [
+]
+
+{ #category : #'private - configure reader' }
+GitModelImporter >> configureReaderForPipeline: reader [
+]
+
+{ #category : #'private - configure reader' }
+GitModelImporter >> configureReaderForReleases: reader [
+]
+
+{ #category : #'private - configure reader' }
+GitModelImporter >> configureReaderForTags: reader [
+]
+
+{ #category : #'private - configure reader' }
+GitModelImporter >> configureReaderForUsers: reader [
+
 ]
 
 { #category : #utils }
@@ -437,6 +476,20 @@ GitModelImporter >> importUserByUsername: username [
 	self subclassResponsibility 
 ]
 
+{ #category : #'private - configure reader' }
+GitModelImporter >> initReader [
+
+	generalReader := NeoJSONReader new.
+	self configureReaderForCommit: generalReader.
+	self configureReaderForGroup: generalReader.
+	self configureReaderForDiffs: generalReader.
+	self configureReaderForMergeRequest: generalReader.
+	self configureReaderForPipeline: generalReader.
+	self configureReaderForTags: generalReader.
+	self configureReaderForReleases: generalReader.
+	self configureReaderForUsers: generalReader
+]
+
 { #category : #initialization }
 GitModelImporter >> initialize [
 
@@ -445,6 +498,8 @@ GitModelImporter >> initialize [
 	userCatalogue := GLHUserCatalogueV2 new
 		                 anImporter: self;
 		                 yourself.
+		
+	self initReader
 ]
 
 { #category : #initialization }

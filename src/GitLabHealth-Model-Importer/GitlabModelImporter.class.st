@@ -3,8 +3,7 @@ Class {
 	#superclass : #GitModelImporter,
 	#instVars : [
 		'withInitialCommits',
-		'withInitialMergeRequest',
-		'generalReader'
+		'withInitialMergeRequest'
 	],
 	#category : #'GitLabHealth-Model-Importer'
 }
@@ -1620,16 +1619,9 @@ GitlabModelImporter >> importUserByUsername: anUsername [
 
 { #category : #initialization }
 GitlabModelImporter >> initReader [
-
-	generalReader := NeoJSONReader new.
-	self configureReaderForCommit: generalReader.
-	self configureReaderForGroup: generalReader.
-	self configureReaderForDiffs: generalReader.
-	self configureReaderForMergeRequest: generalReader.
-	self configureReaderForPipeline: generalReader. 
-	self configureReaderForTags: generalReader. 
-	self configureReaderForReleases: generalReader. 
-	self configureReaderForUsers: generalReader. 
+	
+	"add specific reader for this importer here"
+	super initReader
 ]
 
 { #category : #initialization }
@@ -1642,7 +1634,7 @@ GitlabModelImporter >> initialize [
 
 	self withCommitsSince: 1 week.
 
-	self initReader
+	
 ]
 
 { #category : #private }
