@@ -4,7 +4,7 @@ Class {
 	#category : #'GitHubHealth-Model-Importer'
 }
 
-{ #category : #accessing }
+{ #category : #api }
 GithubModelImporter >> api [
 
 	self
@@ -16,7 +16,7 @@ GithubModelImporter >> api [
 	^ repoApi
 ]
 
-{ #category : #accessing }
+{ #category : #api }
 GithubModelImporter >> api: anObject [
 
 	self
@@ -80,7 +80,7 @@ GithubModelImporter >> completeImportedProject: aGLHProject [
 ]
 
 { #category : #'private - configure reader' }
-GithubModelImporter >> configureReaderForBranches: reader [
+GithubModelImporter >> configureReaderForBranch: reader [
 
 	reader mapInstVarsFor: GLHBranch.
 
@@ -89,19 +89,19 @@ GithubModelImporter >> configureReaderForBranches: reader [
 		mapping
 			mapProperty: #sha
 			getter: [ :branch | #ignore ]
-			setter: [ :branch :value |
-							 branch sha: (value at: #sha).
-							]].
+			setter: [ :branch :value | branch sha: (value at: #sha) ] ].
 
 
 	reader
-		for: #ArrayOfBranches
+		for: #ArrayOfBranch
 		customDo: [ :customMappting |
 		customMappting listOfElementSchema: GLHBranch ]
 ]
 
 { #category : #'private - configure reader' }
 GithubModelImporter >> configureReaderForCommit: reader [
+
+	super configureReaderForCommit: reader.
 
 	reader for: GLHCommit do: [ :mapping |
 		mapping mapInstVar: #id to: #sha.
@@ -135,19 +135,14 @@ GithubModelImporter >> configureReaderForCommit: reader [
 				value ifNotNil: [ glhCommit committer_name: (value at: #login) ] ].
 
 		(mapping mapInstVar: #parent_ids to: #parents) valueSchema:
-			#ArrayOfIds ].
+			#ArrayOfId ].
 
 	reader for: DateAndTime customDo: [ :mapping |
 		mapping decoder: [ :string | DateAndTime fromString: string ] ].
 
-	reader for: #ArrayOfIds customDo: [ :mapping |
+	reader for: #ArrayOfId customDo: [ :mapping |
 		mapping decoder: [ :parents |
-			parents collect: [ :parent | parent at: #sha ] ] ].
-
-	reader
-		for: #ArrayOfCommits
-		customDo: [ :customMappting |
-		customMappting listOfElementSchema: GLHCommit ]
+			parents collect: [ :parent | parent at: #sha ] ] ]
 ]
 
 { #category : #'private - configure reader' }
@@ -183,10 +178,9 @@ GithubModelImporter >> configureReaderForMergeRequest: reader [
 
 { #category : #'private - configure reader' }
 GithubModelImporter >> configureReaderForProject: reader [
+	"	reader mapInstVarsFor: GLHProject. "
 
-"	reader mapInstVarsFor: GLHProject. "
-
-	reader for: GLHProject do: [ :mapping | 
+	reader for: GLHProject do: [ :mapping |
 		mapping mapInstVar: #name to: #name.
 		mapping mapInstVar: #description to: #description.
 		mapping mapInstVar: #id to: #id.
@@ -195,9 +189,9 @@ GithubModelImporter >> configureReaderForProject: reader [
 		mapping mapInstVar: #topics to: #topics ].
 
 	reader
-		for: #ArrayOfProjects 
+		for: #ArrayOfProject
 		customDo: [ :customMappting |
-		customMappting listOfElementSchema: GLHProject ].
+		customMappting listOfElementSchema: GLHProject ]
 ]
 
 { #category : #private }
@@ -212,9 +206,10 @@ GithubModelImporter >> convertApiFileAsFile: aAPIFile [
 		  yourself
 ]
 
-{ #category : #api }
+{ #category : #'import - groups' }
 GithubModelImporter >> ensureGroupNamed: aGroupName [
 
+	self flag: 'WARNING: group from different platform (github vs gitlab) can share the same name, thus being confused here'. 
 	^ self glhModel
 		  detect: [ :a |
 		  (a isKindOf: GLHGroup) and: [ a name = aGroupName ] ]
@@ -359,7 +354,7 @@ GithubModelImporter >> importDiffOfCommit: aGLHCommit [
 		  unless: self blockForDiffEquality
 ]
 
-{ #category : #api }
+{ #category : #'import - files' }
 GithubModelImporter >> importDirectoryFiles: aDirectoryFile OfBranch: aBranch [
 
 	| result files apiFiles |
@@ -381,7 +376,7 @@ GithubModelImporter >> importDirectoryFiles: aDirectoryFile OfBranch: aBranch [
 		self importDirectoryFiles: file OfBranch: aBranch ]
 ]
 
-{ #category : #api }
+{ #category : #'import - files' }
 GithubModelImporter >> importFilesOfBranch: aBranch [
 
 	| result files apiFiles |
@@ -436,7 +431,7 @@ GithubModelImporter >> importLatestPullRequestsOfProject: aGLHProject [
 	^ self importLatestMergeRequestsOfProject: aGLHProject 
 ]
 
-{ #category : #'import - merge request' }
+{ #category : #'import - merge-requests' }
 GithubModelImporter >> importMergeRequestsOfProject: aProject [ 
 	|response mergeRequests|
 	response := self repoApi 
@@ -474,6 +469,13 @@ GithubModelImporter >> importProject: aProjectName ofGroup: aGroupName [
 	self glhModel add: projectResult.
 	self completeImportedProject: projectResult.
 	^ projectResult
+]
+
+{ #category : #'import - merge-requests' }
+GithubModelImporter >> importPullRequestsOfProject: aProject [
+	"alias method since PullRequest = MergeRequest in model"
+
+	^ self importMergeRequestsOfProject: aProject
 ]
 
 { #category : #'import - groups' }
@@ -529,17 +531,7 @@ GithubModelImporter >> importUser: userID [
 { #category : #initialization }
 GithubModelImporter >> initReader [
 
-	generalReader := NeoJSONReader new.
-	
-	"will be reuse for all reader next"
-	generalReader for: DateAndTime customDo: [ :mapping |
-		mapping decoder: [ :string |
-			string ifNil: [ nil ] ifNotNil: [ DateAndTime fromString: string ] ] ].
-	
-	
-	self configureReaderForProject: generalReader.
-	self configureReaderForCommit: generalReader.
-	self configureReaderForBranches: generalReader
+	super initReader. 
 ]
 
 { #category : #initialization }
@@ -557,7 +549,7 @@ GithubModelImporter >> initialize [
 GithubModelImporter >> parseArrayOfProject: arrayOfProjects [
 
 	| reader |
-" reader := NeoJSONReader on: arrayOfProjects readStream.
+	" reader := NeoJSONReader on: arrayOfProjects readStream.
 	
 	reader
 		for: #ArrayOfProjects
@@ -573,10 +565,9 @@ GithubModelImporter >> parseArrayOfProject: arrayOfProjects [
 		mapping mapInstVar: #topics to: #topics ].
 	^ reader nextAs: #ArrayOfProjects
 	"
-
 	reader := generalReader on: arrayOfProjects readStream.
-	
-	^ reader nextAs: #ArrayOfProjects
+
+	^ reader nextAs: #ArrayOfProject
 ]
 
 { #category : #parsing }
@@ -584,8 +575,8 @@ GithubModelImporter >> parseBranchesResult: arrayOfBranch [
 
 	| reader |
 	reader := generalReader on: arrayOfBranch readStream.
-	
-	^ reader nextAs: #ArrayOfBranches
+
+	^ reader nextAs: #ArrayOfBranch
 ]
 
 { #category : #parsing }
@@ -606,7 +597,7 @@ GithubModelImporter >> parseCommitsResult: result [
 
 	reader := generalReader on: result readStream.
 
-	^ reader nextAs: #ArrayOfCommits
+	^ reader nextAs: #ArrayOfCommit
 ]
 
 { #category : #parsing }
@@ -679,16 +670,16 @@ GithubModelImporter >> parsePipelinesResult: pipelineOverview [
 
 	| reader |
 	reader := NeoJSONReader on: pipelineOverview readStream.
-	
+
 	reader for: GHAPIPipelineOverview do: [ :mapping |
 		mapping mapInstVar: #total_count to: #total_count.
-		(mapping mapInstVar: #workflow_runs) valueSchema: #ArrayOfPipelines ].
-	
+		(mapping mapInstVar: #workflow_runs) valueSchema: #ArrayOfPipeline ].
+
 	reader
-		for: #ArrayOfPipelines
+		for: #ArrayOfPipeline
 		customDo: [ :customMappting |
 		customMappting listOfElementSchema: GLHPipeline ].
-	
+
 	reader for: GLHPipeline do: [ :mapping |
 		mapping
 			mapInstVar: #status to: #conclusion;
@@ -696,7 +687,7 @@ GithubModelImporter >> parsePipelinesResult: pipelineOverview [
 			getter: [ :object | #ignore ]
 			setter: [ :object :value |
 				object runDate: (DateAndTime fromString: value) ] ].
-	
+
 	^ reader nextAs: GHAPIPipelineOverview
 ]
 

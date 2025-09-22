@@ -215,11 +215,20 @@ GitModelImporter >> completeImportedProject: aGLHProject [
 ]
 
 { #category : #'private - configure reader' }
-GitModelImporter >> configureReaderForCommit: reader [
+GitModelImporter >> configureReaderForBranch: reader [
 ]
 
 { #category : #'private - configure reader' }
-GitModelImporter >> configureReaderForDiffs: reader [
+GitModelImporter >> configureReaderForCommit: reader [
+
+	reader
+		for: #ArrayOfCommit
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHCommit ]
+]
+
+{ #category : #'private - configure reader' }
+GitModelImporter >> configureReaderForDiff: reader [
 ]
 
 { #category : #'private - configure reader' }
@@ -227,7 +236,19 @@ GitModelImporter >> configureReaderForGroup: reader [
 ]
 
 { #category : #'private - configure reader' }
+GitModelImporter >> configureReaderForIssue: reader [
+
+	
+]
+
+{ #category : #'private - configure reader' }
 GitModelImporter >> configureReaderForMergeRequest: reader [
+]
+
+{ #category : #'private - configure reader' }
+GitModelImporter >> configureReaderForMilestone: reader [
+
+	
 ]
 
 { #category : #'private - configure reader' }
@@ -235,15 +256,19 @@ GitModelImporter >> configureReaderForPipeline: reader [
 ]
 
 { #category : #'private - configure reader' }
-GitModelImporter >> configureReaderForReleases: reader [
+GitModelImporter >> configureReaderForProject: reader [
 ]
 
 { #category : #'private - configure reader' }
-GitModelImporter >> configureReaderForTags: reader [
+GitModelImporter >> configureReaderForRelease: reader [
 ]
 
 { #category : #'private - configure reader' }
-GitModelImporter >> configureReaderForUsers: reader [
+GitModelImporter >> configureReaderForTag: reader [
+]
+
+{ #category : #'private - configure reader' }
+GitModelImporter >> configureReaderForUser: reader [
 
 ]
 
@@ -357,7 +382,7 @@ GitModelImporter >> importJobsOf: aGLHPipeline [
 	self subclassResponsibility 
 ]
 
-{ #category : #'import - merge-requests' }
+{ #category : #'import - commits' }
 GitModelImporter >> importLastestCommitsOfProject: aGLHProject [
 	"limited to the last 50 commits"
 	self subclassResponsibility 
@@ -480,14 +505,25 @@ GitModelImporter >> importUserByUsername: username [
 GitModelImporter >> initReader [
 
 	generalReader := NeoJSONReader new.
+
+	"will be reuse for all reader next"
+	generalReader for: DateAndTime customDo: [ :mapping |
+		mapping decoder: [ :string |
+			string ifNil: [ nil ] ifNotNil: [ DateAndTime fromString: string ] ] ].
+
+
 	self configureReaderForCommit: generalReader.
 	self configureReaderForGroup: generalReader.
-	self configureReaderForDiffs: generalReader.
+	self configureReaderForDiff: generalReader.
 	self configureReaderForMergeRequest: generalReader.
 	self configureReaderForPipeline: generalReader.
-	self configureReaderForTags: generalReader.
-	self configureReaderForReleases: generalReader.
-	self configureReaderForUsers: generalReader
+	self configureReaderForTag: generalReader.
+	self configureReaderForRelease: generalReader.
+	self configureReaderForUser: generalReader.
+	self configureReaderForBranch: generalReader.
+	self configureReaderForIssue: generalReader.
+	self configureReaderForMilestone: generalReader.
+	self configureReaderForProject: generalReader. 
 ]
 
 { #category : #initialization }

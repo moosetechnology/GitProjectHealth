@@ -185,7 +185,9 @@ GitlabModelImporter >> completeImportedProject: aGLHProject [
 { #category : #'private - configure reader' }
 GitlabModelImporter >> configureReaderForCommit: reader [
 
-  	reader for: GLHCommit do: [ :mapping |
+	super configureReaderForCommit: reader.
+	
+	reader for: GLHCommit do: [ :mapping |
 		mapping mapInstVars:
 			#( id short_id title author_name author_email committer_name
 			   committer_email message web_url ).
@@ -206,16 +208,12 @@ GitlabModelImporter >> configureReaderForCommit: reader [
 	reader
 		for: #ArrayOfIds
 		customDo: [ :mapping | mapping decoder: [ :string | string ] ].
-  
-	reader
-		for: #ArrayOfCommit
-		customDo: [ :customMappting |
-		customMappting listOfElementSchema: GLHCommit ].
+
 
 ]
 
 { #category : #'private - configure reader' }
-GitlabModelImporter >> configureReaderForDiffs: reader [
+GitlabModelImporter >> configureReaderForDiff: reader [
 
 	reader for: GLHDiff do: [ :mapping |
 		mapping mapInstVars:
@@ -360,7 +358,7 @@ GitlabModelImporter >> configureReaderForPipeline: reader [
 ]
 
 { #category : #'private - configure reader' }
-GitlabModelImporter >> configureReaderForReleases: reader [
+GitlabModelImporter >> configureReaderForRelease: reader [
 
 	reader mapInstVarsFor: GLHRelease .
 	
@@ -378,7 +376,7 @@ GitlabModelImporter >> configureReaderForReleases: reader [
 ]
 
 { #category : #'private - configure reader' }
-GitlabModelImporter >> configureReaderForTags: reader [
+GitlabModelImporter >> configureReaderForTag: reader [
 
 	reader mapInstVarsFor: GLHTag .
 	
@@ -403,7 +401,7 @@ GitlabModelImporter >> configureReaderForTags: reader [
 ]
 
 { #category : #'private - configure reader' }
-GitlabModelImporter >> configureReaderForUsers: reader [
+GitlabModelImporter >> configureReaderForUser: reader [
 
 	reader mapInstVarsFor: GLHUser.
 
