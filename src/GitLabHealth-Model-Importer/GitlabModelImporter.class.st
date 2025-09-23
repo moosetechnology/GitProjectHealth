@@ -245,6 +245,26 @@ GitlabModelImporter >> configureReaderForGroup: reader [
 ]
 
 { #category : #'private - configure reader' }
+GitlabModelImporter >> configureReaderForJob: reader [
+
+	super configureReaderForJob: reader.
+
+	"reader for: GLHJob do: [ :mapping |
+		
+		mapping
+			mapProperty: #user
+			getter: [ :object | #ignore ]
+			setter: [ :object :value |
+			object user: (self importUser: (value at: #id)) ].
+
+		mapping
+			mapProperty: #duration
+			getter: [ :object | #ignore ]
+			setter: [ :object :value |
+			value ifNotNil: [ object duration: value seconds ] ] ]"
+]
+
+{ #category : #'private - configure reader' }
 GitlabModelImporter >> configureReaderForMergeRequest: reader [
 	"declare quil y a un array a mapper"
 	self flag: 'assignee.s must be parsed with nil condition'.
@@ -1807,35 +1827,18 @@ GitlabModelImporter >> parseGroupResult: aResult [
 GitlabModelImporter >> parseJobsResult: result ofProject: aProject [
 
 	| reader |
-	reader := NeoJSONReader on: result readStream.
-	reader for: GLHJob do: [ :mapping |
-		mapping mapInstVars: #( id allow_failure web_url name ).
-
-		mapping
-			mapProperty: #user
-			getter: [ :object | #ignore ]
-			setter: [ :object :value |
-			object user: (self importUser: (value at: #id)) ].
-
+	reader := generalReader on: result readStream.
+	"reader for: GLHJob do: [ :mapping |
 		mapping
 			mapProperty: #commit
 			getter: [ :object | #ignore ]
 			setter: [ :object :value |
 				value ifNotNil: [
 					object commit:
-						(self importCommit: (value at: #id) ofProject: aProject) ] ].
+						(self importCommit: (value at: #id) ofProject: aProject) ] ] ]."
 
-		mapping
-			mapProperty: #duration
-			getter: [ :object | #ignore ]
-			setter: [ :object :value |
-			value ifNotNil: [ object duration: value seconds ] ] ].
 
-	reader
-		for: #ArrayOfGLHJob
-		customDo: [ :customMappting |
-		customMappting listOfElementSchema: GLHJob ].
-	^ reader nextAs: #ArrayOfGLHJob
+	^ reader nextAs: #ArrayOfJob
 ]
 
 { #category : #'private - parsing' }

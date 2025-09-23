@@ -10,6 +10,11 @@ GLHApiMock >> commits [
 ]
 
 { #category : #accessing }
+GLHApiMock >> jobs [ 
+	^ GitlabJobsMock new
+]
+
+{ #category : #accessing }
 GLHApiMock >> mergeRequests [
 
 	^ GitlabMergeRequestsMock new

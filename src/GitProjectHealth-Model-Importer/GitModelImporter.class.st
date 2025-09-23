@@ -270,6 +270,15 @@ GitModelImporter >> configureReaderForIssue: reader [
 ]
 
 { #category : #'private - configure reader' }
+GitModelImporter >> configureReaderForJob: reader [
+
+	reader mapInstVarsFor: GLHJob .
+
+	reader for: #ArrayOfJob customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHJob ]
+]
+
+{ #category : #'private - configure reader' }
 GitModelImporter >> configureReaderForMergeRequest: reader [
 
 	reader mapInstVarsFor: GLHMergeRequest.
@@ -607,6 +616,7 @@ GitModelImporter >> importUserByUsername: username [
 { #category : #'private - configure reader' }
 GitModelImporter >> initReader [
 
+	| configurators |
 	generalReader := NeoJSONReader new.
 
 	"will be reuse for all reader next"
@@ -615,20 +625,11 @@ GitModelImporter >> initReader [
 		mapping decoder: [ :string |
 			string ifNil: [ nil ] ifNotNil: [ DateAndTime fromString: string ] ] ].
 
+	configurators := self class selectors select: [ :m |
+		                 m beginsWith: #configureReaderFor ].
 
-	self configureReaderForCommit: generalReader.
-	self configureReaderForGroup: generalReader.
-	self configureReaderForDiff: generalReader.
-	self configureReaderForMergeRequest: generalReader.
-	self configureReaderForPipeline: generalReader.
-	self configureReaderForTag: generalReader.
-	self configureReaderForRelease: generalReader.
-	self configureReaderForUser: generalReader.
-	self configureReaderForBranch: generalReader.
-	self configureReaderForIssue: generalReader.
-	self configureReaderForMilestone: generalReader.
-	self configureReaderForNote: generalReader.
-	self configureReaderForProject: generalReader
+	configurators do: [ :configureReader |
+		self perform: configureReader with: generalReader ]
 ]
 
 { #category : #initialization }
