@@ -21,8 +21,8 @@ a commit attached to a repository
 |---|
 | `branch` | `GLHCommit` | `commits` | `GLHBranch` | |
 | `childCommits` | `GLHCommit` | `parentCommits` | `GLHCommit` | |
-| `commitedMergeRequest` | `GLHCommit` | `mergedCommit` | `GLHMergeRequest` | |
 | `commitedMergeRequest` | `GLHCommit` | `mergeRequestCommit` | `GLHMergeRequest` | |
+| `commitedMergeRequest` | `GLHCommit` | `mergedCommit` | `GLHMergeRequest` | |
 | `parentCommits` | `GLHCommit` | `childCommits` | `GLHCommit` | |
 | `squashedMergeRequest` | `GLHCommit` | `squashCommit` | `GLHMergeRequest` | |
 | `tag` | `GLHCommit` | `commit` | `GLHTag` | |
@@ -46,6 +46,7 @@ a commit attached to a repository
 | `message` | `String` | nil | |
 | `name` | `String` | nil | Basic name of the entity, not full reference.|
 | `parent_ids` | `Object` | 'OrderedCollection new' | |
+| `sha` | `String` | nil | |
 | `short_id` | `String` | nil | |
 | `title` | `String` | nil | |
 | `web_url` | `String` | nil | |
