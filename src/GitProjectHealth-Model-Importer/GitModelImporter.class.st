@@ -580,7 +580,7 @@ GitModelImporter >> importProjectsOfUser: aGLHUser [
 	self subclassResponsibility 
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'import - commits' }
 GitModelImporter >> importRefCommitOfBranch: aGLHBranch [
 	|commit|
 	commit := self
@@ -636,11 +636,12 @@ GitModelImporter >> initReader [
 GitModelImporter >> initialize [
 
 	super initialize.
+	self withFiles: false. 
 	self withCommitsSince: (Date today - 1 week) asDateAndTime.
 	userCatalogue := GLHUserCatalogueV2 new
 		                 anImporter: self;
 		                 yourself.
-		
+
 	self initReader
 ]
 
