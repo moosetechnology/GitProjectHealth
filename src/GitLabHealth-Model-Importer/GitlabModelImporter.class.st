@@ -241,18 +241,12 @@ GitlabModelImporter >> configureReaderForDiff: reader [
 { #category : #'private - configure reader' }
 GitlabModelImporter >> configureReaderForGroup: reader [
 
+	super configureReaderForGroup: reader. 
+
 	reader for: GLHGroup do: [ :mapping |
-		mapping mapInstVars.
 		(mapping mapInstVar: #projects) valueSchema: #ArrayOfProjects ].
-	reader mapInstVarsFor: GLHProject.
-	reader
-		for: #ArrayOfProjects
-		customDo: [ :customMappting |
-		customMappting listOfElementSchema: GLHProject ].
-	reader
-		for: #ArrayOfGroups
-		customDo: [ :customMappting |
-		customMappting listOfElementSchema: GLHGroup ]
+	
+
 ]
 
 { #category : #'private - configure reader' }
@@ -308,64 +302,69 @@ GitlabModelImporter >> configureReaderForMergeRequest: reader [
 GitlabModelImporter >> configureReaderForPipeline: reader [
 
 	reader mapInstVarsFor: GLHPipeline.
-	
-	reader for: GLHPipeline do: [ :mapping |
 
+	reader for: GLHPipeline do: [ :mapping |
 		mapping
 			mapProperty: #created_at
 			getter: [ :object | #ignore ]
 			setter: [ :object :value |
-			object created_at: (value ifNotNil: [DateAndTime fromString: value]).
-			object runDate: (value ifNotNil: [DateAndTime fromString: value]) ].
-		
+				object created_at:
+					(value ifNotNil: [ DateAndTime fromString: value ]).
+				object runDate:
+					(value ifNotNil: [ DateAndTime fromString: value ]) ].
+
 		mapping
 			mapProperty: #updated_at
 			getter: [ :object | #ignore ]
 			setter: [ :object :value |
-			object updated_at: (value ifNotNil: [DateAndTime fromString: value]).
-			].
-		
+				object updated_at:
+					(value ifNotNil: [ DateAndTime fromString: value ]) ].
+
 		mapping
 			mapProperty: #finished_at
 			getter: [ :object | #ignore ]
 			setter: [ :object :value |
-				object finished_at: (value ifNotNil: [DateAndTime fromString: value]).
-			].
-		
+				object finished_at:
+					(value ifNotNil: [ DateAndTime fromString: value ]) ].
+
 		mapping
-			mapProperty: #started_at  
+			mapProperty: #started_at
 			getter: [ :object | #ignore ]
 			setter: [ :object :value |
-			object started_at: (value ifNotNil: [DateAndTime fromString: value]).
-			].
-		
+				object started_at:
+					(value ifNotNil: [ DateAndTime fromString: value ]) ].
+
 		mapping
 			mapProperty: #source
 			getter: [ :object | #ignore ]
-			setter: [ :object :value |
-			object sourceEvent: value.
-			].
-		
+			setter: [ :object :value | object sourceEvent: value ].
+
 		mapping
 			mapProperty: #duration
 			getter: [ :object | #ignore ]
 			setter: [ :object :value |
-			object duration: (value ifNotNil: [value asDuration]) .
-			].
-		
+				object duration: (value ifNotNil: [ value asDuration ]) ].
+
 		mapping
 			mapProperty: #user
 			getter: [ :object | #ignore ]
 			setter: [ :object :value |
-			value ifNotNil: [object cacheAt: #userID put: (value at: #id)].
-			].
-		
-		 ].
-	
+				value ifNotNil: [ object cacheAt: #userID put: (value at: #id) ] ] ].
+
 	reader
-		for: #ArrayOfPipelines
+		for: #ArrayOfPipeline
 		customDo: [ :customMappting |
-		customMappting listOfElementSchema: GLHPipeline ].
+		customMappting listOfElementSchema: GLHPipeline ]
+]
+
+{ #category : #'private - configure reader' }
+GitlabModelImporter >> configureReaderForProject: reader [
+
+	super configureReaderForProject: reader.
+	
+	reader for: GLHProject do: [ :mapping |
+		mapping mapInstVar: #web_url to: #html_url.
+		].
 ]
 
 { #category : #'private - configure reader' }
@@ -559,11 +558,11 @@ GitlabModelImporter >> importBranchesOf: aGLHProject [
 	"aGLHProject repository branches removeAll "
 	resultBranches := self repoApi branches getAllFromProject:
 		                  aGLHProject id.
-	
+
 	foundBranches := (resultBranches collect: [ :branchesJson |
 		                  self
 			                  parseBranchesResult: branchesJson
-			                  ofProject: aGLHProject ]) flattened.
+			                   ]) flattened.
 
 	'import the branches of project ' recordInfo.
 
@@ -1671,19 +1670,9 @@ GitlabModelImporter >> newParseDiffResult: result [
 GitlabModelImporter >> parseArrayOfProject: arrayOfProjects [
 
 	| reader |
-	reader := NeoJSONReader on: arrayOfProjects readStream.
-	reader
-		for: #ArrayOfProjects
-		customDo: [ :customMappting |
-		customMappting listOfElementSchema: GLHProject ].
-	reader for: GLHProject do: [ :mapping |
-		mapping mapInstVar: #name to: #name.
-		mapping mapInstVar: #description to: #description.
-		mapping mapInstVar: #id to: #id.
-		mapping mapInstVar: #archived to: #archived.
-		mapping mapInstVar: #web_url to: #html_url.
-		mapping mapInstVar: #topics to: #topics ].
-	^ reader nextAs: #ArrayOfProjects
+	reader := generalReader on: arrayOfProjects readStream.
+	
+	^ reader nextAs: #ArrayOfProject
 ]
 
 { #category : #'private - parsing' }
@@ -1700,6 +1689,13 @@ GitlabModelImporter >> parseBranchesResult: result [
 GitlabModelImporter >> parseBranchesResult: result ofProject: aGLHProject [
 
 	| reader |
+	self
+		deprecated: 'Use parseBranchesResult: instead of current one'
+		on: '23 September 2025'
+		in:
+		'Pharo-12.0.0+SNAPSHOT.build.1571.sha.cf5fcd22e66957962c97dffc58b0393b7f368147 (64 Bit)'.
+
+
 	reader := NeoJSONReader on: result readStream.
 	reader mapInstVarsFor: GLHBranch.
 
@@ -1829,16 +1825,8 @@ GitlabModelImporter >> parseFileTreeResult: aResult [
 GitlabModelImporter >> parseGroupResult: aResult [
 
 	| reader |
+	reader := generalReader on: aResult readStream.
 
-	reader := NeoJSONReader on: aResult readStream.
-	reader for: GLHGroup do: [ :mapping |
-		mapping mapInstVars.
-		(mapping mapInstVar: #projects) valueSchema: #ArrayOfProjects ].
-	reader mapInstVarsFor: GLHProject.
-	reader
-		for: #ArrayOfProjects
-		customDo: [ :customMappting |
-		customMappting listOfElementSchema: GLHProject ].
 	^ reader nextAs: GLHGroup
 ]
 
@@ -1933,21 +1921,18 @@ GitlabModelImporter >> parsePipelineResult: result [
 GitlabModelImporter >> parsePipelinesResult: result [
 
 	| reader |
-	
-	(result includesSubstring: '{"message":"40' )ifTrue: [ ^ {  } ].
-	
+	(result includesSubstring: '{"message":"40') ifTrue: [ ^ {  } ].
+
 	reader := generalReader on: result readStream.
-	
-	^ reader nextAs: #ArrayOfPipelines
+
+	^ reader nextAs: #ArrayOfPipeline
 ]
 
 { #category : #'private - parsing' }
-GitlabModelImporter >> parseProjectResult: aResult [ 
-		| reader |
-	reader := NeoJSONReader on: aResult readStream.
-	reader for: GLHProject do: [ :mapping |
-		mapping mapInstVars. ].
-"	reader mapInstVarsFor: GLHProject."
+GitlabModelImporter >> parseProjectResult: aResult [
+
+	| reader |
+	reader := generalReader on: aResult readStream.
 
 	^ reader nextAs: GLHProject
 ]
@@ -1962,19 +1947,20 @@ GitlabModelImporter >> parseReleaseResult: result [
 
 { #category : #'private - parsing' }
 GitlabModelImporter >> parseReleasesResult: result [
-	|reader|
+
+	| reader |
 	reader := generalReader on: result readStream.
-	
-	^ reader nextAs: #ArrayOfReleases
+
+	^ reader nextAs: #ArrayOfRelease
 ]
 
 { #category : #'private - parsing' }
 GitlabModelImporter >> parseSubGroupResult: aResult [
 
 	| reader |
-	reader := NeoJSONReader on: aResult readStream.
-	self configureReaderForGroup: reader.
-	^ reader nextAs: #ArrayOfGroups
+	reader := generalReader on: aResult readStream.
+	
+	^ reader nextAs: #ArrayOfGroup
 ]
 
 { #category : #'private - parsing' }

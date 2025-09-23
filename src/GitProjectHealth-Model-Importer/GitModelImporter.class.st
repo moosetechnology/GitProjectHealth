@@ -249,6 +249,13 @@ GitModelImporter >> configureReaderForDiff: reader [
 
 { #category : #'private - configure reader' }
 GitModelImporter >> configureReaderForGroup: reader [
+
+	reader mapInstVarsFor: GLHGroup.
+
+	reader
+		for: #ArrayOfGroup
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHGroup ]
 ]
 
 { #category : #'private - configure reader' }
