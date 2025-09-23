@@ -26,8 +26,13 @@ ProjectMetric >> loadAllTags [
 
 { #category : #load }
 ProjectMetric >> loadBranchesSince: since until: until [
-	self flag: 'must import commits of branches in a separate way'.
-	^ glhImporter importBranchesOf: project
+
+	| branches |
+	branches := glhImporter importBranchesOf: project.
+
+
+	branches do: [ :branch | glhImporter importRefCommitOfBranch: branch ].
+	^ branches
 ]
 
 { #category : #loading }

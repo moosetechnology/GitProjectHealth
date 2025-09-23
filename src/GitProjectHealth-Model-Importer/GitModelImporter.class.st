@@ -332,6 +332,13 @@ GitModelImporter >> importCommit: aCommitID ofProject: aGLHProject [
 ]
 
 { #category : #'import - commits' }
+GitModelImporter >> importCommitsOfBranch: aGLHBranch [
+	self subclassResponsibility 
+	
+	
+]
+
+{ #category : #'import - commits' }
 GitModelImporter >> importCommitsOfProject: aGLHProject since: since until: until [
 
 	self subclassResponsibility 
@@ -484,6 +491,18 @@ GitModelImporter >> importProjectsOfUser: aGLHUser [
 	"https://docs.github.com/fr/rest/repos/repos?apiVersion=2022-11-28#list-repositories-for-a-user"
 	
 	self subclassResponsibility 
+]
+
+{ #category : #'as yet unclassified' }
+GitModelImporter >> importRefCommitOfBranch: aGLHBranch [
+	|commit|
+	commit := self
+				 importCommit: aGLHBranch sha
+				 ofProject: aGLHBranch repository project.
+	commit := aGLHBranch commits
+		add: commit
+		unless: self blockOnIdEquality.
+	^ commit
 ]
 
 { #category : #'import - releases' }

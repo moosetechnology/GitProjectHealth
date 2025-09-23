@@ -123,6 +123,11 @@ GLPHImporterMock >> importNotesOfMergeRequest: mriid [
 	^OrderedCollection with: (notes select: [ :note | (note noteable_iid == mriid) ]) 
 ]
 
+{ #category : #'as yet unclassified' }
+GLPHImporterMock >> importRefCommitOfBranch: aGLHBranch [ 
+	^ aGLHBranch 
+]
+
 { #category : #'import - tag' }
 GLPHImporterMock >> importTagsForProject: aGLHProject [ 
 	^ tags.

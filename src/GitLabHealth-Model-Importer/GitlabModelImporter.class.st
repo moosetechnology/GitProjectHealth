@@ -548,7 +548,7 @@ GitlabModelImporter >> importBranchesOf: aGLHProject [
 	"aGLHProject repository branches removeAll "
 	resultBranches := self repoApi branches getAllFromProject:
 		                  aGLHProject id.
-	1 halt. 
+	
 	foundBranches := (resultBranches collect: [ :branchesJson |
 		                  self
 			                  parseBranchesResult: branchesJson
@@ -561,19 +561,12 @@ GitlabModelImporter >> importBranchesOf: aGLHProject [
 		            addAll: foundBranches
 		            unless: self blockOnNameEquality.
 
-	foundBranches do: [ :fb |
-		branches do: [ :b |
-			fb name = b name ifTrue: [
-				b commits addAll: fb commits unless: self blockOnIdEquality ] ] ].
 
 	branches := self glhModel
 		            addAll: branches
 		            unless: self blockForBranchEquality.
 
-	branches do: [ :b |
-		b commits do: [ :c |
-			b repository commits add: c unless: self blockOnIdEquality ] ].
-
+	"WARNING : branch must load its HEAD commit (ref) in a second time "
 	^ branches
 ]
 
