@@ -241,12 +241,10 @@ GitlabModelImporter >> configureReaderForDiff: reader [
 { #category : #'private - configure reader' }
 GitlabModelImporter >> configureReaderForGroup: reader [
 
-	super configureReaderForGroup: reader. 
+	super configureReaderForGroup: reader.
 
 	reader for: GLHGroup do: [ :mapping |
-		(mapping mapInstVar: #projects) valueSchema: #ArrayOfProjects ].
-	
-
+		(mapping mapInstVar: #projects) valueSchema: #ArrayOfProject ]
 ]
 
 { #category : #'private - configure reader' }

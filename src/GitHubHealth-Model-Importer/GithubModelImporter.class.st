@@ -624,10 +624,7 @@ GithubModelImporter >> parseGroupResult: aResult [
 
 	| reader |
 	reader := NeoJSONReader on: aResult readStream.
-	reader for: GLHGroup do: [ :mapping | 
-		mapping mapInstVar: #name to: #login.
-		mapping mapInstVar: #description to: #description.
-		mapping mapInstVar: #id to: #id.
+	reader for: GLHGroup do: [ :mapping |
 		mapping mapInstVar: #web_url to: #html_url ].
 	^ reader nextAs: GLHGroup
 ]
