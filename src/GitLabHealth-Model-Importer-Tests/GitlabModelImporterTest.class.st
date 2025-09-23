@@ -437,6 +437,43 @@ GitlabModelImporterTest >> testImportNotesOfMergeRequest [
 	
 ]
 
+{ #category : #'tests - pipelines' }
+GitlabModelImporterTest >> testImportPipelineOfProject [
+
+	| element |
+	element := importer importPipeline: 123 OfProject: 
+		              (GLHProject new
+			               repository: GLHRepository new;
+			               yourself).
+
+	self assert: element class equals: GLHPipeline.
+	self assert: element project isNotNil.
+	self assert: element project class equals: GLHProject
+]
+
+{ #category : #'tests - pipelines' }
+GitlabModelImporterTest >> testImportPipelinesOfMergeRequest [
+
+	| collection element |
+	collection := importer importPipelinesOfMergeRequest:
+		              (GLHMergeRequest new
+			               project: (GLHProject new id:123);
+								iid: 123;
+			               yourself).
+
+	self assert: collection isEmptyOrNil not.
+	self assert: collection isCollection.
+
+	element := collection first.
+	self assert: element class equals: GLHPipeline.
+	self assert: element project isNotNil.
+	self assert: element project class equals: GLHProject.
+	
+	self assert: element mergeResquest isNotNil.
+	self assert: element mergeResquest class equals: GLHMergeRequest.
+	
+]
+
 { #category : #'tests - projects' }
 GitlabModelImporterTest >> testImportProject [
 

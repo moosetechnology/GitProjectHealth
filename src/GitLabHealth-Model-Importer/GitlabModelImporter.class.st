@@ -1220,19 +1220,18 @@ GitlabModelImporter >> importMergeRequestMergeCommits: aGLPHEMergeRequest [
 ]
 
 { #category : #'import - pipelines' }
-GitlabModelImporter >> importMergeRequestPipelines: aGLHMergeRequest [ 
+GitlabModelImporter >> importMergeRequestPipelines: aGLHMergeRequest [
 	"default limit to one page with last 100 pipelines"
-	
-	|results parseResults|
-	
-	results := self repoApi pipelines getByPage: 1 perPage: 100 inProject: aGLHMergeRequest project id forMergerRequestIid: aGLHMergeRequest iid. 
-	
-	parseResults := self parsePipelinesResult: results.
-	
-	parseResults := glhModel addAll: parseResults unless: self blockOnIdEquality.
-	parseResults := aGLHMergeRequest pipelines addAll: parseResults unless: self blockOnIdEquality.
-	^ parseResults collect: [ :pip | self completeImportedPipeline: pip ]  .
-	
+
+	| results parseResults |
+	self
+		deprecated:
+		'Use importPipelinesOfMergeRequest: instead of current one'
+		on: '23 September 2025'
+		in:
+		'Pharo-12.0.0+SNAPSHOT.build.1571.sha.cf5fcd22e66957962c97dffc58b0393b7f368147 (64 Bit)'.
+
+	^ self importPipelinesOfMergeRequest: aGLHMergeRequest. 
 ]
 
 { #category : #'import - merge-requests' }
@@ -1420,8 +1419,7 @@ GitlabModelImporter >> importPipeline: pipelineId OfProject: aGLHProject [
 	
 	('Search pipelines of: ' , aGLHProject id printString) recordInfo.
 	result := self repoApi pipelines get: pipelineId inProject: aGLHProject id.
-	result isString ifTrue: [ ^ self parsePipelineResult: result ].
-
+	
 	pipeline :=  self parsePipelineResult: result.
 
 	pipeline := self glhModel add: pipeline unless: self blockOnIdEquality .
@@ -1431,9 +1429,45 @@ GitlabModelImporter >> importPipeline: pipelineId OfProject: aGLHProject [
 ]
 
 { #category : #'import - pipelines' }
+GitlabModelImporter >> importPipelinesOfMergeRequest: aGLHMergeRequest [
+	"default limit to one page with last 100 pipelines"
+
+	| results parseResults |
+	results := self repoApi pipelines
+		           getByPage: 1
+		           perPage: 100
+		           inProject: aGLHMergeRequest project id
+		           forMergerRequestIid: aGLHMergeRequest iid.
+
+	parseResults := self parsePipelinesResult: results.
+
+	parseResults do: [ :pipeline |
+		pipeline project: aGLHMergeRequest project.
+		].
+
+	parseResults := glhModel
+		                addAll: parseResults
+		                unless: self blockOnIdEquality.
+	parseResults := aGLHMergeRequest pipelines
+		                addAll: parseResults
+		                unless: self blockOnIdEquality.
+		
+		
+	^ parseResults collect: [ :pip | self completeImportedPipeline: pip ]
+]
+
+{ #category : #'import - pipelines' }
 GitlabModelImporter >> importPipelinesOfProject: aGLHProject [
 
-	self flag: 'WARNING: this import ALL the pipelines at ones. Prefered ImportLatestPipleinesOfProject: for faster performance (if possible)'. 
+	self
+		deprecated:
+		'Use importAllPipelinesOfProject: instead of current one'
+		on: '23 September 2025'
+		in:
+		'Pharo-12.0.0+SNAPSHOT.build.1571.sha.cf5fcd22e66957962c97dffc58b0393b7f368147 (64 Bit)'.
+
+	self flag:
+		'WARNING: this import ALL the pipelines at ones. Prefered ImportLatestPipleinesOfProject: for faster performance (if possible)'.
 	^ self importAllPipelinesOfProject: aGLHProject
 ]
 

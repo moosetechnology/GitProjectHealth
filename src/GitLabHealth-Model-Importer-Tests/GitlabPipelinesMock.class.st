@@ -80,3 +80,9 @@ GitlabPipelinesMock >> getByPage: anInteger perPage: anInteger2 inProject: anInt
   }
 ]'
 ]
+
+{ #category : #api }
+GitlabPipelinesMock >> getByPage: anInteger perPage: anInteger2 inProject: anInteger3 forMergerRequestIid: anInteger4 [ 
+	^self getByPage: anInteger perPage: anInteger2 inProject: nil
+
+]
