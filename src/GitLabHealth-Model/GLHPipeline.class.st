@@ -59,7 +59,7 @@ Class {
 		'#jobs => FMMany type: #GLHJob opposite: #pipeline',
 		'#user => FMOne type: #GLHUser opposite: #launchedPipelines',
 		'#project => FMOne type: #GLHProject opposite: #pipelines',
-		'#mergeResquest => FMOne type: #GLHMergeRequest opposite: #pipelines'
+		'#mergeRequest'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }
@@ -163,26 +163,26 @@ GLHPipeline >> jobsGroup [
 ]
 
 { #category : #accessing }
-GLHPipeline >> mergeResquest [
+GLHPipeline >> mergeRequest [
 	"Relation named: #mergeResquest type: #GLHMergeRequest opposite: #pipelines"
 
 	<generated>
 	<container>
-	^ mergeResquest
+	^ mergeRequest
 ]
 
 { #category : #accessing }
-GLHPipeline >> mergeResquest: anObject [
+GLHPipeline >> mergeRequest: anObject [
 
 	<generated>
-	mergeResquest := anObject
+	mergeRequest := anObject
 ]
 
 { #category : #navigation }
-GLHPipeline >> mergeResquestGroup [
+GLHPipeline >> mergeRequestGroup [
 	<generated>
 	<navigation: 'MergeResquest'>
-	^ MooseSpecializedGroup with: self mergeResquest
+	^ MooseSpecializedGroup with: self mergeRequest
 ]
 
 { #category : #accessing }

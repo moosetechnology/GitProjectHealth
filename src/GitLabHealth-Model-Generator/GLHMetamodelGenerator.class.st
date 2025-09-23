@@ -464,9 +464,9 @@ GLHMetamodelGenerator >> mergeRequestsRelations [
 	(mergeRequest property: #assignee)
 	*- (user property: #currentlyAssignedMergeRequest).
 	(mergeRequest property: #reviewers)
-	*-* (user property: #reviewedMergeResquest).
+	*-* (user property: #reviewedMergeRequest).
 	(mergeRequest property: #pipelines)
-	<>-* (pipeline property: #mergeResquest).
+	<>-* (pipeline property: #mergeRequest).
 	(mergeRequest property: #mergedCommit)
 	- (commit property: #commitedMergeRequest).
 	(mergeRequest property: #mergeRequestCommit)

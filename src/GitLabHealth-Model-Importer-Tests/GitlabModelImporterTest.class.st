@@ -469,8 +469,8 @@ GitlabModelImporterTest >> testImportPipelinesOfMergeRequest [
 	self assert: element project isNotNil.
 	self assert: element project class equals: GLHProject.
 	
-	self assert: element mergeResquest isNotNil.
-	self assert: element mergeResquest class equals: GLHMergeRequest.
+	self assert: element mergeRequest isNotNil.
+	self assert: element mergeRequest class equals: GLHMergeRequest.
 	
 ]
 

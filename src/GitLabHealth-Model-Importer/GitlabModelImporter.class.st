@@ -469,7 +469,7 @@ GitlabModelImporter >> configureReaderForTag: reader [
 { #category : #'private - configure reader' }
 GitlabModelImporter >> configureReaderForUser: reader [
 
-	super configureReaderForUser: reader. 
+	super configureReaderForUser: reader
 	
 ]
 

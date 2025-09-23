@@ -110,7 +110,8 @@ Class {
 		'#assignedMergeRequests => FMMany type: #GLHMergeRequest opposite: #assignees',
 		'#currentlyAssignedMergeRequest => FMMany type: #GLHMergeRequest opposite: #assignee',
 		'#reviewedMergeResquest => FMMany type: #GLHMergeRequest opposite: #reviewers',
-		'#createdMilestone => FMOne type: #GLHMilestone opposite: #author'
+		'#createdMilestone => FMOne type: #GLHMilestone opposite: #author',
+		'#reviewedMergeRequest'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }
@@ -197,9 +198,9 @@ GLHUser >> addRelease: anObject [
 ]
 
 { #category : #adding }
-GLHUser >> addReviewedMergeResquest: anObject [
+GLHUser >> addReviewedMergeRequest: anObject [
 	<generated>
-	^ self reviewedMergeResquest add: anObject
+	^ self reviewedMergeRequest add: anObject
 ]
 
 { #category : #adding }
@@ -714,7 +715,7 @@ GLHUser >> releasesGroup [
 ]
 
 { #category : #accessing }
-GLHUser >> reviewedMergeResquest [
+GLHUser >> reviewedMergeRequest [
 	"Relation named: #reviewedMergeResquest type: #GLHMergeRequest opposite: #reviewers"
 
 	<generated>
@@ -722,7 +723,7 @@ GLHUser >> reviewedMergeResquest [
 ]
 
 { #category : #accessing }
-GLHUser >> reviewedMergeResquest: anObject [
+GLHUser >> reviewedMergeRequest: anObject [
 
 	<generated>
 	reviewedMergeResquest value: anObject
