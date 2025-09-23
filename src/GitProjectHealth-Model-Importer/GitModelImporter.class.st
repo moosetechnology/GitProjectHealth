@@ -274,9 +274,7 @@ GitModelImporter >> configureReaderForMergeRequest: reader [
 
 	reader mapInstVarsFor: GLHMergeRequest.
 
-	reader
-		for: #ArrayOfMergeRequest
-		customDo: [ :customMappting |
+	reader for: #ArrayOfMergeRequest customDo: [ :customMappting |
 		customMappting listOfElementSchema: GLHMergeRequest ]
 ]
 
@@ -289,6 +287,17 @@ GitModelImporter >> configureReaderForMilestone: reader [
 		for: #ArrayOfMilestone
 		customDo: [ :customMappting |
 		customMappting listOfElementSchema: GLHMilestone ]
+]
+
+{ #category : #'private - configure reader' }
+GitModelImporter >> configureReaderForNote: reader [
+
+	reader mapInstVarsFor: GLHNote .
+
+	reader
+		for: #ArrayOfNote
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHNote ]
 ]
 
 { #category : #'private - configure reader' }
@@ -343,7 +352,8 @@ GitModelImporter >> configureReaderForUser: reader [
 	reader
 		for: #ArrayOfUser
 		customDo: [ :customMappting |
-		customMappting listOfElementSchema: GLHUser ]
+		customMappting listOfElementSchema: GLHUser ].
+	
 ]
 
 { #category : #utils }
@@ -600,6 +610,7 @@ GitModelImporter >> initReader [
 	generalReader := NeoJSONReader new.
 
 	"will be reuse for all reader next"
+	"indique ce que doit faire le reader lorsqu'il parse une DateAndTime object"
 	generalReader for: DateAndTime customDo: [ :mapping |
 		mapping decoder: [ :string |
 			string ifNil: [ nil ] ifNotNil: [ DateAndTime fromString: string ] ] ].
@@ -616,7 +627,8 @@ GitModelImporter >> initReader [
 	self configureReaderForBranch: generalReader.
 	self configureReaderForIssue: generalReader.
 	self configureReaderForMilestone: generalReader.
-	self configureReaderForProject: generalReader. 
+	self configureReaderForNote: generalReader.
+	self configureReaderForProject: generalReader
 ]
 
 { #category : #initialization }

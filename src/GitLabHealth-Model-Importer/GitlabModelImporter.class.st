@@ -214,9 +214,6 @@ GitlabModelImporter >> configureReaderForCommit: reader [
 				commit deletions: (value at: #deletions).
 				commit additions: (value at: #additions) ] ].
 
-	reader for: DateAndTime customDo: [ :mapping |
-		mapping decoder: [ :string | DateAndTime fromString: string ] ].
-
 	reader
 		for: #ArrayOfIds
 		customDo: [ :mapping | mapping decoder: [ :string | string ] ].
@@ -250,56 +247,49 @@ GitlabModelImporter >> configureReaderForGroup: reader [
 { #category : #'private - configure reader' }
 GitlabModelImporter >> configureReaderForMergeRequest: reader [
 	"declare quil y a un array a mapper"
-
-	reader for: #ArrayOfMergeRequest customDo: [ :customMappting |
-		customMappting listOfElementSchema: GLHMergeRequest ].
+	self flag: 'assignee.s must be parsed with nil condition'.
+	super configureReaderForMergeRequest: reader.
 
 	"declare la liste des properties"
-	reader for: GLHMergeRequest do: [ :mapping |
-		mapping mapInstVars:
-			#( blocking_discussions_resolved changes_count description
-			   detailed_merge_status discussion_locked downvotes draft first_deployed_to_production_at
-			   force_remove_source_branch has_conflicts id iid labels latest_build_finished_at
-			   latest_build_started_at merge_commit_sha merge_status
-			   merge_when_pipeline_succeeds merged_at milestone project_id
-			   reference references_full references_relative
-			   references_short sha should_remove_source_branch
-			   source_branch source_project_id squash squash_commit_sha
-			   squash_on_merge state subscribed target_branch target_project_id
-			   task_completion_status_completed_count
-			   task_completion_status_count time_stats_human_time_estimate
-			   time_stats_human_total_time_spent
-			   time_stats_time_estimate time_stats_total_time_spent
-			   title updated_at upvotes user_notes_count web_url work_in_progress ).
-		(mapping mapInstVar: #created_at) valueSchema: DateAndTime.
-		(mapping mapInstVar: #updated_at) valueSchema: DateAndTime.
-		(mapping mapInstVar: #merged_at) valueSchema: DateAndTime.
-		(mapping mapInstVar: #closed_at) valueSchema: DateAndTime.
-		"(mapping mapInstVar: #assignee) valueSchema: GLHUser."
-		mapping
-			mapProperty: #author
-			getter: [  ]
-			setter: [ :object :value |
-			object cacheAt: #authorID put: (value at: #id) ].
-		mapping
-			mapProperty: #merge_user
-			getter: [  ]
-			setter: [ :object :value | 
-				value ifNotNil: [
-					object cacheAt: #mergeUserID put: (value at: #id) ] ] ].
+	reader
+		for: GLHMergeRequest
+		do: [ :mapping | 
+			 
+			"(mapping mapInstVar: #assignee) valueSchema: GLHUser."
+			"(mapping mapInstVar: #assignees) valueSchema: #ArrayOfUser."
+			(mapping mapInstVar: #created_at) valueSchema: DateAndTime.
+			(mapping mapInstVar: #updated_at) valueSchema: DateAndTime.
+			(mapping mapInstVar: #merged_at) valueSchema: DateAndTime.
+			(mapping mapInstVar: #closed_at) valueSchema: DateAndTime.
 
-	"(mapping mapInstVar: #closed_by) valueSchema: GLHUser.
-	(mapping mapInstVar: #mergeCommit) valueSchema: GLHCommit."
-	"indique ce que doit faire le reader lorsqu'il parse une DateAndTime object"
-	reader for: DateAndTime customDo: [ :mapping |
-		mapping decoder: [ :string |
-			string ifNil: [ nil ] ifNotNil: [ DateAndTime fromString: string ] ] ]
+			mapping
+				mapProperty: #author
+				getter: [  ]
+				setter: [ :object :value |
+				object cacheAt: #authorID put: (value at: #id) ].
+			mapping
+				mapProperty: #merge_user
+				getter: [  ]
+				setter: [ :object :value |
+					value ifNotNil: [
+						object cacheAt: #mergeUserID put: (value at: #id) ] ] ]
+]
+
+{ #category : #'private - parsing' }
+GitlabModelImporter >> configureReaderForNote: reader [
+
+	super configureReaderForNote: reader.
+
+	reader for: GLHNote do: [ :mapping |
+		
+		(mapping mapInstVar: #created_at) valueSchema: DateAndTime.
+		(mapping mapInstVar: #updated_at) valueSchema: DateAndTime ]
 ]
 
 { #category : #'private - configure reader' }
 GitlabModelImporter >> configureReaderForPipeline: reader [
 
-	reader mapInstVarsFor: GLHPipeline.
+	super configureReaderForPipeline: reader.
 
 	reader for: GLHPipeline do: [ :mapping |
 		mapping
@@ -349,10 +339,6 @@ GitlabModelImporter >> configureReaderForPipeline: reader [
 			setter: [ :object :value |
 				value ifNotNil: [ object cacheAt: #userID put: (value at: #id) ] ] ].
 
-	reader
-		for: #ArrayOfPipeline
-		customDo: [ :customMappting |
-		customMappting listOfElementSchema: GLHPipeline ]
 ]
 
 { #category : #'private - configure reader' }
@@ -368,19 +354,13 @@ GitlabModelImporter >> configureReaderForProject: reader [
 { #category : #'private - configure reader' }
 GitlabModelImporter >> configureReaderForRelease: reader [
 
-	reader mapInstVarsFor: GLHRelease .
-	
-	
-	reader for: GLHRelease do: [ :mapping |
-			
-		(mapping mapInstVar: #author) valueSchema: GLHUser .
-		 ].
-	
-	
+	super configureReaderForRelease: reader.
+
+
 	reader
-		for: #ArrayOfReleases
-		customDo: [ :customMappting |
-		customMappting listOfElementSchema: GLHRelease ].
+		for: GLHRelease
+		do: [ :mapping | (mapping mapInstVar: #author) valueSchema: GLHUser ].
+
 ]
 
 { #category : #'private - configure reader' }
@@ -411,13 +391,8 @@ GitlabModelImporter >> configureReaderForTag: reader [
 { #category : #'private - configure reader' }
 GitlabModelImporter >> configureReaderForUser: reader [
 
-	reader mapInstVarsFor: GLHUser.
-
-	reader
-		for: #ArrayOfUser
-		customDo: [ :customMappting |
-		customMappting listOfElementSchema: GLHUser ].
-
+	super configureReaderForUser: reader. 
+	
 ]
 
 { #category : #private }
@@ -1871,36 +1846,19 @@ GitlabModelImporter >> parseMergeRequestsResult: result [
 ]
 
 { #category : #'private - parsing' }
-GitlabModelImporter >> parseNoteJson: results [  
-    | reader |  
+GitlabModelImporter >> parseNoteJson: results [
 
-    "Créer un lecteur JSON"
-    reader := NeoJSONReader on: results readStream.    
+	| reader |
+	"Créer un lecteur JSON"
+	reader := generalReader on: results readStream.
 
-    "Définir le mapping pour l'objet GLHNote"
-    reader for: GLHNote do: [ :mapping |  
-        mapping mapInstVars: #(id noteable_id attachment system confidential internal  
-                               noteable_iid resolvable imported imported_from  
-                               author body project_id noteable_type).  
+	"Corriger la conversion des dates"
+	"reader for: DateAndTime customDo: [ :mapping |
+		mapping decoder: [ :string |
+			DateAndTime readFrom: string readStream ] ]."
 
-        (mapping mapInstVar: #created_at) valueSchema: DateAndTime.  
-        (mapping mapInstVar: #updated_at) valueSchema: DateAndTime.  
-    ].    
-
-    "Corriger la conversion des dates"
-    reader for: DateAndTime customDo: [ :mapping |  
-        mapping decoder: [ :string | DateAndTime readFrom: string readStream ] ].
-
-	reader
-		for: #ArrayOfNote
-		customDo: [ :customMappting | 
-		customMappting listOfElementSchema: GLHNote ].
-	 ^ reader nextAs: #ArrayOfNote
-
-    "Retourner la Note"
-    "^ reader nextAs: GLHNote"
-
-
+	
+	^ reader nextAs: #ArrayOfNote
 ]
 
 { #category : #'private - parsing' }

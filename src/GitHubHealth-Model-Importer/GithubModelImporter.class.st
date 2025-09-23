@@ -142,8 +142,9 @@ GithubModelImporter >> configureReaderForCommit: reader [
 GithubModelImporter >> configureReaderForMergeRequest: reader [
 	"	reader mapInstVarsFor: GLHProject. "
 
+	super configureReaderForMergeRequest: reader.
+	
 	reader for: GLHMergeRequest do: [ :mapping |
-
 		(mapping mapInstVar: #created_at) valueSchema: DateAndTime.
 		(mapping mapInstVar: #updated_at) valueSchema: DateAndTime.
 		(mapping mapInstVar: #merged_at) valueSchema: DateAndTime.
@@ -159,13 +160,9 @@ GithubModelImporter >> configureReaderForMergeRequest: reader [
 			getter: [  ]
 			setter: [ :object :value |
 				value ifNotNil: [
-					object cacheAt: #mergeUserID put: (value at: #id) ] ]
-		
-		].
-	
+					object cacheAt: #mergeUserID put: (value at: #id) ] ] ].
 
-	reader for: #ArrayOfMergeRequest customDo: [ :customMappting |
-		customMappting listOfElementSchema: GLHMergeRequest ].
+
 
 ]
 
