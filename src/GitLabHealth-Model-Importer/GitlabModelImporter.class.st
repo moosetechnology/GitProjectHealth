@@ -120,6 +120,27 @@ GitlabModelImporter >> completeImportedCommit: aCommit [
 	^ aCommit
 ]
 
+{ #category : #'import - jobs' }
+GitlabModelImporter >> completeImportedJob: aGLHJob [
+	
+	aGLHJob commit ifNil: [ 
+		|commit|
+		commit := self
+		          importCommit:
+		          (aGLHJob cacheAt: #commitID ifAbsent: [ '' ])
+		          ofProject: aGLHJob pipeline project.
+		aGLHJob commit: commit. ].
+	
+	aGLHJob user ifNil: [ 
+		|user|
+		user := self importUser: (aGLHJob cacheAt: #userID ifAbsent: [ '' ]).
+	aGLHJob user: user.
+		 ]. 
+	
+	
+	^ aGLHJob
+]
+
 { #category : #'import - pipelines' }
 GitlabModelImporter >> completeImportedPipeline: aGLHPipeline [ 
 	|result parsedResult|
@@ -249,19 +270,39 @@ GitlabModelImporter >> configureReaderForJob: reader [
 
 	super configureReaderForJob: reader.
 
-	"reader for: GLHJob do: [ :mapping |
-		
-		mapping
+	reader
+		for: GLHJob
+		do: [ :mapping | "(mapping mapInstVar: #user) valueSchema: GLHUser.
+		(mapping mapInstVar: #pipeline) valueSchema: GLHPipeline."
+			mapping
+				mapProperty: #user
+				getter: [  ]
+				setter: [ :job :rawUser |
+				job cacheAt: #userID put: (rawUser at: #id) ].
+
+			mapping
+				mapProperty: #pipeline
+				getter: [  ]
+				setter: [ :job :rawPipeline |
+					job cacheAt: #pipelineID put: (rawPipeline at: #id) ].
+				
+			mapping
+				mapProperty: #commit
+				getter: [  ]
+				setter: [ :job :rawCommit |
+					job cacheAt: #commitID put: (rawCommit at: #id) ].
+
+			"mapping
 			mapProperty: #user
 			getter: [ :object | #ignore ]
 			setter: [ :object :value |
-			object user: (self importUser: (value at: #id)) ].
+			object user: (self importUser: (value at: #id)) ]."
 
-		mapping
-			mapProperty: #duration
-			getter: [ :object | #ignore ]
-			setter: [ :object :value |
-			value ifNotNil: [ object duration: value seconds ] ] ]"
+			mapping
+				mapProperty: #duration
+				getter: [ :object | #ignore ]
+				setter: [ :object :value |
+				value ifNotNil: [ object duration: value seconds ] ] ]
 ]
 
 { #category : #'private - configure reader' }
@@ -1034,10 +1075,15 @@ GitlabModelImporter >> importJobsOf: aPipeline [
 	"jobsOfProject: aPipeline project id
 		          ofPipelines: aPipeline id."
 	jobs := (results collect: [ :jobsJson |
-		         self parseJobsResult: jobsJson ofProject: aPipeline project ])
-		        flattened.
-	jobs do: [ :job | aPipeline addJob: job ].
-	self glhModel addAll: jobs.
+		         self parseJobsResult: jobsJson ]) flattened.
+
+
+	jobs := self glhModel addAll: jobs unless: self blockOnIdEquality.
+	jobs := aPipeline jobs addAll: jobs unless: self blockOnIdEquality.
+
+
+	jobs do: [ :job |
+		self completeImportedJob: job ].
 
 	^ jobs
 ]
@@ -1823,19 +1869,27 @@ GitlabModelImporter >> parseGroupResult: aResult [
 	^ reader nextAs: GLHGroup
 ]
 
+{ #category : #parsing }
+GitlabModelImporter >> parseJobsResult: result [ 
+	| reader |
+	reader := generalReader on: result readStream.
+
+	^ reader nextAs: #ArrayOfJob
+]
+
 { #category : #'private - parsing' }
 GitlabModelImporter >> parseJobsResult: result ofProject: aProject [
 
 	| reader |
 	reader := generalReader on: result readStream.
-	"reader for: GLHJob do: [ :mapping |
+	reader for: GLHJob do: [ :mapping |
 		mapping
 			mapProperty: #commit
 			getter: [ :object | #ignore ]
 			setter: [ :object :value |
 				value ifNotNil: [
 					object commit:
-						(self importCommit: (value at: #id) ofProject: aProject) ] ] ]."
+						(self importCommit: (value at: #id) ofProject: aProject) ] ] ].
 
 
 	^ reader nextAs: #ArrayOfJob
