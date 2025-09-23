@@ -30,7 +30,7 @@ A GitLab User
 | `currentlyAssignedMergeRequest` | `GLHUser` | `assignee` | `GLHMergeRequest` | |
 | `launchedPipelines` | `GLHUser` | `user` | `GLHPipeline` | |
 | `mergerOfMergeRequests` | `GLHUser` | `merged_by` | `GLHMergeRequest` | |
-| `reviewedMergeResquest` | `GLHUser` | `reviewers` | `GLHMergeRequest` | |
+| `reviewedMergeRequest` | `GLHUser` | `reviewers` | `GLHMergeRequest` | |
 | `usedMerges` | `GLHUser` | `merge_user` | `GLHMergeRequest` | |
 
 
@@ -109,9 +109,8 @@ Class {
 		'#mergerOfMergeRequests => FMMany type: #GLHMergeRequest opposite: #merged_by',
 		'#assignedMergeRequests => FMMany type: #GLHMergeRequest opposite: #assignees',
 		'#currentlyAssignedMergeRequest => FMMany type: #GLHMergeRequest opposite: #assignee',
-		'#reviewedMergeResquest => FMMany type: #GLHMergeRequest opposite: #reviewers',
-		'#createdMilestone => FMOne type: #GLHMilestone opposite: #author',
-		'#reviewedMergeRequest'
+		'#reviewedMergeRequest => FMMany type: #GLHMergeRequest opposite: #reviewers',
+		'#createdMilestone => FMOne type: #GLHMilestone opposite: #author'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }
@@ -716,17 +715,17 @@ GLHUser >> releasesGroup [
 
 { #category : #accessing }
 GLHUser >> reviewedMergeRequest [
-	"Relation named: #reviewedMergeResquest type: #GLHMergeRequest opposite: #reviewers"
+	"Relation named: #reviewedMergeRequest type: #GLHMergeRequest opposite: #reviewers"
 
 	<generated>
-	^ reviewedMergeResquest
+	^ reviewedMergeRequest
 ]
 
 { #category : #accessing }
 GLHUser >> reviewedMergeRequest: anObject [
 
 	<generated>
-	reviewedMergeResquest value: anObject
+	reviewedMergeRequest value: anObject
 ]
 
 { #category : #accessing }

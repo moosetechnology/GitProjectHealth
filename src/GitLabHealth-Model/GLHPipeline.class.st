@@ -7,7 +7,7 @@ A GitLab Pipeline execution
 ### Parents
 | Relation | Origin | Opposite | Type | Comment |
 |---|
-| `mergeResquest` | `GLHPipeline` | `pipelines` | `GLHMergeRequest` | |
+| `mergeRequest` | `GLHPipeline` | `pipelines` | `GLHMergeRequest` | |
 | `project` | `GLHPipeline` | `pipelines` | `GLHProject` | |
 
 ### Children
@@ -59,7 +59,7 @@ Class {
 		'#jobs => FMMany type: #GLHJob opposite: #pipeline',
 		'#user => FMOne type: #GLHUser opposite: #launchedPipelines',
 		'#project => FMOne type: #GLHProject opposite: #pipelines',
-		'#mergeRequest'
+		'#mergeRequest => FMOne type: #GLHMergeRequest opposite: #pipelines'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }
@@ -164,7 +164,7 @@ GLHPipeline >> jobsGroup [
 
 { #category : #accessing }
 GLHPipeline >> mergeRequest [
-	"Relation named: #mergeResquest type: #GLHMergeRequest opposite: #pipelines"
+	"Relation named: #mergeRequest type: #GLHMergeRequest opposite: #pipelines"
 
 	<generated>
 	<container>
@@ -181,7 +181,7 @@ GLHPipeline >> mergeRequest: anObject [
 { #category : #navigation }
 GLHPipeline >> mergeRequestGroup [
 	<generated>
-	<navigation: 'MergeResquest'>
+	<navigation: 'MergeRequest'>
 	^ MooseSpecializedGroup with: self mergeRequest
 ]
 
