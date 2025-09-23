@@ -82,19 +82,13 @@ GithubModelImporter >> completeImportedProject: aGLHProject [
 { #category : #'private - configure reader' }
 GithubModelImporter >> configureReaderForBranch: reader [
 
-	super configureReaderForBranch: reader. 
-	
-	reader mapInstVarsFor: GLHBranch.
-
+	super configureReaderForBranch: reader.
 
 	reader for: GLHBranch do: [ :mapping |
 		mapping
 			mapProperty: #sha
 			getter: [ :branch | #ignore ]
-			setter: [ :branch :value | branch sha: (value at: #sha) ] ].
-
-
-	
+			setter: [ :branch :value | branch sha: (value at: #sha) ] ]
 ]
 
 { #category : #'private - configure reader' }

@@ -216,8 +216,9 @@ GitModelImporter >> completeImportedProject: aGLHProject [
 
 { #category : #'private - configure reader' }
 GitModelImporter >> configureReaderForBranch: reader [
-	
-	
+
+	reader mapInstVarsFor: GLHBranch.
+
 	reader
 		for: #ArrayOfBranch
 		customDo: [ :customMappting |
@@ -226,7 +227,9 @@ GitModelImporter >> configureReaderForBranch: reader [
 
 { #category : #'private - configure reader' }
 GitModelImporter >> configureReaderForCommit: reader [
-
+	
+	reader mapInstVarsFor: GLHCommit .
+	
 	reader
 		for: #ArrayOfCommit
 		customDo: [ :customMappting |
@@ -235,6 +238,13 @@ GitModelImporter >> configureReaderForCommit: reader [
 
 { #category : #'private - configure reader' }
 GitModelImporter >> configureReaderForDiff: reader [
+
+	reader mapInstVarsFor: GLHDiff.
+
+	reader
+		for: #ArrayOfDiff
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHDiff ]
 ]
 
 { #category : #'private - configure reader' }
@@ -244,38 +254,89 @@ GitModelImporter >> configureReaderForGroup: reader [
 { #category : #'private - configure reader' }
 GitModelImporter >> configureReaderForIssue: reader [
 
-	
+	reader mapInstVarsFor: GLHIssue.
+
+	reader
+		for: #ArrayOfIssue
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHIssue ]
 ]
 
 { #category : #'private - configure reader' }
 GitModelImporter >> configureReaderForMergeRequest: reader [
+
+	reader mapInstVarsFor: GLHMergeRequest.
+
+	reader
+		for: #ArrayOfMergeRequest
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHMergeRequest ]
 ]
 
 { #category : #'private - configure reader' }
 GitModelImporter >> configureReaderForMilestone: reader [
 
-	
+	reader mapInstVarsFor: GLHMilestone.
+
+	reader
+		for: #ArrayOfMilestone
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHMilestone ]
 ]
 
 { #category : #'private - configure reader' }
 GitModelImporter >> configureReaderForPipeline: reader [
+
+	reader mapInstVarsFor: GLHPipeline.
+
+	reader
+		for: #ArrayOfPipeline
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHPipeline ]
 ]
 
 { #category : #'private - configure reader' }
 GitModelImporter >> configureReaderForProject: reader [
+
+	reader mapInstVarsFor: GLHProject.
+
+	reader
+		for: #ArrayOfProject
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHProject ]
 ]
 
 { #category : #'private - configure reader' }
 GitModelImporter >> configureReaderForRelease: reader [
+
+	reader mapInstVarsFor: GLHRelease.
+
+	reader
+		for: #ArrayOfRelease
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHRelease ]
 ]
 
 { #category : #'private - configure reader' }
 GitModelImporter >> configureReaderForTag: reader [
+
+	reader mapInstVarsFor: GLHTag.
+
+	reader
+		for: #ArrayOfTag
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHTag ]
 ]
 
 { #category : #'private - configure reader' }
 GitModelImporter >> configureReaderForUser: reader [
 
+	reader mapInstVarsFor: GLHUser.
+
+	reader
+		for: #ArrayOfUser
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHUser ]
 ]
 
 { #category : #utils }
@@ -396,7 +457,7 @@ GitModelImporter >> importJobsOf: aGLHPipeline [
 ]
 
 { #category : #'import - commits' }
-GitModelImporter >> importLastestCommitsOfProject: aGLHProject [
+GitModelImporter >> importLatestCommitsOfProject: aGLHProject [
 	"limited to the last 50 commits"
 	self subclassResponsibility 
 ]

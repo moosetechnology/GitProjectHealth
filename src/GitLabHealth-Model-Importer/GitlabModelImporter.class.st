@@ -183,6 +183,18 @@ GitlabModelImporter >> completeImportedProject: aGLHProject [
 ]
 
 { #category : #'private - configure reader' }
+GitlabModelImporter >> configureReaderForBranch: reader [
+
+	super configureReaderForBranch: reader.
+	
+		reader for: GLHBranch do: [ :mapping |
+		mapping
+			mapProperty: #commit
+			getter: [  ]
+			setter: [ :branch :rawCommit | branch sha: (rawCommit at: #id) ] ].
+]
+
+{ #category : #'private - configure reader' }
 GitlabModelImporter >> configureReaderForCommit: reader [
 
 	super configureReaderForCommit: reader.
@@ -215,15 +227,14 @@ GitlabModelImporter >> configureReaderForCommit: reader [
 { #category : #'private - configure reader' }
 GitlabModelImporter >> configureReaderForDiff: reader [
 
-	reader for: GLHDiff do: [ :mapping |
-		mapping mapInstVars:
-			#( deleted_file new_file new_path old_path renamed_file ).
-		mapping mapInstVar: #diffString to: #diff ].
-
+	super configureReaderForDiff: reader.
 	reader
-		for: #ArrayOfDiffs
-		customDo: [ :customMappting |
-		customMappting listOfElementSchema: GLHDiff ].
+		for: GLHDiff
+		do: [ :mapping | 
+			"mapping mapInstVars:
+			#( deleted_file new_file new_path old_path renamed_file )."
+			mapping mapInstVar: #diffString to: #diff ].
+
 	^ reader
 ]
 
@@ -519,7 +530,7 @@ GitlabModelImporter >> importAndLoadLatestsCommitsOfProject: aGLHProject [
 
 	| commits completedProject |
 	completedProject := self completeImportedProject: aGLHProject.
-	commits := self importLastestCommitsOfProject: completedProject.
+	commits := self importLatestCommitsOfProject: completedProject.
 	commits do: [ :commit | self completeImportedCommit: commit ].
 	self chainsCommitsFrom: commits.
 	^ commits
@@ -541,7 +552,7 @@ GitlabModelImporter >> importAuthorOfCommit: aGLHCommit [
 	^ user
 ]
 
-{ #category : #'import - repositories' }
+{ #category : #'import - branches' }
 GitlabModelImporter >> importBranchesOf: aGLHProject [
 
 	| resultBranches branches foundBranches |
@@ -1040,7 +1051,7 @@ GitlabModelImporter >> importJobsOf: aPipeline [
 ]
 
 { #category : #'import - commits' }
-GitlabModelImporter >> importLastestCommitsOfProject: aGLHProject [
+GitlabModelImporter >> importLatestCommitsOfProject: aGLHProject [
 	"limited to the last 50 commits"
 
 	| results parsedResults params |
@@ -1653,7 +1664,7 @@ GitlabModelImporter >> newParseCommitResult: result [
 GitlabModelImporter >> newParseDiffResult: result [
 
 	generalReader on: result readStream.
-	^ generalReader nextAs: #ArrayOfDiffs
+	^ generalReader nextAs: #ArrayOfDiff
 ]
 
 { #category : #'private - parsing' }
@@ -1676,6 +1687,16 @@ GitlabModelImporter >> parseArrayOfProject: arrayOfProjects [
 ]
 
 { #category : #'private - parsing' }
+GitlabModelImporter >> parseBranchesResult: result [
+
+	| reader |
+	reader := generalReader on: result readStream.
+
+
+	^ reader nextAs: #ArrayOfBranch
+]
+
+{ #category : #'private - parsing' }
 GitlabModelImporter >> parseBranchesResult: result ofProject: aGLHProject [
 
 	| reader |
@@ -1687,13 +1708,11 @@ GitlabModelImporter >> parseBranchesResult: result ofProject: aGLHProject [
 			mapProperty: #commit
 			getter: [  ]
 			setter: [ :branch :rawCommit |
-				| commit |
-				
-				branch sha: (rawCommit at: #id). 
+				branch sha: (rawCommit at: #id)
 				"commit := self
 					          importCommit: (rawCommit at: #id)
 					          ofProject: aGLHProject.
-				branch commits add: commit unless: self blockOnIdEquality "] ].
+				branch commits add: commit unless: self blockOnIdEquality " ] ].
 
 	reader
 		for: #ArrayOfBranch
