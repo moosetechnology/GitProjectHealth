@@ -548,7 +548,7 @@ GitlabModelImporter >> importBranchesOf: aGLHProject [
 	"aGLHProject repository branches removeAll "
 	resultBranches := self repoApi branches getAllFromProject:
 		                  aGLHProject id.
-
+	1 halt. 
 	foundBranches := (resultBranches collect: [ :branchesJson |
 		                  self
 			                  parseBranchesResult: branchesJson
@@ -1695,10 +1695,12 @@ GitlabModelImporter >> parseBranchesResult: result ofProject: aGLHProject [
 			getter: [  ]
 			setter: [ :branch :rawCommit |
 				| commit |
-				commit := self
+				
+				branch sha: (rawCommit at: #id). 
+				"commit := self
 					          importCommit: (rawCommit at: #id)
 					          ofProject: aGLHProject.
-				branch commits add: commit unless: self blockOnIdEquality ] ].
+				branch commits add: commit unless: self blockOnIdEquality "] ].
 
 	reader
 		for: #ArrayOfBranch

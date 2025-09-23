@@ -216,6 +216,12 @@ GitModelImporter >> completeImportedProject: aGLHProject [
 
 { #category : #'private - configure reader' }
 GitModelImporter >> configureReaderForBranch: reader [
+	
+	
+	reader
+		for: #ArrayOfBranch
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHBranch ]
 ]
 
 { #category : #'private - configure reader' }

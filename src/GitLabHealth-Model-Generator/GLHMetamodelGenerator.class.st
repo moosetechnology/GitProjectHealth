@@ -617,7 +617,7 @@ GLHMetamodelGenerator >> releaseRelations [
 { #category : #'as yet unclassified' }
 GLHMetamodelGenerator >> tRefProperties [
 	"define the properties of a ref instance"
-
+	1 halt. 
 	tRef property: #sha type: #String.
 	tRef property: #name type: #String
 ]
