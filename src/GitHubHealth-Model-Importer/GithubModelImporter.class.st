@@ -168,20 +168,13 @@ GithubModelImporter >> configureReaderForMergeRequest: reader [
 
 { #category : #'private - configure reader' }
 GithubModelImporter >> configureReaderForProject: reader [
-	"	reader mapInstVarsFor: GLHProject. "
 
+	super configureReaderForProject: reader.
+	
 	reader for: GLHProject do: [ :mapping |
-		mapping mapInstVar: #name to: #name.
-		mapping mapInstVar: #description to: #description.
-		mapping mapInstVar: #id to: #id.
-		mapping mapInstVar: #archived to: #archived.
 		mapping mapInstVar: #web_url to: #html_url.
-		mapping mapInstVar: #topics to: #topics ].
+	 ].
 
-	reader
-		for: #ArrayOfProject
-		customDo: [ :customMappting |
-		customMappting listOfElementSchema: GLHProject ]
 ]
 
 { #category : #private }
@@ -682,18 +675,9 @@ GithubModelImporter >> parsePipelinesResult: pipelineOverview [
 GithubModelImporter >> parseProjectResult: aResult [
 
 	| reader |
-"	reader := NeoJSONReader on: aResult readStream.
-	reader for: GLHProject do: [ :mapping |
-		mapping mapInstVar: #name to: #name.
-		mapping mapInstVar: #description to: #description.
-		mapping mapInstVar: #id to: #id.
-		mapping mapInstVar: #archived to: #archived.
-		mapping mapInstVar: #web_url to: #html_url.
-		mapping mapInstVar: #topics to: #topics ].
-	^ reader nextAs: GLHProject"
-	
+
 	reader := generalReader on: aResult readStream.
-	
+
 	^ reader nextAs: GLHProject
 ]
 
@@ -701,18 +685,8 @@ GithubModelImporter >> parseProjectResult: aResult [
 GithubModelImporter >> parseUserResult: result [
 
 	| reader |
-	reader := NeoJSONReader on: result readStream.
-	reader for: GLHUser do: [ :mapping |
-		mapping mapInstVar: #id to: #id.
-		mapping mapInstVar: #public_email to: #email.
-		mapping mapInstVar: #username to: #login.
-		mapping mapInstVar: #bio to: #bio.
-		mapping mapInstVar: #organization to: #company.
-		mapping mapInstVar: #followers to: #followers.
-		mapping mapInstVar: #following to: #following.
-		mapping mapInstVar: #web_url to: #html_url.
-		mapping mapInstVar: #name to: #name.
-		mapping mapInstVar: #avatar_url to: #avatar_url ].
+	reader := generalReader on: result readStream.
+
 	^ reader nextAs: GLHUser
 ]
 
