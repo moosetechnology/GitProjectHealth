@@ -438,7 +438,14 @@ GitModelImporter >> importContributedProjectsOfUser: aGLHUser [
 { #category : #'import - users' }
 GitModelImporter >> importCreatorOfCommit: aGLHCommit [
 
-	self subclassResponsibility 
+	
+	aGLHCommit commitCreator ifNil: [
+		aGLHCommit commitCreator:
+			(self importUserByUsername: aGLHCommit author_name) ].
+	self userCatalogue
+		addUser: aGLHCommit commitCreator
+		withProject: aGLHCommit repository project id.
+	^ aGLHCommit commitCreator
 ]
 
 { #category : #'import - diffs' }
@@ -485,6 +492,7 @@ GitModelImporter >> importJobsOf: aGLHPipeline [
 { #category : #'import - commits' }
 GitModelImporter >> importLatestCommitsOfProject: aGLHProject [
 	"limited to the last 50 commits"
+
 	self subclassResponsibility 
 ]
 

@@ -934,18 +934,6 @@ GitlabModelImporter >> importContributedProjectsOfUser: aGLHUser [
 	^ projects
 ]
 
-{ #category : #'import - users' }
-GitlabModelImporter >> importCreatorOfCommit: aCommit [
-
-	aCommit commitCreator ifNil: [
-		aCommit commitCreator:
-			(self importUserByUsername: aCommit author_name) ].
-	self userCatalogue
-		addUser: aCommit commitCreator
-		withProject: aCommit repository project id.
-	^ aCommit commitCreator
-]
-
 { #category : #'import - commits' }
 GitlabModelImporter >> importDiffOfCommit: aCommit [
 

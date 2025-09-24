@@ -4,9 +4,9 @@ The test suite for `GLHModelImporter` but not using remote API
 Class {
 	#name : #GitlabModelImporterTest,
 	#superclass : #TestCase,
+	#traits : 'TGitModelImporterTest',
+	#classTraits : 'TGitModelImporterTest classTrait',
 	#instVars : [
-		'importer',
-		'model',
 		'diffs'
 	],
 	#category : #'GitLabHealth-Model-Importer-Tests'
@@ -184,10 +184,16 @@ GitlabModelImporterTest >> setUp [
 
 	super setUp.
 
+	"first set the local importer"
 	importer := GitlabModelImporter new.
+	importer repoApi: GitlabApiMock new.
+
+	"than set up the model in super"
 	model := GLHModel new.
 	importer glhModel: model.
-	importer repoApi: GitlabApiMock new
+	defaultProject := (GLHProject new
+			            repository: GLHRepository new;
+			            yourself).
 ]
 
 { #category : #'tests - repositories' }
@@ -195,7 +201,7 @@ GitlabModelImporterTest >> testCompleteImportsOfRepository [
 
 	| element project |
 	project := GLHProject new
-						name: 'testProject';
+		           name: 'testProject';
 		           repository: GLHRepository new;
 		           yourself.
 	element := importer completeImportsOfRepository: project repository.
@@ -207,37 +213,7 @@ GitlabModelImporterTest >> testCompleteImportsOfRepository [
 	self assert: element project equals: project.
 
 	self assert: element branches isNotNil.
-	self assert: element branches anyOne class equals: GLHBranch.	
-
-]
-
-{ #category : #'tests - branches' }
-GitlabModelImporterTest >> testImportBranchesOf [
-
-	| branches branch |
-	branches := importer importBranchesOf: (GLHProject new
-			            repository: GLHRepository new;
-			            yourself).
-
-	self assert: branches isEmptyOrNil not.
-
-	branch := branches first.
-	self assert: branch class equals: GLHBranch .
-
-]
-
-{ #category : #'tests - commits' }
-GitlabModelImporterTest >> testImportCommitOfProject [
-
-	| commit |
-	commit := importer importCommit: 123 ofProject: (GLHProject new
-			           repository: GLHRepository new;
-			           yourself).
-			
-	self assert: commit isNotNil.
-	self assert: commit class equals: GLHCommit.
-	self assert: commit repository class equals: GLHRepository.
-	self assert: commit repository project class equals: GLHProject .
+	self assert: element branches anyOne class equals: GLHBranch
 ]
 
 { #category : #'tests - commits' }
@@ -311,18 +287,6 @@ GitlabModelImporterTest >> testImportDiffOfMergeRequest [
 	self assert: (model allWithType: GLHDiff) size equals: 3 
 ]
 
-{ #category : #'tests - groups' }
-GitlabModelImporterTest >> testImportGroup [
-
-	| collection element |
-	collection := importer importGroup: 123.
-
-	self assert: collection class equals: GLHGroup.
-
-	element := collection projects first.
-	self assert: element class equals: GLHProject. 
-]
-
 { #category : #'tests - jobs' }
 GitlabModelImporterTest >> testImportJobsOf [
 
@@ -338,22 +302,6 @@ GitlabModelImporterTest >> testImportJobsOf [
 
 	self assert: jobsArray size equals: 2.
 	self assert: job name equals: 'teaspoon'
-]
-
-{ #category : #'tests - commits' }
-GitlabModelImporterTest >> testImportLatestCommitsOfProject [
-
-	| commits commit|
-	commits := importer importLatestCommitsOfProject: (GLHProject new
-			           repository: GLHRepository new;
-			           yourself).
-			
-	self assert: commits isEmptyOrNil not .
-	
-	commit := commits first. 
-	self assert: commit class equals: GLHCommit.
-	self assert: commit repository class equals: GLHRepository.
-	self assert: commit repository project class equals: GLHProject .
 ]
 
 { #category : #'tests - merge-requests' }

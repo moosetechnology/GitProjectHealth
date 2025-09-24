@@ -119,7 +119,7 @@ GithubModelImporter >> configureReaderForCommit: reader [
 					value
 						at: #id
 						ifPresent: [ :authorId |
-						glhCommit commitCreator: (self importUser: authorId) ] ] ].
+						glhCommit cacheAt: #authorID put: ( value at: #id)  ] ] ].
 
 		mapping
 			mapProperty: #committer
@@ -136,6 +136,16 @@ GithubModelImporter >> configureReaderForCommit: reader [
 	reader for: #ArrayOfId customDo: [ :mapping |
 		mapping decoder: [ :parents |
 			parents collect: [ :parent | parent at: #sha ] ] ]
+]
+
+{ #category : #'private - configure reader' }
+GithubModelImporter >> configureReaderForGroup: reader [
+
+	super configureReaderForGroup: reader.
+	
+	reader
+		for: GLHGroup
+		do: [ :mapping | mapping mapInstVar: #web_url to: #html_url ]
 ]
 
 { #category : #'private - configure reader' }
@@ -164,6 +174,20 @@ GithubModelImporter >> configureReaderForMergeRequest: reader [
 
 
 
+]
+
+{ #category : #'private - configure reader' }
+GithubModelImporter >> configureReaderForPipeline: reader [
+
+	super configureReaderForPipeline: reader.
+
+	"reader for: GLHPipeline do: [ :mapping |
+		mapping
+			mapInstVar: #status to: #conclusion;
+			mapProperty: #run_started_at
+			getter: [ :object | #ignore ]
+			setter: [ :object :value |
+				object runDate: (DateAndTime fromString: value) ] ]"
 ]
 
 { #category : #'private - configure reader' }
@@ -239,7 +263,9 @@ GithubModelImporter >> importBranchesOf: aGLHProject [
 		            unless: self blockForBranchEquality.
 
 	self withFiles ifTrue: [
-		branches do: [ :branch | self importFilesOfBranch: branch ] ]
+		branches do: [ :branch | self importFilesOfBranch: branch ] ].
+	
+	^branches.
 ]
 
 { #category : #'import - commits' }
@@ -406,6 +432,29 @@ GithubModelImporter >> importGroup: aGroupName [
 	^ groupResult
 ]
 
+{ #category : #'import - commits' }
+GithubModelImporter >> importLatestCommitsOfProject: aGLHProject [
+	"limited to the last 50 commits"
+
+	| results parsedResults |
+	results := self repoApi commits
+		           getLatestForRepo: aGLHProject name
+		           ofOwner: aGLHProject group name.
+	parsedResults := self parseCommitsResult: results.
+	parsedResults := self glhModel
+		                 addAll: parsedResults
+		                 unless: self blockOnIdEquality.
+
+	aGLHProject repository commits
+		addAll: parsedResults
+		unless: self blockOnIdEquality.
+
+	self withCommitDiffs ifTrue: [
+		parsedResults do: [ :commit | self importDiffOfCommit: commit ] ].
+
+	^ parsedResults
+]
+
 { #category : #'import - merge-requests' }
 GithubModelImporter >> importLatestMergeRequestsOfProject: aGLHProject [ 
 	
@@ -460,7 +509,7 @@ GithubModelImporter >> importProject: aProjectName ofGroup: aGroupName [
 
 	| result projectResult group |
 	group := self ensureGroupNamed: aGroupName.
-	result := self repoApi organization: aGroupName repo: aProjectName.
+	result := self repoApi organizations getRepository: aProjectName ofOrganization: aGroupName .
 	projectResult := self parseProjectResult: result.
 	projectResult group: group.
 	self glhModel add: projectResult.
@@ -523,6 +572,55 @@ GithubModelImporter >> importUser: userID [
 	^ glhModel
 		  add: userResult
 		  unless: [ :current :new | current id = new id ]
+]
+
+{ #category : #'import - users' }
+GithubModelImporter >> importUserByUsername: anUsername [
+
+	| dicUsername resultUser |
+	dicUsername := ((self glhModel allWithType: GLHUser) collect: [ :user |
+		                user username -> user ]) asSet asDictionary.
+
+	dicUsername addAll: self userCatalogue collectUsernames.
+
+
+	resultUser := dicUsername
+		              at: anUsername
+		              ifAbsent: [ "thus we have to import this new user"
+			              | userId searchResult |
+			              ('Import user with username: '
+			               , anUsername printString) recordInfo.
+
+			              searchResult := self repoApi users getUsername: anUsername.
+
+			              (searchResult class = Dictionary and: [
+				               (searchResult at: #status) includesSubstring:
+					               '404' ])
+				              ifTrue: [ "if the result is an 403 error we fake a new user"
+					              self glhModel
+						              add: (GLHUser new
+								               username: anUsername;
+								               name: anUsername;
+								               yourself)
+						              unless: [ :nu :ou | nu username = ou username ] ]
+				              ifFalse: [
+					              searchResult
+						              ifEmpty: [ "results can be empty thus we force a new user with the info we have "
+							              self glhModel
+								              add: (GLHUser new
+										               username: anUsername;
+										               name: anUsername;
+										               yourself)
+								              unless: [ :nu :ou | nu username = ou username ] ]
+						              ifNotEmpty: [ "because we may already have the researched user, we look by ID in the model"
+							              userId := searchResult first at: #id.
+							              (self glhModel allWithType: GLHUser)
+								              detect: [ :user | user id = userId ]
+								              ifNone: [ self importUser: userId ] ] ] ].
+
+	self userCatalogue addUser: resultUser withName: anUsername.
+
+	^ resultUser
 ]
 
 { #category : #initialization }
@@ -627,9 +725,8 @@ GithubModelImporter >> parseFileTreeResult: aResult [
 GithubModelImporter >> parseGroupResult: aResult [
 
 	| reader |
-	reader := NeoJSONReader on: aResult readStream.
-	reader for: GLHGroup do: [ :mapping |
-		mapping mapInstVar: #web_url to: #html_url ].
+	reader := generalReader on: aResult readStream.
+	
 	^ reader nextAs: GLHGroup
 ]
 
@@ -663,24 +760,12 @@ GithubModelImporter >> parseMergeRequestsResult: response [
 GithubModelImporter >> parsePipelinesResult: pipelineOverview [
 
 	| reader |
-	reader := NeoJSONReader on: pipelineOverview readStream.
+	reader := generalReader on: pipelineOverview readStream.
 
 	reader for: GHAPIPipelineOverview do: [ :mapping |
 		mapping mapInstVar: #total_count to: #total_count.
-		(mapping mapInstVar: #workflow_runs) valueSchema: #ArrayOfPipeline ].
+		(mapping mapInstVar: #workflow_runs to: #workflows) valueSchema: #ArrayOfPipeline ].
 
-	reader
-		for: #ArrayOfPipeline
-		customDo: [ :customMappting |
-		customMappting listOfElementSchema: GLHPipeline ].
-
-	reader for: GLHPipeline do: [ :mapping |
-		mapping
-			mapInstVar: #status to: #conclusion;
-			mapProperty: #run_started_at
-			getter: [ :object | #ignore ]
-			setter: [ :object :value |
-				object runDate: (DateAndTime fromString: value) ] ].
 
 	^ reader nextAs: GHAPIPipelineOverview
 ]

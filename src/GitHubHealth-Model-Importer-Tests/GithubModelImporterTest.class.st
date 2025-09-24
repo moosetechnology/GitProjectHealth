@@ -4,10 +4,8 @@ A GithubModelImporterTest is a test class for testing the behavior of GithubMode
 Class {
 	#name : #GithubModelImporterTest,
 	#superclass : #TestCase,
-	#instVars : [
-		'importer',
-		'model'
-	],
+	#traits : 'TGitModelImporterTest',
+	#classTraits : 'TGitModelImporterTest classTrait',
 	#category : #'GitHubHealth-Model-Importer-Tests'
 }
 
@@ -15,22 +13,19 @@ Class {
 GithubModelImporterTest >> setUp [
 
 	super setUp.
-
+	"first set the local importer"
 	importer := GithubModelImporter new.
+	importer repoApi: GithubApiMock new.
+
+	"than set up the model in super"
 	model := GLHModel new.
 	importer glhModel: model.
-	importer repoApi: GithubApiMock new
-]
-
-{ #category : #'tests - users' }
-GithubModelImporterTest >> testImportUser [
-
-	| element |
-	element := importer importUser: 123.
-
-	self assert: element isNotNil.
-	self assert: element class equals: GLHUser.
-
+	
+	defaultProject := (GLHProject new
+			               name: 'myProject';
+			               group: (GLHGroup new name: 'itsGroup');
+			               repository: GLHRepository new;
+			               yourself).
 ]
 
 { #category : #'tests - parsing' }
