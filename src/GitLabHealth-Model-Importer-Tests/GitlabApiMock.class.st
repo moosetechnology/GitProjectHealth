@@ -1,72 +1,72 @@
 Class {
-	#name : #GLHApiMock,
+	#name : #GitlabApiMock,
 	#superclass : #Object,
 	#category : #'GitLabHealth-Model-Importer-Tests'
 }
 
 { #category : #accessing }
-GLHApiMock >> branches [
+GitlabApiMock >> branches [
 	^ GitlabBranchesMock new .
 ]
 
 { #category : #accessing }
-GLHApiMock >> commits [
+GitlabApiMock >> commits [
 	^GitlabCommitsMock new.
 ]
 
 { #category : #accessing }
-GLHApiMock >> groups [
+GitlabApiMock >> groups [
 	^ GitlabGroupMock new.
 ]
 
 { #category : #accessing }
-GLHApiMock >> jobs [ 
+GitlabApiMock >> jobs [ 
 	^ GitlabJobsMock new
 ]
 
 { #category : #accessing }
-GLHApiMock >> mergeRequests [
+GitlabApiMock >> mergeRequests [
 
 	^ GitlabMergeRequestsMock new
 ]
 
 { #category : #accessing }
-GLHApiMock >> notes [
+GitlabApiMock >> notes [
 	^ GitlabNotesMock new.
 ]
 
 { #category : #accessing }
-GLHApiMock >> output: aString [ 
+GitlabApiMock >> output: aString [ 
 	^ self 
 ]
 
 { #category : #accessing }
-GLHApiMock >> pipelines [
+GitlabApiMock >> pipelines [
 	^ GitlabPipelinesMock new
 ]
 
 { #category : #accessing }
-GLHApiMock >> projects [
+GitlabApiMock >> projects [
 	^ GitlabProjectsMock new .
 ]
 
 { #category : #accessing }
-GLHApiMock >> releases [
+GitlabApiMock >> releases [
 	^ GitlabReleasesMock new.
 ]
 
 { #category : #accessing }
-GLHApiMock >> repositories [
+GitlabApiMock >> repositories [
 
 	^ GitlabRepositoryMock new
 ]
 
 { #category : #accessing }
-GLHApiMock >> tags [
+GitlabApiMock >> tags [
 	^GitlabTagMock new 
 ]
 
 { #category : #accessing }
-GLHApiMock >> users [
+GitlabApiMock >> users [
 	^GitlabUsersMock new
 ]

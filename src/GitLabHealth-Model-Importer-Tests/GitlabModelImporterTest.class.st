@@ -187,7 +187,7 @@ GitlabModelImporterTest >> setUp [
 	importer := GitlabModelImporter new.
 	model := GLHModel new.
 	importer glhModel: model.
-	importer repoApi: GLHApiMock new
+	importer repoApi: GitlabApiMock new
 ]
 
 { #category : #'tests - repositories' }

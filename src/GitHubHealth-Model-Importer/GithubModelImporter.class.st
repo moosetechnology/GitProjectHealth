@@ -177,6 +177,20 @@ GithubModelImporter >> configureReaderForProject: reader [
 
 ]
 
+{ #category : #'private - configure reader' }
+GithubModelImporter >> configureReaderForUser: reader [
+	super configureReaderForUser: reader.
+	
+	
+		reader for: GLHUser do: [ :mapping |
+		mapping mapInstVar: #public_email to: #email.
+		mapping mapInstVar: #username to: #login.
+		mapping mapInstVar: #bio to: #bio.
+		mapping mapInstVar: #organization to: #company.
+		mapping mapInstVar: #web_url to: #html_url.
+ ].
+]
+
 { #category : #private }
 GithubModelImporter >> convertApiFileAsFile: aAPIFile [
 
