@@ -257,21 +257,14 @@ GithubModelImporterTest >> testParseCommitsResultWithSomeNullValue [
 GithubModelImporterTest >> testParsePipelinesResult [
 
 	| project |
-	project := importer parsePipelinesResult: '{
-  "total_count": 1,
-  "workflow_runs": [
-    {
-      "id": 7482814798,
-      "conclusion": "success",
-      "run_started_at": "2024-01-11T00:00:00"
-    }]}'.
+	project := importer parsePipelinesResult: (GithubActionsMock new getLatestForRepo: nil ofOwner: nil).
 
 	self assert: project workflow_runs size equals: 1.
 
-	self assert: project workflow_runs anyOne status equals: 'success'.
+	self assert: project workflow_runs anyOne status equals: 'queued'.
 	self
-		assert: project workflow_runs anyOne runDate
-		equals: (DateAndTime year: 2024 month: 01 day: 11)
+		assert: project workflow_runs anyOne runDate asDate printString
+		equals: (Date year: 2020 month: 01 day: 22) printString
 ]
 
 { #category : #'tests - parsing' }

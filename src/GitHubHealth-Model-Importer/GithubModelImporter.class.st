@@ -181,13 +181,27 @@ GithubModelImporter >> configureReaderForPipeline: reader [
 
 	super configureReaderForPipeline: reader.
 
-	"reader for: GLHPipeline do: [ :mapping |
+	reader for: GLHPipeline do: [ :mapping |
+		"mapping mapInstVar: #status to: #conclusion."
+
 		mapping
-			mapInstVar: #status to: #conclusion;
+			mapProperty: #status
+			getter: [ :object | #ignore ]
+			setter: [ :object :value |
+			(object status isNil and: [value isNotNil]) ifTrue: [ object status: value ].
+			 ].
+
+		mapping
+			mapProperty: #conclusion
+			getter: [ :object | #ignore ]
+			setter: [ :object :value |
+			(object status isNil and: [value isNotNil]) ifTrue: [ object status: value ]. ].
+		
+		mapping
 			mapProperty: #run_started_at
 			getter: [ :object | #ignore ]
 			setter: [ :object :value |
-				object runDate: (DateAndTime fromString: value) ] ]"
+			object runDate: (DateAndTime fromString: value) ] ]
 ]
 
 { #category : #'private - configure reader' }
@@ -764,7 +778,7 @@ GithubModelImporter >> parsePipelinesResult: pipelineOverview [
 
 	reader for: GHAPIPipelineOverview do: [ :mapping |
 		mapping mapInstVar: #total_count to: #total_count.
-		(mapping mapInstVar: #workflow_runs to: #workflows) valueSchema: #ArrayOfPipeline ].
+		(mapping mapInstVar: #workflow_runs) valueSchema: #ArrayOfPipeline ].
 
 
 	^ reader nextAs: GHAPIPipelineOverview
