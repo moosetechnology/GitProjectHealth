@@ -276,6 +276,36 @@ TGitModelImporterTest >> testImportLatestCommitsOfProject [
 	self assert: commit repository project class equals: GLHProject
 ]
 
+{ #category : #'tests - merge-requests' }
+TGitModelImporterTest >> testImportLatestMergeRequestsOfProject [
+
+	| collection element |
+	collection := importer importLatestMergeRequestsOfProject:
+		              self defaultProject.
+
+	self assert: collection isCollection.
+	element := collection first.
+	self assert: element class equals: GLHMergeRequest.
+	self assert: element project class equals: GLHProject.
+
+	
+]
+
+{ #category : #'tests - merge-requests' }
+TGitModelImporterTest >> testImportMergeRequestsOfProject [
+
+	| collection element |
+	collection := importer importMergeRequestsOfProject: self defaultProject .
+
+	self assert: collection isCollection.
+	element := collection first.
+	self assert: element class equals: GLHMergeRequest.
+	self assert: element project class equals: GLHProject.
+	self assert: element diffs isCollection.
+	self assert: element diffs first class equals: GLHDiff.
+	self assert: element mergeRequestCommit class equals: GLHCommit
+]
+
 { #category : #'tests - users' }
 TGitModelImporterTest >> testImportUser [
 

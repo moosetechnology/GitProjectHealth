@@ -106,6 +106,11 @@ GithubCommitsMock >> get: anInteger inProject: anUndefinedObject [
 ]
 
 { #category : #'as yet unclassified' }
+GithubCommitsMock >> getCommit: aString ForRepo: aString2 ofOwner: aString3 [ 
+	^ self get: nil inProject: nil
+]
+
+{ #category : #'as yet unclassified' }
 GithubCommitsMock >> getForRepo: aString ofOwner: aString2 withParms: aCollection [ 
 	^ self getLatestForRepo: nil ofOwner: nil
 ]

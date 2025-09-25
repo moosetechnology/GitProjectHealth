@@ -119,7 +119,7 @@ GithubModelImporter >> configureReaderForCommit: reader [
 					value
 						at: #id
 						ifPresent: [ :authorId |
-						glhCommit cacheAt: #authorID put: ( value at: #id)  ] ] ].
+						glhCommit cacheAt: #authorID put: (value at: #id) ] ] ].
 
 		mapping
 			mapProperty: #committer
@@ -128,7 +128,11 @@ GithubModelImporter >> configureReaderForCommit: reader [
 				value ifNotNil: [ glhCommit committer_name: (value at: #login) ] ].
 
 		(mapping mapInstVar: #parent_ids to: #parents) valueSchema:
-			#ArrayOfId ].
+			#ArrayOfId.
+			
+		(mapping mapInstVar: #diffs to: #files) valueSchema: #ArrayOfDiff. 
+			
+			 ].
 
 	reader for: DateAndTime customDo: [ :mapping |
 		mapping decoder: [ :string | DateAndTime fromString: string ] ].
@@ -136,6 +140,17 @@ GithubModelImporter >> configureReaderForCommit: reader [
 	reader for: #ArrayOfId customDo: [ :mapping |
 		mapping decoder: [ :parents |
 			parents collect: [ :parent | parent at: #sha ] ] ]
+]
+
+{ #category : #'private - configure reader' }
+GithubModelImporter >> configureReaderForDiff: reader [
+
+	super configureReaderForDiff: reader.
+
+	reader for: GLHDiff do: [ :mapping |
+		mapping mapInstVar: #new_path to: #filename.
+		mapping mapInstVar: #old_path to: #filename.
+		mapping mapInstVar: #diffString to: #patch. ]
 ]
 
 { #category : #'private - configure reader' }
@@ -370,25 +385,36 @@ GithubModelImporter >> importCreatorOfCommit: aGLHCommit [
 	^ creator
 ]
 
-{ #category : #'import - commits' }
+{ #category : #'import - diffs' }
 GithubModelImporter >> importDiffOfCommit: aGLHCommit [
 
-	| result diffsResult |
+	| result diffs |
 	aGLHCommit diffs ifNotEmpty: [
 		'Diff already importer: '
 		, aGLHCommit short_id printString recordInfo.
 		^ aGLHCommit diffs ].
 	('Import diff of commit: ' , aGLHCommit short_id printString)
 		recordInfo.
-	result := self repoApi
-		          commit: aGLHCommit id
-		          ofOrganisation: aGLHCommit repository project group name
-		          ofProject: aGLHCommit repository project name.
-	diffsResult := self parseDiffresult: result.
+
+	result := self repoApi commits
+		          getCommit: aGLHCommit id
+		          ForRepo: aGLHCommit repository project name
+		          ofOwner: aGLHCommit repository project group name.
+		
+	diffs := (self parseCommitResult: result) diffs.
+	
+	diffs do: [ :diff | 
+		self parseDiffString: diff.
+		].	
+
+	diffs := aGLHCommit diffs
+		         addAll: diffs
+		         unless: self blockForDiffRangeEquality.
+	diffs := glhModel
+		         addAll: diffs
+		         unless: self blockForDiffRangeEquality.
 
 	^ aGLHCommit diffs
-		  addAll: diffsResult
-		  unless: self blockForDiffEquality
 ]
 
 { #category : #'import - files' }
@@ -455,6 +481,8 @@ GithubModelImporter >> importLatestCommitsOfProject: aGLHProject [
 		           getLatestForRepo: aGLHProject name
 		           ofOwner: aGLHProject group name.
 	parsedResults := self parseCommitsResult: results.
+	
+	
 	parsedResults := self glhModel
 		                 addAll: parsedResults
 		                 unless: self blockOnIdEquality.
@@ -464,7 +492,10 @@ GithubModelImporter >> importLatestCommitsOfProject: aGLHProject [
 		unless: self blockOnIdEquality.
 
 	self withCommitDiffs ifTrue: [
-		parsedResults do: [ :commit | self importDiffOfCommit: commit ] ].
+		parsedResults do: [ :commit | 
+			self importDiffOfCommit: commit. 
+			
+			 ] ].
 
 	^ parsedResults
 ]
@@ -492,16 +523,28 @@ GithubModelImporter >> importLatestPullRequestsOfProject: aGLHProject [
 ]
 
 { #category : #'import - merge-requests' }
-GithubModelImporter >> importMergeRequestsOfProject: aProject [ 
-	|response mergeRequests|
-	response := self repoApi 
-			mergeRequestsOfRepo: aProject group name 
-			ofProject: aProject name.
-	mergeRequests := self parseMergeRequestsResult: response. 
+GithubModelImporter >> importMergeRequestsOfProject: aGLHProject [
+
+	| response mergeRequests |
+	response := self repoApi pullRequests
+		            getLatestForRepo: aGLHProject name
+		            ofOwner: aGLHProject group name.
+	mergeRequests := self parseMergeRequestsResult: response.
+
+	mergeRequests := aGLHProject mergeRequests
+		                 addAll: mergeRequests
+		                 unless: self blockOnIdEquality.
+		
+	"gets it related commits"
+	aGLHProject mergeRequests do: [ :mr |
+		self importMergeRequestMergeCommits: mr ].
+
+
+	self withCommitDiffs ifTrue: [
+		aGLHProject mergeRequests do: [ :mr |
+			self importDiffOfMergeRequest: mr ] ].
 	
-	mergeRequests := aProject mergeRequests addAll:mergeRequests unless: self blockOnIdEquality.
 	^ mergeRequests
-	
 ]
 
 { #category : #'import - pipelines' }
@@ -649,9 +692,8 @@ GithubModelImporter >> initialize [
 	super initialize.
 	self repoApi: GithubApi new.
 	self repoApi output: 'json'.
-	self withCommitDiffs: false.
-	withFiles := false.
-
+	self withCommitDiffs: true.
+	withFiles := false
 ]
 
 { #category : #parsing }

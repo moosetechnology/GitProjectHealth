@@ -304,21 +304,6 @@ GitlabModelImporterTest >> testImportJobsOf [
 	self assert: job name equals: 'teaspoon'
 ]
 
-{ #category : #'tests - merge-requests' }
-GitlabModelImporterTest >> testImportLatestMergeRequestsOfProject [
-
-	| collection element |
-	collection := importer importLatestMergeRequestsOfProject:
-		              (GLHProject new
-			               repository: GLHRepository new;
-			               yourself).
-
-	self assert: collection isCollection.
-	element := collection first.
-	self assert: element class equals: GLHMergeRequest.
-	self assert: element project class equals: GLHProject.
-]
-
 { #category : #'tests - pipelines' }
 GitlabModelImporterTest >> testImportLatestPipelinesOfProject [
 
@@ -349,24 +334,6 @@ GitlabModelImporterTest >> testImportLatestReleaseOfProject [
 	self deny: element isCollection.
 	self assert: element class equals: GLHRelease.
 	self assert: element project isNotNil
-]
-
-{ #category : #'tests - merge-requests' }
-GitlabModelImporterTest >> testImportMergeRequestsOfProject [
-
-	| collection element |
-	collection := importer importMergeRequestsOfProject: (GLHProject new
-			               repository: GLHRepository new;
-			               yourself).
-
-	self assert: collection isCollection.
-	element := collection first.
-	self assert: element class equals: GLHMergeRequest.
-	self assert: element project class equals: GLHProject.
-	self assert: element diffs isCollection.
-	self assert: element diffs first class equals: GLHDiff.
-	self assert: element mergeRequestCommit class equals: GLHCommit .
-	 
 ]
 
 { #category : #'tests - notes' }

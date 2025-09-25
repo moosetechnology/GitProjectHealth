@@ -29,6 +29,12 @@ GithubApiMock >> output: aString [
 	^ self
 ]
 
+{ #category : #ressources }
+GithubApiMock >> pullRequests [
+	
+	^ GithubPullRequestsMock new
+]
+
 { #category : #accessing }
 GithubApiMock >> users [
 	^ GithubUsersMock new
