@@ -417,6 +417,23 @@ GithubModelImporter >> importDiffOfCommit: aGLHCommit [
 	^ aGLHCommit diffs
 ]
 
+{ #category : #'import - merge-requests' }
+GithubModelImporter >> importDiffOfMergeRequest: aGLHMergeRequest [ 
+	|diffsResult|
+	
+	diffsResult := self importDiffOfCommit: aGLHMergeRequest mergedCommit.
+	
+	diffsResult := aGLHMergeRequest diffs
+		addAll: diffsResult
+		unless: self blockForDiffEquality.
+	self glhModel
+		addAll: diffsResult
+		unless: self blockForDiffEquality.
+
+	aGLHMergeRequest diffs do: [ :diff | self importDiffRangesForDiff: diff ].
+	^ aGLHMergeRequest diffs. 
+]
+
 { #category : #'import - files' }
 GithubModelImporter >> importDirectoryFiles: aDirectoryFile OfBranch: aBranch [
 
@@ -520,6 +537,39 @@ GithubModelImporter >> importLatestMergeRequestsOfProject: aGLHProject [
 GithubModelImporter >> importLatestPullRequestsOfProject: aGLHProject [
 	"alias method since PullRequest = MergeRequest in model"
 	^ self importLatestMergeRequestsOfProject: aGLHProject 
+]
+
+{ #category : #'import - merge-requests' }
+GithubModelImporter >> importMergeRequestMergeCommits: aGLHMergeRequest [
+
+	| foundCommits |
+	foundCommits := OrderedCollection new.
+
+	('Import commit sha of MR:  ' , aGLHMergeRequest iid printString)
+		recordInfo.
+	"the founds commits are added to the model during their respective import"
+	aGLHMergeRequest mergeRequestCommit: ((self
+			  importCommit: aGLHMergeRequest sha
+			  ofProject: aGLHMergeRequest project) ifNotNil: [ :commit |
+			 foundCommits add: commit ]).
+
+	('Import commit merge_commit_sha of MR:  '
+	 , aGLHMergeRequest iid printString) recordInfo.
+	aGLHMergeRequest mergedCommit: ((self
+			  importCommit: aGLHMergeRequest merge_commit_sha
+			  ofProject: aGLHMergeRequest project) ifNotNil: [ :commit |
+			 foundCommits add: commit ]).
+
+	('Import commit squash_commit_sha of MR:  '
+	 , aGLHMergeRequest iid printString) recordInfo.
+	aGLHMergeRequest squashCommit: ((self
+			  importCommit: aGLHMergeRequest squash_commit_sha
+			  ofProject: aGLHMergeRequest project) ifNotNil: [ :commit |
+			 foundCommits add: commit ]).
+
+
+	self chainsCommitsFrom: foundCommits.
+	^ foundCommits
 ]
 
 { #category : #'import - merge-requests' }
