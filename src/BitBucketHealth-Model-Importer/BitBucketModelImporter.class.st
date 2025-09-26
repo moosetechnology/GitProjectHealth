@@ -190,6 +190,32 @@ BitBucketModelImporter >> importAndLoadLatestsCommitsOfProject: aGLHProject [
 BitBucketModelImporter >> importBranchesOf: aGLHProject [
 
 	| branches glhBranches |
+	self
+		deprecated: 'Use importBranchesOfProject: instead of current one'
+		on: '26 September 2025'
+		in:
+		'Pharo-12.0.0+SNAPSHOT.build.1571.sha.cf5fcd22e66957962c97dffc58b0393b7f368147 (64 Bit)'.
+	branches := self repoApi branches
+		            allWithParams: {  } asDictionary
+		            inRepository: aGLHProject id
+		            ofProject: aGLHProject group id.
+	glhBranches := branches collect: [ :branch |
+		               self
+			               parseBranchIntoGLHBranch: branch
+			               ofProject: aGLHProject ].
+
+	glhBranches do: [ :glhBranch |
+		aGLHProject repository addBranch: glhBranch ].
+
+	self glhModel addAll: glhBranches unless: self blockForBranchEquality.
+
+	^ glhBranches
+]
+
+{ #category : #'import - branches' }
+BitBucketModelImporter >> importBranchesOfProject: aGLHProject [
+
+	| branches glhBranches |
 	branches := self repoApi branches
 		            allWithParams: {  } asDictionary
 		            inRepository: aGLHProject id

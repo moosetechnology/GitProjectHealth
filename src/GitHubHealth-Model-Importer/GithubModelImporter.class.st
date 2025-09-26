@@ -310,6 +310,11 @@ GithubModelImporter >> importBranchesOf: aGLHProject [
 	"add the pipeline (actions runs) in the project"
 
 	| branchesResults foundBranches branches |
+	self
+		deprecated: 'Use importBranchesOfProject: instead of current one'
+		on: '26 September 2025'
+		in:
+		'Pharo-12.0.0+SNAPSHOT.build.1571.sha.cf5fcd22e66957962c97dffc58b0393b7f368147 (64 Bit)'.
 	branchesResults := self repoApi branches
 		                   getAllForRepo: aGLHProject name
 		                   ofOwner: aGLHProject group name.
@@ -332,8 +337,39 @@ GithubModelImporter >> importBranchesOf: aGLHProject [
 
 	self withFiles ifTrue: [
 		branches do: [ :branch | self importFilesOfBranch: branch ] ].
-	
-	^branches.
+
+	^ branches
+]
+
+{ #category : #'import - repositories' }
+GithubModelImporter >> importBranchesOfProject: aGLHProject [
+	"add the pipeline (actions runs) in the project"
+
+	| branchesResults foundBranches branches |
+	branchesResults := self repoApi branches
+		                   getAllForRepo: aGLHProject name
+		                   ofOwner: aGLHProject group name.
+
+	foundBranches := (branchesResults collect: [ :branchesResult |
+		                  self parseBranchesResult: branchesResult ])
+		                 flattened.
+
+
+	"WARNING: always add branch first into repository, than into model !"
+	branches := aGLHProject repository branches
+		            addAll: foundBranches
+		            unless: self blockOnNameEquality.
+
+	"branch HEAD commit is not imported by default. use branch ref (sha) to import it specifically"
+
+	branches := self glhModel
+		            addAll: branches
+		            unless: self blockForBranchEquality.
+
+	self withFiles ifTrue: [
+		branches do: [ :branch | self importFilesOfBranch: branch ] ].
+
+	^ branches
 ]
 
 { #category : #'import - commits' }

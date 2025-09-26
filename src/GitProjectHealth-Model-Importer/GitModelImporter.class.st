@@ -412,6 +412,12 @@ GitModelImporter >> importBranchesOf: aGLHProject [
 	^ self subclassResponsibility
 ]
 
+{ #category : #'import - repositories' }
+GitModelImporter >> importBranchesOfProject: aGLHProject [
+
+	^ self subclassResponsibility
+]
+
 { #category : #'import - commits' }
 GitModelImporter >> importCommit: aCommitID ofProject: aGLHProject [
 

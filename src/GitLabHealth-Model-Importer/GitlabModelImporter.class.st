@@ -607,13 +607,45 @@ GitlabModelImporter >> importBranchesOf: aGLHProject [
 
 	| resultBranches branches foundBranches |
 	"aGLHProject repository branches removeAll "
+	self
+		deprecated: 'Use importBranchesOfProject: instead of current one'
+		on: '26 September 2025'
+		in:
+		'Pharo-12.0.0+SNAPSHOT.build.1571.sha.cf5fcd22e66957962c97dffc58b0393b7f368147 (64 Bit)'.
 	resultBranches := self repoApi branches getAllFromProject:
 		                  aGLHProject id.
 
 	foundBranches := (resultBranches collect: [ :branchesJson |
-		                  self
-			                  parseBranchesResult: branchesJson
-			                   ]) flattened.
+		                  self parseBranchesResult: branchesJson ])
+		                 flattened.
+
+	'import the branches of project ' recordInfo.
+
+	"WARNING: always add branch first into repository, than into model !"
+	branches := aGLHProject repository branches
+		            addAll: foundBranches
+		            unless: self blockOnNameEquality.
+
+
+	branches := self glhModel
+		            addAll: branches
+		            unless: self blockForBranchEquality.
+
+	"WARNING : branch must load its HEAD commit (ref) in a second time "
+	^ branches
+]
+
+{ #category : #'import - branches' }
+GitlabModelImporter >> importBranchesOfProject: aGLHProject [
+
+	| resultBranches branches foundBranches |
+	"aGLHProject repository branches removeAll "
+	resultBranches := self repoApi branches getAllFromProject:
+		                  aGLHProject id.
+
+	foundBranches := (resultBranches collect: [ :branchesJson |
+		                  self parseBranchesResult: branchesJson ])
+		                 flattened.
 
 	'import the branches of project ' recordInfo.
 
