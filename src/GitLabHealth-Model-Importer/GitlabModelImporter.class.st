@@ -1076,7 +1076,7 @@ GitlabModelImporter >> importFilesOfBranch: aBranch [
 		thenCollect: [ :file | 
 		self importDirectoryFiles: file OfBranch: aBranch ].
 	
-   ^files. 
+   ^ files
 ]
 
 { #category : #'import - groups' }
