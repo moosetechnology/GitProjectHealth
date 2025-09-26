@@ -344,7 +344,7 @@ GithubModelImporter >> ensureGroupNamed: aGroupName [
 		  ifNone: [ self glhModel newGroupNamed: aGroupName ]
 ]
 
-{ #category : #'import - repositories' }
+{ #category : #'import - branches' }
 GithubModelImporter >> importBranchesOf: aGLHProject [
 	"add the pipeline (actions runs) in the project"
 
