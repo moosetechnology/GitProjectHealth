@@ -544,7 +544,7 @@ GithubModelImporter >> importDiffOfMergeRequest: aGLHMergeRequest [
 		unless: self blockForDiffEquality.
 
 	aGLHMergeRequest diffs do: [ :diff | self importDiffRangesForDiff: diff ].
-	^ aGLHMergeRequest diffs. 
+	^ aGLHMergeRequest diffs
 ]
 
 { #category : #'import - files' }
