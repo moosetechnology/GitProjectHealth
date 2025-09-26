@@ -1073,6 +1073,18 @@ GitlabModelImporter >> importGroup: aGroupID [
 { #category : #'import - jobs' }
 GitlabModelImporter >> importJobsOf: aPipeline [
 
+	
+	self
+		deprecated: 'Use importJobsOfPipeline: instead of current one'
+		on: '26 September 2025'
+		in:
+		'Pharo-12.0.0+SNAPSHOT.build.1571.sha.cf5fcd22e66957962c97dffc58b0393b7f368147 (64 Bit)'.
+	^ self importJobsOfPipeline: aPipeline.
+]
+
+{ #category : #'import - jobs' }
+GitlabModelImporter >> importJobsOfPipeline: aPipeline [
+
 	| jobs results |
 	results := self repoApi jobs
 		           getAllForPipeline: aPipeline id
@@ -1087,8 +1099,7 @@ GitlabModelImporter >> importJobsOf: aPipeline [
 	jobs := aPipeline jobs addAll: jobs unless: self blockOnIdEquality.
 
 
-	jobs do: [ :job |
-		self completeImportedJob: job ].
+	jobs do: [ :job | self completeImportedJob: job ].
 
 	^ jobs
 ]

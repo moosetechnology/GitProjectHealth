@@ -20,12 +20,17 @@ GithubModelImporterTest >> setUp [
 	"than set up the model in super"
 	model := GLHModel new.
 	importer glhModel: model.
-	
-	defaultProject := (GLHProject new
-			               name: 'myProject';
-			               group: (GLHGroup new name: 'itsGroup');
-			               repository: GLHRepository new;
-			               yourself).
+
+	defaultProject := GLHProject new
+		                  name: 'myProject';
+		                  group: (GLHGroup new name: 'itsGroup');
+		                  repository: GLHRepository new;
+		                  yourself.
+		
+	defaultMergeRequestOrPipeline := GLHMergeRequest new
+		                  name: 'myPipeline';
+								sha: '30433642';
+								project: defaultProject; yourself.
 ]
 
 { #category : #'tests - parsing' }

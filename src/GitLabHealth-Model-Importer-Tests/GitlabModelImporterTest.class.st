@@ -191,9 +191,13 @@ GitlabModelImporterTest >> setUp [
 	"than set up the model in super"
 	model := GLHModel new.
 	importer glhModel: model.
-	defaultProject := (GLHProject new
-			            repository: GLHRepository new;
-			            yourself).
+	defaultProject := GLHProject new
+		                  repository: GLHRepository new;
+		                  yourself.
+	defaultMergeRequestOrPipeline := (GLHMergeRequest new
+			               project: (GLHProject new id: 123);
+			               iid: 123;
+			               yourself). 
 ]
 
 { #category : #'tests - repositories' }
@@ -288,16 +292,18 @@ GitlabModelImporterTest >> testImportDiffOfMergeRequest [
 ]
 
 { #category : #'tests - jobs' }
-GitlabModelImporterTest >> testImportJobsOf [
+GitlabModelImporterTest >> testImportJobsOfPipeline [
 
 	| json jobsArray job |
 	json := self jobsJson.
 
-	jobsArray := importer importJobsOf: (GLHPipeline new
-			 id: 12;
-			 project: (GLHProject new id: 12; repository: GLHRepository new);
-			 yourself).
-	
+	jobsArray := importer importJobsOfPipeline: (GLHPipeline new
+			              id: 12;
+			              project: (GLHProject new
+					               id: 12;
+					               repository: GLHRepository new);
+			              yourself).
+
 	job := jobsArray first.
 
 	self assert: jobsArray size equals: 2.
@@ -349,43 +355,6 @@ GitlabModelImporterTest >> testImportNotesOfMergeRequest [
 	element := collection first. 
 	self assert: element class equals: GLHNote.
 	self assert: element mergeRequest isNotNil. 
-	
-]
-
-{ #category : #'tests - pipelines' }
-GitlabModelImporterTest >> testImportPipelineOfProject [
-
-	| element |
-	element := importer importPipeline: 123 OfProject: 
-		              (GLHProject new
-			               repository: GLHRepository new;
-			               yourself).
-
-	self assert: element class equals: GLHPipeline.
-	self assert: element project isNotNil.
-	self assert: element project class equals: GLHProject
-]
-
-{ #category : #'tests - pipelines' }
-GitlabModelImporterTest >> testImportPipelinesOfMergeRequest [
-
-	| collection element |
-	collection := importer importPipelinesOfMergeRequest:
-		              (GLHMergeRequest new
-			               project: (GLHProject new id:123);
-								iid: 123;
-			               yourself).
-
-	self assert: collection isEmptyOrNil not.
-	self assert: collection isCollection.
-
-	element := collection first.
-	self assert: element class equals: GLHPipeline.
-	self assert: element project isNotNil.
-	self assert: element project class equals: GLHProject.
-	
-	self assert: element mergeRequest isNotNil.
-	self assert: element mergeRequest class equals: GLHMergeRequest.
 	
 ]
 

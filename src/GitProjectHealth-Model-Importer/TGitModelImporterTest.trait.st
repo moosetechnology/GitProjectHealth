@@ -3,7 +3,8 @@ Trait {
 	#instVars : [
 		'importer',
 		'model',
-		'defaultProject'
+		'defaultProject',
+		'defaultMergeRequestOrPipeline'
 	],
 	#category : #'GitProjectHealth-Model-Importer'
 }
@@ -222,6 +223,12 @@ TGitModelImporterTest classSide >> traits [
 ]
 
 { #category : #accessing }
+TGitModelImporterTest >> defaultMergeRequestOrPipeline [
+
+	^ defaultMergeRequestOrPipeline
+]
+
+{ #category : #accessing }
 TGitModelImporterTest >> defaultProject [
 	^ defaultProject 
 ]
@@ -304,6 +311,36 @@ TGitModelImporterTest >> testImportMergeRequestsOfProject [
 	self assert: element diffs isCollection.
 	self assert: element diffs first class equals: GLHDiff.
 	self assert: element mergeRequestCommit class equals: GLHCommit
+]
+
+{ #category : #'tests - pipelines' }
+TGitModelImporterTest >> testImportPipelineOfProject [
+
+	| element |
+	element := importer importPipeline: 123 OfProject: self defaultProject .
+
+	self assert: element class equals: GLHPipeline.
+	self assert: element project isNotNil.
+	self assert: element project class equals: GLHProject
+]
+
+{ #category : #'tests - pipelines' }
+TGitModelImporterTest >> testImportPipelinesOfMergeRequest [
+
+	| collection element |
+	collection := importer importPipelinesOfMergeRequest:
+		              self defaultMergeRequestOrPipeline.
+
+	self assert: collection isEmptyOrNil not.
+	self assert: collection isCollection.
+
+	element := collection first.
+	self assert: element class equals: GLHPipeline.
+	self assert: element project isNotNil.
+	self assert: element project class equals: GLHProject.
+
+	self assert: element mergeRequest isNotNil.
+	self assert: element mergeRequest class equals: GLHMergeRequest
 ]
 
 { #category : #'tests - users' }

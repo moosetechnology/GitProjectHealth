@@ -486,7 +486,19 @@ GitModelImporter >> importIssuesOfProject: aGLHProject [
 
 { #category : #'import - jobs' }
 GitModelImporter >> importJobsOf: aGLHPipeline [
-	self subclassResponsibility 
+
+	self
+		deprecated: 'Use importJobsOfPipeline: instead of current one'
+		on: '26 September 2025'
+		in:
+		'Pharo-12.0.0+SNAPSHOT.build.1571.sha.cf5fcd22e66957962c97dffc58b0393b7f368147 (64 Bit)'.
+	self subclassResponsibility
+]
+
+{ #category : #'import - jobs' }
+GitModelImporter >> importJobsOfPipeline: aGLHPipeline [
+
+	self subclassResponsibility
 ]
 
 { #category : #'import - commits' }
@@ -555,7 +567,7 @@ GitModelImporter >> importNotesOfMergeRequest: mergeRequest [
 { #category : #'import - pipelines' }
 GitModelImporter >> importPipeline: aPipelineId OfProject: aGLHProject [
 
-	self subclassResponsibility 
+	^ self subclassResponsibility 
 ]
 
 { #category : #'import - merge-requests' }

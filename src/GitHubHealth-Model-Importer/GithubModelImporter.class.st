@@ -164,6 +164,12 @@ GithubModelImporter >> configureReaderForGroup: reader [
 ]
 
 { #category : #'private - configure reader' }
+GithubModelImporter >> configureReaderForJob: reader [
+	super configureReaderForJob: reader.
+	
+]
+
+{ #category : #'private - configure reader' }
 GithubModelImporter >> configureReaderForMergeRequest: reader [
 	"	reader mapInstVarsFor: GLHProject. "
 
@@ -196,27 +202,32 @@ GithubModelImporter >> configureReaderForPipeline: reader [
 
 	super configureReaderForPipeline: reader.
 
-	reader for: GLHPipeline do: [ :mapping |
-		"mapping mapInstVar: #status to: #conclusion."
+	reader
+		for: GLHPipeline
+		do: [ :mapping | "mapping mapInstVar: #status to: #conclusion."
+			
+		(mapping mapInstVar: #created_at) valueSchema: DateAndTime.
+		(mapping mapInstVar: #updated_at) valueSchema: DateAndTime.
+			
+			mapping
+				mapProperty: #status
+				getter: [ :object | #ignore ]
+				setter: [ :object :value |
+					(object status isNil and: [ value isNotNil ]) ifTrue: [
+						object status: value ] ].
 
-		mapping
-			mapProperty: #status
-			getter: [ :object | #ignore ]
-			setter: [ :object :value |
-			(object status isNil and: [value isNotNil]) ifTrue: [ object status: value ].
-			 ].
+			mapping
+				mapProperty: #conclusion
+				getter: [ :object | #ignore ]
+				setter: [ :object :value |
+					(object status isNil and: [ value isNotNil ]) ifTrue: [
+						object status: value ] ].
 
-		mapping
-			mapProperty: #conclusion
-			getter: [ :object | #ignore ]
-			setter: [ :object :value |
-			(object status isNil and: [value isNotNil]) ifTrue: [ object status: value ]. ].
-		
-		mapping
-			mapProperty: #run_started_at
-			getter: [ :object | #ignore ]
-			setter: [ :object :value |
-			object runDate: (DateAndTime fromString: value) ] ]
+			mapping
+				mapProperty: #run_started_at
+				getter: [ :object | #ignore ]
+				setter: [ :object :value |
+				object runDate: (DateAndTime fromString: value) ] ]
 ]
 
 { #category : #'private - configure reader' }
@@ -598,6 +609,46 @@ GithubModelImporter >> importMergeRequestsOfProject: aGLHProject [
 ]
 
 { #category : #'import - pipelines' }
+GithubModelImporter >> importPipeline: aPipelineId OfProject: aGLHProject [
+
+	"import specific actions' run "
+	| reponse result |
+	aGLHProject pipelines
+		detect: [ :p | p id = aPipelineId ]
+		ifFound: [ :p | ^ p ]
+		ifNone: [  ].
+
+	reponse := self repoApi actions
+		           getRun: aPipelineId
+		           forRepo: aGLHProject name
+		           ofOwner: aGLHProject group name.
+	result := self parsePipelineResult: reponse.
+
+	result := self glhModel add: result unless: self blockOnIdEquality.
+	result := aGLHProject pipelines
+		          add: result
+		          unless: self blockOnIdEquality.
+
+	^ result
+]
+
+{ #category : #'import - pipelines' }
+GithubModelImporter >> importPipelinesOfMergeRequest: aGLHMergeRequest [ 
+	|result pipelines|
+	result := self repoApi actions getAllRunsForRepo: aGLHMergeRequest project name ofOwner: aGLHMergeRequest project group name withParms: { #event->'pull_request' . #head_sha -> aGLHMergeRequest sha } asDictionary .
+	
+	
+	pipelines := (self parsePipelinesResult: result) workflow_runs .
+	
+	pipelines := glhModel addAll: pipelines unless:  self blockOnIdEquality. 
+	pipelines := aGLHMergeRequest pipelines addAll: pipelines unless: self blockOnIdEquality. 
+	
+	aGLHMergeRequest project pipelines addAll: pipelines unless: self blockOnIdEquality.
+	
+	^ pipelines 
+]
+
+{ #category : #'import - pipelines' }
 GithubModelImporter >> importPipelinesOfProject: project [
 
 	"add the pipeline (actions runs) in the project"
@@ -863,14 +914,26 @@ GithubModelImporter >> parseMergeRequestsResult: response [
 ]
 
 { #category : #parsing }
+GithubModelImporter >> parsePipelineResult: result [
+	
+	| reader |
+	reader := generalReader on: result readStream. 
+	^ reader nextAs: GLHPipeline .
+	
+]
+
+{ #category : #parsing }
 GithubModelImporter >> parsePipelinesResult: pipelineOverview [
+
+	"in github, Actions runs (pipeline) are returns in an overview objects"
 
 	| reader |
 	reader := generalReader on: pipelineOverview readStream.
 
 	reader for: GHAPIPipelineOverview do: [ :mapping |
 		mapping mapInstVar: #total_count to: #total_count.
-		(mapping mapInstVar: #workflow_runs) valueSchema: #ArrayOfPipeline ].
+		(mapping mapInstVar: #workflow_runs) valueSchema: #ArrayOfPipeline.
+		(mapping mapInstVar: #jobs) valueSchema: #ArrayOfJob ].
 
 
 	^ reader nextAs: GHAPIPipelineOverview
