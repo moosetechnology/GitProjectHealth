@@ -165,8 +165,36 @@ GithubModelImporter >> configureReaderForGroup: reader [
 
 { #category : #'private - configure reader' }
 GithubModelImporter >> configureReaderForJob: reader [
+
 	super configureReaderForJob: reader.
-	
+
+	reader for: GLHJob do: [ :mapping |
+		
+		mapping mapInstVar: #web_url to: #html_url.
+		
+		mapping
+			mapProperty: #pipeline
+			getter: [  ]
+			setter: [ :job :rawPipeline |
+				job cacheAt: #pipelineID put: (rawPipeline at: #head_sha) ].
+
+		mapping
+			mapProperty: #commit
+			getter: [  ]
+			setter: [ :job :rawCommit |
+			job cacheAt: #commitID put: (rawCommit at: #id) ].
+
+		mapping
+			mapProperty: #completed_at
+			getter: [ :object | #ignore ]
+			setter: [ :job :value |
+				value ifNotNil: [ job cacheAt: #completed_at put: (value asDateAndTime ) ] ].
+			
+			mapping
+			mapProperty: #started_at
+			getter: [ :object | #ignore ]
+			setter: [ :job :value |
+				value ifNotNil: [ job cacheAt: #started_at put: (value asDateAndTime ) ] ] ]
 ]
 
 { #category : #'private - configure reader' }
@@ -500,6 +528,31 @@ GithubModelImporter >> importGroup: aGroupName [
 	^ groupResult
 ]
 
+{ #category : #'import - jobs' }
+GithubModelImporter >> importJobsOfPipeline: aGLHPipeline [
+
+	| result jobs |
+	result := self repoApi actions
+		          getAllJobsForRun: aGLHPipeline id
+		          forRepo: aGLHPipeline project name
+		          ofOwner: aGLHPipeline project group name.
+
+	jobs := (self parsePipelinesResult: result) jobs.
+
+	jobs do: [ :job |
+		|stop start|
+		stop := job cacheAt: #completed_at ifAbsent: [ nil ].
+		start := job cacheAt: #started_at ifAbsent: [ nil ].
+		job duration: (stop - start) asDuration . 
+	].
+
+	jobs := glhModel addAll: jobs unless: self blockOnIdEquality.
+	aGLHPipeline jobs addAll: jobs unless: self blockOnIdEquality.
+
+
+	^ aGLHPipeline jobs
+]
+
 { #category : #'import - commits' }
 GithubModelImporter >> importLatestCommitsOfProject: aGLHProject [
 	"limited to the last 50 commits"
@@ -640,10 +693,12 @@ GithubModelImporter >> importPipelinesOfMergeRequest: aGLHMergeRequest [
 	
 	pipelines := (self parsePipelinesResult: result) workflow_runs .
 	
+	pipelines := aGLHMergeRequest project pipelines addAll: pipelines unless: self blockOnIdEquality.
+	
 	pipelines := glhModel addAll: pipelines unless:  self blockOnIdEquality. 
 	pipelines := aGLHMergeRequest pipelines addAll: pipelines unless: self blockOnIdEquality. 
 	
-	aGLHMergeRequest project pipelines addAll: pipelines unless: self blockOnIdEquality.
+	
 	
 	^ pipelines 
 ]
