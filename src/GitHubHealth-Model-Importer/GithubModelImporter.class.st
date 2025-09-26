@@ -700,10 +700,10 @@ GithubModelImporter >> importLatestMergeRequestsOfProject: aGLHProject [
 	results := self repoApi pullRequests getLatestForRepo: aGLHProject name ofOwner:  aGLHProject group name.
 	parsedResults := self parseMergeRequestsResult: results.
 
-	parsedResults := glhModel
+	parsedResults := aGLHProject mergeRequests
 		                 addAll: parsedResults
 		                 unless: self blockOnIdEquality.
-	parsedResults := aGLHProject mergeRequests
+	parsedResults := glhModel
 		                 addAll: parsedResults
 		                 unless: self blockOnIdEquality.
 	^ parsedResults
