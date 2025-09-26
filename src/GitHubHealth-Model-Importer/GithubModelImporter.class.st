@@ -523,7 +523,7 @@ GithubModelImporter >> importDiffOfCommit: aGLHCommit [
 	diffs := aGLHCommit diffs
 		         addAll: diffs
 		         unless: self blockForDiffRangeEquality.
-	diffs := glhModel
+	glhModel
 		         addAll: diffs
 		         unless: self blockForDiffRangeEquality.
 
