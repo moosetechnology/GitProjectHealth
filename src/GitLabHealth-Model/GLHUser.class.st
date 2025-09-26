@@ -8,13 +8,13 @@ A GitLab User
 | Relation | Origin | Opposite | Type | Comment |
 |---|
 | `assignedIssue` | `GLHUser` | `assignees` | `GLHIssue` | |
-| `createdIssue` | `GLHUser` | `author` | `GLHIssue` | |
 | `createdMilestone` | `GLHUser` | `author` | `GLHMilestone` | |
 
 ### Children
 | Relation | Origin | Opposite | Type | Comment |
 |---|
 | `commits` | `GLHUser` | `commitCreator` | `GLHCommit` | |
+| `createdIssue` | `GLHUser` | `author` | `GLHIssue` | |
 | `jobs` | `GLHUser` | `user` | `GLHJob` | |
 | `releases` | `GLHUser` | `author` | `GLHRelease` | |
 
@@ -51,8 +51,8 @@ A GitLab User
 | `job_title` | `String` | nil | |
 | `linkedin` | `String` | nil | |
 | `location` | `String` | nil | |
-| `name` | `String` | nil | |
 | `name` | `String` | nil | Basic name of the entity, not full reference.|
+| `name` | `String` | nil | |
 | `organization` | `String` | nil | |
 | `pronouns` | `String` | nil | |
 | `public_email` | `String` | nil | |
@@ -101,7 +101,7 @@ Class {
 		'#contributedProjects => FMMany type: #GLHProject opposite: #contributors',
 		'#releases => FMMany type: #GLHRelease opposite: #author',
 		'#assignedIssue => FMOne type: #GLHIssue opposite: #assignees',
-		'#createdIssue => FMOne type: #GLHIssue opposite: #author',
+		'#createdIssue => FMMany type: #GLHIssue opposite: #author',
 		'#createdMergeRequests => FMMany type: #GLHMergeRequest opposite: #author',
 		'#approcheMergeRequests => FMMany type: #GLHMergeRequest opposite: #approved_by',
 		'#usedMerges => FMMany type: #GLHMergeRequest opposite: #merge_user',
@@ -152,6 +152,12 @@ GLHUser >> addCommit: anObject [
 GLHUser >> addContributedProject: anObject [
 	<generated>
 	^ self contributedProjects add: anObject
+]
+
+{ #category : #adding }
+GLHUser >> addCreatedIssue: anObject [
+	<generated>
+	^ self createdIssue add: anObject
 ]
 
 { #category : #adding }
@@ -376,7 +382,6 @@ GLHUser >> createdIssue [
 	"Relation named: #createdIssue type: #GLHIssue opposite: #author"
 
 	<generated>
-	<container>
 	<derived>
 	^ createdIssue
 ]
@@ -385,14 +390,14 @@ GLHUser >> createdIssue [
 GLHUser >> createdIssue: anObject [
 
 	<generated>
-	createdIssue := anObject
+	createdIssue value: anObject
 ]
 
 { #category : #navigation }
 GLHUser >> createdIssueGroup [
 	<generated>
 	<navigation: 'CreatedIssue'>
-	^ MooseSpecializedGroup with: self createdIssue
+	^ MooseSpecializedGroup withAll: self createdIssue asSet
 ]
 
 { #category : #accessing }
