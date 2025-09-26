@@ -238,7 +238,6 @@ GithubModelImporter >> configureReaderForJob: reader [
 
 { #category : #'private - configure reader' }
 GithubModelImporter >> configureReaderForMergeRequest: reader [
-	"	reader mapInstVarsFor: GLHProject. "
 
 	super configureReaderForMergeRequest: reader.
 	
