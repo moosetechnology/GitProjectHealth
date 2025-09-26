@@ -631,14 +631,14 @@ GithubModelImporter >> importIssuesOfProject: aGLHProject [
 		].
 
 	
-	issues := aGLHProject issue
+	issues := aGLHProject issues
 		          addAll: issues
 		          unless: self blockOnIdEquality.
 	
 	glhModel addAll: issues unless: self blockOnIdEquality.
 
 
-	^ aGLHProject issue
+	^ aGLHProject issues
 ]
 
 { #category : #'import - jobs' }
