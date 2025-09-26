@@ -28,9 +28,14 @@ GithubModelImporterTest >> setUp [
 		                  yourself.
 		
 	defaultMergeRequestOrPipeline := GLHMergeRequest new
-		                  name: 'myPipeline';
-								sha: '30433642';
-								project: defaultProject; yourself.
+			                                   name: 'myPipeline';
+			                                   sha: '30433642';
+			                                   project: (GLHProject new
+		                  name: 'myProject';
+		                  group: (GLHGroup new name: 'itsGroup');
+		                  repository: GLHRepository new;
+		                  yourself);
+			                                   yourself
 ]
 
 { #category : #'tests - parsing' }

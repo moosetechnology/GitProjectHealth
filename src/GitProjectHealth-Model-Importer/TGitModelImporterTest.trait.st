@@ -225,7 +225,7 @@ TGitModelImporterTest classSide >> traits [
 { #category : #accessing }
 TGitModelImporterTest >> defaultMergeRequestOrPipeline [
 
-	^ defaultMergeRequestOrPipeline
+	^ defaultMergeRequestOrPipeline 
 ]
 
 { #category : #accessing }
@@ -302,7 +302,10 @@ TGitModelImporterTest >> testImportLatestMergeRequestsOfProject [
 TGitModelImporterTest >> testImportMergeRequestsOfProject [
 
 	| collection element |
-	collection := importer importMergeRequestsOfProject: self defaultProject .
+	
+
+	collection := importer importMergeRequestsOfProject:
+		              self defaultProject.
 
 	self assert: collection isCollection.
 	element := collection first.

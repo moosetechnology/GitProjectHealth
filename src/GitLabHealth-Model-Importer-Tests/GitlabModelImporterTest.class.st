@@ -194,10 +194,11 @@ GitlabModelImporterTest >> setUp [
 	defaultProject := GLHProject new
 		                  repository: GLHRepository new;
 		                  yourself.
-	defaultMergeRequestOrPipeline := (GLHMergeRequest new
-			               project: (GLHProject new id: 123);
-			               iid: 123;
-			               yourself). 
+	
+	defaultMergeRequestOrPipeline := GLHMergeRequest new
+		                                 project: (GLHProject new id: 123);
+		                                 iid: 123;
+		                                 yourself
 ]
 
 { #category : #'tests - repositories' }
