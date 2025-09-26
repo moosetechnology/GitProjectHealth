@@ -261,7 +261,7 @@ GitModelImporter >> configureReaderForGroup: reader [
 { #category : #'private - configure reader' }
 GitModelImporter >> configureReaderForIssue: reader [
 
-	reader mapInstVarsFor: GLHIssue.
+	reader mapInstVarsFor: GLHIssue .
 
 	reader
 		for: #ArrayOfIssue
@@ -408,6 +408,12 @@ GitModelImporter >> importAuthorOfCommit: aGLHCommit [
 
 { #category : #'import - repositories' }
 GitModelImporter >> importBranchesOf: aGLHProject [
+
+	self
+		deprecated: 'Use importBranchesOfProject: instead of current one'
+		on: '26 September 2025'
+		in:
+		'Pharo-12.0.0+SNAPSHOT.build.1571.sha.cf5fcd22e66957962c97dffc58b0393b7f368147 (64 Bit)'.
 
 	^ self subclassResponsibility
 ]
@@ -653,8 +659,8 @@ GitModelImporter >> initReader [
 		mapping decoder: [ :string |
 			string ifNil: [ nil ] ifNotNil: [ DateAndTime fromString: string ] ] ].
 
-	configurators := self class selectors select: [ :m |
-		                 m beginsWith: #configureReaderFor ].
+	configurators := (self class allSelectors select: [ :m |
+		                 m beginsWith: #configureReaderFor ]) asSet.
 
 	configurators do: [ :configureReader |
 		self perform: configureReader with: generalReader ]
@@ -727,6 +733,11 @@ GitModelImporter >> parseDiffString: aDiff [
 					existing index = new index ] ] ] ].
 
 	^ aDiff diffRanges
+]
+
+{ #category : #parsing }
+GitModelImporter >> parseIssuesResult: aString [ 
+	self subclassResponsibility 
 ]
 
 { #category : #accessing }

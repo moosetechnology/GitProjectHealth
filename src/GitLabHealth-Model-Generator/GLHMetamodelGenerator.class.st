@@ -367,10 +367,9 @@ GLHMetamodelGenerator >> issueProperties [
 { #category : #issues }
 GLHMetamodelGenerator >> issueRelations [
 
-	(issue property: #project) *-<> (project property: #issue).
+	issue *-<> project.
 	(issue property: #assignees) <>-* (user property: #assignedIssue).
-	(issue property: #author) <>- (user property: #createdIssue).
-	
+	(issue property: #author) *-<> (user property: #createdIssue)
 ]
 
 { #category : #jobs }

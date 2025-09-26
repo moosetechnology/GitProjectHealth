@@ -164,6 +164,45 @@ GithubModelImporter >> configureReaderForGroup: reader [
 ]
 
 { #category : #'private - configure reader' }
+GithubModelImporter >> configureReaderForIssue: reader [
+
+	super configureReaderForIssue: reader.
+
+	reader
+		for: GLHIssue
+		do: [ :mapping | "mapping mapInstVar: #status to: #conclusion."
+			(mapping mapInstVar: #created_at) valueSchema: DateAndTime.
+			(mapping mapInstVar: #updated_at) valueSchema: DateAndTime.
+			mapping mapInstVar: #name to: #title.
+			mapping mapInstVar: #description to: #body.
+
+
+			mapping
+				mapProperty: #assignees
+				getter: [ :object | #ignore ]
+				setter: [ :issue :values |
+					values do: [ :item |
+						issue
+							cacheAt: #assigneesID
+							ifPresent: [ :v | v add: (item at: #id) ]
+							ifAbsentPut: [
+								Set new
+									add: (item at: #id);
+									yourself ] ] ].
+
+
+			mapping
+				mapProperty: #user
+				getter: [ :object | #ignore ]
+				setter: [ :issue :value |
+					value ifNotNil: [
+						value
+							at: #id
+							ifPresent: [ :authorId |
+							issue cacheAt: #authorID put: (value at: #id) ] ] ] ]
+]
+
+{ #category : #'private - configure reader' }
 GithubModelImporter >> configureReaderForJob: reader [
 
 	super configureReaderForJob: reader.
@@ -562,6 +601,44 @@ GithubModelImporter >> importGroup: aGroupName [
 	self glhModel add: groupResult.
 	self importRepositoriesOfGroup: groupResult.
 	^ groupResult
+]
+
+{ #category : #'import - issues' }
+GithubModelImporter >> importIssuesOfProject: aGLHProject [
+
+	| results issues foundIssues |
+	results := self repoApi issues
+		           getAllForRepo: aGLHProject name
+		           ofOwner: aGLHProject group name
+		           withParms: Dictionary new.
+	foundIssues := (results collect: [ :result |
+		                self parseIssuesResult: result ]) flattened.
+
+
+	issues := OrderedCollection new.
+	issues := foundIssues collect: [ :issue | 
+		
+		issue author:
+			(self importUser: (issue cacheAt: #authorID ifAbsent: [ '' ])).
+
+		issue assignees
+			addAll:
+				((issue cacheAt: #assigneesID ifAbsent: [ {  } ]) collect: [
+					 :assigneeID | self importUser: assigneeID ])
+			unless: self blockOnIdEquality. 
+			issue. 
+			
+		].
+
+	
+	issues := aGLHProject issue
+		          addAll: issues
+		          unless: self blockOnIdEquality.
+	
+	glhModel addAll: issues unless: self blockOnIdEquality.
+
+
+	^ aGLHProject issue
 ]
 
 { #category : #'import - jobs' }
@@ -976,6 +1053,12 @@ GithubModelImporter >> parseGroupResult: aResult [
 	reader := generalReader on: aResult readStream.
 	
 	^ reader nextAs: GLHGroup
+]
+
+{ #category : #parsing }
+GithubModelImporter >> parseIssuesResult: result [ 
+	
+	^ (generalReader on: result readStream) nextAs: #ArrayOfIssue 
 ]
 
 { #category : #parsing }
