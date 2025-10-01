@@ -1,8 +1,8 @@
 Class {
 	#name : #GPJCModel,
 	#superclass : #MooseModel,
-	#traits : 'JPTEntityCreator',
-	#classTraits : 'JPTEntityCreator classTrait',
+	#traits : 'GLHTEntityCreator + JPTEntityCreator',
+	#classTraits : 'GLHTEntityCreator classTrait + JPTEntityCreator classTrait',
 	#category : #'GitProject-JiraConnector-Model-Model'
 }
 
