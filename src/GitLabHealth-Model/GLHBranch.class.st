@@ -25,14 +25,16 @@ A git branch
 
 | Name | Type | Default value | Comment |
 |---|
-| `name` | `String` | nil | |
+| `name` | `String` | nil | Basic name of the entity, not full reference.|
+| `sha` | `String` | nil | |
 
 "
 Class {
 	#name : #GLHBranch,
 	#superclass : #GLHEntity,
+	#traits : 'GLHTRef',
+	#classTraits : 'GLHTRef classTrait',
 	#instVars : [
-		'#name => FMProperty',
 		'#repository => FMOne type: #GLHRepository opposite: #branches',
 		'#files => FMMany type: #GLHFile opposite: #branch',
 		'#commits => FMMany type: #GLHCommit opposite: #branch'
@@ -98,20 +100,6 @@ GLHBranch >> filesGroup [
 	<generated>
 	<navigation: 'Files'>
 	^ MooseSpecializedGroup withAll: self files asSet
-]
-
-{ #category : #accessing }
-GLHBranch >> name [
-
-	<FMProperty: #name type: #String>
-	<generated>
-	^ name
-]
-
-{ #category : #accessing }
-GLHBranch >> name: anObject [
-	<generated>
-	name := anObject
 ]
 
 { #category : #accessing }

@@ -73,7 +73,7 @@ UserMetric >> loadMergeRequestsSince: since until: until [
 		                 | mr |
 		                 project cacheAt: cacheSymbol ifAbsentPut: [
 			                 mr := glhImporter
-				                       importMergeRequests: project
+				                       importMergeRequestsOfProject: project
 				                       since: since
 				                       until: until.
 			                 mr ] ].

@@ -67,7 +67,7 @@ GitlabModelImporterRemoteTest >> testImportCommits [
 	| projectTestCodeChurn |
 	projectTestCodeChurn := (self model allWithType: GLHProject) detect: [
 		                        :project | project id = 57841283 ].
-	self glhImporter importLastestCommitsOfProject: projectTestCodeChurn.
+	self glhImporter importLatestCommitsOfProject: projectTestCodeChurn.
 
 	self
 		assert: projectTestCodeChurn repository commits last author_name

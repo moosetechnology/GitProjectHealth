@@ -46,6 +46,7 @@ a commit attached to a repository
 | `message` | `String` | nil | |
 | `name` | `String` | nil | Basic name of the entity, not full reference.|
 | `parent_ids` | `Object` | 'OrderedCollection new' | |
+| `sha` | `String` | nil | |
 | `short_id` | `String` | nil | |
 | `title` | `String` | nil | |
 | `web_url` | `String` | nil | |
@@ -54,8 +55,8 @@ a commit attached to a repository
 Class {
 	#name : #GLHCommit,
 	#superclass : #GLHEntity,
-	#traits : 'FamixTNamedEntity',
-	#classTraits : 'FamixTNamedEntity classTrait',
+	#traits : 'FamixTNamedEntity + GLHTRef',
+	#classTraits : 'FamixTNamedEntity classTrait + GLHTRef classTrait',
 	#instVars : [
 		'#parent_ids => FMProperty defaultValue: \'OrderedCollection new\'',
 		'#id => FMProperty',

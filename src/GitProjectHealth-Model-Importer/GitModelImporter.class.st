@@ -13,7 +13,8 @@ Class {
 		'glhModel',
 		'userCatalogue',
 		'repoApi',
-		'withCommitDiffs'
+		'withCommitDiffs',
+		'generalReader'
 	],
 	#classVars : [
 		'currentImporter'
@@ -21,9 +22,90 @@ Class {
 	#category : #'GitProjectHealth-Model-Importer'
 }
 
+{ #category : #bitbucket }
+GitModelImporter class >> forBitbucketHostOn: anHostURL withToken: anApiToken [
+	
+	^ self forBitbucketHostOn: anHostURL withToken: anApiToken andModel: GLHModel new. 
+]
+
+{ #category : #bitbucket }
+GitModelImporter class >> forBitbucketHostOn: anHostURL withToken: anApiToken andModel: aGitModel [
+	
+	| bitbucketApi bitBucketImporter |
+	bitbucketApi := BitbucketApi new
+                host: anHostURL;
+                bearerToken: anApiToken.
+
+	bitBucketImporter := BitBucketModelImporter new
+                     repoApi: bitbucketApi;
+                     glhModel: aGitModel;
+                     withFiles: false;
+                     withCommitsSince: 3 day;
+                     withCommitDiffs: false.
+	^bitBucketImporter 
+]
+
+{ #category : #github }
+GitModelImporter class >> forGithubWithToken: anApiToken [
+	^ self forGithubWithToken: anApiToken andModel: GLHModel new
+]
+
+{ #category : #github }
+GitModelImporter class >> forGithubWithToken: anApiToken andModel: aGitModel [
+
+	| githubImport |
+	githubImport := GithubModelImporter new
+		                glhModel: aGitModel;
+		                privateToken: anApiToken;
+		                withCommitsSince: 3 day;
+		                yourself.
+	^ githubImport
+]
+
+{ #category : #gitlab }
+GitModelImporter class >> forGitlabHostOn: anHostURL withToken: anApiToken [ 
+	^ self forGitlabHostOn: anHostURL withToken: anApiToken andModel: GLHModel new. 
+]
+
+{ #category : #gitlab }
+GitModelImporter class >> forGitlabHostOn: anHostURL withToken: anApiToken andModel: aGitModel [
+	"use it when accessing onpremise or custom gitlab platform"
+	| glphApi gitlabImporter |
+	
+	glphApi := GitlabApi new
+    privateToken: anApiToken;
+    hostUrl: anHostURL;
+	 output: 'json';
+    yourself.
+
+	gitlabImporter := GitlabModelImporter new
+    repoApi: glphApi;
+    glhModel: aGitModel;
+	 withFiles: false;
+	 withCommitsSince: 3 day;
+	 withCommitDiffs: false.
+		
+	^ gitlabImporter 
+]
+
+{ #category : #gitlab }
+GitModelImporter class >> forGitlabWithToken: anApiToken [
+	^ self forGitlabHostOn: 'https://gitlab.com/api/v4' withToken: anApiToken andModel: GLHModel new. 
+]
+
+{ #category : #gitlab }
+GitModelImporter class >> forGitlabWithToken: anApiToken andModel: aGitModel [
+	^ self forGitlabHostOn: 'https://gitlab.com/api/v4' withToken: anApiToken andModel: aGitModel
+]
+
 { #category : #'accessing - global variables' }
 GitModelImporter class >> importers [
 	^ currentImporter 
+]
+
+{ #category : #'class initialization' }
+GitModelImporter class >> initialize [ 
+	currentImporter := Dictionary new. 
 ]
 
 { #category : #initialization }
@@ -31,25 +113,25 @@ GitModelImporter class >> reset [
 	currentImporter := OrderedDictionary new.
 ]
 
-{ #category : #accessing }
+{ #category : #initialization }
 GitModelImporter >> beWithFiles [
 
 	withFiles := true
 ]
 
-{ #category : #accessing }
+{ #category : #initialization }
 GitModelImporter >> beWithoutFiles [
 
 	withFiles := false
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #equality }
 GitModelImporter >> blockEqualityOn: aSymbol [
 	^ [ :existing :new |
 	  (existing perform: aSymbol) = (new perform: aSymbol) ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #equality }
 GitModelImporter >> blockEqualityOn: aSymbol andOn: aSecondSymbol [
 	^ (self blockEqualityOn: aSymbol) and: [ self blockEqualityOn: aSecondSymbol ]
 ]
@@ -68,7 +150,7 @@ GitModelImporter >> blockForDiffEquality [
 				existing diffString = new diffString ] ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #equality }
 GitModelImporter >> blockForDiffRangeEquality [
 
 	^ [ :existing :new |
@@ -90,7 +172,7 @@ GitModelImporter >> blockOnNameEquality [
 	^ self blockEqualityOn: #name
 ]
 
-{ #category : #commit }
+{ #category : #utils }
 GitModelImporter >> chainsCommitsFrom: commitsCollection [
 
 	| dic |
@@ -112,7 +194,7 @@ GitModelImporter >> chainsCommitsFrom: commitsCollection [
 	^ commitsCollection
 ]
 
-{ #category : #commit }
+{ #category : #'import - commits' }
 GitModelImporter >> completeImportedCommit: aGLHCommit [ 
 	
 	
@@ -128,7 +210,162 @@ GitModelImporter >> completeImportedCommit: aGLHCommit [
 	^ aGLHCommit
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'import - projects' }
+GitModelImporter >> completeImportedProject: aGLHProject [
+]
+
+{ #category : #'private - configure reader' }
+GitModelImporter >> configureReaderForBranch: reader [
+
+	reader mapInstVarsFor: GLHBranch.
+
+	reader
+		for: #ArrayOfBranch
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHBranch ]
+]
+
+{ #category : #'private - configure reader' }
+GitModelImporter >> configureReaderForCommit: reader [
+	
+	reader mapInstVarsFor: GLHCommit .
+	
+	reader
+		for: #ArrayOfCommit
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHCommit ]
+]
+
+{ #category : #'private - configure reader' }
+GitModelImporter >> configureReaderForDiff: reader [
+
+	reader mapInstVarsFor: GLHDiff.
+
+	reader
+		for: #ArrayOfDiff
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHDiff ]
+]
+
+{ #category : #'private - configure reader' }
+GitModelImporter >> configureReaderForGroup: reader [
+
+	reader mapInstVarsFor: GLHGroup.
+
+	reader
+		for: #ArrayOfGroup
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHGroup ]
+]
+
+{ #category : #'private - configure reader' }
+GitModelImporter >> configureReaderForIssue: reader [
+
+	reader mapInstVarsFor: GLHIssue .
+
+	reader
+		for: #ArrayOfIssue
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHIssue ]
+]
+
+{ #category : #'private - configure reader' }
+GitModelImporter >> configureReaderForJob: reader [
+
+	reader mapInstVarsFor: GLHJob .
+
+	reader for: #ArrayOfJob customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHJob ]
+]
+
+{ #category : #'private - configure reader' }
+GitModelImporter >> configureReaderForMergeRequest: reader [
+
+	reader mapInstVarsFor: GLHMergeRequest.
+
+	reader for: #ArrayOfMergeRequest customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHMergeRequest ]
+]
+
+{ #category : #'private - configure reader' }
+GitModelImporter >> configureReaderForMilestone: reader [
+
+	reader mapInstVarsFor: GLHMilestone.
+
+	reader
+		for: #ArrayOfMilestone
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHMilestone ]
+]
+
+{ #category : #'private - configure reader' }
+GitModelImporter >> configureReaderForNote: reader [
+
+	reader mapInstVarsFor: GLHNote .
+
+	reader
+		for: #ArrayOfNote
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHNote ]
+]
+
+{ #category : #'private - configure reader' }
+GitModelImporter >> configureReaderForPipeline: reader [
+
+	reader mapInstVarsFor: GLHPipeline.
+
+	reader
+		for: #ArrayOfPipeline
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHPipeline ]
+]
+
+{ #category : #'private - configure reader' }
+GitModelImporter >> configureReaderForProject: reader [
+
+	reader mapInstVarsFor: GLHProject.
+
+	reader
+		for: #ArrayOfProject
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHProject ]
+]
+
+{ #category : #'private - configure reader' }
+GitModelImporter >> configureReaderForRelease: reader [
+
+	reader mapInstVarsFor: GLHRelease.
+
+	reader
+		for: #ArrayOfRelease
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHRelease ]
+]
+
+{ #category : #'private - configure reader' }
+GitModelImporter >> configureReaderForTag: reader [
+
+	reader mapInstVarsFor: GLHTag.
+
+	reader
+		for: #ArrayOfTag
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHTag ]
+]
+
+{ #category : #'private - configure reader' }
+GitModelImporter >> configureReaderForUser: reader [
+
+	reader mapInstVarsFor: GLHUser.
+
+	reader
+		for: #ArrayOfUser
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHUser ].
+	
+]
+
+{ #category : #utils }
 GitModelImporter >> filterCommitChanges: aCollection [
 
 	^ aCollection reject: [ :line |
@@ -151,13 +388,85 @@ GitModelImporter >> glhModel: anObject [
 	glhModel := anObject
 ]
 
+{ #category : #'import - commits' }
+GitModelImporter >> importAndLoadLatestsCommitsOfProject: aGLHProject [
+
+	self subclassResponsibility 
+]
+
+{ #category : #'import - users' }
+GitModelImporter >> importAuthorOfCommit: aGLHCommit [
+
+	self
+		deprecated: 'Use importCreatorOfCommit: instead of current one'
+		on: '19 September 2025'
+		in:
+		'Pharo-12.0.0+SNAPSHOT.build.1571.sha.cf5fcd22e66957962c97dffc58b0393b7f368147 (64 Bit)'.
+
+	self subclassResponsibility
+]
+
 { #category : #'import - repositories' }
 GitModelImporter >> importBranchesOf: aGLHProject [
+
+	self
+		deprecated: 'Use importBranchesOfProject: instead of current one'
+		on: '26 September 2025'
+		in:
+		'Pharo-12.0.0+SNAPSHOT.build.1571.sha.cf5fcd22e66957962c97dffc58b0393b7f368147 (64 Bit)'.
 
 	^ self subclassResponsibility
 ]
 
-{ #category : #import }
+{ #category : #'import - repositories' }
+GitModelImporter >> importBranchesOfProject: aGLHProject [
+
+	^ self subclassResponsibility
+]
+
+{ #category : #'import - commits' }
+GitModelImporter >> importCommit: aCommitID ofProject: aGLHProject [
+
+	self subclassResponsibility 
+]
+
+{ #category : #'import - commits' }
+GitModelImporter >> importCommitsOfBranch: aGLHBranch [
+	self subclassResponsibility 
+	
+	
+]
+
+{ #category : #'import - commits' }
+GitModelImporter >> importCommitsOfProject: aGLHProject since: since until: until [
+
+	self subclassResponsibility 
+]
+
+{ #category : #'import - projects' }
+GitModelImporter >> importContributedProjectsOfUser: aGLHUser [
+]
+
+{ #category : #'import - users' }
+GitModelImporter >> importCreatorOfCommit: aGLHCommit [
+
+	
+	aGLHCommit commitCreator ifNil: [
+		aGLHCommit commitCreator:
+			(self importUserByUsername: aGLHCommit author_name) ].
+	self userCatalogue
+		addUser: aGLHCommit commitCreator
+		withProject: aGLHCommit repository project id.
+	^ aGLHCommit commitCreator
+]
+
+{ #category : #'import - diffs' }
+GitModelImporter >> importDiffOfCommit: aCommit [
+
+	self subclassResponsibility 
+]
+
+{ #category : #'import - diffs' }
 GitModelImporter >> importDiffRangesForDiff: aGLHDiff [
 
 	| diffRanges |
@@ -182,17 +491,100 @@ GitModelImporter >> importGroup: aGroupID [
 	self subclassResponsibility
 ]
 
-{ #category : #pipelines }
-GitModelImporter >> importLatestPipelinesOfProject: aGLHProject [ 
-	(self pipelinesOf: aGLHProject id withLimit:30) do: [ :pipeline |
-		self glhModel add: pipeline unless: self blockOnIdEquality .
-		aGLHProject pipelines add: pipeline unless: self blockOnIdEquality]
+{ #category : #'import - issues' }
+GitModelImporter >> importIssuesOfProject: aGLHProject [
+	self subclassResponsibility 
+]
+
+{ #category : #'import - jobs' }
+GitModelImporter >> importJobsOf: aGLHPipeline [
+
+	self
+		deprecated: 'Use importJobsOfPipeline: instead of current one'
+		on: '26 September 2025'
+		in:
+		'Pharo-12.0.0+SNAPSHOT.build.1571.sha.cf5fcd22e66957962c97dffc58b0393b7f368147 (64 Bit)'.
+	self subclassResponsibility
+]
+
+{ #category : #'import - jobs' }
+GitModelImporter >> importJobsOfPipeline: aGLHPipeline [
+
+	self subclassResponsibility
+]
+
+{ #category : #'import - commits' }
+GitModelImporter >> importLatestCommitsOfProject: aGLHProject [
+	"limited to the last 50 commits"
+
+	self subclassResponsibility 
+]
+
+{ #category : #'import - merge-requests' }
+GitModelImporter >> importLatestMergeRequestsOfProject: aGLHProject [
+	self subclassResponsibility 
+]
+
+{ #category : #'import - pipelines' }
+GitModelImporter >> importLatestPipelinesOfProject: aGLHProject [
+	self subclassResponsibility 
+	
+]
+
+{ #category : #'import - releases' }
+GitModelImporter >> importLatestReleaseOfProject: aGLHProject [
+	^ self subclassResponsibility 
+]
+
+{ #category : #'import - merge-requests' }
+GitModelImporter >> importMergeRequestCommits: mergeRequest [
+]
+
+{ #category : #'import - merge-requests' }
+GitModelImporter >> importMergeRequestMergeCommits: aGLHMergeRequest [
+
+	self subclassResponsibility 
+]
+
+{ #category : #'import - merge-requests' }
+GitModelImporter >> importMergeRequestsOfProject: aGLHProject [
+
+	self subclassResponsibility 
+]
+
+{ #category : #'import - merge-requests' }
+GitModelImporter >> importMergeRequestsOfProject: aGLHProject since: fromDate until: toDate [
+	self subclassResponsibility 
+]
+
+{ #category : #'import - merge-requests' }
+GitModelImporter >> importMergeResquestAuthor: mergeRequest [
+]
+
+{ #category : #'import - merge-requests' }
+GitModelImporter >> importMergeResquestMerger: mergeRequest [
+]
+
+{ #category : #'import - milestones' }
+GitModelImporter >> importMilestonesOfProject: aGLHProject [
+	self subclassResponsibility 
 ]
 
 { #category : #'import - notes' }
-GitModelImporter >> importNotesfromMergeRequest: mergeRequest [
+GitModelImporter >> importNotesOfMergeRequest: mergeRequest [
 
 	self subclassResponsibility
+]
+
+{ #category : #'import - pipelines' }
+GitModelImporter >> importPipeline: aPipelineId OfProject: aGLHProject [
+
+	^ self subclassResponsibility 
+]
+
+{ #category : #'import - merge-requests' }
+GitModelImporter >> importPipelinesOfProject: aGLHProject [
+	^ self subclassResponsibility 
 ]
 
 { #category : #'import - projects' }
@@ -205,28 +597,94 @@ GitModelImporter >> importProject: id [
 ]
 
 { #category : #'import - projects' }
+GitModelImporter >> importProject: aProjectID ofGroup: aGroup [
+]
+
+{ #category : #'import - projects' }
 GitModelImporter >> importProjects: aCollectionOfProjectID [
 
 
 	^ aCollectionOfProjectID collect: [ :id | self importProject: id ]
 ]
 
+{ #category : #'import - projects' }
+GitModelImporter >> importProjectsOfUser: aGLHUser [
+	"https://docs.github.com/fr/rest/repos/repos?apiVersion=2022-11-28#list-repositories-for-a-user"
+	
+	self subclassResponsibility 
+]
+
+{ #category : #'import - commits' }
+GitModelImporter >> importRefCommitOfBranch: aGLHBranch [
+	|commit|
+	commit := self
+				 importCommit: aGLHBranch sha
+				 ofProject: aGLHBranch repository project.
+	commit := aGLHBranch commits
+		add: commit
+		unless: self blockOnIdEquality.
+	^ commit
+]
+
+{ #category : #'import - releases' }
+GitModelImporter >> importRelease: aReleaseID ofProject: aGLHProject [
+	self subclassResponsibility 
+]
+
+{ #category : #'import - tags' }
+GitModelImporter >> importTagsForProject: aGLHProject [
+	self subclassResponsibility 
+]
+
+{ #category : #'import - users' }
+GitModelImporter >> importUser: aUserID [
+	self subclassResponsibility 
+]
+
+{ #category : #'import - users' }
+GitModelImporter >> importUserByUsername: username [
+
+	self subclassResponsibility 
+]
+
+{ #category : #'private - configure reader' }
+GitModelImporter >> initReader [
+
+	| configurators |
+	generalReader := NeoJSONReader new.
+
+	"will be reuse for all reader next"
+	"indique ce que doit faire le reader lorsqu'il parse une DateAndTime object"
+	generalReader for: DateAndTime customDo: [ :mapping |
+		mapping decoder: [ :string |
+			string ifNil: [ nil ] ifNotNil: [ DateAndTime fromString: string ] ] ].
+
+	configurators := (self class allSelectors select: [ :m |
+		                 m beginsWith: #configureReaderFor ]) asSet.
+
+	configurators do: [ :configureReader |
+		self perform: configureReader with: generalReader ]
+]
+
 { #category : #initialization }
 GitModelImporter >> initialize [
 
 	super initialize.
+	self withFiles: false. 
 	self withCommitsSince: (Date today - 1 week) asDateAndTime.
-		userCatalogue := GLHUserCatalogueV2 new
+	userCatalogue := GLHUserCatalogueV2 new
 		                 anImporter: self;
 		                 yourself.
+
+	self initReader
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #initialization }
 GitModelImporter >> makeGlobal [
 	^ self makeGlobal: DateAndTime now printString.
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #initialization }
 GitModelImporter >> makeGlobal: aLabel [ 
 
 	currentImporter := GithubModelImporter importers ifNil: [ OrderedDictionary new ].
@@ -275,6 +733,11 @@ GitModelImporter >> parseDiffString: aDiff [
 					existing index = new index ] ] ] ].
 
 	^ aDiff diffRanges
+]
+
+{ #category : #parsing }
+GitModelImporter >> parseIssuesResult: aString [ 
+	self subclassResponsibility 
 ]
 
 { #category : #accessing }

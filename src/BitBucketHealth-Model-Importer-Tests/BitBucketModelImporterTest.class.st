@@ -672,7 +672,7 @@ BitBucketModelImporterTest >> testImportMergeRequestsSinceUntil [
 
 	"When"
 	mergeRequests := bitBucketImporter
-		                 importMergeRequests: project
+		                 importMergeRequestsOfProject: project
 		                 since: '09-23-2024'
 		                 until: '09-25-2024'.
 
@@ -712,7 +712,7 @@ BitBucketModelImporterTest >> testImportMergeRequestsSinceUntilAttachedToGoodPro
 
 	"When"
 	mergeRequests := bitBucketImporter
-		                 importMergeRequests: project
+		                 importMergeRequestsOfProject: project
 		                 since: '09-23-2024'
 		                 until: '09-25-2024'.
 
@@ -749,7 +749,7 @@ BitBucketModelImporterTest >> testImportMergeRequestsSinceUntilClosedMR [
 
 	"When"
 	mergeRequests := bitBucketImporter
-		                 importMergeRequests: project
+		                 importMergeRequestsOfProject: project
 		                 since: '09-23-2024'
 		                 until: '09-25-2024'.
 
@@ -790,7 +790,7 @@ BitBucketModelImporterTest >> testImportMergeRequestsSinceUntilDeclinedMR [
 
 	"When"
 	mergeRequests := bitBucketImporter
-		                 importMergeRequests: project
+		                 importMergeRequestsOfProject: project
 		                 since: '09-23-2024'
 		                 until: '09-25-2024'.
 
