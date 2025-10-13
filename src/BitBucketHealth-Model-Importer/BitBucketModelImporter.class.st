@@ -31,7 +31,7 @@ BitBucketModelImporter >> bitBucketApi: anObject [
 	repoApi := anObject
 ]
 
-{ #category : #commit }
+{ #category : #'import - commits' }
 BitBucketModelImporter >> completeImportedCommit: aCommit [ 
 	
 	('completing commit: ' , aCommit short_id printString) recordInfo.
@@ -118,7 +118,7 @@ BitBucketModelImporter >> convertBitBucketDiffToGitDiff: response [
 	^ result
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'import - notes' }
 BitBucketModelImporter >> extractNoteFromComment: aDictionary [
 
 	^ GLHNote new
@@ -186,8 +186,34 @@ BitBucketModelImporter >> importAndLoadLatestsCommitsOfProject: aGLHProject [
 	^ commits
 ]
 
-{ #category : #'import - repositories' }
+{ #category : #'import - branches' }
 BitBucketModelImporter >> importBranchesOf: aGLHProject [
+
+	| branches glhBranches |
+	self
+		deprecated: 'Use importBranchesOfProject: instead of current one'
+		on: '26 September 2025'
+		in:
+		'Pharo-12.0.0+SNAPSHOT.build.1571.sha.cf5fcd22e66957962c97dffc58b0393b7f368147 (64 Bit)'.
+	branches := self repoApi branches
+		            allWithParams: {  } asDictionary
+		            inRepository: aGLHProject id
+		            ofProject: aGLHProject group id.
+	glhBranches := branches collect: [ :branch |
+		               self
+			               parseBranchIntoGLHBranch: branch
+			               ofProject: aGLHProject ].
+
+	glhBranches do: [ :glhBranch |
+		aGLHProject repository addBranch: glhBranch ].
+
+	self glhModel addAll: glhBranches unless: self blockForBranchEquality.
+
+	^ glhBranches
+]
+
+{ #category : #'import - branches' }
+BitBucketModelImporter >> importBranchesOfProject: aGLHProject [
 
 	| branches glhBranches |
 	branches := self repoApi branches
@@ -377,7 +403,7 @@ BitBucketModelImporter >> importMergeRequestCommits: mergeRequest [
 	^ commits
 ]
 
-{ #category : #'import - merge request' }
+{ #category : #'import - merge-requests' }
 BitBucketModelImporter >> importMergeRequestMergeCommits: aGLHMergeRequest [
 
 	aGLHMergeRequest mergedCommit ifNotNil: [
@@ -406,7 +432,7 @@ BitBucketModelImporter >> importMergeRequestMergeCommits: aGLHMergeRequest [
 			^ { found } ]
 ]
 
-{ #category : #'import - merge request' }
+{ #category : #'import - merge-requests' }
 BitBucketModelImporter >> importMergeRequestStats: aMergeRequest [
 
 	| commitDiffs contribution |
@@ -432,7 +458,7 @@ BitBucketModelImporter >> importMergeRequestStats: aMergeRequest [
 ]
 
 { #category : #'import - merge-requests' }
-BitBucketModelImporter >> importMergeRequests: aGLHProject since: fromDate until: toDate [
+BitBucketModelImporter >> importMergeRequestsOfProject: aGLHProject since: fromDate until: toDate [
 
 	| pullRequests params |
 	params := { 
@@ -484,7 +510,7 @@ BitBucketModelImporter >> importMergeResquestMerger: mergeRequest [
 ]
 
 { #category : #'import - notes' }
-BitBucketModelImporter >> importNotesfromMergeRequest: mergeRequest [
+BitBucketModelImporter >> importNotesOfMergeRequest: mergeRequest [
 
 	| results notes |
 	results := self repoApi pullRequests

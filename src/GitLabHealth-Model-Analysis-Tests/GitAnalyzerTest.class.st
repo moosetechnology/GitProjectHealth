@@ -114,7 +114,7 @@ GitAnalyzerTest >> testAnalyseCommitFrequencySinceUntil [
 GitAnalyzerTest >> testAnalyseMergeResquestValidation [
 
 	| mergeResquest res |
-	glhImporter importMergeRequests: projects anyOne.
+	glhImporter importMergeRequestsOfProject: projects anyOne.
 	mergeResquest := (glhImporter glhModel allWithType: GLHMergeRequest)
 		                 detect: [ :mr | mr iid = 1 ].
 

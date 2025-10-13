@@ -12,7 +12,7 @@ A GitLab Project
 ### Children
 | Relation | Origin | Opposite | Type | Comment |
 |---|
-| `issue` | `GLHProject` | `project` | `GLHIssue` | |
+| `issues` | `GLHProject` | `project` | `GLHIssue` | |
 | `mergeRequests` | `GLHProject` | `project` | `GLHMergeRequest` | |
 | `milestone` | `GLHProject` | `project` | `GLHMilestone` | |
 | `pipelines` | `GLHProject` | `project` | `GLHPipeline` | |
@@ -63,7 +63,7 @@ Class {
 		'#contributors => FMMany type: #GLHUser opposite: #contributedProjects',
 		'#repository => FMOne type: #GLHRepository opposite: #project',
 		'#releases => FMMany type: #GLHRelease opposite: #project',
-		'#issue => FMMany type: #GLHIssue opposite: #project',
+		'#issues => FMMany type: #GLHIssue opposite: #project',
 		'#mergeRequests => FMMany type: #GLHMergeRequest opposite: #project',
 		'#milestone => FMMany type: #GLHMilestone opposite: #project'
 	],
@@ -88,7 +88,7 @@ GLHProject >> addContributor: anObject [
 { #category : #adding }
 GLHProject >> addIssue: anObject [
 	<generated>
-	^ self issue add: anObject
+	^ self issues add: anObject
 ]
 
 { #category : #adding }
@@ -240,26 +240,26 @@ GLHProject >> id: anObject [
 ]
 
 { #category : #accessing }
-GLHProject >> issue [
-	"Relation named: #issue type: #GLHIssue opposite: #project"
+GLHProject >> issues [
+	"Relation named: #issues type: #GLHIssue opposite: #project"
 
 	<generated>
 	<derived>
-	^ issue
+	^ issues
 ]
 
 { #category : #accessing }
-GLHProject >> issue: anObject [
+GLHProject >> issues: anObject [
 
 	<generated>
-	issue value: anObject
+	issues value: anObject
 ]
 
 { #category : #navigation }
-GLHProject >> issueGroup [
+GLHProject >> issuesGroup [
 	<generated>
-	<navigation: 'Issue'>
-	^ MooseSpecializedGroup withAll: self issue asSet
+	<navigation: 'Issues'>
+	^ MooseSpecializedGroup withAll: self issues asSet
 ]
 
 { #category : #accessing }

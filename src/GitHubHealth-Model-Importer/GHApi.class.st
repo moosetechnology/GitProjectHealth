@@ -19,9 +19,17 @@ GHApi class >> isDeprecated [
 { #category : #api }
 GHApi >> actionsRunOfRepo: aRepoName ofOrganization: anOrganizationName [
 
-	^ self client get:
+"	^ self client get:
 		  self baseAPIUrl , '/repos/' , anOrganizationName , '/' , aRepoName
-		  , '/actions/runs'
+		  , '/actions/runs'"
+		
+	self
+		deprecated: 'Use self actions getLatestForRepo:ofOwner: instead of current one'
+		on: '21 august 2025'
+		in:
+		'Pharo-12.0.0+SNAPSHOT.build.1571.sha.cf5fcd22e66957962c97dffc58b0393b7f368147 (64 Bit)'.
+		
+	^ self actions getLatestForRepo: aRepoName  ofOwner: anOrganizationName. 
 ]
 
 { #category : #accessing }

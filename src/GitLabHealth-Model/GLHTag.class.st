@@ -23,16 +23,18 @@ a Tag is a reference to a specific point in the repository's history
 |---|
 | `created_at` | `Object` | nil | |
 | `message` | `String` | nil | |
-| `name` | `String` | nil | |
+| `name` | `String` | nil | Basic name of the entity, not full reference.|
 | `protected` | `Boolean` | nil | |
+| `sha` | `String` | nil | |
 | `target` | `String` | nil | |
 
 "
 Class {
 	#name : #GLHTag,
 	#superclass : #GLHEntity,
+	#traits : 'GLHTRef',
+	#classTraits : 'GLHTRef classTrait',
 	#instVars : [
-		'#name => FMProperty',
 		'#message => FMProperty',
 		'#target => FMProperty',
 		'#protected => FMProperty',
@@ -94,20 +96,6 @@ GLHTag >> message [
 GLHTag >> message: anObject [
 	<generated>
 	message := anObject
-]
-
-{ #category : #accessing }
-GLHTag >> name [
-
-	<FMProperty: #name type: #String>
-	<generated>
-	^ name
-]
-
-{ #category : #accessing }
-GLHTag >> name: anObject [
-	<generated>
-	name := anObject
 ]
 
 { #category : #accessing }

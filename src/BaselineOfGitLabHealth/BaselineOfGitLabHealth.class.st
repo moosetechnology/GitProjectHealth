@@ -99,8 +99,8 @@ BaselineOfGitLabHealth >> defineGroups: spec [
 			   'GitLabHealth-Model-Importer' 'GitLabHealth-Model-Importer-Tests'
 			   'GitHubHealth-Model-Importer-Tests'
 			   'GitLabHealth-Model-Analysis' 'GitLabHealth-Model-Analysis-Tests'
-			   'GitLabHealth-Visualization'
-			   'GitLabProjectHealth-Model-Importer'
+			   'GitLabHealth-Visualization' 'GitLabProjectHealth-Model-Importer'
+			   'GitProjectHealth-Model-Importer-Tests'
 			   'BitBucketHealth-Model-Importer'
 			   'BitBucketHealth-Model-Importer-Tests' ).
 	spec group: 'default' with: #( 'Core' )

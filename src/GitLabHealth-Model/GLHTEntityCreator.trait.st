@@ -33,6 +33,13 @@ GLHTEntityCreator >> newBranch [
 ]
 
 { #category : #'entity creation' }
+GLHTEntityCreator >> newBranchNamed: aName [
+
+	<generated>
+	^ self add: (GLHBranch named: aName)
+]
+
+{ #category : #'entity creation' }
 GLHTEntityCreator >> newChange [
 
 	<generated>
@@ -240,6 +247,13 @@ GLHTEntityCreator >> newTag [
 
 	<generated>
 	^ self add: GLHTag new
+]
+
+{ #category : #'entity creation' }
+GLHTEntityCreator >> newTagNamed: aName [
+
+	<generated>
+	^ self add: (GLHTag named: aName)
 ]
 
 { #category : #'entity creation' }
