@@ -41,5 +41,5 @@ CreatedACRPipelineByProject >> load [
 	projectMergeRequests := self
 	                      loadMergeRequestsSince:  (period at: #since)
 	                      until:  (period at: #until) .
-	projectMergeRequests do: [ :mr | glhImporter importNotesfromMergeRequest: mr ].
+	projectMergeRequests do: [ :mr | glhImporter importNotesOfMergeRequest: mr ].
 ]

@@ -3,8 +3,7 @@ Class {
 	#superclass : #GitModelImporter,
 	#instVars : [
 		'withInitialCommits',
-		'withInitialMergeRequest',
-		'generalReader'
+		'withInitialMergeRequest'
 	],
 	#category : #'GitLabHealth-Model-Importer'
 }
@@ -46,28 +45,6 @@ GitlabModelImporter >> allPipelinesOf: aProjectID [
 
 	^ (result collect: [ :pipelinesJson |
 			   self parsePipelinesResult: pipelinesJson ]) flattened
-]
-
-{ #category : #private }
-GitlabModelImporter >> chainsCommitsFrom: commitsCollection [
-
-	| dic |
-	
-	('Chains ', commitsCollection size printString , ' commits') recordInfo.
-	
-	dic := ((self glhModel allWithType: GLHCommit) collect: [ :commit |
-		        commit id -> commit ]) asSet asDictionary.
-
-	commitsCollection do: [ :commit |
-		commit parent_ids do: [ :parentId | 
-			dic
-				at: parentId
-				ifPresent: [ :parentCommit |
-					parentCommit childCommits
-						add: commit
-						unless: self blockOnIdEquality ]
-				ifAbsent: [  ] ] ].
-	^ commitsCollection
 ]
 
 { #category : #'import - commits' }
@@ -114,12 +91,12 @@ GitlabModelImporter >> completeImportProject: aGLHProject [
 
 	importedProject repository: GLHRepository new.
 	self glhModel add: importedProject repository.
-	self importRepository: importedProject repository.
+	self completeImportsOfRepository: importedProject repository.
 
 
 	withInitialMergeRequest ifTrue: [
 		self
-			importMergeRequests: importedProject
+			importMergeRequestsOfProject: importedProject
 			since: DateAndTime today
 			until: DateAndTime now ].
 
@@ -141,6 +118,27 @@ GitlabModelImporter >> completeImportedCommit: aCommit [
 			self glhModel addAll: diffs unless: self blockForDiffEquality ] ].
 
 	^ aCommit
+]
+
+{ #category : #'import - jobs' }
+GitlabModelImporter >> completeImportedJob: aGLHJob [
+	
+	aGLHJob commit ifNil: [ 
+		|commit|
+		commit := self
+		          importCommit:
+		          (aGLHJob cacheAt: #commitID ifAbsent: [ '' ])
+		          ofProject: aGLHJob pipeline project.
+		aGLHJob commit: commit. ].
+	
+	aGLHJob user ifNil: [ 
+		|user|
+		user := self importUser: (aGLHJob cacheAt: #userID ifAbsent: [ '' ]).
+	aGLHJob user: user.
+		 ]. 
+	
+	
+	^ aGLHJob
 ]
 
 { #category : #'import - pipelines' }
@@ -191,12 +189,12 @@ GitlabModelImporter >> completeImportedProject: aGLHProject [
 	
 	importedProject repository: GLHRepository new.
 	self glhModel add: importedProject repository.
-	self importRepository: importedProject repository.
+	self completeImportsOfRepository: importedProject repository.
 	
 
 	withInitialMergeRequest ifTrue: [
 		self
-			importMergeRequests: importedProject
+			importMergeRequestsOfProject: importedProject
 			since: DateAndTime today
 			until: DateAndTime now ].
 
@@ -205,13 +203,46 @@ GitlabModelImporter >> completeImportedProject: aGLHProject [
 
 ]
 
+{ #category : #'import - repositories' }
+GitlabModelImporter >> completeImportsOfRepository: aGLHRepository [
+
+	| branches |
+	[
+	('import the repository of project ' , aGLHRepository project name)
+		recordInfo.
+	branches := self importBranchesOf: aGLHRepository project.
+	self withFiles ifTrue: [
+		branches do: [ :branch | self importFilesOfBranch: branch ] ] ]
+		on: NeoJSONParseError
+		do: [
+		self inform: aGLHRepository project name , ' has no repository' ].
+
+	withInitialCommits ifTrue: [
+		aGLHRepository branches do: [ :branch |
+			self importCommitsOfBranch: branch ] ].
+	
+	^ aGLHRepository 
+]
+
+{ #category : #'private - configure reader' }
+GitlabModelImporter >> configureReaderForBranch: reader [
+
+	super configureReaderForBranch: reader.
+	
+		reader for: GLHBranch do: [ :mapping |
+		mapping
+			mapProperty: #commit
+			getter: [  ]
+			setter: [ :branch :rawCommit | branch sha: (rawCommit at: #id) ] ].
+]
+
 { #category : #'private - configure reader' }
 GitlabModelImporter >> configureReaderForCommit: reader [
 
-  	reader for: GLHCommit do: [ :mapping |
-		mapping mapInstVars:
-			#( id short_id title author_name author_email committer_name
-			   committer_email message web_url ).
+	super configureReaderForCommit: reader.
+
+	reader for: GLHCommit do: [ :mapping |
+
 		(mapping mapInstVar: #authored_date) valueSchema: DateAndTime.
 		(mapping mapInstVar: #committed_date) valueSchema: DateAndTime.
 		(mapping mapInstVar: #created_at) valueSchema: DateAndTime.
@@ -223,185 +254,195 @@ GitlabModelImporter >> configureReaderForCommit: reader [
 				commit deletions: (value at: #deletions).
 				commit additions: (value at: #additions) ] ].
 
-	reader for: DateAndTime customDo: [ :mapping |
-		mapping decoder: [ :string | DateAndTime fromString: string ] ].
-
 	reader
 		for: #ArrayOfIds
-		customDo: [ :mapping | mapping decoder: [ :string | string ] ].
-  
-	reader
-		for: #ArrayOfCommit
-		customDo: [ :customMappting |
-		customMappting listOfElementSchema: GLHCommit ].
-
+		customDo: [ :mapping | mapping decoder: [ :string | string ] ]
 ]
 
 { #category : #'private - configure reader' }
-GitlabModelImporter >> configureReaderForDiffs: reader [
+GitlabModelImporter >> configureReaderForDiff: reader [
 
-	reader for: GLHDiff do: [ :mapping |
-		mapping mapInstVars:
-			#( deleted_file new_file new_path old_path renamed_file ).
-		mapping mapInstVar: #diffString to: #diff ].
-
+	super configureReaderForDiff: reader.
 	reader
-		for: #ArrayOfDiffs
-		customDo: [ :customMappting |
-		customMappting listOfElementSchema: GLHDiff ].
+		for: GLHDiff
+		do: [ :mapping | 
+			"mapping mapInstVars:
+			#( deleted_file new_file new_path old_path renamed_file )."
+			mapping mapInstVar: #diffString to: #diff ].
+
 	^ reader
 ]
 
 { #category : #'private - configure reader' }
 GitlabModelImporter >> configureReaderForGroup: reader [
 
+	super configureReaderForGroup: reader.
+
 	reader for: GLHGroup do: [ :mapping |
-		mapping mapInstVars.
-		(mapping mapInstVar: #projects) valueSchema: #ArrayOfProjects ].
-	reader mapInstVarsFor: GLHProject.
+		(mapping mapInstVar: #projects) valueSchema: #ArrayOfProject ]
+]
+
+{ #category : #'private - configure reader' }
+GitlabModelImporter >> configureReaderForJob: reader [
+
+	super configureReaderForJob: reader.
+
 	reader
-		for: #ArrayOfProjects
-		customDo: [ :customMappting |
-		customMappting listOfElementSchema: GLHProject ].
-	reader
-		for: #ArrayOfGroups
-		customDo: [ :customMappting |
-		customMappting listOfElementSchema: GLHGroup ]
+		for: GLHJob
+		do: [ :mapping | "(mapping mapInstVar: #user) valueSchema: GLHUser.
+		(mapping mapInstVar: #pipeline) valueSchema: GLHPipeline."
+			mapping
+				mapProperty: #user
+				getter: [  ]
+				setter: [ :job :rawUser |
+				job cacheAt: #userID put: (rawUser at: #id) ].
+
+			mapping
+				mapProperty: #pipeline
+				getter: [  ]
+				setter: [ :job :rawPipeline |
+					job cacheAt: #pipelineID put: (rawPipeline at: #id) ].
+				
+			mapping
+				mapProperty: #commit
+				getter: [  ]
+				setter: [ :job :rawCommit |
+					job cacheAt: #commitID put: (rawCommit at: #id) ].
+
+			"mapping
+			mapProperty: #user
+			getter: [ :object | #ignore ]
+			setter: [ :object :value |
+			object user: (self importUser: (value at: #id)) ]."
+
+			mapping
+				mapProperty: #duration
+				getter: [ :object | #ignore ]
+				setter: [ :object :value |
+				value ifNotNil: [ object duration: value seconds ] ] ]
 ]
 
 { #category : #'private - configure reader' }
 GitlabModelImporter >> configureReaderForMergeRequest: reader [
 	"declare quil y a un array a mapper"
-
-	reader for: #ArrayOfMergeRequest customDo: [ :customMappting |
-		customMappting listOfElementSchema: GLHMergeRequest ].
+	self flag: 'assignee.s must be parsed with nil condition'.
+	super configureReaderForMergeRequest: reader.
 
 	"declare la liste des properties"
-	reader for: GLHMergeRequest do: [ :mapping |
-		mapping mapInstVars:
-			#( blocking_discussions_resolved changes_count description
-			   detailed_merge_status discussion_locked downvotes draft first_deployed_to_production_at
-			   force_remove_source_branch has_conflicts id iid labels latest_build_finished_at
-			   latest_build_started_at merge_commit_sha merge_status
-			   merge_when_pipeline_succeeds merged_at milestone project_id
-			   reference references_full references_relative
-			   references_short sha should_remove_source_branch
-			   source_branch source_project_id squash squash_commit_sha
-			   squash_on_merge state subscribed target_branch target_project_id
-			   task_completion_status_completed_count
-			   task_completion_status_count time_stats_human_time_estimate
-			   time_stats_human_total_time_spent
-			   time_stats_time_estimate time_stats_total_time_spent
-			   title updated_at upvotes user_notes_count web_url work_in_progress ).
-		(mapping mapInstVar: #created_at) valueSchema: DateAndTime.
-		(mapping mapInstVar: #updated_at) valueSchema: DateAndTime.
-		(mapping mapInstVar: #merged_at) valueSchema: DateAndTime.
-		(mapping mapInstVar: #closed_at) valueSchema: DateAndTime.
-		"(mapping mapInstVar: #assignee) valueSchema: GLHUser."
-		mapping
-			mapProperty: #author
-			getter: [  ]
-			setter: [ :object :value |
-			object cacheAt: #authorID put: (value at: #id) ].
-		mapping
-			mapProperty: #merge_user
-			getter: [  ]
-			setter: [ :object :value | 
-				value ifNotNil: [
-					object cacheAt: #mergeUserID put: (value at: #id) ] ] ].
+	reader
+		for: GLHMergeRequest
+		do: [ :mapping | 
+			 
+			"(mapping mapInstVar: #assignee) valueSchema: GLHUser."
+			"(mapping mapInstVar: #assignees) valueSchema: #ArrayOfUser."
+			(mapping mapInstVar: #created_at) valueSchema: DateAndTime.
+			(mapping mapInstVar: #updated_at) valueSchema: DateAndTime.
+			(mapping mapInstVar: #merged_at) valueSchema: DateAndTime.
+			(mapping mapInstVar: #closed_at) valueSchema: DateAndTime.
 
-	"(mapping mapInstVar: #closed_by) valueSchema: GLHUser.
-	(mapping mapInstVar: #mergeCommit) valueSchema: GLHCommit."
-	"indique ce que doit faire le reader lorsqu'il parse une DateAndTime object"
-	reader for: DateAndTime customDo: [ :mapping |
-		mapping decoder: [ :string |
-			string ifNil: [ nil ] ifNotNil: [ DateAndTime fromString: string ] ] ]
+			mapping
+				mapProperty: #author
+				getter: [  ]
+				setter: [ :object :value |
+				object cacheAt: #authorID put: (value at: #id) ].
+			mapping
+				mapProperty: #merge_user
+				getter: [  ]
+				setter: [ :object :value |
+					value ifNotNil: [
+						object cacheAt: #mergeUserID put: (value at: #id) ] ] ]
+]
+
+{ #category : #'private - parsing' }
+GitlabModelImporter >> configureReaderForNote: reader [
+
+	super configureReaderForNote: reader.
+
+	reader for: GLHNote do: [ :mapping |
+		
+		(mapping mapInstVar: #created_at) valueSchema: DateAndTime.
+		(mapping mapInstVar: #updated_at) valueSchema: DateAndTime ]
 ]
 
 { #category : #'private - configure reader' }
 GitlabModelImporter >> configureReaderForPipeline: reader [
 
-	reader mapInstVarsFor: GLHPipeline.
-	
-	reader for: GLHPipeline do: [ :mapping |
+	super configureReaderForPipeline: reader.
 
+	reader for: GLHPipeline do: [ :mapping |
 		mapping
 			mapProperty: #created_at
 			getter: [ :object | #ignore ]
 			setter: [ :object :value |
-			object created_at: (value ifNotNil: [DateAndTime fromString: value]).
-			object runDate: (value ifNotNil: [DateAndTime fromString: value]) ].
-		
+				object created_at:
+					(value ifNotNil: [ DateAndTime fromString: value ]).
+				object runDate:
+					(value ifNotNil: [ DateAndTime fromString: value ]) ].
+
 		mapping
 			mapProperty: #updated_at
 			getter: [ :object | #ignore ]
 			setter: [ :object :value |
-			object updated_at: (value ifNotNil: [DateAndTime fromString: value]).
-			].
-		
+				object updated_at:
+					(value ifNotNil: [ DateAndTime fromString: value ]) ].
+
 		mapping
 			mapProperty: #finished_at
 			getter: [ :object | #ignore ]
 			setter: [ :object :value |
-				object finished_at: (value ifNotNil: [DateAndTime fromString: value]).
-			].
-		
+				object finished_at:
+					(value ifNotNil: [ DateAndTime fromString: value ]) ].
+
 		mapping
-			mapProperty: #started_at  
+			mapProperty: #started_at
 			getter: [ :object | #ignore ]
 			setter: [ :object :value |
-			object started_at: (value ifNotNil: [DateAndTime fromString: value]).
-			].
-		
+				object started_at:
+					(value ifNotNil: [ DateAndTime fromString: value ]) ].
+
 		mapping
 			mapProperty: #source
 			getter: [ :object | #ignore ]
-			setter: [ :object :value |
-			object sourceEvent: value.
-			].
-		
+			setter: [ :object :value | object sourceEvent: value ].
+
 		mapping
 			mapProperty: #duration
 			getter: [ :object | #ignore ]
 			setter: [ :object :value |
-			object duration: (value ifNotNil: [value asDuration]) .
-			].
-		
+				object duration: (value ifNotNil: [ value asDuration ]) ].
+
 		mapping
 			mapProperty: #user
 			getter: [ :object | #ignore ]
 			setter: [ :object :value |
-			value ifNotNil: [object cacheAt: #userID put: (value at: #id)].
-			].
-		
-		 ].
-	
-	reader
-		for: #ArrayOfPipelines
-		customDo: [ :customMappting |
-		customMappting listOfElementSchema: GLHPipeline ].
+				value ifNotNil: [ object cacheAt: #userID put: (value at: #id) ] ] ].
+
 ]
 
 { #category : #'private - configure reader' }
-GitlabModelImporter >> configureReaderForReleases: reader [
+GitlabModelImporter >> configureReaderForProject: reader [
 
-	reader mapInstVarsFor: GLHRelease .
+	super configureReaderForProject: reader.
 	
-	
-	reader for: GLHRelease do: [ :mapping |
-			
-		(mapping mapInstVar: #author) valueSchema: GLHUser .
-		 ].
-	
-	
-	reader
-		for: #ArrayOfReleases
-		customDo: [ :customMappting |
-		customMappting listOfElementSchema: GLHRelease ].
+	reader for: GLHProject do: [ :mapping |
+		mapping mapInstVar: #web_url to: #html_url.
+		].
 ]
 
 { #category : #'private - configure reader' }
-GitlabModelImporter >> configureReaderForTags: reader [
+GitlabModelImporter >> configureReaderForRelease: reader [
+
+	super configureReaderForRelease: reader.
+
+
+	reader
+		for: GLHRelease
+		do: [ :mapping | (mapping mapInstVar: #author) valueSchema: GLHUser ].
+
+]
+
+{ #category : #'private - configure reader' }
+GitlabModelImporter >> configureReaderForTag: reader [
 
 	reader mapInstVarsFor: GLHTag .
 	
@@ -426,15 +467,10 @@ GitlabModelImporter >> configureReaderForTags: reader [
 ]
 
 { #category : #'private - configure reader' }
-GitlabModelImporter >> configureReaderForUsers: reader [
+GitlabModelImporter >> configureReaderForUser: reader [
 
-	reader mapInstVarsFor: GLHUser.
-
-	reader
-		for: #ArrayOfUser
-		customDo: [ :customMappting |
-		customMappting listOfElementSchema: GLHUser ].
-
+	super configureReaderForUser: reader
+	
 ]
 
 { #category : #private }
@@ -529,14 +565,13 @@ GitlabModelImporter >> importAllGroups [
 
 { #category : #'import - pipelines' }
 GitlabModelImporter >> importAllPipelinesOfProject: aGLHProject [
-
-	(self allPipelinesOf: aGLHProject id) do: [ :pipeline |
-		|pip|
-		pip := self glhModel add: pipeline unless: self blockOnIdEquality .
-		pip := aGLHProject pipelines add: pip unless: self blockOnIdEquality.
-		self completeImportedPipeline: pip. 
-		].
 	
+	(self allPipelinesOf: aGLHProject id) do: [ :pipeline |
+		| pip |
+		pip := self glhModel add: pipeline unless: self blockOnIdEquality.
+		pip := aGLHProject pipelines add: pip unless: self blockOnIdEquality.
+		self completeImportedPipeline: pip ].
+
 	^ aGLHProject pipelines
 ]
 
@@ -545,32 +580,44 @@ GitlabModelImporter >> importAndLoadLatestsCommitsOfProject: aGLHProject [
 
 	| commits completedProject |
 	completedProject := self completeImportedProject: aGLHProject.
-	commits := self importLastestCommitsOfProject: completedProject.
+	commits := self importLatestCommitsOfProject: completedProject.
 	commits do: [ :commit | self completeImportedCommit: commit ].
 	self chainsCommitsFrom: commits.
 	^ commits
 ]
 
-{ #category : #'import - user' }
-GitlabModelImporter >> importAuthorOfCommit: aGLHCommit [ 
-		|user|
-	user:= (self importUserByUsername: aGLHCommit author_name) .
-	aGLHCommit commitCreator: user. 
+{ #category : #'import - users' }
+GitlabModelImporter >> importAuthorOfCommit: aGLHCommit [
+
+	| user |
+		self
+		deprecated: 'Use importCreatorOfCommit: instead of current one'
+		on: '19 September 2025'
+		in:
+		'Pharo-12.0.0+SNAPSHOT.build.1571.sha.cf5fcd22e66957962c97dffc58b0393b7f368147 (64 Bit)'.
+
+	
+	user := self importUserByUsername: aGLHCommit author_name.
+	aGLHCommit commitCreator: user.
 	^ user
 ]
 
-{ #category : #'import - repositories' }
+{ #category : #'import - branches' }
 GitlabModelImporter >> importBranchesOf: aGLHProject [
 
 	| resultBranches branches foundBranches |
 	"aGLHProject repository branches removeAll "
+	self
+		deprecated: 'Use importBranchesOfProject: instead of current one'
+		on: '26 September 2025'
+		in:
+		'Pharo-12.0.0+SNAPSHOT.build.1571.sha.cf5fcd22e66957962c97dffc58b0393b7f368147 (64 Bit)'.
 	resultBranches := self repoApi branches getAllFromProject:
 		                  aGLHProject id.
 
 	foundBranches := (resultBranches collect: [ :branchesJson |
-		                  self
-			                  parseBranchesResult: branchesJson
-			                  ofProject: aGLHProject ]) flattened.
+		                  self parseBranchesResult: branchesJson ])
+		                 flattened.
 
 	'import the branches of project ' recordInfo.
 
@@ -579,19 +626,40 @@ GitlabModelImporter >> importBranchesOf: aGLHProject [
 		            addAll: foundBranches
 		            unless: self blockOnNameEquality.
 
-	foundBranches do: [ :fb |
-		branches do: [ :b |
-			fb name = b name ifTrue: [
-				b commits addAll: fb commits unless: self blockOnIdEquality ] ] ].
 
 	branches := self glhModel
 		            addAll: branches
 		            unless: self blockForBranchEquality.
 
-	branches do: [ :b |
-		b commits do: [ :c |
-			b repository commits add: c unless: self blockOnIdEquality ] ].
+	"WARNING : branch must load its HEAD commit (ref) in a second time "
+	^ branches
+]
 
+{ #category : #'import - branches' }
+GitlabModelImporter >> importBranchesOfProject: aGLHProject [
+
+	| resultBranches branches foundBranches |
+	"aGLHProject repository branches removeAll "
+	resultBranches := self repoApi branches getAllFromProject:
+		                  aGLHProject id.
+
+	foundBranches := (resultBranches collect: [ :branchesJson |
+		                  self parseBranchesResult: branchesJson ])
+		                 flattened.
+
+	'import the branches of project ' recordInfo.
+
+	"WARNING: always add branch first into repository, than into model !"
+	branches := aGLHProject repository branches
+		            addAll: foundBranches
+		            unless: self blockOnNameEquality.
+
+
+	branches := self glhModel
+		            addAll: branches
+		            unless: self blockForBranchEquality.
+
+	"WARNING : branch must load its HEAD commit (ref) in a second time "
 	^ branches
 ]
 
@@ -662,11 +730,20 @@ GitlabModelImporter >> importCommits: aGLHProject [
 	"limited to the last 20 commits"
 
 	| results parsedResults params |
-	params := { 
-	 #with_stats -> 'true'
-	} asDictionary.
-	results := self repoApi commits getByPage: 1 perPage: 20 inProject: aGLHProject id withParams: params.
-	
+	self
+		deprecated:
+		'Use importLatestCommitsOfProject: instead of current one'
+		on: '19 September 2025'
+		in:
+		'Pharo-12.0.0+SNAPSHOT.build.1571.sha.cf5fcd22e66957962c97dffc58b0393b7f368147 (64 Bit)'.
+		
+	params := { (#with_stats -> 'true') } asDictionary.
+	results := self repoApi commits
+		           getByPage: 1
+		           perPage: 20
+		           inProject: aGLHProject id
+		           withParams: params.
+
 	parsedResults := self parseCommitsResult: results.
 	self glhModel addAll: parsedResults unless: self blockOnIdEquality.
 
@@ -675,8 +752,8 @@ GitlabModelImporter >> importCommits: aGLHProject [
 
 	self withCommitDiffs ifTrue: [
 		parsedResults do: [ :commit | self importDiffOfCommit: commit ] ].
-	
-	^ parsedResults. 
+
+	^ parsedResults
 ]
 
 { #category : #'import - commits' }
@@ -890,18 +967,6 @@ GitlabModelImporter >> importContributedProjectsOfUser: aGLHUser [
 ]
 
 { #category : #'import - commits' }
-GitlabModelImporter >> importCreatorOfCommit: aCommit [
-
-	aCommit commitCreator ifNil: [
-		aCommit commitCreator:
-			(self importUserByUsername: aCommit author_name) ].
-	self userCatalogue
-		addUser: aCommit commitCreator
-		withProject: aCommit repository project id.
-	^ aCommit commitCreator
-]
-
-{ #category : #'import - commits' }
 GitlabModelImporter >> importDiffOfCommit: aCommit [
 
 	| result diffsResult |
@@ -926,7 +991,7 @@ GitlabModelImporter >> importDiffOfCommit: aCommit [
 	^ aCommit diffs
 ]
 
-{ #category : #'import - merge request' }
+{ #category : #'import - merge-requests' }
 GitlabModelImporter >> importDiffOfMergeRequest: aMergeRequest [
 
 	| result diffsResult |
@@ -981,6 +1046,12 @@ GitlabModelImporter >> importDirectoryFiles: aDirectoryFile OfBranch: aBranch [
 		self importDirectoryFiles: file OfBranch: aBranch ]
 ]
 
+{ #category : #'import - file' }
+GitlabModelImporter >> importFileWithPath: aPath ofProject: aGLHProject inBranch: aBranch [ 
+	self flag: 'imported file need to be store inside the model'.
+	^ self repoApi repositories getRawFile: aPath ofProject: aGLHProject id withParams: {#ref -> aBranch name} asDictionary .
+]
+
 { #category : #'import - repositories' }
 GitlabModelImporter >> importFilesOfBranch: aBranch [
 
@@ -1003,7 +1074,9 @@ GitlabModelImporter >> importFilesOfBranch: aBranch [
 	files
 		select: [ :file | file isKindOf: GLHFileDirectory ]
 		thenCollect: [ :file | 
-		self importDirectoryFiles: file OfBranch: aBranch ]
+		self importDirectoryFiles: file OfBranch: aBranch ].
+	
+   ^ files
 ]
 
 { #category : #'import - groups' }
@@ -1032,6 +1105,18 @@ GitlabModelImporter >> importGroup: aGroupID [
 { #category : #'import - jobs' }
 GitlabModelImporter >> importJobsOf: aPipeline [
 
+	
+	self
+		deprecated: 'Use importJobsOfPipeline: instead of current one'
+		on: '26 September 2025'
+		in:
+		'Pharo-12.0.0+SNAPSHOT.build.1571.sha.cf5fcd22e66957962c97dffc58b0393b7f368147 (64 Bit)'.
+	^ self importJobsOfPipeline: aPipeline.
+]
+
+{ #category : #'import - jobs' }
+GitlabModelImporter >> importJobsOfPipeline: aPipeline [
+
 	| jobs results |
 	results := self repoApi jobs
 		           getAllForPipeline: aPipeline id
@@ -1039,16 +1124,20 @@ GitlabModelImporter >> importJobsOf: aPipeline [
 	"jobsOfProject: aPipeline project id
 		          ofPipelines: aPipeline id."
 	jobs := (results collect: [ :jobsJson |
-		         self parseJobsResult: jobsJson ofProject: aPipeline project ])
-		        flattened.
-	jobs do: [ :job | aPipeline addJob: job ].
-	self glhModel addAll: jobs.
+		         self parseJobsResult: jobsJson ]) flattened.
+
+
+	jobs := self glhModel addAll: jobs unless: self blockOnIdEquality.
+	jobs := aPipeline jobs addAll: jobs unless: self blockOnIdEquality.
+
+
+	jobs do: [ :job | self completeImportedJob: job ].
 
 	^ jobs
 ]
 
 { #category : #'import - commits' }
-GitlabModelImporter >> importLastestCommitsOfProject: aGLHProject [
+GitlabModelImporter >> importLatestCommitsOfProject: aGLHProject [
 	"limited to the last 50 commits"
 
 	| results parsedResults params |
@@ -1073,7 +1162,7 @@ GitlabModelImporter >> importLastestCommitsOfProject: aGLHProject [
 	^ parsedResults
 ]
 
-{ #category : #'import - merge request' }
+{ #category : #'import - merge-requests' }
 GitlabModelImporter >> importLatestMergeRequestsOfProject: aGLHProject [ 
 	
 	|results parsedResults|
@@ -1097,7 +1186,7 @@ GitlabModelImporter >> importLatestPipelinesOfProject: aGLHProject [
 	^ aGLHProject pipelines 
 ]
 
-{ #category : #'import - release' }
+{ #category : #'import - releases' }
 GitlabModelImporter >> importLatestReleaseOfProject: aGLHProject [ 
 	
 	|result foundRelease|
@@ -1112,7 +1201,7 @@ GitlabModelImporter >> importLatestReleaseOfProject: aGLHProject [
 	^ foundRelease.
 ]
 
-{ #category : #'import - merge request' }
+{ #category : #'import - commits' }
 GitlabModelImporter >> importMergeRequestCommits: aGLPHEMergeRequest [
 
 	| commits result |
@@ -1128,7 +1217,7 @@ GitlabModelImporter >> importMergeRequestCommits: aGLPHEMergeRequest [
 	^ commits
 ]
 
-{ #category : #'import - merge request' }
+{ #category : #'import - commits' }
 GitlabModelImporter >> importMergeRequestMergeCommits: aGLPHEMergeRequest [
 
 	| foundCommits |
@@ -1162,23 +1251,22 @@ GitlabModelImporter >> importMergeRequestMergeCommits: aGLPHEMergeRequest [
 ]
 
 { #category : #'import - pipelines' }
-GitlabModelImporter >> importMergeRequestPipelines: aGLHMergeRequest [ 
+GitlabModelImporter >> importMergeRequestPipelines: aGLHMergeRequest [
 	"default limit to one page with last 100 pipelines"
-	
-	|results parseResults|
-	
-	results := self repoApi pipelines getByPage: 1 perPage: 100 inProject: aGLHMergeRequest project id forMergerRequestIid: aGLHMergeRequest iid. 
-	
-	parseResults := self parsePipelinesResult: results.
-	
-	parseResults := glhModel addAll: parseResults unless: self blockOnIdEquality.
-	parseResults := aGLHMergeRequest pipelines addAll: parseResults unless: self blockOnIdEquality.
-	^ parseResults collect: [ :pip | self completeImportedPipeline: pip ]  .
-	
+
+	| results parseResults |
+	self
+		deprecated:
+		'Use importPipelinesOfMergeRequest: instead of current one'
+		on: '23 September 2025'
+		in:
+		'Pharo-12.0.0+SNAPSHOT.build.1571.sha.cf5fcd22e66957962c97dffc58b0393b7f368147 (64 Bit)'.
+
+	^ self importPipelinesOfMergeRequest: aGLHMergeRequest. 
 ]
 
-{ #category : #'import - merge request' }
-GitlabModelImporter >> importMergeRequests: aGLHProject [
+{ #category : #'import - merge-requests' }
+GitlabModelImporter >> importMergeRequestsOfProject: aGLHProject [
 
 	| results parsedResults mrs |
 	('Import merge request of Project: ' , aGLHProject id printString)
@@ -1208,8 +1296,8 @@ GitlabModelImporter >> importMergeRequests: aGLHProject [
 	^ mrs
 ]
 
-{ #category : #'import - merge request' }
-GitlabModelImporter >> importMergeRequests: aGLHProject since: fromDate until: toDate [
+{ #category : #'import - merge-requests' }
+GitlabModelImporter >> importMergeRequestsOfProject: aGLHProject since: fromDate until: toDate [
 
 	| params result mergeRequests |
 	('import MR of Project ' , aGLHProject name) recordInfo.
@@ -1252,7 +1340,7 @@ GitlabModelImporter >> importMergeRequests: aGLHProject since: fromDate until: t
 	^ mergeRequests
 ]
 
-{ #category : #'import - merge request' }
+{ #category : #'import - merge-requests' }
 GitlabModelImporter >> importMergeResquestApprovals: aGLPHEMergeRequest [
 
 	| results parsedResult |
@@ -1272,7 +1360,7 @@ GitlabModelImporter >> importMergeResquestApprovals: aGLPHEMergeRequest [
 	^ aGLPHEMergeRequest
 ]
 
-{ #category : #'import - merge request' }
+{ #category : #'import - merge-requests' }
 GitlabModelImporter >> importMergeResquestAuthor: aGLPHEMergeRequest [
 
 	| authorID |
@@ -1289,7 +1377,7 @@ GitlabModelImporter >> importMergeResquestAuthor: aGLPHEMergeRequest [
 	^aGLPHEMergeRequest author: (self importUser: authorID)
 ]
 
-{ #category : #'import - merge request' }
+{ #category : #'import - merge-requests' }
 GitlabModelImporter >> importMergeResquestMerger: aGLPHEMergeRequest [
 
 	| authorID |
@@ -1310,7 +1398,7 @@ GitlabModelImporter >> importMergeResquestMerger: aGLPHEMergeRequest [
 ]
 
 { #category : #'import - notes' }
-GitlabModelImporter >> importNotesfromMergeRequest: mergeRequest [
+GitlabModelImporter >> importNotesOfMergeRequest: mergeRequest [
 	| results notes |
 	
 	results := self repoApi notes allInMergeRequest: mergeRequest iid ofProject: mergeRequest project id.
@@ -1362,14 +1450,56 @@ GitlabModelImporter >> importPipeline: pipelineId OfProject: aGLHProject [
 	
 	('Search pipelines of: ' , aGLHProject id printString) recordInfo.
 	result := self repoApi pipelines get: pipelineId inProject: aGLHProject id.
-	result isString ifTrue: [ ^ self parsePipelineResult: result ].
-
+	
 	pipeline :=  self parsePipelineResult: result.
 
 	pipeline := self glhModel add: pipeline unless: self blockOnIdEquality .
 	pipeline := aGLHProject pipelines add: pipeline unless: self blockOnIdEquality.
 	
 	^ self completeImportedPipeline: pipeline. 
+]
+
+{ #category : #'import - pipelines' }
+GitlabModelImporter >> importPipelinesOfMergeRequest: aGLHMergeRequest [
+	"default limit to one page with last 100 pipelines"
+
+	| results parseResults |
+	results := self repoApi pipelines
+		           getByPage: 1
+		           perPage: 100
+		           inProject: aGLHMergeRequest project id
+		           forMergerRequestIid: aGLHMergeRequest iid.
+
+	parseResults := self parsePipelinesResult: results.
+
+	parseResults do: [ :pipeline |
+		pipeline project: aGLHMergeRequest project.
+		].
+
+	parseResults := glhModel
+		                addAll: parseResults
+		                unless: self blockOnIdEquality.
+	parseResults := aGLHMergeRequest pipelines
+		                addAll: parseResults
+		                unless: self blockOnIdEquality.
+		
+		
+	^ parseResults collect: [ :pip | self completeImportedPipeline: pip ]
+]
+
+{ #category : #'import - pipelines' }
+GitlabModelImporter >> importPipelinesOfProject: aGLHProject [
+
+	self
+		deprecated:
+		'Use importAllPipelinesOfProject: instead of current one'
+		on: '23 September 2025'
+		in:
+		'Pharo-12.0.0+SNAPSHOT.build.1571.sha.cf5fcd22e66957962c97dffc58b0393b7f368147 (64 Bit)'.
+
+	self flag:
+		'WARNING: this import ALL the pipelines at ones. Prefered ImportLatestPipleinesOfProject: for faster performance (if possible)'.
+	^ self importAllPipelinesOfProject: aGLHProject
 ]
 
 { #category : #'import - pipelines' }
@@ -1464,47 +1594,30 @@ GitlabModelImporter >> importProjectsSince: since [
 		foundProject addAll: newlyFoundProjects ].
 ]
 
-{ #category : #'import - repositories' }
-GitlabModelImporter >> importRepository: aGLHRepository [
-
-	| branches |
-	[
-	('import the repository of project ' , aGLHRepository project name)
-		recordInfo.
-	branches := self importBranchesOf: aGLHRepository project.
-	self withFiles ifTrue: [
-		branches do: [ :branch | self importFilesOfBranch: branch ] ] ]
-		on: NeoJSONParseError
-		do: [
-		self inform: aGLHRepository project name , ' has no repository' ].
-
-	withInitialCommits ifTrue: [
-		aGLHRepository branches do: [ :branch |
-			self importCommitsOfBranch: branch ] ]
-]
-
-{ #category : #'as yet unclassified' }
+{ #category : #'import - commits' }
 GitlabModelImporter >> importSZZFromCommit: aCommit [
 
-	| result diffRanges diffs szzCommits|
-	szzCommits := Set new. 
-	diffs := (self importDiffOfCommit: aCommit).
+	| diffRanges diffs szzCommits |
+	szzCommits := Set new.
+	diffs := self importDiffOfCommit: aCommit.
 	diffRanges := diffs flatCollect: #diffRanges.
 	diffRanges do: [ :range |
-		|blames|
-		
-			blames := NeoJSONReader fromString:( self repoApi repositories getBlameOf: range diff new_path  inRef: aCommit id start: range start end:range end ofProject: (aCommit repository project id)).
-			blames collect: [ :blame |
-			blame isDictionary ifTrue: [ szzCommits add: 	(self importCommit:(blame at: #commit at: #id) ofProject: aCommit repository project). ]
-			 
-				 ]
-			
-		 ].
-	^ szzCommits .
-
+		| blames |
+		blames := NeoJSONReader fromString: (self repoApi repositories
+				           getBlameOf: range diff new_path
+				           inRef: aCommit id
+				           start: range start
+				           end: range end
+				           ofProject: aCommit repository project id).
+		blames collect: [ :blame |
+			blame isDictionary ifTrue: [
+				szzCommits add: (self
+						 importCommit: (blame at: #commit at: #id)
+						 ofProject: aCommit repository project) ] ] ].
+	^ szzCommits
 ]
 
-{ #category : #'import - tag' }
+{ #category : #'import - tags' }
 GitlabModelImporter >> importTagsForProject: aProject [ 
 	|results tags |
 	results  := repoApi tags getAllOfProject: aProject id.
@@ -1609,16 +1722,9 @@ GitlabModelImporter >> importUserByUsername: anUsername [
 
 { #category : #initialization }
 GitlabModelImporter >> initReader [
-
-	generalReader := NeoJSONReader new.
-	self configureReaderForCommit: generalReader.
-	self configureReaderForGroup: generalReader.
-	self configureReaderForDiffs: generalReader.
-	self configureReaderForMergeRequest: generalReader.
-	self configureReaderForPipeline: generalReader. 
-	self configureReaderForTags: generalReader. 
-	self configureReaderForReleases: generalReader. 
-	self configureReaderForUsers: generalReader. 
+	
+	"add specific reader for this importer here"
+	super initReader
 ]
 
 { #category : #initialization }
@@ -1631,7 +1737,7 @@ GitlabModelImporter >> initialize [
 
 	self withCommitsSince: 1 week.
 
-	self initReader
+	
 ]
 
 { #category : #private }
@@ -1659,32 +1765,39 @@ GitlabModelImporter >> newParseCommitResult: result [
 GitlabModelImporter >> newParseDiffResult: result [
 
 	generalReader on: result readStream.
-	^ generalReader nextAs: #ArrayOfDiffs
+	^ generalReader nextAs: #ArrayOfDiff
 ]
 
 { #category : #'private - parsing' }
 GitlabModelImporter >> parseArrayOfProject: arrayOfProjects [
 
 	| reader |
-	reader := NeoJSONReader on: arrayOfProjects readStream.
-	reader
-		for: #ArrayOfProjects
-		customDo: [ :customMappting |
-		customMappting listOfElementSchema: GLHProject ].
-	reader for: GLHProject do: [ :mapping |
-		mapping mapInstVar: #name to: #name.
-		mapping mapInstVar: #description to: #description.
-		mapping mapInstVar: #id to: #id.
-		mapping mapInstVar: #archived to: #archived.
-		mapping mapInstVar: #web_url to: #html_url.
-		mapping mapInstVar: #topics to: #topics ].
-	^ reader nextAs: #ArrayOfProjects
+	reader := generalReader on: arrayOfProjects readStream.
+	
+	^ reader nextAs: #ArrayOfProject
+]
+
+{ #category : #'private - parsing' }
+GitlabModelImporter >> parseBranchesResult: result [
+
+	| reader |
+	reader := generalReader on: result readStream.
+
+	^ reader nextAs: #ArrayOfBranch
 ]
 
 { #category : #'private - parsing' }
 GitlabModelImporter >> parseBranchesResult: result ofProject: aGLHProject [
 
 	| reader |
+	self flag: 'WARNING: do not use the importer inside a parsing process. do it after using a object cached on the sub elemnt id'.
+	self
+		deprecated: 'Use parseBranchesResult: instead of current one'
+		on: '23 September 2025'
+		in:
+		'Pharo-12.0.0+SNAPSHOT.build.1571.sha.cf5fcd22e66957962c97dffc58b0393b7f368147 (64 Bit)'.
+
+
 	reader := NeoJSONReader on: result readStream.
 	reader mapInstVarsFor: GLHBranch.
 
@@ -1693,11 +1806,11 @@ GitlabModelImporter >> parseBranchesResult: result ofProject: aGLHProject [
 			mapProperty: #commit
 			getter: [  ]
 			setter: [ :branch :rawCommit |
-				| commit |
-				commit := self
+				branch sha: (rawCommit at: #id)
+				"commit := self
 					          importCommit: (rawCommit at: #id)
 					          ofProject: aGLHProject.
-				branch commits add: commit unless: self blockOnIdEquality ] ].
+				branch commits add: commit unless: self blockOnIdEquality " ] ].
 
 	reader
 		for: #ArrayOfBranch
@@ -1711,30 +1824,7 @@ GitlabModelImporter >> parseBranchesResult: result ofProject: aGLHProject [
 GitlabModelImporter >> parseCommitResult: result [
 
 	| reader |
-	reader := NeoJSONReader on: result readStream.
-
-	reader for: GLHCommit do: [ :mapping |
-		mapping mapInstVars:
-			#( id short_id title author_name author_email committer_name
-			   committer_email message web_url ).
-		(mapping mapInstVar: #authored_date) valueSchema: DateAndTime.
-		(mapping mapInstVar: #committed_date) valueSchema: DateAndTime.
-		(mapping mapInstVar: #created_at) valueSchema: DateAndTime.
-		(mapping mapInstVar: #parent_ids) valueSchema: #ArrayOfIds.
-		mapping
-			mapProperty: 'stats'
-			getter: [ :el | "Not used" ]
-			setter: [ :commit :value |
-				commit deletions: (value at: #deletions).
-				commit additions: (value at: #additions) ] ].
-
-	reader for: DateAndTime customDo: [ :mapping |
-		mapping decoder: [ :string | DateAndTime fromString: string ] ].
-
-	reader
-		for: #ArrayOfIds
-		customDo: [ :mapping | mapping decoder: [ :string | string ] ].
-
+	reader := generalReader on: result readStream.
 
 	^ reader nextAs: GLHCommit
 ]
@@ -1743,34 +1833,7 @@ GitlabModelImporter >> parseCommitResult: result [
 GitlabModelImporter >> parseCommitsResult: result [
 
 	| reader |
-	reader := NeoJSONReader on: result readStream.
-
-  	reader for: GLHCommit do: [ :mapping |
-		mapping mapInstVars:
-			#( id short_id title author_name author_email committer_name
-			   committer_email message web_url ).
-		(mapping mapInstVar: #authored_date) valueSchema: DateAndTime.
-		(mapping mapInstVar: #committed_date) valueSchema: DateAndTime.
-		(mapping mapInstVar: #created_at) valueSchema: DateAndTime.
-		(mapping mapInstVar: #parent_ids) valueSchema: #ArrayOfIds.
-		mapping
-			mapProperty: 'stats'
-			getter: [ :el | "Not used" ]
-			setter: [ :commit :value |
-				commit deletions: (value at: #deletions).
-				commit additions: (value at: #additions) ] ].
-
-	reader for: DateAndTime customDo: [ :mapping |
-		mapping decoder: [ :string | DateAndTime fromString: string ] ].
-
-	reader
-		for: #ArrayOfIds
-		customDo: [ :mapping | mapping decoder: [ :string | string ] ].
-  
-	reader
-		for: #ArrayOfCommit
-		customDo: [ :customMappting |
-		customMappting listOfElementSchema: GLHCommit ].
+	reader := generalReader on: result readStream.
 
 	^ reader nextAs: #ArrayOfCommit
 ]
@@ -1814,52 +1877,41 @@ GitlabModelImporter >> parseFileTreeResult: aResult [
 GitlabModelImporter >> parseGroupResult: aResult [
 
 	| reader |
+	reader := generalReader on: aResult readStream.
 
-	reader := NeoJSONReader on: aResult readStream.
-	reader for: GLHGroup do: [ :mapping |
-		mapping mapInstVars.
-		(mapping mapInstVar: #projects) valueSchema: #ArrayOfProjects ].
-	reader mapInstVarsFor: GLHProject.
-	reader
-		for: #ArrayOfProjects
-		customDo: [ :customMappting |
-		customMappting listOfElementSchema: GLHProject ].
 	^ reader nextAs: GLHGroup
+]
+
+{ #category : #'private - parsing' }
+GitlabModelImporter >> parseJobsResult: result [ 
+	| reader |
+	reader := generalReader on: result readStream.
+
+	^ reader nextAs: #ArrayOfJob
 ]
 
 { #category : #'private - parsing' }
 GitlabModelImporter >> parseJobsResult: result ofProject: aProject [
 
 	| reader |
-	reader := NeoJSONReader on: result readStream.
+	self
+		deprecated: 'Use parseJobsResult: instead of current one'
+		on: '23 September 2025'
+		in:
+		'Pharo-12.0.0+SNAPSHOT.build.1571.sha.cf5fcd22e66957962c97dffc58b0393b7f368147 (64 Bit)'.
+		
+	reader := generalReader on: result readStream.
 	reader for: GLHJob do: [ :mapping |
-		mapping mapInstVars: #( id allow_failure web_url name ).
-
-		mapping
-			mapProperty: #user
-			getter: [ :object | #ignore ]
-			setter: [ :object :value |
-			object user: (self importUser: (value at: #id)) ].
-
 		mapping
 			mapProperty: #commit
 			getter: [ :object | #ignore ]
 			setter: [ :object :value |
 				value ifNotNil: [
 					object commit:
-						(self importCommit: (value at: #id) ofProject: aProject) ] ].
+						(self importCommit: (value at: #id) ofProject: aProject) ] ] ].
 
-		mapping
-			mapProperty: #duration
-			getter: [ :object | #ignore ]
-			setter: [ :object :value |
-			value ifNotNil: [ object duration: value seconds ] ] ].
 
-	reader
-		for: #ArrayOfGLHJob
-		customDo: [ :customMappting |
-		customMappting listOfElementSchema: GLHJob ].
-	^ reader nextAs: #ArrayOfGLHJob
+	^ reader nextAs: #ArrayOfJob
 ]
 
 { #category : #'private - parsing' }
@@ -1870,36 +1922,19 @@ GitlabModelImporter >> parseMergeRequestsResult: result [
 ]
 
 { #category : #'private - parsing' }
-GitlabModelImporter >> parseNoteJson: results [  
-    | reader |  
+GitlabModelImporter >> parseNoteJson: results [
 
-    "Créer un lecteur JSON"
-    reader := NeoJSONReader on: results readStream.    
+	| reader |
+	"Créer un lecteur JSON"
+	reader := generalReader on: results readStream.
 
-    "Définir le mapping pour l'objet GLHNote"
-    reader for: GLHNote do: [ :mapping |  
-        mapping mapInstVars: #(id noteable_id attachment system confidential internal  
-                               noteable_iid resolvable imported imported_from  
-                               author body project_id noteable_type).  
+	"Corriger la conversion des dates"
+	"reader for: DateAndTime customDo: [ :mapping |
+		mapping decoder: [ :string |
+			DateAndTime readFrom: string readStream ] ]."
 
-        (mapping mapInstVar: #created_at) valueSchema: DateAndTime.  
-        (mapping mapInstVar: #updated_at) valueSchema: DateAndTime.  
-    ].    
-
-    "Corriger la conversion des dates"
-    reader for: DateAndTime customDo: [ :mapping |  
-        mapping decoder: [ :string | DateAndTime readFrom: string readStream ] ].
-
-	reader
-		for: #ArrayOfNote
-		customDo: [ :customMappting | 
-		customMappting listOfElementSchema: GLHNote ].
-	 ^ reader nextAs: #ArrayOfNote
-
-    "Retourner la Note"
-    "^ reader nextAs: GLHNote"
-
-
+	
+	^ reader nextAs: #ArrayOfNote
 ]
 
 { #category : #'private - parsing' }
@@ -1918,26 +1953,23 @@ GitlabModelImporter >> parsePipelineResult: result [
 GitlabModelImporter >> parsePipelinesResult: result [
 
 	| reader |
-	
-	(result includesSubstring: '{"message":"40' )ifTrue: [ ^ {  } ].
-	
+	(result includesSubstring: '{"message":"40') ifTrue: [ ^ {  } ].
+
 	reader := generalReader on: result readStream.
-	
-	^ reader nextAs: #ArrayOfPipelines
+
+	^ reader nextAs: #ArrayOfPipeline
 ]
 
 { #category : #'private - parsing' }
-GitlabModelImporter >> parseProjectResult: aResult [ 
-		| reader |
-	reader := NeoJSONReader on: aResult readStream.
-	reader for: GLHProject do: [ :mapping |
-		mapping mapInstVars. ].
-"	reader mapInstVarsFor: GLHProject."
+GitlabModelImporter >> parseProjectResult: aResult [
+
+	| reader |
+	reader := generalReader on: aResult readStream.
 
 	^ reader nextAs: GLHProject
 ]
 
-{ #category : #parsing }
+{ #category : #'private - parsing' }
 GitlabModelImporter >> parseReleaseResult: result [
 	|reader|
 	reader := generalReader on: result readStream.
@@ -1945,24 +1977,25 @@ GitlabModelImporter >> parseReleaseResult: result [
 	^ reader nextAs: GLHRelease 
 ]
 
-{ #category : #parsing }
+{ #category : #'private - parsing' }
 GitlabModelImporter >> parseReleasesResult: result [
-	|reader|
+
+	| reader |
 	reader := generalReader on: result readStream.
-	
-	^ reader nextAs: #ArrayOfReleases
+
+	^ reader nextAs: #ArrayOfRelease
 ]
 
 { #category : #'private - parsing' }
 GitlabModelImporter >> parseSubGroupResult: aResult [
 
 	| reader |
-	reader := NeoJSONReader on: aResult readStream.
-	self configureReaderForGroup: reader.
-	^ reader nextAs: #ArrayOfGroups
+	reader := generalReader on: aResult readStream.
+	
+	^ reader nextAs: #ArrayOfGroup
 ]
 
-{ #category : #parsing }
+{ #category : #'private - parsing' }
 GitlabModelImporter >> parseTagsResult: result [
 	|reader|
 	reader := generalReader on: result readStream.
@@ -2009,7 +2042,7 @@ GitlabModelImporter >> partiallyImportProject: aProjectID [
 
 	projectResult repository: GLHRepository new.
 	self glhModel add: projectResult repository.
-	self importRepository: projectResult repository.
+	self completeImportsOfRepository: projectResult repository.
 
 	^ projectResult
 ]

@@ -20,8 +20,8 @@ A CI Job
 | `allow_failure` | `Boolean` | nil | |
 | `duration` | `Object` | nil | |
 | `id` | `Number` | nil | |
-| `name` | `String` | nil | |
 | `name` | `String` | nil | Basic name of the entity, not full reference.|
+| `name` | `String` | nil | |
 | `ref` | `String` | nil | |
 | `web_url` | `String` | nil | |
 

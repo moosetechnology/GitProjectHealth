@@ -25,11 +25,14 @@ ProjectMetric >> loadAllTags [
 ]
 
 { #category : #load }
-ProjectMetric >> loadBranchesSince: since until: until [ 
+ProjectMetric >> loadBranchesSince: since until: until [
+
+	| branches |
+	branches := glhImporter importBranchesOf: project.
 
 
-	^	glhImporter importBranchesOf: project.
-	
+	branches do: [ :branch | glhImporter importRefCommitOfBranch: branch ].
+	^ branches
 ]
 
 { #category : #loading }
@@ -78,7 +81,7 @@ ProjectMetric >> loadMergeRequestsSince: since until: until [
 		                    ifAbsentPut: [
 			                    | foundMergeRequests |
 			                    foundMergeRequests := glhImporter
-				                                          importMergeRequests:
+				                                          importMergeRequestsOfProject:
 				                                          project
 				                                          since: since
 				                                          until: until.

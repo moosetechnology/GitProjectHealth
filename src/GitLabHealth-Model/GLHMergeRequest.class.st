@@ -13,7 +13,7 @@ a gitlab merge request
 ### Children
 | Relation | Origin | Opposite | Type | Comment |
 |---|
-| `pipelines` | `GLHMergeRequest` | `mergeResquest` | `GLHPipeline` | |
+| `pipelines` | `GLHMergeRequest` | `mergeRequest` | `GLHPipeline` | |
 
 ### Other
 | Relation | Origin | Opposite | Type | Comment |
@@ -29,7 +29,7 @@ a gitlab merge request
 | `mergedCommit` | `GLHMergeRequest` | `commitedMergeRequest` | `GLHCommit` | |
 | `merged_by` | `GLHMergeRequest` | `mergerOfMergeRequests` | `GLHUser` | |
 | `note` | `GLHMergeRequest` | `mergeRequest` | `GLHNote` | |
-| `reviewers` | `GLHMergeRequest` | `reviewedMergeResquest` | `GLHUser` | |
+| `reviewers` | `GLHMergeRequest` | `reviewedMergeRequest` | `GLHUser` | |
 | `squashCommit` | `GLHMergeRequest` | `squashedMergeRequest` | `GLHCommit` | |
 
 
@@ -158,8 +158,8 @@ Class {
 		'#merged_by => FMOne type: #GLHUser opposite: #mergerOfMergeRequests',
 		'#assignees => FMMany type: #GLHUser opposite: #assignedMergeRequests',
 		'#assignee => FMOne type: #GLHUser opposite: #currentlyAssignedMergeRequest',
-		'#reviewers => FMMany type: #GLHUser opposite: #reviewedMergeResquest',
-		'#pipelines => FMMany type: #GLHPipeline opposite: #mergeResquest',
+		'#reviewers => FMMany type: #GLHUser opposite: #reviewedMergeRequest',
+		'#pipelines => FMMany type: #GLHPipeline opposite: #mergeRequest',
 		'#mergedCommit => FMOne type: #GLHCommit opposite: #commitedMergeRequest',
 		'#mergeRequestCommit => FMOne type: #GLHCommit opposite: #commitedMergeRequest',
 		'#squashCommit => FMOne type: #GLHCommit opposite: #squashedMergeRequest',
@@ -729,7 +729,7 @@ GLHMergeRequest >> note: anObject [
 
 { #category : #accessing }
 GLHMergeRequest >> pipelines [
-	"Relation named: #pipelines type: #GLHPipeline opposite: #mergeResquest"
+	"Relation named: #pipelines type: #GLHPipeline opposite: #mergeRequest"
 
 	<generated>
 	<derived>
@@ -845,7 +845,7 @@ GLHMergeRequest >> references_short: anObject [
 
 { #category : #accessing }
 GLHMergeRequest >> reviewers [
-	"Relation named: #reviewers type: #GLHUser opposite: #reviewedMergeResquest"
+	"Relation named: #reviewers type: #GLHUser opposite: #reviewedMergeRequest"
 
 	<generated>
 	<derived>
