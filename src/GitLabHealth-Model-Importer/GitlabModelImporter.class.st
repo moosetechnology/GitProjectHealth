@@ -1337,7 +1337,8 @@ GitlabModelImporter >> importMergeRequestsOfProject: aGLHProject since: fromDate
 		addAll: mergeRequests
 		unless: (self blockEqualityOn: #iid).
 
-	^ mergeRequests
+	^ aGLHProject mergeRequests select: [ :mr |
+		  mr created_at >= fromDate and: mr created_at <= toDate ]
 ]
 
 { #category : #'import - merge-requests' }

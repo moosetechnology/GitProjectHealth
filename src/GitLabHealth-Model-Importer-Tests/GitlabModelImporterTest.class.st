@@ -192,6 +192,7 @@ GitlabModelImporterTest >> setUp [
 	model := GLHModel new.
 	importer glhModel: model.
 	defaultProject := GLHProject new
+								name: 'default project';
 		                  repository: GLHRepository new;
 		                  yourself.
 	
@@ -341,6 +342,27 @@ GitlabModelImporterTest >> testImportLatestReleaseOfProject [
 	self deny: element isCollection.
 	self assert: element class equals: GLHRelease.
 	self assert: element project isNotNil
+]
+
+{ #category : #'tests - merge-requests' }
+GitlabModelImporterTest >> testImportMergeRequestsOfProjectSinceUntil [
+
+	| collection element collection2 |
+	collection := importer importMergeRequestsOfProject:
+		              self defaultProject since: '04-28-2017' asDate until: '04-30-2017' asDate.
+		
+	collection2 := importer importMergeRequestsOfProject:
+		              self defaultProject since: '04-28-2017' asDate until: '04-30-2017' asDate.
+		
+	self assert: collection isCollection.
+	element := collection first.
+	self assert: element class equals: GLHMergeRequest.
+	self assert: element project class equals: GLHProject.
+	self assert: element diffs isCollection.
+	self assert: element diffs first class equals: GLHDiff.
+	self assert: element mergeRequestCommit class equals: GLHCommit.
+
+	self assertCollection: collection equals: collection2. 
 ]
 
 { #category : #'tests - notes' }

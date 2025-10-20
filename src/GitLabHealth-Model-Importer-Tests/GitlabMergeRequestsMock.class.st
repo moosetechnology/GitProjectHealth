@@ -181,6 +181,11 @@ GitlabMergeRequestsMock >> getAllOfProject: anUndefinedObject [
 ]
 
 { #category : #api }
+GitlabMergeRequestsMock >> getAllOfProject: project withParams: params [
+	^self getAllOfProject: project
+]
+
+{ #category : #api }
 GitlabMergeRequestsMock >> getByPage: anInteger perPage: anInteger2 inProject: anUndefinedObject [ 
 	^ '[
   {
