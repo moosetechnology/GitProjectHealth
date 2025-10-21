@@ -23,6 +23,7 @@ Class {
 		'lineOfCode',
 		'note',
 		'notePosition',
+		'noteSuggestion',
 		'entity',
 		'release',
 		'tag',
@@ -181,6 +182,10 @@ GLHMetamodelGenerator >> defineClasses [
 		                newClassNamed: #NotePosition
 		                comment: 'indicate the position of a note'.
 
+	noteSuggestion := builder
+		                  newClassNamed: #NoteSuggestion
+		                  comment: 'suggestion of code made in a note'.
+
 	tag := builder
 		       newClassNamed: #Tag
 		       comment:
@@ -218,7 +223,8 @@ GLHMetamodelGenerator >> defineHierarchy [
 	diff --|> #TNamedEntity.
 	job --|> #TNamedEntity.
 	note --|> #TNamedEntity.
-	notePosition  --|> #TNamedEntity.
+	notePosition --|> #TNamedEntity.
+	noteSuggestion --|> #TNamedEntity.
 
 	tRef --|> #TNamedEntity.
 	tRef <|-- commit.
@@ -254,6 +260,7 @@ GLHMetamodelGenerator >> defineProperties [
 	self diffRangeProperties.
 	self noteProperties.
 	self notePositionProperties.
+	self noteSuggestionProperties.
 	self tagProperties.
 	self releaseProperties.
 	self issueProperties.
@@ -295,6 +302,8 @@ GLHMetamodelGenerator >> defineRelations [
 	self issueRelations.
 	self mergeRequestsRelations.
 	self noteRelations.
+	self notePositionRelations.
+	self noteSuggestionProperties.
 	self milestoneRelations.
 	self notePositionRelations
 ]
@@ -563,6 +572,21 @@ GLHMetamodelGenerator >> noteRelations [
 
 	(note property: #mergeRequest) *- (mergeRequest property: #note).
 	(note property: #position) - (notePosition property: #note)
+]
+
+{ #category : #notes }
+GLHMetamodelGenerator >> noteSuggestionProperties [
+
+	noteSuggestion property: #from_line type: #Number.
+	noteSuggestion property: #to_line type: #Number.
+	noteSuggestion property: #from_content type: #String.
+	noteSuggestion property: #to_content type: #String.
+]
+
+{ #category : #notes }
+GLHMetamodelGenerator >> noteSuggestionRelations [ 
+
+	(noteSuggestion property: #note) - (note property: #position)
 ]
 
 { #category : #pipelines }
