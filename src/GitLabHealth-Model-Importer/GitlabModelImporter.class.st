@@ -1333,12 +1333,11 @@ GitlabModelImporter >> importMergeRequestsOfProject: aGLHProject since: fromDate
 		aGLHProject mergeRequests do: [ :mr |
 			self importDiffOfMergeRequest: mr ] ].
 
-	self glhModel
+	mergeRequests := self glhModel
 		addAll: mergeRequests
 		unless: (self blockEqualityOn: #iid).
 
-	^ aGLHProject mergeRequests select: [ :mr |
-		  mr created_at >= fromDate and: mr created_at <= toDate ]
+	^ mergeRequests
 ]
 
 { #category : #'import - merge-requests' }
