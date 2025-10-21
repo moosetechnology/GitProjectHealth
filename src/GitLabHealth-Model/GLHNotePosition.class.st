@@ -20,7 +20,6 @@ indicate the position of a note
 | `end_line_type` | `String` | nil | |
 | `file_path` | `String` | nil | |
 | `name` | `String` | nil | Basic name of the entity, not full reference.|
-| `note` | `Object` | nil | |
 | `original_file_path` | `String` | nil | |
 | `start_line` | `Number` | nil | |
 | `start_line_type` | `String` | nil | |
@@ -38,7 +37,7 @@ Class {
 		'#start_line_type => FMProperty',
 		'#end_line => FMProperty',
 		'#end_line_type => FMProperty',
-		'#note => FMProperty'
+		'#note => FMOne type: #GLHNote opposite: #position'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }
@@ -96,14 +95,16 @@ GLHNotePosition >> file_path: anObject [
 
 { #category : #accessing }
 GLHNotePosition >> note [
+	"Relation named: #note type: #GLHNote opposite: #position"
 
-	<FMProperty: #note type: #Object>
 	<generated>
+	<derived>
 	^ note
 ]
 
 { #category : #accessing }
 GLHNotePosition >> note: anObject [
+
 	<generated>
 	note := anObject
 ]

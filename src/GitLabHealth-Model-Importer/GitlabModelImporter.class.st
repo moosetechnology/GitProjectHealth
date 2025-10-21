@@ -409,17 +409,7 @@ GitlabModelImporter >> configureReaderForNotePosition: reader [
 						           ifTrue: [ end at: #new_line ]
 						           ifFalse: [ end at: #old_line ].
 					notePosition end_line_type: (end at: #type).
-					notePosition end_line: endLine ]].
-				
-		mapping
-				mapProperty: #note
-				getter: [  ]
-				setter: [ :object :value |
-					1 halt.
-				object cacheAt: #noteID put: (value at: #id) ].
-			
-	].
-		
+					notePosition end_line: endLine ]]]
 ]
 
 { #category : #'private - configure reader' }
