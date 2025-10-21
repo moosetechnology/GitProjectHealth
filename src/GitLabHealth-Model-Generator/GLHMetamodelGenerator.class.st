@@ -520,7 +520,6 @@ GLHMetamodelGenerator >> notePositionProperties [
 	notePosition property: #start_line_type type: #String.
 	notePosition property: #end_line type: #Number.
 	notePosition property: #end_line_type type: #String.
-	notePosition property: #note type: #Object
 ]
 
 { #category : #notes }

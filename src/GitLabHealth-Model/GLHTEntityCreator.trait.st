@@ -208,6 +208,20 @@ GLHTEntityCreator >> newNoteNamed: aName [
 ]
 
 { #category : #'entity creation' }
+GLHTEntityCreator >> newNotePosition [
+
+	<generated>
+	^ self add: GLHNotePosition new
+]
+
+{ #category : #'entity creation' }
+GLHTEntityCreator >> newNotePositionNamed: aName [
+
+	<generated>
+	^ self add: (GLHNotePosition named: aName)
+]
+
+{ #category : #'entity creation' }
 GLHTEntityCreator >> newPipeline [
 
 	<generated>

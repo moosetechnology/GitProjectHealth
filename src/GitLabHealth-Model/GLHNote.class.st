@@ -8,6 +8,8 @@ a note (a diff) proposed in a Merge Request; can be accepted, modified or delete
 | Relation | Origin | Opposite | Type | Comment |
 |---|
 | `mergeRequest` | `GLHNote` | `note` | `GLHMergeRequest` | |
+| `position` | `GLHNote` | `note` | `GLHNotePosition` | |
+| `position` | `GLHNote` | `note` | `GLHNotePosition` | |
 
 
 ## Properties
@@ -256,13 +258,16 @@ GLHNote >> noteable_type: anObject [
 
 { #category : #accessing }
 GLHNote >> position [
+	"Relation named: #position type: #GLHNotePosition opposite: #note"
 
+	<generated>
 	^ position
 ]
 
 { #category : #accessing }
 GLHNote >> position: anObject [
 
+	<generated>
 	position := anObject
 ]
 
