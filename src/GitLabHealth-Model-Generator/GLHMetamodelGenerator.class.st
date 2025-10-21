@@ -568,7 +568,8 @@ GLHMetamodelGenerator >> noteProperties [
 { #category : #notes }
 GLHMetamodelGenerator >> noteRelations [
 
-	(note property: #position) - (notePosition property: #note).
+	(note property: #mergeRequest) *- (mergeRequest property: #note).
+	(note property: #position) - (notePosition property: #note)
 ]
 
 { #category : #pipelines }
