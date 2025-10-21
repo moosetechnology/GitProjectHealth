@@ -310,6 +310,17 @@ GitModelImporter >> configureReaderForNote: reader [
 ]
 
 { #category : #'private - configure reader' }
+GitModelImporter >> configureReaderForNotePosition: reader [
+
+	reader mapInstVarsFor: GLHNotePosition.
+
+	reader
+		for: #ArrayOfNotePosition
+		customDo: [ :customMappting |
+		customMappting listOfElementSchema: GLHNotePosition ]
+]
+
+{ #category : #'private - configure reader' }
 GitModelImporter >> configureReaderForPipeline: reader [
 
 	reader mapInstVarsFor: GLHPipeline.

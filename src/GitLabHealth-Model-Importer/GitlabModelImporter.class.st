@@ -359,9 +359,58 @@ GitlabModelImporter >> configureReaderForNote: reader [
 	super configureReaderForNote: reader.
 
 	reader for: GLHNote do: [ :mapping |
-		
 		(mapping mapInstVar: #created_at) valueSchema: DateAndTime.
-		(mapping mapInstVar: #updated_at) valueSchema: DateAndTime ]
+		(mapping mapInstVar: #updated_at) valueSchema: DateAndTime.
+
+		(mapping mapInstVar: #position) valueSchema: GLHNotePosition ]
+]
+
+{ #category : #'private - configure reader' }
+GitlabModelImporter >> configureReaderForNotePosition: reader [
+
+	super configureReaderForNotePosition: reader.
+
+	reader for: GLHNotePosition do: [ :mapping |
+		mapping mapInstVar: #file_path to: #new_path.
+		mapping mapInstVar: #original_file_path to: #old_path.
+
+		mapping
+			mapProperty: #new_line
+			getter: [  ]
+			setter: [ :notePosition :newLine |
+				notePosition start_line: newLine asString.
+				notePosition start_line_type: 'new' ].
+
+		mapping
+			mapProperty: #old_line
+			getter: [  ]
+			setter: [ :notePosition :oldLine |
+				notePosition start_line: oldLine asString.
+				notePosition start_line_type: 'old' ].
+
+		mapping
+			mapProperty: #line_range
+			getter: [  ]
+			setter: [ :notePosition :rawLineRange |
+				
+				rawLineRange ifNotNil: [
+					| start startType startLine end endType endLine |
+					start := rawLineRange at: #start.
+					startType := start at: #type.
+					startLine := (start at: #type) = 'new'
+						             ifTrue: [ start at: #new_line ]
+						             ifFalse: [ start at: #old_line ].
+					notePosition start_line_type: (start at: #type).
+					notePosition start_line: startLine.
+
+
+					end := rawLineRange at: #end.
+					endType := end at: #type.
+					endLine := (end at: #type) = 'new'
+						           ifTrue: [ end at: #new_line ]
+						           ifFalse: [ end at: #old_line ].
+					notePosition end_line_type: (end at: #type).
+					notePosition end_line: endLine ] ] ]
 ]
 
 { #category : #'private - configure reader' }
@@ -1333,7 +1382,7 @@ GitlabModelImporter >> importMergeRequestsOfProject: aGLHProject since: fromDate
 		aGLHProject mergeRequests do: [ :mr |
 			self importDiffOfMergeRequest: mr ] ].
 
-	self glhModel
+	mergeRequests := self glhModel
 		addAll: mergeRequests
 		unless: (self blockEqualityOn: #iid).
 
@@ -1926,6 +1975,7 @@ GitlabModelImporter >> parseNoteJson: results [
 
 	| reader |
 	"Créer un lecteur JSON"
+	
 	reader := generalReader on: results readStream.
 
 	"Corriger la conversion des dates"
@@ -1933,7 +1983,7 @@ GitlabModelImporter >> parseNoteJson: results [
 		mapping decoder: [ :string |
 			DateAndTime readFrom: string readStream ] ]."
 
-	
+
 	^ reader nextAs: #ArrayOfNote
 ]
 

@@ -56,7 +56,8 @@ Class {
 		'#internal => FMProperty',
 		'#imported => FMProperty',
 		'#imported_from => FMProperty',
-		'#mergeRequest => FMOne type: #GLHMergeRequest opposite: #note'
+		'#mergeRequest => FMOne type: #GLHMergeRequest opposite: #note',
+		'#position => FMOne type: #GLHNotePosition opposite: #note'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }
@@ -251,6 +252,18 @@ GLHNote >> noteable_type [
 GLHNote >> noteable_type: anObject [
 	<generated>
 	noteable_type := anObject
+]
+
+{ #category : #accessing }
+GLHNote >> position [
+
+	^ position
+]
+
+{ #category : #accessing }
+GLHNote >> position: anObject [
+
+	position := anObject
 ]
 
 { #category : #accessing }
