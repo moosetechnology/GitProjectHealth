@@ -177,15 +177,9 @@ GLHMetamodelGenerator >> defineClasses [
 		        comment:
 		        'a note (a diff) proposed in a Merge Request; can be accepted, modified or deleted'.
 
-	note := builder
-		        newClassNamed: #Note
-		        comment:
-		        'a note (a diff) proposed in a Merge Request; can be accepted, modified or deleted'.
-		
 	notePosition := builder
-		        newClassNamed: #NotePosition
-		        comment:
-		        'indicate the position of a note'.
+		                newClassNamed: #NotePosition
+		                comment: 'indicate the position of a note'.
 
 	tag := builder
 		       newClassNamed: #Tag
