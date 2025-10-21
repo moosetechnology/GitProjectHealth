@@ -10,6 +10,7 @@ a note (a diff) proposed in a Merge Request; can be accepted, modified or delete
 | `mergeRequest` | `GLHNote` | `note` | `GLHMergeRequest` | |
 | `position` | `GLHNote` | `note` | `GLHNotePosition` | |
 | `position` | `GLHNote` | `note` | `GLHNotePosition` | |
+| `position` | `GLHNote` | `note` | `GLHNotePosition` | |
 
 
 ## Properties

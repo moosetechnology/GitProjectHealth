@@ -1447,21 +1447,25 @@ GitlabModelImporter >> importMergeResquestMerger: aGLPHEMergeRequest [
 
 { #category : #'import - notes' }
 GitlabModelImporter >> importNotesOfMergeRequest: mergeRequest [
+
 	| results notes |
-	
-	results := self repoApi notes allInMergeRequest: mergeRequest iid ofProject: mergeRequest project id.
-	
-	notes := results collect: [ :note | 
-		self parseNoteJson: note ].
+	results := self repoApi notes
+		           allInMergeRequest: mergeRequest iid
+		           ofProject: mergeRequest project id.
+
+	notes := results collect: [ :note | self parseNoteJson: note ].
 	"notes := self parseNoteJson: results."
-	notes do: [ :tabNotes | tabNotes do: [ :note |
+	notes do: [ :tabNotes |
+		tabNotes do: [ :note |
 			note author: (self importUser: (note author at: #id)).
-			note name: note id asString]. ].
+			note name: note id asString ] ].
 	notes := notes flattened.
-	notes := self glhModel addAll: notes unless: self blockOnIdEquality. 
-	notes := mergeRequest note addAll: notes unless: self blockOnIdEquality. 
-	^notes
+	notes := self glhModel addAll: notes unless: self blockOnIdEquality.
+	notes := mergeRequest note
+		         addAll: notes
+		         unless: self blockOnIdEquality.
 	
+	^ notes
 ]
 
 { #category : #'import - commits' }

@@ -584,9 +584,9 @@ GLHMetamodelGenerator >> noteSuggestionProperties [
 ]
 
 { #category : #notes }
-GLHMetamodelGenerator >> noteSuggestionRelations [ 
+GLHMetamodelGenerator >> noteSuggestionRelations [
 
-	(noteSuggestion property: #note) - (note property: #position)
+	(noteSuggestion property: #note) -* (note property: #suggestions)
 ]
 
 { #category : #pipelines }

@@ -9,6 +9,7 @@ indicate the position of a note
 |---|
 | `note` | `GLHNotePosition` | `position` | `GLHNote` | |
 | `note` | `GLHNotePosition` | `position` | `GLHNote` | |
+| `note` | `GLHNotePosition` | `position` | `GLHNote` | |
 
 
 ## Properties
