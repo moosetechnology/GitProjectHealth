@@ -22,6 +22,7 @@ Class {
 		'deletion',
 		'lineOfCode',
 		'note',
+		'notePosition',
 		'entity',
 		'release',
 		'tag',
@@ -176,6 +177,15 @@ GLHMetamodelGenerator >> defineClasses [
 		        comment:
 		        'a note (a diff) proposed in a Merge Request; can be accepted, modified or deleted'.
 
+	note := builder
+		        newClassNamed: #Note
+		        comment:
+		        'a note (a diff) proposed in a Merge Request; can be accepted, modified or deleted'.
+		
+	notePosition := builder
+		        newClassNamed: #NotePosition
+		        comment:
+		        'indicate the position of a note'.
 
 	tag := builder
 		       newClassNamed: #Tag
@@ -187,16 +197,16 @@ GLHMetamodelGenerator >> defineClasses [
 		           newClassNamed: #Release
 		           comment:
 		           'a Release is typically associated with a tag and provide additional metadata and assets that can be distributed to users'.
-		
+
 	issue := builder
 		         newClassNamed: #Issue
 		         comment:
 		         'an Issues help collaboration within a team to plan, track, and deliver work'.
-		
+
 	milestone := builder
-		         newClassNamed: #Milestone
-		         comment:
-		         'a Milestone is use to track progress on groups of issues or pull requests in a repository'.
+		             newClassNamed: #Milestone
+		             comment:
+		             'a Milestone is use to track progress on groups of issues or pull requests in a repository'
 ]
 
 { #category : #definition }
@@ -214,11 +224,12 @@ GLHMetamodelGenerator >> defineHierarchy [
 	diff --|> #TNamedEntity.
 	job --|> #TNamedEntity.
 	note --|> #TNamedEntity.
-	
+	notePosition  --|> #TNamedEntity.
+
 	tRef --|> #TNamedEntity.
-	tRef <|-- commit .
-	tRef <|-- branch .
-	tRef <|-- tag .
+	tRef <|-- commit.
+	tRef <|-- branch.
+	tRef <|-- tag.
 
 	change --|> #TNamedEntity.
 	change <|-- addition.
@@ -227,7 +238,7 @@ GLHMetamodelGenerator >> defineHierarchy [
 	mergeRequest --|> #TNamedEntity.
 
 	issue --|> #TNamedEntity.
-	milestone --|> #TNamedEntity. 
+	milestone --|> #TNamedEntity
 ]
 
 { #category : #definition }
@@ -248,12 +259,13 @@ GLHMetamodelGenerator >> defineProperties [
 	self mergeRequestProperties.
 	self diffRangeProperties.
 	self noteProperties.
+	self notePositionProperties.
 	self tagProperties.
 	self releaseProperties.
 	self issueProperties.
 	self milestoneProperties.
-	
-	self tRefProperties. 
+
+	self tRefProperties
 ]
 
 { #category : #definition }
@@ -289,7 +301,8 @@ GLHMetamodelGenerator >> defineRelations [
 	self issueRelations.
 	self mergeRequestsRelations.
 	self noteRelations.
-	self milestoneRelations. 
+	self milestoneRelations.
+	self notePositionRelations
 ]
 
 { #category : #definition }
@@ -505,6 +518,24 @@ GLHMetamodelGenerator >> milestoneRelations [
 ]
 
 { #category : #notes }
+GLHMetamodelGenerator >> notePositionProperties [
+
+	notePosition property: #file_path type: #String.
+	notePosition property: #original_file_path type: #String.
+	notePosition property: #start_line type: #Number.
+	notePosition property: #start_line_type type: #String.
+	notePosition property: #end_line type: #Number.
+	notePosition property: #end_line_type type: #String.
+	notePosition property: #note type: #Object
+]
+
+{ #category : #notes }
+GLHMetamodelGenerator >> notePositionRelations [
+
+	 (notePosition property: #note) - (note property: #position)
+]
+
+{ #category : #notes }
 GLHMetamodelGenerator >> noteProperties [ 
 	note property: #id type: #Number.
 	note property: #body type: #String. 
@@ -534,10 +565,10 @@ GLHMetamodelGenerator >> noteProperties [
 
 ]
 
-{ #category : #'merge requests' }
+{ #category : #notes }
 GLHMetamodelGenerator >> noteRelations [
 
-	(note property: #mergeRequest) *- (mergeRequest property: #note)
+	(note property: #position) - (notePosition property: #note).
 ]
 
 { #category : #pipelines }

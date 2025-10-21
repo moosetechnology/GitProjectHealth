@@ -314,10 +314,8 @@ GitModelImporter >> configureReaderForNotePosition: reader [
 
 	reader mapInstVarsFor: GLHNotePosition.
 
-	reader
-		for: #ArrayOfNotePosition
-		customDo: [ :customMappting |
-		customMappting listOfElementSchema: GLHNotePosition ]
+	reader for: #ArrayOfNotePosition customDo: [ :customMapping |
+		customMapping listOfElementSchema: GLHNotePosition ]
 ]
 
 { #category : #'private - configure reader' }
@@ -671,7 +669,7 @@ GitModelImporter >> initReader [
 			string ifNil: [ nil ] ifNotNil: [ DateAndTime fromString: string ] ] ].
 
 	configurators := (self class allSelectors select: [ :m |
-		                 m beginsWith: #configureReaderFor ]) asSet.
+		                  m beginsWith: #configureReaderFor ]) asSet.
 
 	configurators do: [ :configureReader |
 		self perform: configureReader with: generalReader ]
