@@ -303,7 +303,7 @@ GLHMetamodelGenerator >> defineRelations [
 	self mergeRequestsRelations.
 	self noteRelations.
 	self notePositionRelations.
-	self noteSuggestionProperties.
+	self noteSuggestionRelations.
 	self milestoneRelations.
 	self notePositionRelations
 ]
