@@ -1,11 +1,11 @@
 Class {
-	#name : #SelfMergedMergeRequestMetric,
+	#name : #MergeRequestMergedByUserMetric,
 	#superclass : #UserMergeRequestMetric,
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
 { #category : #calculating }
-SelfMergedMergeRequestMetric >> calculate [
+MergeRequestMergedByUserMetric >> calculate [
 
 	| groupedByDate userMergedMergeRequests dateOver |
 		userMergeRequests ifNil: [ self load ].
@@ -33,13 +33,13 @@ SelfMergedMergeRequestMetric >> calculate [
 ]
 
 { #category : #accessing }
-SelfMergedMergeRequestMetric >> description [
+MergeRequestMergedByUserMetric >> description [
 
 	^ 'number of merge request merged by this user'
 ]
 
 { #category : #'as yet unclassified' }
-SelfMergedMergeRequestMetric >> load [
+MergeRequestMergedByUserMetric >> load [
 
 	userMergeRequests := self
 		                     loadMergeRequestsSince: (period at: #since)
@@ -47,7 +47,7 @@ SelfMergedMergeRequestMetric >> load [
 ]
 
 { #category : #accessing }
-SelfMergedMergeRequestMetric >> name [
+MergeRequestMergedByUserMetric >> name [
 
 	^ 'selfMergedMergeRequest'
 ]
