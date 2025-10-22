@@ -46,6 +46,80 @@ MergedMergeRequestMetricTest >> testCalculate [
 ]
 
 { #category : #tests }
+MergedMergeRequestMetricTest >> testCalculate1MRCreatedBeforeAndMergeAfterPeriod [
+
+	| result glhImporter mergedMergeRequest |
+	"Given"
+	glhImporter := GLPHImporterMock new.
+	glhImporter mergeRequests: {
+			(GLHMergeRequest new
+				 author: user;
+				 project: project1;
+				 merge_user: user;
+				 created_at: createdAt;
+				 merged_at: mergedAt).
+
+			"opened anotherWeek"
+			(GLHMergeRequest new
+				 author: user;
+				 merge_user: user;
+				 project: project1;
+				 created_at: createdAt - 10 days;
+				 merged_at: createdAt + 10 days) }.
+	"open and merge during the same week"
+
+
+	mergedMergeRequest := MergedMergeRequestMetric new
+		                      user: user;
+		                      glhImporter: glhImporter;
+		                      setPeriodSince: since until: until;
+		                      over: Week.
+
+	"When"
+	result := mergedMergeRequest calculate.
+
+	"Then"
+	self assert: result equals: 1
+]
+
+{ #category : #tests }
+MergedMergeRequestMetricTest >> testCalculate1MRCreatedBeforePeriod [
+
+	| result glhImporter mergedMergeRequest |
+	"Given"
+	glhImporter := GLPHImporterMock new.
+	glhImporter mergeRequests: {
+			(GLHMergeRequest new
+				 author: user;
+				 project: project1;
+				 merge_user: user;
+				 created_at: createdAt;
+				 merged_at: mergedAt).
+
+			"opened anotherWeek"
+			(GLHMergeRequest new
+				 author: user;
+				 merge_user: user;
+				 project: project1;
+				 created_at: createdAt - 10 days;
+				 merged_at: createdAt) }.
+	"open and merge during the same week"
+
+
+	mergedMergeRequest := MergedMergeRequestMetric new
+		                      user: user;
+		                      glhImporter: glhImporter;
+		                      setPeriodSince: since until: until;
+		                      over: Week.
+
+	"When"
+	result := mergedMergeRequest calculate.
+
+	"Then"
+	self assert: result equals: 2
+]
+
+{ #category : #tests }
 MergedMergeRequestMetricTest >> testCalculate1MRInPeriod1Outside [
 
 	| result glhImporter mergedMergeRequest |
