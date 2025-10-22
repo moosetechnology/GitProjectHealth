@@ -40,3 +40,10 @@ GLHGroupGroup >> isQueryable [
 	<generated>
 	^ false
 ]
+
+{ #category : #testing }
+GLHGroupGroup >> isRef [
+
+	<generated>
+	^ false
+]

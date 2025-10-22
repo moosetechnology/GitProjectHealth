@@ -3,10 +3,23 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'total_count',
-		'workflow_runs'
+		'workflow_runs',
+		'jobs'
 	],
 	#category : #'GitHubHealth-Model-Importer'
 }
+
+{ #category : #accessing }
+GHAPIPipelineOverview >> jobs [
+
+	^ jobs
+]
+
+{ #category : #accessing }
+GHAPIPipelineOverview >> jobs: anObject [
+
+	jobs := anObject
+]
 
 { #category : #accessing }
 GHAPIPipelineOverview >> total_count [

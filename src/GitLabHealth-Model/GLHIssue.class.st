@@ -7,14 +7,14 @@ an Issues help collaboration within a team to plan, track, and deliver work
 ### Parents
 | Relation | Origin | Opposite | Type | Comment |
 |---|
+| `author` | `GLHIssue` | `createdIssue` | `GLHUser` | |
 | `milestone` | `GLHIssue` | `issue` | `GLHMilestone` | |
-| `project` | `GLHIssue` | `issue` | `GLHProject` | |
+| `project` | `GLHIssue` | `issues` | `GLHProject` | |
 
 ### Children
 | Relation | Origin | Opposite | Type | Comment |
 |---|
 | `assignees` | `GLHIssue` | `assignedIssue` | `GLHUser` | |
-| `author` | `GLHIssue` | `createdIssue` | `GLHUser` | |
 
 
 ## Properties
@@ -47,7 +47,7 @@ Class {
 		'#updated_at => FMProperty',
 		'#closed_at => FMProperty',
 		'#due_date => FMProperty',
-		'#project => FMOne type: #GLHProject opposite: #issue',
+		'#project => FMOne type: #GLHProject opposite: #issues',
 		'#assignees => FMMany type: #GLHUser opposite: #assignedIssue',
 		'#author => FMOne type: #GLHUser opposite: #createdIssue',
 		'#milestone => FMOne type: #GLHMilestone opposite: #issue'
@@ -98,6 +98,7 @@ GLHIssue >> author [
 	"Relation named: #author type: #GLHUser opposite: #createdIssue"
 
 	<generated>
+	<container>
 	^ author
 ]
 
@@ -224,7 +225,7 @@ GLHIssue >> name: anObject [
 
 { #category : #accessing }
 GLHIssue >> project [
-	"Relation named: #project type: #GLHProject opposite: #issue"
+	"Relation named: #project type: #GLHProject opposite: #issues"
 
 	<generated>
 	<container>
