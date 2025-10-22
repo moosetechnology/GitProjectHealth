@@ -1,3 +1,9 @@
+"
+I compute the case where an MR has for author the _user_, and has been merged
+
+If the merge is merged by someone else, it counts since my _user_ created the MR
+If the merge is created by someone else, and my _user_ merge it, it does not cound (the important is that the _user_ created it)
+"
 Class {
 	#name : #MergedMergeRequestMetric,
 	#superclass : #UserMergeRequestMetric,
@@ -7,22 +13,17 @@ Class {
 { #category : #calculating }
 MergedMergeRequestMetric >> calculate [
 
-	| groupedByDate userMergedMergeRequests dateOver |
-		userMergeRequests ifNil: [ self load ].
+	| groupedByDate dateOver |
+	userMergeRequests ifNil: [ self load ].
 
 	groupedByDate := self setupGroupedDate.
 
-	"filter to see the MR associated to one user"
-	userMergedMergeRequests := userMergeRequests select: [
-		                           :userMergeRequest |
-		                           userMergeRequest merge_user isNotNil 
-												and: [ userMergeRequest merge_user id = user id ] ].
-											
+
 	"filter to reject MR that are not merge"
-	userMergedMergeRequests := userMergedMergeRequests reject: [ :mr | mr merged_at isNil ].
-	
-	userMergedMergeRequests do: [ :userMergeRequest |
-		"here we look at the specific date of its merged"
+	userMergeRequests := userMergeRequests reject: [ :mr |
+		                     mr merged_at isNil ].
+
+	userMergeRequests do: [ :userMergeRequest | "here we look at the specific date of its merged"
 		dateOver := self transformDate: userMergeRequest merged_at to: over.
 		groupedByDate
 			at: dateOver printString
@@ -35,15 +36,7 @@ MergedMergeRequestMetric >> calculate [
 { #category : #accessing }
 MergedMergeRequestMetric >> description [
 
-	^ 'number of merge request merged by this user'
-]
-
-{ #category : #loading }
-MergedMergeRequestMetric >> load [
-
-	userMergeRequests := self
-		                     loadMergeRequestsSince: (period at: #since)
-		                     until: (period at: #until)
+	^ 'number of merge request created by this user that is merged'
 ]
 
 { #category : #accessing }
