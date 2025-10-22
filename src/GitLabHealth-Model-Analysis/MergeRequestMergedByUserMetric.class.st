@@ -49,5 +49,5 @@ MergeRequestMergedByUserMetric >> load [
 { #category : #accessing }
 MergeRequestMergedByUserMetric >> name [
 
-	^ 'selfMergedMergeRequest'
+	^ 'mergeRequestMergedByThisUser'
 ]
