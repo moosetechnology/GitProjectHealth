@@ -1,19 +1,24 @@
 "
 suggestion of code made in a note
 
+## Relations
+======================
+
+### Other
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `note` | `GLHNoteSuggestion` | `suggestions` | `GLHNote` | |
+
+
 ## Properties
 ======================
 
 | Name | Type | Default value | Comment |
 |---|
 | `from_content` | `String` | nil | |
-| `from_content` | `String` | nil | |
-| `from_line` | `Number` | nil | |
 | `from_line` | `Number` | nil | |
 | `name` | `String` | nil | Basic name of the entity, not full reference.|
 | `to_content` | `String` | nil | |
-| `to_content` | `String` | nil | |
-| `to_line` | `Number` | nil | |
 | `to_line` | `Number` | nil | |
 
 "
@@ -26,7 +31,8 @@ Class {
 		'#from_line => FMProperty',
 		'#to_line => FMProperty',
 		'#from_content => FMProperty',
-		'#to_content => FMProperty'
+		'#to_content => FMProperty',
+		'#note => FMMany type: #GLHNote opposite: #suggestions'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }
@@ -38,6 +44,12 @@ GLHNoteSuggestion class >> annotation [
 	<package: #'GitLabHealth-Model'>
 	<generated>
 	^ self
+]
+
+{ #category : #adding }
+GLHNoteSuggestion >> addNote: anObject [
+	<generated>
+	^ self note add: anObject
 ]
 
 { #category : #accessing }
@@ -66,6 +78,22 @@ GLHNoteSuggestion >> from_line [
 GLHNoteSuggestion >> from_line: anObject [
 	<generated>
 	from_line := anObject
+]
+
+{ #category : #accessing }
+GLHNoteSuggestion >> note [
+	"Relation named: #note type: #GLHNote opposite: #suggestions"
+
+	<generated>
+	<derived>
+	^ note
+]
+
+{ #category : #accessing }
+GLHNoteSuggestion >> note: anObject [
+
+	<generated>
+	note value: anObject
 ]
 
 { #category : #accessing }

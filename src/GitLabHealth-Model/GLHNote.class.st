@@ -11,6 +11,7 @@ a note (a diff) proposed in a Merge Request; can be accepted, modified or delete
 | `position` | `GLHNote` | `note` | `GLHNotePosition` | |
 | `position` | `GLHNote` | `note` | `GLHNotePosition` | |
 | `position` | `GLHNote` | `note` | `GLHNotePosition` | |
+| `suggestions` | `GLHNote` | `note` | `GLHNoteSuggestion` | |
 
 
 ## Properties
@@ -60,7 +61,8 @@ Class {
 		'#imported => FMProperty',
 		'#imported_from => FMProperty',
 		'#mergeRequest => FMOne type: #GLHMergeRequest opposite: #note',
-		'#position => FMOne type: #GLHNotePosition opposite: #note'
+		'#position => FMOne type: #GLHNotePosition opposite: #note',
+		'#suggestions => FMOne type: #GLHNoteSuggestion opposite: #note'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }
@@ -298,6 +300,21 @@ GLHNote >> resolvable [
 GLHNote >> resolvable: anObject [
 	<generated>
 	resolvable := anObject
+]
+
+{ #category : #accessing }
+GLHNote >> suggestions [
+	"Relation named: #suggestions type: #GLHNoteSuggestion opposite: #note"
+
+	<generated>
+	^ suggestions
+]
+
+{ #category : #accessing }
+GLHNote >> suggestions: anObject [
+
+	<generated>
+	suggestions := anObject
 ]
 
 { #category : #accessing }

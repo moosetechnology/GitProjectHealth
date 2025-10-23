@@ -392,24 +392,26 @@ GitlabModelImporter >> configureReaderForNotePosition: reader [
 			mapProperty: #line_range
 			getter: [  ]
 			setter: [ :notePosition :rawLineRange |
-				rawLineRange ifNotNil: [
-					| start startType startLine end endType endLine |
-					start := rawLineRange at: #start.
-					startType := start at: #type.
-					startLine := (start at: #type) = 'new'
-						             ifTrue: [ start at: #new_line ]
-						             ifFalse: [ start at: #old_line ].
-					notePosition start_line_type: (start at: #type).
-					notePosition start_line: startLine.
+				rawLineRange
+					ifNil: [ notePosition end_line = notePosition start_line ]
+					ifNotNil: [
+						| start startType startLine end endType endLine |
+						start := rawLineRange at: #start.
+						startType := start at: #type.
+						startLine := (start at: #type) = 'new'
+							             ifTrue: [ start at: #new_line ]
+							             ifFalse: [ start at: #old_line ].
+						notePosition start_line_type: (start at: #type).
+						notePosition start_line: startLine.
 
 
-					end := rawLineRange at: #end.
-					endType := end at: #type.
-					endLine := (end at: #type) = 'new'
-						           ifTrue: [ end at: #new_line ]
-						           ifFalse: [ end at: #old_line ].
-					notePosition end_line_type: (end at: #type).
-					notePosition end_line: endLine ]]]
+						end := rawLineRange at: #end.
+						endType := end at: #type.
+						endLine := (end at: #type) = 'new'
+							           ifTrue: [ end at: #new_line ]
+							           ifFalse: [ end at: #old_line ].
+						notePosition end_line_type: (end at: #type).
+						notePosition end_line: endLine ] ] ]
 ]
 
 { #category : #'private - configure reader' }
@@ -538,6 +540,61 @@ GitlabModelImporter >> detectEntityType: aType overAttribut: aSelector equalTo: 
 
 	^ (self glhModel allWithType: aType) detect: [ :entity |
 		  (entity perform: aSelector) = value ] ifNone: [ nil ]. 
+]
+
+{ #category : #'import - notes' }
+GitlabModelImporter >> getSuggestionsFromNote: glhNote [
+
+	| suggestions suggestion fromLine toLine suggestionsInfo |
+	glhNote position ifNil: [ ^ {  } ].
+	suggestions := MooseGroup new.
+
+	suggestionsInfo := self getSuggestionsInfoFromString: glhNote body.
+
+	^ suggestionsInfo collect: [ :suggestionInfo |
+		  suggestion := GLHNoteSuggestion new.
+		  fromLine := glhNote position end_line - (suggestionInfo at: #minus).
+		  toLine := glhNote position end_line + (suggestionInfo at: #plus).
+		  suggestion from_line: fromLine.
+		  suggestion to_line: toLine.
+		  suggestion to_content: (suggestionInfo at: #content) ].
+
+]
+
+{ #category : #'import - notes' }
+GitlabModelImporter >> getSuggestionsInfoFromString: string [
+
+	| suggestionsInfo regex result regex2 suggestionInfo |
+	suggestionsInfo := OrderedCollection new.
+
+	regex := '```suggestion' asRegex.
+	result := regex matchesIn: string.
+
+	result isEmpty ifTrue: [ ^ suggestionsInfo ].
+	result size > 1 ifTrue: [
+		| start end firstPart secondPart |
+		start := string findString: '```suggestion'.
+		end := (string findString: '```' startingAt: start +2) + 2.
+
+		firstPart := string copyFrom: 1 to: end.
+		secondPart := string copyFrom: end to: string size.
+
+		suggestionsInfo addAll:
+			(self getSuggestionsInfoFromString: firstPart).
+		suggestionsInfo addAll:
+			(self getSuggestionsInfoFromString: secondPart).
+		^ suggestionsInfo ].
+
+	regex2 := '```suggestion\:-(\d+)\+(\d+)(.*)```' asRegex.
+	regex2 search: string.
+
+	suggestionInfo := {
+		                  (#minus -> (regex2 subexpression: 2) asNumber).
+		                  (#plus -> (regex2 subexpression: 3) asNumber).
+		                  (#content -> (regex2 subexpression: 4)) }
+		                  asDictionary.
+
+	^ { suggestionInfo }
 ]
 
 { #category : #accessing }
@@ -1454,17 +1511,23 @@ GitlabModelImporter >> importNotesOfMergeRequest: mergeRequest [
 		           ofProject: mergeRequest project id.
 
 	notes := results collect: [ :note | self parseNoteJson: note ].
-	"notes := self parseNoteJson: results."
+	
 	notes do: [ :tabNotes |
 		tabNotes do: [ :note |
 			note author: (self importUser: (note author at: #id)).
-			note name: note id asString ] ].
+			note name: note id asString.
+			
+			note suggestions: (self getSuggestionsFromNote: note)
+			
+	] ].
 	notes := notes flattened.
 	notes := self glhModel addAll: notes unless: self blockOnIdEquality.
 	notes := mergeRequest note
 		         addAll: notes
 		         unless: self blockOnIdEquality.
-	
+		
+
+
 	^ notes
 ]
 
