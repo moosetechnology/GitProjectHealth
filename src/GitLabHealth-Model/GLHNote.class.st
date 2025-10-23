@@ -62,7 +62,7 @@ Class {
 		'#imported_from => FMProperty',
 		'#mergeRequest => FMOne type: #GLHMergeRequest opposite: #note',
 		'#position => FMOne type: #GLHNotePosition opposite: #note',
-		'#suggestions => FMOne type: #GLHNoteSuggestion opposite: #note'
+		'#suggestions => FMMany type: #GLHNoteSuggestion opposite: #note'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }
@@ -74,6 +74,12 @@ GLHNote class >> annotation [
 	<package: #'GitLabHealth-Model'>
 	<generated>
 	^ self
+]
+
+{ #category : #adding }
+GLHNote >> addSuggestion: anObject [
+	<generated>
+	^ self suggestions add: anObject
 ]
 
 { #category : #accessing }
@@ -307,6 +313,7 @@ GLHNote >> suggestions [
 	"Relation named: #suggestions type: #GLHNoteSuggestion opposite: #note"
 
 	<generated>
+	<derived>
 	^ suggestions
 ]
 
@@ -314,7 +321,7 @@ GLHNote >> suggestions [
 GLHNote >> suggestions: anObject [
 
 	<generated>
-	suggestions := anObject
+	suggestions value: anObject
 ]
 
 { #category : #accessing }

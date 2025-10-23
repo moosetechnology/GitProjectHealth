@@ -379,21 +379,25 @@ GitlabModelImporter >> configureReaderForNotePosition: reader [
 			getter: [  ]
 			setter: [ :notePosition :newLine |
 				notePosition start_line: newLine.
-				notePosition start_line_type: 'new' ].
+				notePosition start_line_type: 'new'.
+				notePosition end_line: newLine.
+				notePosition end_line_type: 'new'. ].
 
 		mapping
 			mapProperty: #old_line
 			getter: [  ]
 			setter: [ :notePosition :oldLine |
 				notePosition start_line: oldLine.
-				notePosition start_line_type: 'old' ].
+				notePosition start_line_type: 'old'.
+				notePosition end_line: oldLine.
+				notePosition end_line_type: 'old'.
+		].
 
 		mapping
 			mapProperty: #line_range
 			getter: [  ]
 			setter: [ :notePosition :rawLineRange |
 				rawLineRange
-					ifNil: [ notePosition end_line = notePosition start_line ]
 					ifNotNil: [
 						| start startType startLine end endType endLine |
 						start := rawLineRange at: #start.
