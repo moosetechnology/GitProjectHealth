@@ -647,7 +647,7 @@ GitlabModelImporterTest >> testParseNote [
   "confidential": false,
   "internal": false
 }]'.
-	notesArray := importer parseNoteJson: jsonNote.
+	notesArray := importer parseNotesResult: jsonNote.
 	note := notesArray first.
 	self assert: notesArray size equals: 1.
 	self assert: note body equals: 'Comment for MR'
