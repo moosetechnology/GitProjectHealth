@@ -1708,18 +1708,17 @@ GitlabModelImporter >> importSuggestionsFromNote: glhNote [
 	suggestionsInfo := self importSuggestionsInfoFromString: glhNote body.
 
 	suggestions := suggestionsInfo collect: [ :suggestionInfo |
-		  suggestion := GLHNoteSuggestion new.
-		  fromLine := glhNote position end_line
-		              - (suggestionInfo at: #minus).
-		  toLine := glhNote position end_line + (suggestionInfo at: #plus).
-		  suggestion from_line: fromLine.
-		  suggestion to_line: toLine.
-		  suggestion to_content: (suggestionInfo at: #content).
-		  suggestion ].
-	
-	^self glhModel addAll: suggestions unless: self blockOnIdEquality.
-	
+		               suggestion := GLHNoteSuggestion new.
+		               fromLine := glhNote position end_line
+		                           - (suggestionInfo at: #minus).
+		               toLine := glhNote position end_line
+		                         + (suggestionInfo at: #plus).
+		               suggestion from_line: fromLine.
+		               suggestion to_line: toLine.
+		               suggestion to_content: (suggestionInfo at: #content).
+		               suggestion ].
 
+	^ suggestions
 ]
 
 { #category : #'import - notes' }
