@@ -1717,8 +1717,12 @@ GitlabModelImporter >> importSuggestionsFromNote: glhNote [
 		               suggestion to_line: toLine.
 		               suggestion to_content: (suggestionInfo at: #content).
 		               suggestion ].
+	
+	1 halt.
 
-	^ suggestions
+	^ glhModel
+		  addAll: suggestions
+		  unless: self blockForNoteSuggestionEquality
 ]
 
 { #category : #'import - notes' }

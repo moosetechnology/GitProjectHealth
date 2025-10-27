@@ -160,6 +160,20 @@ GitModelImporter >> blockForDiffRangeEquality [
 ]
 
 { #category : #equality }
+GitModelImporter >> blockForNoteSuggestionEquality [
+
+
+^ [ :existing :new |
+	 | sameLine sameNote sameContent |
+	  sameLine := existing to_line = new to_line.
+	  sameNote := existing note id = new note id.
+	  sameContent := existing to_content = new to_content.
+	  sameLine and: (sameNote and: sameContent)
+	
+	]
+]
+
+{ #category : #equality }
 GitModelImporter >> blockOnIdEquality [
 
 	^ [ :existing :new |
