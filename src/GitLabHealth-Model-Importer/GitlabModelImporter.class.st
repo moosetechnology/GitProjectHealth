@@ -353,15 +353,76 @@ GitlabModelImporter >> configureReaderForMergeRequest: reader [
 						object cacheAt: #mergeUserID put: (value at: #id) ] ] ]
 ]
 
-{ #category : #'private - parsing' }
+{ #category : #'private - configure reader' }
 GitlabModelImporter >> configureReaderForNote: reader [
 
 	super configureReaderForNote: reader.
 
 	reader for: GLHNote do: [ :mapping |
 		
+		mapping
+				mapProperty: #author
+				getter: [  ]
+				setter: [ :note :rawUser |
+				note cacheAt: #userID put: (rawUser at: #id) ].
+		
 		(mapping mapInstVar: #created_at) valueSchema: DateAndTime.
-		(mapping mapInstVar: #updated_at) valueSchema: DateAndTime ]
+		(mapping mapInstVar: #updated_at) valueSchema: DateAndTime.
+
+		(mapping mapInstVar: #position) valueSchema: GLHNotePosition ]
+]
+
+{ #category : #'private - configure reader' }
+GitlabModelImporter >> configureReaderForNotePosition: reader [
+
+	super configureReaderForNotePosition: reader.
+
+	reader for: GLHNotePosition do: [ :mapping |
+		mapping mapInstVar: #file_path to: #new_path.
+		mapping mapInstVar: #original_file_path to: #old_path.
+
+		mapping
+			mapProperty: #new_line
+			getter: [  ]
+			setter: [ :notePosition :newLine |
+				notePosition start_line: newLine.
+				notePosition start_line_type: 'new'.
+				notePosition end_line: newLine.
+				notePosition end_line_type: 'new'. ].
+
+		mapping
+			mapProperty: #old_line
+			getter: [  ]
+			setter: [ :notePosition :oldLine |
+				notePosition start_line: oldLine.
+				notePosition start_line_type: 'old'.
+				notePosition end_line: oldLine.
+				notePosition end_line_type: 'old'.
+		].
+
+		mapping
+			mapProperty: #line_range
+			getter: [  ]
+			setter: [ :notePosition :rawLineRange |
+				rawLineRange
+					ifNotNil: [
+						| start startType startLine end endType endLine |
+						start := rawLineRange at: #start.
+						startType := start at: #type.
+						startLine := (start at: #type) = 'new'
+							             ifTrue: [ start at: #new_line ]
+							             ifFalse: [ start at: #old_line ].
+						notePosition start_line_type: (start at: #type).
+						notePosition start_line: startLine.
+
+
+						end := rawLineRange at: #end.
+						endType := end at: #type.
+						endLine := (end at: #type) = 'new'
+							           ifTrue: [ end at: #new_line ]
+							           ifFalse: [ end at: #old_line ].
+						notePosition end_line_type: (end at: #type).
+						notePosition end_line: endLine ] ] ]
 ]
 
 { #category : #'private - configure reader' }
@@ -1333,7 +1394,7 @@ GitlabModelImporter >> importMergeRequestsOfProject: aGLHProject since: fromDate
 		aGLHProject mergeRequests do: [ :mr |
 			self importDiffOfMergeRequest: mr ] ].
 
-	self glhModel
+	mergeRequests := self glhModel
 		addAll: mergeRequests
 		unless: (self blockEqualityOn: #iid).
 
@@ -1399,21 +1460,40 @@ GitlabModelImporter >> importMergeResquestMerger: aGLPHEMergeRequest [
 
 { #category : #'import - notes' }
 GitlabModelImporter >> importNotesOfMergeRequest: mergeRequest [
+
 	| results notes |
-	
-	results := self repoApi notes allInMergeRequest: mergeRequest iid ofProject: mergeRequest project id.
-	
-	notes := results collect: [ :note | 
-		self parseNoteJson: note ].
-	"notes := self parseNoteJson: results."
-	notes do: [ :tabNotes | tabNotes do: [ :note |
-			note author: (self importUser: (note author at: #id)).
-			note name: note id asString]. ].
-	notes := notes flattened.
-	notes := self glhModel addAll: notes unless: self blockOnIdEquality. 
-	notes := mergeRequest note addAll: notes unless: self blockOnIdEquality. 
-	^notes
-	
+	results := self repoApi notes
+		           allInMergeRequest: mergeRequest iid
+		           ofProject: mergeRequest project id.
+
+	notes := (results collect: [ :rawNotes |
+		          | items |
+		          items := self parseNotesResult: rawNotes.
+		          (items select: [ :item | item position isNotNil ]) do: [
+			          :item |
+			          | position |
+			          position := self glhModel
+				                      add: item position
+				                      unless: [ :existing :new |
+					                      new note isNotNil and: [
+						                      existing note id = new note id ] ].
+			          position note: item ].
+		          items ]) flattened.
+
+	notes := mergeRequest note
+		         addAll: notes
+		         unless: self blockOnIdEquality.
+	notes := self glhModel addAll: notes unless: self blockOnIdEquality.
+
+	notes do: [ :note | "	self haltIf: [ note id = 553666 ]."
+		note
+			cacheAt: #userID
+			ifPresent: [ :id | note author: (self importUser: id) ].
+		note name: note id asString.
+
+		note suggestions: (self importSuggestionsFromNote: note) ].
+
+	^ notes
 ]
 
 { #category : #'import - commits' }
@@ -1615,6 +1695,66 @@ GitlabModelImporter >> importSZZFromCommit: aCommit [
 						 importCommit: (blame at: #commit at: #id)
 						 ofProject: aCommit repository project) ] ] ].
 	^ szzCommits
+]
+
+{ #category : #'import - notes' }
+GitlabModelImporter >> importSuggestionsFromNote: glhNote [
+
+	| suggestions suggestion fromLine toLine suggestionsInfo |
+	glhNote position ifNil: [ ^ {  } ].
+	suggestions := MooseGroup new.
+
+
+	suggestionsInfo := self importSuggestionsInfoFromString: glhNote body.
+
+	suggestions := suggestionsInfo collect: [ :suggestionInfo |
+		               suggestion := GLHNoteSuggestion new.
+		               fromLine := glhNote position end_line
+		                           - (suggestionInfo at: #minus).
+		               toLine := glhNote position end_line
+		                         + (suggestionInfo at: #plus).
+		               suggestion from_line: fromLine.
+		               suggestion to_line: toLine.
+		               suggestion to_content: (suggestionInfo at: #content).
+		               suggestion ].
+
+	^ suggestions
+]
+
+{ #category : #'import - notes' }
+GitlabModelImporter >> importSuggestionsInfoFromString: string [
+
+	| suggestionsInfo regex result regex2 suggestionInfo |
+	suggestionsInfo := OrderedCollection new.
+	regex := '```suggestion' asRegex.
+	result := regex matchesIn: string.
+
+	result isEmpty ifTrue: [ ^ suggestionsInfo ].
+
+	result size > 1 ifTrue: [
+		| start end firstPart secondPart |
+		start := string findString: '```suggestion'.
+		end := (string findString: '```' startingAt: start + 2) + 2.
+
+		firstPart := string copyFrom: 1 to: end.
+		secondPart := string copyFrom: end to: string size.
+
+		suggestionsInfo addAll:
+			(self importSuggestionsInfoFromString: firstPart).
+		suggestionsInfo addAll:
+			(self importSuggestionsInfoFromString: secondPart).
+		^ suggestionsInfo ].
+
+	regex2 := '```suggestion\:-(\d+)\+(\d+)(.*)```' asRegex.
+	regex2 search: string.
+
+	suggestionInfo := {
+		                  (#minus -> (regex2 subexpression: 2) asNumber).
+		                  (#plus -> (regex2 subexpression: 3) asNumber).
+		                  (#content -> (regex2 subexpression: 4)) }
+		                  asDictionary.
+
+	^ { suggestionInfo }
 ]
 
 { #category : #'import - tags' }
@@ -1922,10 +2062,11 @@ GitlabModelImporter >> parseMergeRequestsResult: result [
 ]
 
 { #category : #'private - parsing' }
-GitlabModelImporter >> parseNoteJson: results [
+GitlabModelImporter >> parseNotesResult: results [
 
 	| reader |
 	"Créer un lecteur JSON"
+	
 	reader := generalReader on: results readStream.
 
 	"Corriger la conversion des dates"
@@ -1933,7 +2074,7 @@ GitlabModelImporter >> parseNoteJson: results [
 		mapping decoder: [ :string |
 			DateAndTime readFrom: string readStream ] ]."
 
-	
+
 	^ reader nextAs: #ArrayOfNote
 ]
 
