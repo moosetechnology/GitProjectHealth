@@ -160,6 +160,20 @@ GitModelImporter >> blockForDiffRangeEquality [
 ]
 
 { #category : #equality }
+GitModelImporter >> blockForNoteSuggestionEquality [
+
+
+^ [ :existing :new |
+	 | sameLine sameNote sameContent |
+	  sameLine := existing to_line = new to_line.
+	  sameNote := existing note id = new note id.
+	  sameContent := existing to_content = new to_content.
+	  sameLine and: (sameNote and: sameContent)
+	
+	]
+]
+
+{ #category : #equality }
 GitModelImporter >> blockOnIdEquality [
 
 	^ [ :existing :new |
@@ -307,6 +321,15 @@ GitModelImporter >> configureReaderForNote: reader [
 		for: #ArrayOfNote
 		customDo: [ :customMappting |
 		customMappting listOfElementSchema: GLHNote ]
+]
+
+{ #category : #'private - configure reader' }
+GitModelImporter >> configureReaderForNotePosition: reader [
+
+	reader mapInstVarsFor: GLHNotePosition.
+
+	reader for: #ArrayOfNotePosition customDo: [ :customMapping |
+		customMapping listOfElementSchema: GLHNotePosition ]
 ]
 
 { #category : #'private - configure reader' }
@@ -660,7 +683,7 @@ GitModelImporter >> initReader [
 			string ifNil: [ nil ] ifNotNil: [ DateAndTime fromString: string ] ] ].
 
 	configurators := (self class allSelectors select: [ :m |
-		                 m beginsWith: #configureReaderFor ]) asSet.
+		                  m beginsWith: #configureReaderFor ]) asSet.
 
 	configurators do: [ :configureReader |
 		self perform: configureReader with: generalReader ]
