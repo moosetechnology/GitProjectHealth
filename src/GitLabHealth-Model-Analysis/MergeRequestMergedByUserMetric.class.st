@@ -1,6 +1,9 @@
 Class {
 	#name : #MergeRequestMergedByUserMetric,
 	#superclass : #UserMergeRequestMetric,
+	#instVars : [
+		'allMergeRequestDuringPeriod'
+	],
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
@@ -8,21 +11,22 @@ Class {
 MergeRequestMergedByUserMetric >> calculate [
 
 	| groupedByDate userMergedMergeRequests dateOver |
-		userMergeRequests ifNil: [ self load ].
+	allMergeRequestDuringPeriod ifNil: [ self load ].
 
 	groupedByDate := self setupGroupedDate.
 
 	"filter to see the MR associated to one user"
-	userMergedMergeRequests := userMergeRequests select: [
+	userMergedMergeRequests := allMergeRequestDuringPeriod select: [
 		                           :userMergeRequest |
-		                           userMergeRequest merge_user isNotNil 
-												and: [ userMergeRequest merge_user id = user id ] ].
-											
+		                           userMergeRequest merge_user isNotNil
+			                           and: [
+			                           userMergeRequest merge_user id = user id ] ].
+
 	"filter to reject MR that are not merge"
-	userMergedMergeRequests := userMergedMergeRequests reject: [ :mr | mr merged_at isNil ].
-	
-	userMergedMergeRequests do: [ :userMergeRequest |
-		"here we look at the specific date of its merged"
+	userMergedMergeRequests := userMergedMergeRequests reject: [ :mr |
+		                           mr merged_at isNil ].
+
+	userMergedMergeRequests do: [ :userMergeRequest | "here we look at the specific date of its merged"
 		dateOver := self transformDate: userMergeRequest merged_at to: over.
 		groupedByDate
 			at: dateOver printString
@@ -38,10 +42,10 @@ MergeRequestMergedByUserMetric >> description [
 	^ 'number of merge request merged by this user'
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #loading }
 MergeRequestMergedByUserMetric >> load [
 
-	userMergeRequests := self
+	allMergeRequestDuringPeriod := self
 		                     loadMergeRequestsSince: (period at: #since)
 		                     until: (period at: #until)
 ]
