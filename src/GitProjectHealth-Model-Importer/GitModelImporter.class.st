@@ -145,9 +145,15 @@ GitModelImporter >> blockForBranchEquality [
 
 { #category : #equality }
 GitModelImporter >> blockForDiffEquality [
-	^ [ :existing :new |
-			existing diffString size = new diffString size and: [
-				existing diffString = new diffString ] ]
+
+^ [ :existing :new |
+	  | sameSize sameDiff sameFile |
+	  sameSize := existing diffString size = new diffString size.
+	  sameDiff := existing diffString = new diffString.
+	  sameFile := existing new_path = new new_path.
+
+	  sameSize and: [ sameDiff and: [ sameFile ] ].
+ ]
 ]
 
 { #category : #equality }
