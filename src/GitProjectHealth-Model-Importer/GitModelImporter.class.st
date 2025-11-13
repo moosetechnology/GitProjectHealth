@@ -152,7 +152,7 @@ GitModelImporter >> blockForDiffEquality [
 	  sameDiff := existing diffString = new diffString.
 	  sameFile := existing new_path = new new_path.
 
-	  sameSize and: (sameDiff and: sameFile).
+	  sameSize and: [ sameDiff and: [ sameFile ] ].
  ]
 ]
 
