@@ -145,9 +145,15 @@ GitModelImporter >> blockForBranchEquality [
 
 { #category : #equality }
 GitModelImporter >> blockForDiffEquality [
-	^ [ :existing :new |
-			existing diffString size = new diffString size and: [
-				existing diffString = new diffString ] ]
+
+^ [ :existing :new |
+	  | sameSize sameDiff sameFile |
+	  sameSize := existing diffString size = new diffString size.
+	  sameDiff := existing diffString = new diffString.
+	  sameFile := existing new_path = new new_path.
+
+	  sameSize and: [ sameDiff and: [ sameFile ] ].
+ ]
 ]
 
 { #category : #equality }
@@ -157,6 +163,20 @@ GitModelImporter >> blockForDiffRangeEquality [
 	  existing diff mooseID = new diff mooseID and: [
 		  existing originalLineRange = new originalLineRange and: [
 			  existing newLineRange = new newLineRange ] ] ]
+]
+
+{ #category : #equality }
+GitModelImporter >> blockForNoteSuggestionEquality [
+
+
+^ [ :existing :new |
+	 | sameLine sameNote sameContent |
+	  sameLine := existing to_line = new to_line.
+	  sameNote := existing note id = new note id.
+	  sameContent := existing to_content = new to_content.
+	  sameLine and: (sameNote and: sameContent)
+	
+	]
 ]
 
 { #category : #equality }
@@ -307,6 +327,15 @@ GitModelImporter >> configureReaderForNote: reader [
 		for: #ArrayOfNote
 		customDo: [ :customMappting |
 		customMappting listOfElementSchema: GLHNote ]
+]
+
+{ #category : #'private - configure reader' }
+GitModelImporter >> configureReaderForNotePosition: reader [
+
+	reader mapInstVarsFor: GLHNotePosition.
+
+	reader for: #ArrayOfNotePosition customDo: [ :customMapping |
+		customMapping listOfElementSchema: GLHNotePosition ]
 ]
 
 { #category : #'private - configure reader' }
@@ -660,7 +689,7 @@ GitModelImporter >> initReader [
 			string ifNil: [ nil ] ifNotNil: [ DateAndTime fromString: string ] ] ].
 
 	configurators := (self class allSelectors select: [ :m |
-		                 m beginsWith: #configureReaderFor ]) asSet.
+		                  m beginsWith: #configureReaderFor ]) asSet.
 
 	configurators do: [ :configureReader |
 		self perform: configureReader with: generalReader ]

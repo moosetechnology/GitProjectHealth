@@ -8,6 +8,10 @@ a note (a diff) proposed in a Merge Request; can be accepted, modified or delete
 | Relation | Origin | Opposite | Type | Comment |
 |---|
 | `mergeRequest` | `GLHNote` | `note` | `GLHMergeRequest` | |
+| `position` | `GLHNote` | `note` | `GLHNotePosition` | |
+| `position` | `GLHNote` | `note` | `GLHNotePosition` | |
+| `position` | `GLHNote` | `note` | `GLHNotePosition` | |
+| `suggestions` | `GLHNote` | `note` | `GLHNoteSuggestion` | |
 
 
 ## Properties
@@ -56,7 +60,9 @@ Class {
 		'#internal => FMProperty',
 		'#imported => FMProperty',
 		'#imported_from => FMProperty',
-		'#mergeRequest => FMOne type: #GLHMergeRequest opposite: #note'
+		'#mergeRequest => FMOne type: #GLHMergeRequest opposite: #note',
+		'#position => FMOne type: #GLHNotePosition opposite: #note',
+		'#suggestions => FMMany type: #GLHNoteSuggestion opposite: #note'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }
@@ -68,6 +74,12 @@ GLHNote class >> annotation [
 	<package: #'GitLabHealth-Model'>
 	<generated>
 	^ self
+]
+
+{ #category : #adding }
+GLHNote >> addSuggestion: anObject [
+	<generated>
+	^ self suggestions add: anObject
 ]
 
 { #category : #accessing }
@@ -254,6 +266,21 @@ GLHNote >> noteable_type: anObject [
 ]
 
 { #category : #accessing }
+GLHNote >> position [
+	"Relation named: #position type: #GLHNotePosition opposite: #note"
+
+	<generated>
+	^ position
+]
+
+{ #category : #accessing }
+GLHNote >> position: anObject [
+
+	<generated>
+	position := anObject
+]
+
+{ #category : #accessing }
 GLHNote >> project_id [
 
 	<FMProperty: #project_id type: #Number>
@@ -279,6 +306,22 @@ GLHNote >> resolvable [
 GLHNote >> resolvable: anObject [
 	<generated>
 	resolvable := anObject
+]
+
+{ #category : #accessing }
+GLHNote >> suggestions [
+	"Relation named: #suggestions type: #GLHNoteSuggestion opposite: #note"
+
+	<generated>
+	<derived>
+	^ suggestions
+]
+
+{ #category : #accessing }
+GLHNote >> suggestions: anObject [
+
+	<generated>
+	suggestions value: anObject
 ]
 
 { #category : #accessing }

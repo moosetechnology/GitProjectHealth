@@ -192,6 +192,7 @@ GitlabModelImporterTest >> setUp [
 	model := GLHModel new.
 	importer glhModel: model.
 	defaultProject := GLHProject new
+								name: 'default project';
 		                  repository: GLHRepository new;
 		                  yourself.
 	
@@ -343,6 +344,27 @@ GitlabModelImporterTest >> testImportLatestReleaseOfProject [
 	self assert: element project isNotNil
 ]
 
+{ #category : #'tests - merge-requests' }
+GitlabModelImporterTest >> testImportMergeRequestsOfProjectSinceUntil [
+
+	| collection element collection2 |
+	collection := importer importMergeRequestsOfProject:
+		              self defaultProject since: '04-28-2017' asDate until: '04-30-2017' asDate.
+		
+	collection2 := importer importMergeRequestsOfProject:
+		              self defaultProject since: '04-28-2017' asDate until: '04-30-2017' asDate.
+		
+	self assert: collection isCollection.
+	element := collection first.
+	self assert: element class equals: GLHMergeRequest.
+	self assert: element project class equals: GLHProject.
+	self assert: element diffs isCollection.
+	self assert: element diffs first class equals: GLHDiff.
+	self assert: element mergeRequestCommit class equals: GLHCommit.
+
+	self assertCollection: collection equals: collection2. 
+]
+
 { #category : #'tests - notes' }
 GitlabModelImporterTest >> testImportNotesOfMergeRequest [
 
@@ -384,6 +406,156 @@ GitlabModelImporterTest >> testImportProjects [
 	self assert: element isNotNil.
 	self assert: element class equals: GLHProject.
 	self assert: element repository isNil. 
+]
+
+{ #category : #tests }
+GitlabModelImporterTest >> testImportSuggestionsFromNote [
+
+	| body position glhNote result suggestion |
+	body := '
+	test 
+	```suggestion:-0+5	
+	content
+```'.
+
+	position := GLHNotePosition new
+		            start_line: 2;
+		            end_line: 2.
+	glhNote := GLHNote new
+		           body: body;
+		           position: position.
+
+
+	result := importer importSuggestionsFromNote: glhNote.
+
+	self assert: result size equals: 1.
+
+	suggestion := result first.
+	self assert: suggestion from_line equals: 2.
+	self assert: suggestion to_line equals: 7.
+	self assert: suggestion to_content trim equals: 'content'
+]
+
+{ #category : #tests }
+GitlabModelImporterTest >> testImportSuggestionsFromNoteWithDifferentStartAndEndLine [
+
+	| body position glhNote result suggestion |
+	body := '
+	test 
+	```suggestion:-2+5	
+	content
+```'.
+
+	position := GLHNotePosition new
+		            start_line: 2;
+		            end_line: 5.
+	glhNote := GLHNote new
+		           body: body;
+		           position: position.
+
+
+	result := importer importSuggestionsFromNote: glhNote.
+
+	self assert: result size equals: 1.
+
+	suggestion := result first.
+	self assert: suggestion from_line equals: 3.
+	self assert: suggestion to_line equals: 10.
+	self assert: suggestion to_content trim equals: 'content'
+]
+
+{ #category : #tests }
+GitlabModelImporterTest >> testImportSuggestionsFromNoteWithMultipleSuggestions [
+
+	| body position glhNote result suggestion suggestion2 |
+	body := '
+	test 
+	```suggestion:-2+5	
+	content
+```
+
+```suggestion:-0+0	
+```'.
+
+	position := GLHNotePosition new
+		            start_line: 2;
+		            end_line: 5.
+	glhNote := GLHNote new
+		           body: body;
+		           position: position.
+
+
+	result := importer importSuggestionsFromNote: glhNote.
+
+	self assert: result size equals: 2.
+
+	suggestion := result first.
+	self assert: suggestion from_line equals: 3.
+	self assert: suggestion to_line equals: 10.
+	self assert: suggestion to_content trim equals: 'content'.
+	
+	suggestion2 := result at: 2.
+	self assert: suggestion2 from_line equals: 5.
+	self assert: suggestion2 to_line equals: 5.
+	self assert: suggestion2 to_content trim equals: ''
+]
+
+{ #category : #tests }
+GitlabModelImporterTest >> testImportSuggestionsInfoFromString [
+
+	| string result suggestion |
+	string := '
+	some content 
+	```suggestion:-0+2
+	test
+```'.
+
+	result := importer importSuggestionsInfoFromString: string.
+
+	self assert: result size equals: 1.
+	suggestion := result first.
+	self assert: (suggestion at: #minus) equals: 0.
+	self assert: (suggestion at: #plus) equals: 2.
+	self assert: (suggestion at: #content) trim equals: 'test'
+]
+
+{ #category : #tests }
+GitlabModelImporterTest >> testImportSuggestionsInfoFromStringWithMultipleSuggestion [
+
+	| string result suggestion suggestion2 |
+	string := '```suggestion:-0+2
+	test
+```
+
+```suggestion:-2+4
+
+oui
+
+```'.
+
+	result := importer importSuggestionsInfoFromString: string.
+
+	self assert: result size equals: 2.
+	suggestion := result first.
+	self assert: (suggestion at: #minus) equals: 0.
+	self assert: (suggestion at: #plus) equals: 2.
+	self assert: (suggestion at: #content) trim equals: 'test'.
+	
+	suggestion2 := result at: 2.
+	self assert: (suggestion2 at: #minus) equals: 2.
+	self assert: (suggestion2 at: #plus) equals: 4.
+	self assert: (suggestion2 at: #content) trim equals: 'oui'
+]
+
+{ #category : #tests }
+GitlabModelImporterTest >> testImportSuggestionsInfoFromStringWithNoSuggestions [
+
+	| string result |
+	string := 'a normal comment'.
+
+	result := importer importSuggestionsInfoFromString: string.
+
+	self assert: result size equals: 0.
 ]
 
 { #category : #'tests - tags' }
@@ -497,7 +669,7 @@ GitlabModelImporterTest >> testParseNote [
   "confidential": false,
   "internal": false
 }]'.
-	notesArray := importer parseNoteJson: jsonNote.
+	notesArray := importer parseNotesResult: jsonNote.
 	note := notesArray first.
 	self assert: notesArray size equals: 1.
 	self assert: note body equals: 'Comment for MR'
