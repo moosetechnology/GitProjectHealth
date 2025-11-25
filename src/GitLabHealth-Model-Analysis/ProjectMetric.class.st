@@ -28,7 +28,7 @@ ProjectMetric >> loadAllTags [
 ProjectMetric >> loadBranchesSince: since until: until [
 
 	| branches |
-	branches := glhImporter importBranchesOfProject: project.
+	branches := glhImporter importBranchesOf: project.
 
 
 	branches do: [ :branch | glhImporter importRefCommitOfBranch: branch ].
