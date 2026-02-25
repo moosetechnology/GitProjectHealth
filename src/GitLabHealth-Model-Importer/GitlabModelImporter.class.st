@@ -2099,13 +2099,7 @@ GitlabModelImporter >> parseNotesSuggestionResult: results [
 	"Créer un lecteur JSON"
 	reader := generalReader on: results readStream.
 
-	"Corriger la conversion des dates"
-	"reader for: DateAndTime customDo: [ :mapping |
-		mapping decoder: [ :string |
-			DateAndTime readFrom: string readStream ] ]."
-
-
-	^ reader nextAs: #ArrayOfNoteSuggestion 
+	^ reader nextAs: #ArrayOfNoteSuggestion
 ]
 
 { #category : #'private - parsing' }
