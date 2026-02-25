@@ -1489,7 +1489,7 @@ GitlabModelImporter >> importNotesOfMergeRequest: mergeRequest [
 						                      existing note id = new note id ] ].
 			          position note: item ].
 
-		          items do: [ :item |
+		          (items select: [ :item | item suggestions isNotNil ]) do: [ :item |
 			          item suggestions do: [ :suggestion |
 				          | newSuggestion |
 				          newSuggestion := self glhModel

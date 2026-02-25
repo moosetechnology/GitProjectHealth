@@ -569,6 +569,7 @@ GLHMetamodelGenerator >> noteProperties [
 
 { #category : #notes }
 GLHMetamodelGenerator >> noteRelations [
+
 	(note property: #suggestions) -* (noteSuggestion property: #note).
 
 	(note property: #mergeRequest) *- (mergeRequest property: #note).
