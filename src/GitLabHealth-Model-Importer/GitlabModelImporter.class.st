@@ -369,8 +369,14 @@ GitlabModelImporter >> configureReaderForNote: reader [
 		(mapping mapInstVar: #updated_at) valueSchema: DateAndTime.
 
 		(mapping mapInstVar: #position) valueSchema: GLHNotePosition.
-		(mapping mapInstVar: #suggestions) valueSchema:
-			#ArrayOfNoteSuggestion ]
+
+		mapping
+			mapProperty: #suggestions
+			getter: [  ]
+			setter: [ :note :rawSuggestions |
+				| stringSuggestions |
+				stringSuggestions := NeoJSONWriter toString: rawSuggestions.
+				note cacheAt: #stringSuggestions put: stringSuggestions ] ]
 ]
 
 { #category : #'private - configure reader' }
@@ -428,11 +434,9 @@ GitlabModelImporter >> configureReaderForNotePosition: reader [
 
 { #category : #'private - configure reader' }
 GitlabModelImporter >> configureReaderForNoteSuggestion: reader [
+	super configureReaderForNoteSuggestion: reader.
 
-	reader mapInstVarsFor: GLHNoteSuggestion.
 
-	reader for: #ArrayOfNoteSuggestion customDo: [ :customMapping |
-		customMapping listOfElementSchema: GLHNoteSuggestion ]
 ]
 
 { #category : #'private - configure reader' }
@@ -1488,14 +1492,6 @@ GitlabModelImporter >> importNotesOfMergeRequest: mergeRequest [
 					                      new note isNotNil and: [
 						                      existing note id = new note id ] ].
 			          position note: item ].
-
-		          (items select: [ :item | item suggestions isNotNil ]) do: [ :item |
-			          item suggestions do: [ :suggestion |
-				          | newSuggestion |
-				          newSuggestion := self glhModel
-					                           add: suggestion
-					                           unless: self blockOnIdEquality.
-				          newSuggestion note: item ] ].
 		          items ]) flattened.
 
 	notes := mergeRequest note
@@ -1507,7 +1503,10 @@ GitlabModelImporter >> importNotesOfMergeRequest: mergeRequest [
 		note
 			cacheAt: #userID
 			ifPresent: [ :id | note author: (self importUser: id) ].
-		note name: note id asString ].
+		note name: note id asString.
+
+		note cacheAt: #stringSuggestions ifPresent: [ :stringSuggestions |
+			note suggestions: (self parseNotesSuggestionResult: stringSuggestions) ] ].
 
 	^ notes
 ]
@@ -2091,6 +2090,22 @@ GitlabModelImporter >> parseNotesResult: results [
 
 
 	^ reader nextAs: #ArrayOfNote
+]
+
+{ #category : #'private - parsing' }
+GitlabModelImporter >> parseNotesSuggestionResult: results [
+
+	| reader |
+	"Créer un lecteur JSON"
+	reader := generalReader on: results readStream.
+
+	"Corriger la conversion des dates"
+	"reader for: DateAndTime customDo: [ :mapping |
+		mapping decoder: [ :string |
+			DateAndTime readFrom: string readStream ] ]."
+
+
+	^ reader nextAs: #ArrayOfNoteSuggestion 
 ]
 
 { #category : #'private - parsing' }
