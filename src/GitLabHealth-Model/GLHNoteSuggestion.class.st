@@ -46,6 +46,34 @@ GLHNoteSuggestion class >> annotation [
 	^ self
 ]
 
+{ #category : #'as yet unclassified' }
+GLHNoteSuggestion >> appliable [
+
+	<FMProperty: #appliable type: #Boolean>
+	<generated>
+	^ appliable
+]
+
+{ #category : #'as yet unclassified' }
+GLHNoteSuggestion >> appliable: anObject [
+	<generated>
+	appliable := anObject
+]
+
+{ #category : #'as yet unclassified' }
+GLHNoteSuggestion >> applied [
+
+	<FMProperty: #applied type: #Boolean>
+	<generated>
+	^ applied
+]
+
+{ #category : #'as yet unclassified' }
+GLHNoteSuggestion >> applied: anObject [
+	<generated>
+	applied := anObject
+]
+
 { #category : #accessing }
 GLHNoteSuggestion >> from_content [
 
@@ -72,6 +100,20 @@ GLHNoteSuggestion >> from_line [
 GLHNoteSuggestion >> from_line: anObject [
 	<generated>
 	from_line := anObject
+]
+
+{ #category : #'as yet unclassified' }
+GLHNoteSuggestion >> id [
+
+	<FMProperty: #id type: #Number>
+	<generated>
+	^ id
+]
+
+{ #category : #'as yet unclassified' }
+GLHNoteSuggestion >> id: anObject [
+	<generated>
+	id := anObject
 ]
 
 { #category : #accessing }

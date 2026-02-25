@@ -359,17 +359,18 @@ GitlabModelImporter >> configureReaderForNote: reader [
 	super configureReaderForNote: reader.
 
 	reader for: GLHNote do: [ :mapping |
-		
 		mapping
-				mapProperty: #author
-				getter: [  ]
-				setter: [ :note :rawUser |
-				note cacheAt: #userID put: (rawUser at: #id) ].
-		
+			mapProperty: #author
+			getter: [  ]
+			setter: [ :note :rawUser |
+			note cacheAt: #userID put: (rawUser at: #id) ].
+
 		(mapping mapInstVar: #created_at) valueSchema: DateAndTime.
 		(mapping mapInstVar: #updated_at) valueSchema: DateAndTime.
 
-		(mapping mapInstVar: #position) valueSchema: GLHNotePosition ]
+		(mapping mapInstVar: #position) valueSchema: GLHNotePosition.
+		(mapping mapInstVar: #suggestions) valueSchema:
+			#ArrayOfNoteSuggestion ]
 ]
 
 { #category : #'private - configure reader' }
@@ -423,6 +424,15 @@ GitlabModelImporter >> configureReaderForNotePosition: reader [
 							           ifFalse: [ end at: #old_line ].
 						notePosition end_line_type: (end at: #type).
 						notePosition end_line: endLine ] ] ]
+]
+
+{ #category : #'private - configure reader' }
+GitlabModelImporter >> configureReaderForNoteSuggestion: reader [
+
+	reader mapInstVarsFor: GLHNoteSuggestion.
+
+	reader for: #ArrayOfNoteSuggestion customDo: [ :customMapping |
+		customMapping listOfElementSchema: GLHNoteSuggestion ]
 ]
 
 { #category : #'private - configure reader' }
@@ -1478,6 +1488,14 @@ GitlabModelImporter >> importNotesOfMergeRequest: mergeRequest [
 					                      new note isNotNil and: [
 						                      existing note id = new note id ] ].
 			          position note: item ].
+
+		          items do: [ :item |
+			          item suggestions do: [ :suggestion |
+				          | newSuggestion |
+				          newSuggestion := self glhModel
+					                           add: suggestion
+					                           unless: self blockOnIdEquality.
+				          newSuggestion note: item ] ].
 		          items ]) flattened.
 
 	notes := mergeRequest note
@@ -1489,9 +1507,7 @@ GitlabModelImporter >> importNotesOfMergeRequest: mergeRequest [
 		note
 			cacheAt: #userID
 			ifPresent: [ :id | note author: (self importUser: id) ].
-		note name: note id asString.
-
-		note suggestions: (self importSuggestionsFromNote: note) ].
+		note name: note id asString ].
 
 	^ notes
 ]
@@ -2066,7 +2082,6 @@ GitlabModelImporter >> parseNotesResult: results [
 
 	| reader |
 	"Créer un lecteur JSON"
-	
 	reader := generalReader on: results readStream.
 
 	"Corriger la conversion des dates"
