@@ -15,8 +15,11 @@ suggestion of code made in a note
 
 | Name | Type | Default value | Comment |
 |---|
+| `appliable` | `Boolean` | nil | |
+| `applied` | `Boolean` | nil | |
 | `from_content` | `String` | nil | |
 | `from_line` | `Number` | nil | |
+| `id` | `Number` | nil | |
 | `name` | `String` | nil | Basic name of the entity, not full reference.|
 | `to_content` | `String` | nil | |
 | `to_line` | `Number` | nil | |
@@ -28,10 +31,13 @@ Class {
 	#traits : 'FamixTNamedEntity',
 	#classTraits : 'FamixTNamedEntity classTrait',
 	#instVars : [
+		'#id => FMProperty',
 		'#from_line => FMProperty',
 		'#to_line => FMProperty',
 		'#from_content => FMProperty',
 		'#to_content => FMProperty',
+		'#applied => FMProperty',
+		'#appliable => FMProperty',
 		'#note => FMOne type: #GLHNote opposite: #suggestions'
 	],
 	#category : #'GitLabHealth-Model-Entities'
@@ -46,7 +52,7 @@ GLHNoteSuggestion class >> annotation [
 	^ self
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 GLHNoteSuggestion >> appliable [
 
 	<FMProperty: #appliable type: #Boolean>
@@ -54,13 +60,13 @@ GLHNoteSuggestion >> appliable [
 	^ appliable
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 GLHNoteSuggestion >> appliable: anObject [
 	<generated>
 	appliable := anObject
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 GLHNoteSuggestion >> applied [
 
 	<FMProperty: #applied type: #Boolean>
@@ -68,7 +74,7 @@ GLHNoteSuggestion >> applied [
 	^ applied
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 GLHNoteSuggestion >> applied: anObject [
 	<generated>
 	applied := anObject
@@ -102,7 +108,7 @@ GLHNoteSuggestion >> from_line: anObject [
 	from_line := anObject
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 GLHNoteSuggestion >> id [
 
 	<FMProperty: #id type: #Number>
@@ -110,7 +116,7 @@ GLHNoteSuggestion >> id [
 	^ id
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 GLHNoteSuggestion >> id: anObject [
 	<generated>
 	id := anObject
