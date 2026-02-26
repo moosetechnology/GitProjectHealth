@@ -1712,66 +1712,6 @@ GitlabModelImporter >> importSZZFromCommit: aCommit [
 	^ szzCommits
 ]
 
-{ #category : #'import - notes' }
-GitlabModelImporter >> importSuggestionsFromNote: glhNote [
-
-	| suggestions suggestion fromLine toLine suggestionsInfo |
-	glhNote position ifNil: [ ^ {  } ].
-	suggestions := MooseGroup new.
-
-
-	suggestionsInfo := self importSuggestionsInfoFromString: glhNote body.
-
-	suggestions := suggestionsInfo collect: [ :suggestionInfo |
-		               suggestion := GLHNoteSuggestion new.
-		               fromLine := glhNote position end_line
-		                           - (suggestionInfo at: #minus).
-		               toLine := glhNote position end_line
-		                         + (suggestionInfo at: #plus).
-		               suggestion from_line: fromLine.
-		               suggestion to_line: toLine.
-		               suggestion to_content: (suggestionInfo at: #content).
-		               suggestion ].
-
-	^ suggestions
-]
-
-{ #category : #'import - notes' }
-GitlabModelImporter >> importSuggestionsInfoFromString: string [
-
-	| suggestionsInfo regex result regex2 suggestionInfo |
-	suggestionsInfo := OrderedCollection new.
-	regex := '```suggestion' asRegex.
-	result := regex matchesIn: string.
-
-	result isEmpty ifTrue: [ ^ suggestionsInfo ].
-
-	result size > 1 ifTrue: [
-		| start end firstPart secondPart |
-		start := string findString: '```suggestion'.
-		end := (string findString: '```' startingAt: start + 2) + 2.
-
-		firstPart := string copyFrom: 1 to: end.
-		secondPart := string copyFrom: end to: string size.
-
-		suggestionsInfo addAll:
-			(self importSuggestionsInfoFromString: firstPart).
-		suggestionsInfo addAll:
-			(self importSuggestionsInfoFromString: secondPart).
-		^ suggestionsInfo ].
-
-	regex2 := '```suggestion\:-(\d+)\+(\d+)(.*)```' asRegex.
-	regex2 search: string.
-
-	suggestionInfo := {
-		                  (#minus -> (regex2 subexpression: 2) asNumber).
-		                  (#plus -> (regex2 subexpression: 3) asNumber).
-		                  (#content -> (regex2 subexpression: 4)) }
-		                  asDictionary.
-
-	^ { suggestionInfo }
-]
-
 { #category : #'import - tags' }
 GitlabModelImporter >> importTagsForProject: aProject [ 
 	|results tags |
