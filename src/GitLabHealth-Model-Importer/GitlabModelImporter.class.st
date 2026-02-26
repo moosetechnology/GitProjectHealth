@@ -1506,7 +1506,8 @@ GitlabModelImporter >> importNotesOfMergeRequest: mergeRequest [
 		note name: note id asString.
 
 		note cacheAt: #stringSuggestions ifPresent: [ :stringSuggestions |
-			note suggestions: (self parseNotesSuggestionResult: stringSuggestions) ] ].
+			note suggestions:
+				(self parseNotesSuggestionResult: stringSuggestions) ] ].
 
 	^ notes
 ]
