@@ -359,17 +359,24 @@ GitlabModelImporter >> configureReaderForNote: reader [
 	super configureReaderForNote: reader.
 
 	reader for: GLHNote do: [ :mapping |
-		
 		mapping
-				mapProperty: #author
-				getter: [  ]
-				setter: [ :note :rawUser |
-				note cacheAt: #userID put: (rawUser at: #id) ].
-		
+			mapProperty: #author
+			getter: [  ]
+			setter: [ :note :rawUser |
+			note cacheAt: #userID put: (rawUser at: #id) ].
+
 		(mapping mapInstVar: #created_at) valueSchema: DateAndTime.
 		(mapping mapInstVar: #updated_at) valueSchema: DateAndTime.
 
-		(mapping mapInstVar: #position) valueSchema: GLHNotePosition ]
+		(mapping mapInstVar: #position) valueSchema: GLHNotePosition.
+
+		mapping
+			mapProperty: #suggestions
+			getter: [  ]
+			setter: [ :note :rawSuggestions |
+				| stringSuggestions |
+				stringSuggestions := NeoJSONWriter toString: rawSuggestions.
+				note cacheAt: #stringSuggestions put: stringSuggestions ] ]
 ]
 
 { #category : #'private - configure reader' }
@@ -423,6 +430,13 @@ GitlabModelImporter >> configureReaderForNotePosition: reader [
 							           ifFalse: [ end at: #old_line ].
 						notePosition end_line_type: (end at: #type).
 						notePosition end_line: endLine ] ] ]
+]
+
+{ #category : #'private - configure reader' }
+GitlabModelImporter >> configureReaderForNoteSuggestion: reader [
+	super configureReaderForNoteSuggestion: reader.
+
+
 ]
 
 { #category : #'private - configure reader' }
@@ -1491,7 +1505,9 @@ GitlabModelImporter >> importNotesOfMergeRequest: mergeRequest [
 			ifPresent: [ :id | note author: (self importUser: id) ].
 		note name: note id asString.
 
-		note suggestions: (self importSuggestionsFromNote: note) ].
+		note cacheAt: #stringSuggestions ifPresent: [ :stringSuggestions |
+			note suggestions:
+				(self parseNotesSuggestionResult: stringSuggestions) ] ].
 
 	^ notes
 ]
@@ -1695,66 +1711,6 @@ GitlabModelImporter >> importSZZFromCommit: aCommit [
 						 importCommit: (blame at: #commit at: #id)
 						 ofProject: aCommit repository project) ] ] ].
 	^ szzCommits
-]
-
-{ #category : #'import - notes' }
-GitlabModelImporter >> importSuggestionsFromNote: glhNote [
-
-	| suggestions suggestion fromLine toLine suggestionsInfo |
-	glhNote position ifNil: [ ^ {  } ].
-	suggestions := MooseGroup new.
-
-
-	suggestionsInfo := self importSuggestionsInfoFromString: glhNote body.
-
-	suggestions := suggestionsInfo collect: [ :suggestionInfo |
-		               suggestion := GLHNoteSuggestion new.
-		               fromLine := glhNote position end_line
-		                           - (suggestionInfo at: #minus).
-		               toLine := glhNote position end_line
-		                         + (suggestionInfo at: #plus).
-		               suggestion from_line: fromLine.
-		               suggestion to_line: toLine.
-		               suggestion to_content: (suggestionInfo at: #content).
-		               suggestion ].
-
-	^ suggestions
-]
-
-{ #category : #'import - notes' }
-GitlabModelImporter >> importSuggestionsInfoFromString: string [
-
-	| suggestionsInfo regex result regex2 suggestionInfo |
-	suggestionsInfo := OrderedCollection new.
-	regex := '```suggestion' asRegex.
-	result := regex matchesIn: string.
-
-	result isEmpty ifTrue: [ ^ suggestionsInfo ].
-
-	result size > 1 ifTrue: [
-		| start end firstPart secondPart |
-		start := string findString: '```suggestion'.
-		end := (string findString: '```' startingAt: start + 2) + 2.
-
-		firstPart := string copyFrom: 1 to: end.
-		secondPart := string copyFrom: end to: string size.
-
-		suggestionsInfo addAll:
-			(self importSuggestionsInfoFromString: firstPart).
-		suggestionsInfo addAll:
-			(self importSuggestionsInfoFromString: secondPart).
-		^ suggestionsInfo ].
-
-	regex2 := '```suggestion\:-(\d+)\+(\d+)(.*)```' asRegex.
-	regex2 search: string.
-
-	suggestionInfo := {
-		                  (#minus -> (regex2 subexpression: 2) asNumber).
-		                  (#plus -> (regex2 subexpression: 3) asNumber).
-		                  (#content -> (regex2 subexpression: 4)) }
-		                  asDictionary.
-
-	^ { suggestionInfo }
 ]
 
 { #category : #'import - tags' }
@@ -2066,7 +2022,6 @@ GitlabModelImporter >> parseNotesResult: results [
 
 	| reader |
 	"Créer un lecteur JSON"
-	
 	reader := generalReader on: results readStream.
 
 	"Corriger la conversion des dates"
@@ -2076,6 +2031,16 @@ GitlabModelImporter >> parseNotesResult: results [
 
 
 	^ reader nextAs: #ArrayOfNote
+]
+
+{ #category : #'private - parsing' }
+GitlabModelImporter >> parseNotesSuggestionResult: results [
+
+	| reader |
+	"Créer un lecteur JSON"
+	reader := generalReader on: results readStream.
+
+	^ reader nextAs: #ArrayOfNoteSuggestion
 ]
 
 { #category : #'private - parsing' }

@@ -4,10 +4,14 @@ indicate the position of a note
 ## Relations
 ======================
 
-### Other
+### Parents
 | Relation | Origin | Opposite | Type | Comment |
 |---|
 | `note` | `GLHNotePosition` | `position` | `GLHNote` | |
+
+### Other
+| Relation | Origin | Opposite | Type | Comment |
+|---|
 | `note` | `GLHNotePosition` | `position` | `GLHNote` | |
 | `note` | `GLHNotePosition` | `position` | `GLHNote` | |
 
@@ -94,11 +98,20 @@ GLHNotePosition >> file_path: anObject [
 	file_path := anObject
 ]
 
+{ #category : #printing }
+GLHNotePosition >> mooseNameOn: stream
+
+mooseNameOn: aStream [
+
+	aStream nextPutAll: 'test'
+]
+
 { #category : #accessing }
 GLHNotePosition >> note [
 	"Relation named: #note type: #GLHNote opposite: #position"
 
 	<generated>
+	<container>
 	<derived>
 	^ note
 ]
@@ -108,6 +121,13 @@ GLHNotePosition >> note: anObject [
 
 	<generated>
 	note := anObject
+]
+
+{ #category : #navigation }
+GLHNotePosition >> noteGroup [
+	<generated>
+	<navigation: 'Note'>
+	^ MooseSpecializedGroup with: self note
 ]
 
 { #category : #accessing }
