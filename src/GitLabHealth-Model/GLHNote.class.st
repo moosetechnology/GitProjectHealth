@@ -4,11 +4,15 @@ a note (a diff) proposed in a Merge Request; can be accepted, modified or delete
 ## Relations
 ======================
 
+### Children
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `position` | `GLHNote` | `note` | `GLHNotePosition` | |
+
 ### Other
 | Relation | Origin | Opposite | Type | Comment |
 |---|
 | `mergeRequest` | `GLHNote` | `note` | `GLHMergeRequest` | |
-| `position` | `GLHNote` | `note` | `GLHNotePosition` | |
 | `position` | `GLHNote` | `note` | `GLHNotePosition` | |
 | `position` | `GLHNote` | `note` | `GLHNotePosition` | |
 | `suggestions` | `GLHNote` | `note` | `GLHNoteSuggestion` | |
@@ -223,6 +227,12 @@ GLHNote >> mergeRequest: anObject [
 	mergeRequest := anObject
 ]
 
+{ #category : #printing }
+GLHNote >> mooseNameOn: stream [
+
+	stream nextPutAll: '[', id asString, ']', body
+]
+
 { #category : #accessing }
 GLHNote >> noteable_id [
 
@@ -278,6 +288,13 @@ GLHNote >> position: anObject [
 
 	<generated>
 	position := anObject
+]
+
+{ #category : #navigation }
+GLHNote >> positionGroup [
+	<generated>
+	<navigation: 'Position'>
+	^ MooseSpecializedGroup with: self position
 ]
 
 { #category : #accessing }

@@ -576,7 +576,9 @@ BitBucketModelImporter >> parseBranchIntoGLHBranch: branchDictionary ofProject: 
 	commit := self
 		          importCommit: (branchDictionary at: #latestCommit)
 		          ofProject: aGLHProject.
+
 	^ GLHBranch new
+		  sha: commit id;
 		  name: (branchDictionary at: #displayId);
 		  commits: { commit } asOrderedCollection;
 		  yourself

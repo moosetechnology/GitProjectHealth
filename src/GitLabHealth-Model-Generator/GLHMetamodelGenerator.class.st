@@ -571,22 +571,26 @@ GLHMetamodelGenerator >> noteProperties [
 GLHMetamodelGenerator >> noteRelations [
 
 	(note property: #mergeRequest) *- (mergeRequest property: #note).
-	(note property: #position) - (notePosition property: #note)
+	(note property: #position) <>- (notePosition property: #note)
 ]
 
 { #category : #notes }
 GLHMetamodelGenerator >> noteSuggestionProperties [
-
+	
+	noteSuggestion property: #id type: #Number .
 	noteSuggestion property: #from_line type: #Number.
 	noteSuggestion property: #to_line type: #Number.
 	noteSuggestion property: #from_content type: #String.
-	noteSuggestion property: #to_content type: #String.
+	noteSuggestion property: #to_content type: #String .
+	noteSuggestion property: #applied type: #Boolean. 
+	noteSuggestion property: #appliable type: #Boolean
 ]
 
 { #category : #notes }
 GLHMetamodelGenerator >> noteSuggestionRelations [
-
 	(noteSuggestion property: #note) *- (note property: #suggestions)
+
+	
 ]
 
 { #category : #pipelines }
