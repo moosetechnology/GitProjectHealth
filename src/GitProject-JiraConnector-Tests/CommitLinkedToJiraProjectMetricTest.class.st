@@ -4,7 +4,7 @@ A MergeRequestLinkedToJiraProjectMetricTest is a test class for testing the beha
 Class {
 	#name : #CommitLinkedToJiraProjectMetricTest,
 	#superclass : #ProjectMetricTest,
-	#category : #'GitLabHealth-Model-Analysis-Tests'
+	#category : #'GitProject-JiraConnector-Tests'
 }
 
 { #category : #tests }

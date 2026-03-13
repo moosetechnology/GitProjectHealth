@@ -4,7 +4,7 @@ A JiraTimeMRTimeDifferenceProjectMetricTest is a test class for testing the beha
 Class {
 	#name : #JiraTimeMRTimeDifferenceProjectMetricTest,
 	#superclass : #ProjectMetricTest,
-	#category : #'GitLabHealth-Model-Analysis-Tests'
+	#category : #'GitProject-JiraConnector-Tests'
 }
 
 { #category : #tests }

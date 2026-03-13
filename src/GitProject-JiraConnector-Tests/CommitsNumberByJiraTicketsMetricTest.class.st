@@ -4,7 +4,7 @@ A CommitsNumberByJiraTicketsMetricTest is a test class for testing the behavior 
 Class {
 	#name : #CommitsNumberByJiraTicketsMetricTest,
 	#superclass : #UserMetricTest,
-	#category : #'GitLabHealth-Model-Analysis-Tests'
+	#category : #'GitProject-JiraConnector-Tests'
 }
 
 { #category : #tests }
