@@ -107,7 +107,7 @@ Here is the metamodel used in this project
 ## Connectors
 
 This project comes with connectors to other metamodels to increase its powerfulness.
-Explore this part of the [documentation on the main website](https://modularmoose.org/moose-wiki/Users/gitproject-health/getting-started-with-gitproject-health).
+Explore this part of the [documentation on the main website](https://modularmoose.org/users/git-project-health/getting-started-with-gitproject-health).
 
 ## Contributor
 
