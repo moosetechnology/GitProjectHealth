@@ -1,62 +1,45 @@
-|glphModel glphApi glhImporter beforeExp duringExp usersWithProjects gme|
+| glhModel gitlabApi glhImporter |
 
-"This example set up and run a GitProjectHealth metrics over two period of time of a given set of users and their projects.
-It ouputs a csv files containing : churn code, commits frequencies, code addition and deletion, comments added (e.g. // # /**/ ), avg delay before first churn and merge request duration.
-"
+"This example shows how to set up and run GitProjectHealth metrics for a given set of users and their projects over two periods of time.
+It ouputs a csv files containing: code churn, commit frequencies, code additions and deletions, comments added (e.g., `//`, `#`, `/**/`), average delay before first churn, and merge request duration."
 
-"load githealth project into your image"
+"load GitProjectHealth into your image"
 Metacello new
-  repository: 'github://moosetechnology/GitProjectHealth:main/src';
-  baseline: 'GitLabHealth';
-  onConflict: [ :ex | ex useIncoming ];
-  onUpgrade: [ :ex | ex useIncoming ];
-  onDowngrade: [ :ex | ex useLoaded ];
-  ignoreImage;
-  load.
+    repository: 'github://moosetechnology/GitProjectHealth:main/src';
+    baseline: 'GitLabHealth';
+    onConflict: [ :ex | ex useIncoming ];
+    onUpgrade: [ :ex | ex useIncoming ];
+    onDowngrade: [ :ex | ex useLoaded ];
+    ignoreImage;
+    load.
 
 "set up a log at your root"
-TinyLogger default
-    addFileLoggerNamed: 'pharo-code-churn.log'.
+TinyLogger default addFileLoggerNamed: 'pharo-code-churn.log'.
 
 "new model instance"
-glphModel := GLPHEModel new.
+glhModel := GLHModel new.
 
 "new API class instance"
-glphApi := GLPHApi new
+gitlabApi := GitlabApi new
     privateToken: '<YOUR_TOKEN_KEY>';
-    baseAPIUrl:'https://gitlab.com/api/v4';
-    yourself.
+    hostUrl: 'https://gitlab.com/api/v4'.
 
 "new importer instance"
-glhImporter := GLPHModelImporter new
-    glhApi: glphApi;
-    glhModel: glphModel;
-        withFiles: false;
-        withCommitDiffs: true.
+glhImporter := GitlabModelImporter new
+    repoApi: gitlabApi;
+    glhModel: glhModel;
+    withFiles: false;
+    withCommitDiffs: true.
 
-"setting up the period to compare (e.g. before a experience and during an experience)"
-beforeExp := {
-                                        #since -> ('1 march 2023' asDate).
-                                        #until -> ('24 may 2023' asDate).
-                                        } asDictionary .
-duringExp := {
-                                        #since -> ('1 march 2024' asDate).
-                                        #until -> ('24 may 2024' asDate).
-                                        } asDictionary .
-
-usersWithProjects := {
-"  'dev nameA' -> {  projectID1 . projectID2 }."
-"  'dev nameB' -> {  projectID3 . projectID2 }."
-'John Do' -> { 14 . 543 . 2455 }.
- } asDictionary.
-
-
-gme := GitMetricExporter new glhImporter: glhImporter;
-            initEntitiesFromUserProjects: usersWithProjects;
-            beforeDic: beforeExp; duringDic: duringExp; label: 'GitLabHealth'.
-
-"select among the following calendar class (at least one) "
-gme exportOver: { Date . Week . Month . Year .}.
+"export metrics, the output files are located at `FileLocator home / *.csv`"
+GitMetricExporter new
+    glhImporter: glhImporter;
+    addAPeriodFrom: '1 march 2023' to: '24 may 2023';
+    addAPeriodFrom: '1 march 2024' to: '24 may 2024';
+    setupAnalysisForUsersWithNames: { 'John Doe' };
+    setupAnalysisForProjectsWithIds: { 14. 543. 2455 };
+    label: 'GitLabHealth';
+    exportInCSV.
 
 "the output files are located at 'FileLocator home/*.csv' "
 Smalltalk snapshot: true andQuit: true.
