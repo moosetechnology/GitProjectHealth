@@ -41,5 +41,4 @@ GitMetricExporter new
     label: 'GitLabHealth';
     exportInCSV.
 
-"the output files are located at 'FileLocator home/*.csv' "
 Smalltalk snapshot: true andQuit: true.
