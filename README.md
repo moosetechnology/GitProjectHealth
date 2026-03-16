@@ -134,7 +134,7 @@ Metacello new
 TinyLogger default addFileLoggerNamed: 'pharo-code-churn.log'.
 
 "new model instance"
-glphModel := GLHModel new.
+glhModel := GLHModel new.
 
 "new API class instance"
 gitlabApi := GitlabApi new
@@ -144,7 +144,7 @@ gitlabApi := GitlabApi new
 "new importer instance"
 glhImporter := GitlabModelImporter new
     repoApi: gitlabApi;
-    glhModel: glphModel;
+    glhModel: glhModel;
     withFiles: false;
     withCommitDiffs: true.
 
