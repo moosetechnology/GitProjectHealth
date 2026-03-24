@@ -690,20 +690,16 @@ GitModelImporter >> importUserByUsername: username [
 { #category : #'private - configure reader' }
 GitModelImporter >> initReader [
 
-	| configurators |
 	generalReader := NeoJSONReader new.
 
-	"will be reuse for all reader next"
-	"indique ce que doit faire le reader lorsqu'il parse une DateAndTime object"
 	generalReader for: DateAndTime customDo: [ :mapping |
 		mapping decoder: [ :string |
-			string ifNil: [ nil ] ifNotNil: [ DateAndTime fromString: string ] ] ].
+			string ifNotNil: [ DateAndTime fromString: string ] ] ].
 
-	configurators := (self class allSelectors select: [ :m |
-		                  m beginsWith: #configureReaderFor ]) asSet.
-
-	configurators do: [ :configureReader |
-		self perform: configureReader with: generalReader ]
+	(self class allSelectorsBelow: GitModelImporter superclass) do: [
+		:configurator |
+		(configurator beginsWith: #configureReaderFor) ifTrue: [
+			self perform: configurator with: generalReader ] ]
 ]
 
 { #category : #initialization }
@@ -787,21 +783,22 @@ GitModelImporter >> repoApi [
 ]
 
 { #category : #accessing }
-GitModelImporter >> repoApi: anObject [
+GitModelImporter >> repoApi: anApi [
 
-	repoApi := anObject
+	repoApi := anApi
 ]
 
 { #category : #accessing }
 GitModelImporter >> userCatalogue [
-	^ userCatalogue 
+
+	^ userCatalogue
 ]
 
 { #category : #accessing }
 GitModelImporter >> userCatalogue: aGLHUserCatalogue [
 
 	userCatalogue := aGLHUserCatalogue.
-	aGLHUserCatalogue anImporter: self. 
+	aGLHUserCatalogue anImporter: self
 ]
 
 { #category : #accessing }
@@ -811,9 +808,9 @@ GitModelImporter >> withCommitDiffs [
 ]
 
 { #category : #accessing }
-GitModelImporter >> withCommitDiffs: anObject [
+GitModelImporter >> withCommitDiffs: aBoolean [
 
-	withCommitDiffs := anObject
+	withCommitDiffs := aBoolean
 ]
 
 { #category : #accessing }
@@ -830,10 +827,9 @@ GitModelImporter >> withCommitsSince: someDays [
 
 	"(GitlabModelImporter new withCommitsSince: 30 day ) >>> (Date today - 30 day) asDateAndTime"
 
-	(someDays isKindOf: DateAndTime)
-		ifTrue: [ withCommitsSince := someDays ]
-		ifFalse: [
-		withCommitsSince := (DateAndTime today - someDays) ].
+	withCommitsSince := (someDays isKindOf: DateAndTime)
+		                    ifTrue: [ someDays ]
+		                    ifFalse: [ DateAndTime today - someDays ].
 	^ withCommitsSince
 ]
 
@@ -844,7 +840,7 @@ GitModelImporter >> withFiles [
 ]
 
 { #category : #accessing }
-GitModelImporter >> withFiles: anObject [
+GitModelImporter >> withFiles: aBoolean [
 
-	withFiles := anObject
+	withFiles := aBoolean
 ]
