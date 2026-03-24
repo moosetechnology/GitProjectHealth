@@ -1,11 +1,14 @@
+"
+I look at the commit on the period and I sum their deletions
+"
 Class {
-	#name : #CodeAdditionByCommitProjectMetric,
+	#name : #CodeDeletionProjectMetric,
 	#superclass : #ProjectMetric,
 	#category : #'GitLabHealth-Model-Analysis'
 }
 
 { #category : #calculating }
-CodeAdditionByCommitProjectMetric >> calculate [
+CodeDeletionProjectMetric >> calculate [
 
 	| gitAnalyzer contributions groupedByDate |
 	projectCommits ifNil: [ self load ].
@@ -27,19 +30,19 @@ CodeAdditionByCommitProjectMetric >> calculate [
 			ifPresent: [ :v | v add: assoc value ] ].
 
 	groupedByDate := groupedByDate collect: [ :contribs |
-		                 contribs sum: [ :v | v at: #addition ] ].
+		                 contribs sum: [ :v | v at: #deletion ] ].
 
 	^ groupedByDate average asFloat
 ]
 
 { #category : #accessing }
-CodeAdditionByCommitProjectMetric >> description [
+CodeDeletionProjectMetric >> description [
 
-	^ 'Code Addition by Commits (avg)'
+	^ 'Code Deletion'
 ]
 
 { #category : #loading }
-CodeAdditionByCommitProjectMetric >> load [
+CodeDeletionProjectMetric >> load [
 
 	projectCommits := self
 		                  loadCommitsSince: (period at: #since)
