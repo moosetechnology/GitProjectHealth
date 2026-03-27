@@ -363,7 +363,8 @@ GLHMetamodelGenerator >> groupProperties [
 	group property: #web_url type: #String.
 	group property: #description type: #String.
 	group property: #visibility type: #String.
-	group property: #avatar_url type: #String
+	group property: #avatar_url type: #String.
+	group property: #display_name type: #String
 ]
 
 { #category : #issues }

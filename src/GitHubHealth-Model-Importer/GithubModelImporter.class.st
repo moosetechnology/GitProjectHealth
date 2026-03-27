@@ -157,10 +157,11 @@ GithubModelImporter >> configureReaderForDiff: reader [
 GithubModelImporter >> configureReaderForGroup: reader [
 
 	super configureReaderForGroup: reader.
-	
-	reader
-		for: GLHGroup
-		do: [ :mapping | mapping mapInstVar: #web_url to: #html_url ]
+
+	reader for: GLHGroup do: [ :mapping |
+		mapping mapInstVar: #web_url to: #html_url.
+		mapping mapInstVar: #name to: #login.
+		mapping mapInstVar: #display_name to: #name ]
 ]
 
 { #category : #'private - configure reader' }
@@ -853,7 +854,7 @@ GithubModelImporter >> importPullRequestsOfProject: aProject [
 GithubModelImporter >> importRepositoriesOfGroup: groupResult [
 	"Github Repository = GLHProject"
 
-	| reposResult itemsPerPage pageNumber reposFound repos |
+	| itemsPerPage pageNumber reposFound repos |
 	itemsPerPage := 100.
 	pageNumber := 1.
 	('Extract all repositories of ' , groupResult name) recordInfo.
@@ -868,7 +869,7 @@ GithubModelImporter >> importRepositoriesOfGroup: groupResult [
 	reposFound addAll: repos.
 	[ repos size = itemsPerPage ] whileTrue: [
 		pageNumber := pageNumber + 1.
-		('Extract issues from ' , reposFound size printString , ' to '
+		('Extract commits from ' , reposFound size printString , ' to '
 		 , (reposFound size + itemsPerPage) printString) recordInfo.
 		repos := self parseArrayOfProject: (self repoApi organizations
 				        getRepositoriesOfOrganization: groupResult name
@@ -876,8 +877,6 @@ GithubModelImporter >> importRepositoriesOfGroup: groupResult [
 				        page: pageNumber).
 		reposFound addAll: repos ].
 
-	reposResult := self repoApi organizations
-		               getRepositoriesOfOrganization: groupResult name.
 	groupResult projects addAll: reposFound.
 	self glhModel addAll: groupResult projects.
 	groupResult projects do: [ :project |
