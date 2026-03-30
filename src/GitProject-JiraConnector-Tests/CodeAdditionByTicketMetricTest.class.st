@@ -1,37 +1,37 @@
 "
-A CodeDeletionByTicketMetricTest is a test class for testing the behavior of CodeDeletionByTicketMetric
+A CodeAdditionByTicketMetricTest is a test class for testing the behavior of CodeAdditionByTicketMetric
 "
 Class {
-	#name : #CodeDeletionByTicketMetricTest,
+	#name : #CodeAdditionByTicketMetricTest,
 	#superclass : #UserMetricTest,
-	#category : #'GitLabHealth-Model-Analysis-Tests'
+	#category : #'GitProject-JiraConnector-Tests'
 }
 
 { #category : #tests }
-CodeDeletionByTicketMetricTest >> testCalculate [
+CodeAdditionByTicketMetricTest >> testCalculate [
 
 	| result glhImporter jiraImporter codeAddition |
-	"Given"
 	glhImporter := GLPHImporterMock new.
 	glhImporter mergeRequests: { (GLHMergeRequest new
 			 author: user;
+			 created_at: createdAt ;
+			 merged_at: closedAt ;
 			 project: project1;
-			 created_at: createdAt;
-			 merged_at: mergedAt;
+			 state: 'merged';
 			 title: 'GL-205 feat do something') }.
 
 	glhImporter commits: {
 			(GLHCommit new
 				 id: 1;
 				 repository: project1 repository;
-				 created_at: createdAt;
+				 created_at: createdAt ;
 				 additions: 7;
 				 commitCreator: user;
 				 deletions: 5).
 			(GLHCommit new
 				 id: 2;
 				 repository: project1 repository;
-				 created_at: createdAt + 10 minutes;
+				 created_at: createdAt ;
 				 additions: 3;
 				 commitCreator: user;
 				 deletions: 5) }.
@@ -57,10 +57,9 @@ CodeDeletionByTicketMetricTest >> testCalculate [
 ]
 
 { #category : #tests }
-CodeDeletionByTicketMetricTest >> testCalculateNoCommits [
+CodeAdditionByTicketMetricTest >> testCalculateNoCommits [
 
 	| result glhImporter  jiraImporter codeAddition |
-	"Given"
 
 
 	glhImporter := GLPHImporterMock new.
@@ -69,7 +68,9 @@ CodeDeletionByTicketMetricTest >> testCalculateNoCommits [
 			 created_at: createdAt ;
 			 merged_at: mergedAt ;
 			 project: project1;
+			 state: 'merged';
 			 title: '205 feat do something') }.
+
 
 	jiraImporter := JiraImporterMock new.
 	jiraImporter issues: { (JPIssue new
@@ -92,12 +93,9 @@ CodeDeletionByTicketMetricTest >> testCalculateNoCommits [
 ]
 
 { #category : #tests }
-CodeDeletionByTicketMetricTest >> testCalculateNoMergeRequests [
+CodeAdditionByTicketMetricTest >> testCalculateNoMergeRequests [
 
-	| result glhImporter  jiraImporter codeAddition |
-	"Given"
-
-
+	| result glhImporter jiraImporter codeAddition |
 	glhImporter := GLPHImporterMock new.
 
 	jiraImporter := JiraImporterMock new.

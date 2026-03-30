@@ -4,7 +4,7 @@ A CommitsLinkWithTicketMetricTest is a test class for testing the behavior of Co
 Class {
 	#name : #CommitsLinkWithTicketMetricTest,
 	#superclass : #UserMetricTest,
-	#category : #'GitLabHealth-Model-Analysis-Tests'
+	#category : #'GitProject-JiraConnector-Tests'
 }
 
 { #category : #tests }

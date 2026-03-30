@@ -33,8 +33,8 @@ GitMetricExporter >> addAPeriodFrom: since to: until [
 	runningPeriods add: {
 			(#since -> since asDate).
 			(#until -> until asDate) } asDictionary.
-	
-	^runningPeriods 
+
+	^ runningPeriods
 ]
 
 { #category : #adding }

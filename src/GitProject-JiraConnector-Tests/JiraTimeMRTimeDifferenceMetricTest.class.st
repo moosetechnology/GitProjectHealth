@@ -4,7 +4,7 @@ A JiraTimeMRTimeDifferenceMetricTest is a test class for testing the behavior of
 Class {
 	#name : #JiraTimeMRTimeDifferenceMetricTest,
 	#superclass : #UserMetricTest,
-	#category : #'GitLabHealth-Model-Analysis-Tests'
+	#category : #'GitProject-JiraConnector-Tests'
 }
 
 { #category : #tests }

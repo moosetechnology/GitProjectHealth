@@ -4,7 +4,7 @@ A ClosedTicketsMetricTest is a test class for testing the behavior of ClosedTick
 Class {
 	#name : #ClosedTicketsMetricTest,
 	#superclass : #UserMetricTest,
-	#category : #'GitLabHealth-Model-Analysis-Tests'
+	#category : #'GitProject-JiraConnector-Tests'
 }
 
 { #category : #tests }
