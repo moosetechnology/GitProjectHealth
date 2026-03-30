@@ -20,7 +20,7 @@ CommitsNumberByJiraTicketsMetricTest >> testCalculate [
 			 project: project1;
 			 created_at: createdAt ;
 			 merged_at: mergedAt ;
-			 title: '205 feat do something') }.
+			 title: 'GL-205 feat do something') }.
 
 	glhImporter commits: { (GLHCommit new
 			 id: 1;
@@ -31,7 +31,7 @@ CommitsNumberByJiraTicketsMetricTest >> testCalculate [
 
 	jiraImporter := JiraImporterMock new.
 	jiraImporter issues: { (JPIssue new
-			 key: '205';
+			 key: 'GL-205';
 			 timeEstimate: 25 hours asDuration) }.
 
 
