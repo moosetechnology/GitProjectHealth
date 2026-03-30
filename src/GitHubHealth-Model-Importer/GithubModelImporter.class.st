@@ -853,30 +853,31 @@ GithubModelImporter >> importPullRequestsOfProject: aProject [
 GithubModelImporter >> importRepositoriesOfGroup: groupResult [
 	"Github Repository = GLHProject"
 
-	| reposResult itemByPage pageNumber reposFound tmp |
-	itemByPage := 100.
+	| reposResult itemsPerPage pageNumber reposFound repos |
+	itemsPerPage := 100.
 	pageNumber := 1.
-	('Extract all repository of ' , groupResult name) recordInfo.
+	('Extract all repositories of ' , groupResult name) recordInfo.
 	reposFound := OrderedCollection new.
 	('Extract commits from ' , reposFound size printString , ' to '
-	 , (reposFound size + itemByPage) printString) recordInfo.
-	tmp := self parseArrayOfProject: (self repoApi
-			        organizations getRepositoriesOfOrganization: groupResult name
-			        perPage: itemByPage
+	 , (reposFound size + itemsPerPage) printString) recordInfo.
+	repos := self parseArrayOfProject: (self repoApi organizations
+			        getRepositoriesOfOrganization: groupResult name
+			        perPage: itemsPerPage
 			        page: pageNumber).
 
-	reposFound addAll: tmp.
-	[ tmp size = itemByPage ] whileTrue: [
+	reposFound addAll: repos.
+	[ repos size = itemsPerPage ] whileTrue: [
 		pageNumber := pageNumber + 1.
 		('Extract issues from ' , reposFound size printString , ' to '
-		 , (reposFound size + itemByPage) printString) recordInfo.
-		tmp := self parseArrayOfProject: (self repoApi
-				        reposOfOrganization: groupResult name
-				        perPage: itemByPage
+		 , (reposFound size + itemsPerPage) printString) recordInfo.
+		repos := self parseArrayOfProject: (self repoApi organizations
+				        getRepositoriesOfOrganization: groupResult name
+				        perPage: itemsPerPage
 				        page: pageNumber).
-		reposFound addAll: tmp ].
+		reposFound addAll: repos ].
 
-	reposResult := self repoApi organizations getRepositoriesOfOrganization: groupResult name.
+	reposResult := self repoApi organizations
+		               getRepositoriesOfOrganization: groupResult name.
 	groupResult projects addAll: reposFound.
 	self glhModel addAll: groupResult projects.
 	groupResult projects do: [ :project |
@@ -946,12 +947,6 @@ GithubModelImporter >> importUserByUsername: anUsername [
 	self userCatalogue addUser: resultUser withName: anUsername.
 
 	^ resultUser
-]
-
-{ #category : #initialization }
-GithubModelImporter >> initReader [
-
-	super initReader. 
 ]
 
 { #category : #initialization }

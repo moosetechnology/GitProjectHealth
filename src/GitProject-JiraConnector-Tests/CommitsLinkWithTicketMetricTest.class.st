@@ -4,7 +4,7 @@ A CommitsLinkWithTicketMetricTest is a test class for testing the behavior of Co
 Class {
 	#name : #CommitsLinkWithTicketMetricTest,
 	#superclass : #UserMetricTest,
-	#category : #'GitLabHealth-Model-Analysis-Tests'
+	#category : #'GitProject-JiraConnector-Tests'
 }
 
 { #category : #tests }
@@ -27,14 +27,14 @@ CommitsLinkWithTicketMetricTest >> testCalculate [
 				 id: 2;
 				 repository: project1 repository;
 				 created_at: createdAt;
-				 message: '205';
+				 message: 'GL-205';
 				 additions: 3;
 				 commitCreator: user;
 				 deletions: 5) }.
 
 	jiraImporter := JiraImporterMock new.
 	jiraImporter issues: { (JPIssue new
-			 key: '205';
+			 key: 'GL-205';
 			 timeEstimate: 25 hours asDuration) }.
 
 

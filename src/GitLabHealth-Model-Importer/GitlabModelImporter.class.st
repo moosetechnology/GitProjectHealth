@@ -1806,7 +1806,7 @@ GitlabModelImporter >> importUserByUsername: anUsername [
 										               yourself)
 								              unless: [ :nu :ou | nu username = ou username ] ]
 						              ifNotEmpty: [ "because we may already have the researched user, we look by ID in the model"
-							              userId := searchResult first at: #id.
+							              userId := searchResult anyOne at: #id.
 							              (self glhModel allWithType: GLHUser)
 								              detect: [ :user | user id = userId ]
 								              ifNone: [ self importUser: userId ] ] ] ].
@@ -1814,13 +1814,6 @@ GitlabModelImporter >> importUserByUsername: anUsername [
 	self userCatalogue addUser: resultUser withName: anUsername.
 
 	^ resultUser
-]
-
-{ #category : #initialization }
-GitlabModelImporter >> initReader [
-	
-	"add specific reader for this importer here"
-	super initReader
 ]
 
 { #category : #initialization }
@@ -2181,8 +2174,9 @@ GitlabModelImporter >> pipelinesOf: aProjectID withLimit: aLimit [
 ]
 
 { #category : #accessing }
-GitlabModelImporter >> repoApi: anObject [
-	super repoApi: anObject.
+GitlabModelImporter >> repoApi: anApi [
+
+	super repoApi: anApi.
 	self repoApi output: 'json'
 ]
 
@@ -2218,6 +2212,7 @@ GitlabModelImporter >> subGroupsOf: aGroupID [
 ]
 
 { #category : #accessing }
-GitlabModelImporter >> withInitialCommits: boolean [
-	withInitialCommits := boolean 
+GitlabModelImporter >> withInitialCommits: aBoolean [
+
+	withInitialCommits := aBoolean
 ]

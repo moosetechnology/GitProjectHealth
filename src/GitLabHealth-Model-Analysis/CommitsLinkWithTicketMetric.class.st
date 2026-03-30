@@ -30,22 +30,22 @@ CommitsLinkWithTicketMetric >> description [
 { #category : #loading }
 CommitsLinkWithTicketMetric >> load [
 
-	| email |
+	| email connector jiraIds |
 	userCommits := self
 		               loadUserCommitsSince: (period at: #since)
 		               until: (period at: #until).
-		
+
 	email := self userEmail.
+	connector := GPJCConnector new.
+	jiraIds := userCommits collect: [ :userCommit |
+		           connector jiraKeyFromCommitMessage: userCommit message ].
+	jiraImporter importAllIssues: jiraIds.
 
-	jiraImporter importAllCurrentAndPastIssuesOf: email.
-
-	GPJCConnector new
+	connector
 		gpModel: glhImporter glhModel;
 		jiraModel: jiraImporter model;
 		connectCommits: userCommits.
 
-	^userCommits := userCommits select: [ :commit |
-		  commit jiraIssue isNotNil ]
-		
-	
+	^ userCommits := userCommits select: [ :commit |
+		                 commit jiraIssue isNotNil ]
 ]
