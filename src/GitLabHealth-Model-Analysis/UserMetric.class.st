@@ -163,16 +163,18 @@ UserMetric >> loadUserCompleteMergeRequestsSince: since until: until [
 { #category : #loading }
 UserMetric >> loadUserCompleteMergeRequestsWithJiraIssueSince: since until: until [
 
-	| email mergeRequests |
+	| email mergeRequests connector jiraIds |
 	mergeRequests := self
 		                 loadUserCompleteMergeRequestsSince: since
 		                 until: until.
 
 	email := self userEmail.
+	
+	connector := GPJCConnector new.
+	jiraIds := mergeRequests collect: [ :mergeRequest | connector jiraKeyFromCommitMessage: mergeRequest title ].
+	jiraImporter importAllIssues: jiraIds.
 
-	jiraImporter importAllCurrentAndPastIssuesOf: email.
-
-	GPJCConnector new
+	connector
 		gpModel: glhImporter glhModel;
 		jiraModel: jiraImporter model;
 		connectMergeRequests: mergeRequests.
