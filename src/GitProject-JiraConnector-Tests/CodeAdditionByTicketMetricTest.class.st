@@ -18,7 +18,7 @@ CodeAdditionByTicketMetricTest >> testCalculate [
 			 merged_at: closedAt ;
 			 project: project1;
 			 state: 'merged';
-			 title: '205 feat do something') }.
+			 title: 'GL-205 feat do something') }.
 
 	glhImporter commits: {
 			(GLHCommit new
@@ -38,7 +38,7 @@ CodeAdditionByTicketMetricTest >> testCalculate [
 
 	jiraImporter := JiraImporterMock new.
 	jiraImporter issues: { (JPIssue new
-			 key: '205';
+			 key: 'GL-205';
 			 timeEstimate: 25 hours asDuration) }.
 
 

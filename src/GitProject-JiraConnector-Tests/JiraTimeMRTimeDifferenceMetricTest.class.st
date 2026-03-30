@@ -21,7 +21,7 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculate [
 			 merged_at: createdAt + 24 hours;
 			 state: #merged;
 			 project: project1;
-			 title: '205 feat do something') }.
+			 title: 'GL-205 feat do something') }.
 
 	glhImporter commits: { (GLHCommit new
 			 id: 1;
@@ -34,7 +34,7 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculate [
 	"and a Jira ticket estimated at 25 hours"
 	jiraImporter := JiraImporterMock new.
 	jiraImporter issues: { (JPIssue new
-			 key: '205';
+			 key: 'GL-205';
 			 timeEstimate: 25 hours asDuration) }.
 
 
@@ -65,7 +65,7 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculate2PeriodWith1EmptyPeriod [
 			 state: #merged;
 			 created_at: createdAt;
 			 merged_at: createdAt + 24 hours;
-			 title: '205 feat do something') }.
+			 title: 'GL-205 feat do something') }.
 
 	glhImporter commits: { (GLHCommit new
 			 id: 1;
@@ -76,7 +76,7 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculate2PeriodWith1EmptyPeriod [
 
 	jiraImporter := JiraImporterMock new.
 	jiraImporter issues: { (JPIssue new
-			 key: '205';
+			 key: 'GL-205';
 			 timeEstimate: 25 hours asDuration) }.
 
 
@@ -176,7 +176,7 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculateWithTimeOriginalEstimateAndNo
 			 created_at: createdAt ;
 			 merged_at: (createdAt + 24 hours);
 			 state: #merged;
-			 title: '205 feat do something') }.
+			 title: 'GL-205 feat do something') }.
 
 	glhImporter commits: { (GLHCommit new
 			 id: 1;
@@ -188,7 +188,7 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculateWithTimeOriginalEstimateAndNo
 
 	jiraImporter := JiraImporterMock new.
 	jiraImporter issues: { (JPIssue new
-			 key: '205';
+			 key: 'GL-205';
 			 timeEstimate: nil;
 			 timeOriginalEstimate: 25 hours asDuration) }.
 
