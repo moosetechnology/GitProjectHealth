@@ -2,13 +2,13 @@
 A CodeAdditionByCommitProjectMetricTest is a test class for testing the behavior of CodeAdditionByCommitProjectMetric
 "
 Class {
-	#name : #CodeAdditionByCommitProjectMetricTest,
+	#name : #CodeDeletionProjectMetricTest,
 	#superclass : #ProjectMetricTest,
 	#category : #'GitLabHealth-Model-Analysis-Tests'
 }
 
 { #category : #tests }
-CodeAdditionByCommitProjectMetricTest >> testCalculate [
+CodeDeletionProjectMetricTest >> testCalculate [
 
 	| result glhImporter codeAddition |
 	glhImporter := GLPHImporterMock new.
@@ -39,7 +39,7 @@ CodeAdditionByCommitProjectMetricTest >> testCalculate [
 				 deletions: 5) }.
 
 
-	codeAddition := CodeAdditionByCommitProjectMetric new
+	codeAddition := CodeDeletionProjectMetric new
 		                project: project1;
 		                glhImporter: glhImporter;
 		                setPeriodSince: since until: until;
@@ -49,11 +49,11 @@ CodeAdditionByCommitProjectMetricTest >> testCalculate [
 	result := codeAddition calculate.
 
 	"Then"
-	self assert: result equals: 13
+	self assert: result equals: 15
 ]
 
 { #category : #tests }
-CodeAdditionByCommitProjectMetricTest >> testCalculate2commits1OutsidePeriod [
+CodeDeletionProjectMetricTest >> testCalculate2commits1OutsidePeriod [
 
 	| result glhImporter codeAddition |
 	glhImporter := GLPHImporterMock new.
@@ -84,7 +84,7 @@ CodeAdditionByCommitProjectMetricTest >> testCalculate2commits1OutsidePeriod [
 				 deletions: 5) }.
 
 
-	codeAddition := CodeAdditionByCommitProjectMetric new
+	codeAddition := CodeDeletionProjectMetric new
 		                project: project1;
 		                glhImporter: glhImporter;
 		                setPeriodSince: since until: until;
@@ -94,11 +94,11 @@ CodeAdditionByCommitProjectMetricTest >> testCalculate2commits1OutsidePeriod [
 	result := codeAddition calculate.
 
 	"Then"
-	self assert: result equals: 2
+	self assert: result equals: 10
 ]
 
 { #category : #tests }
-CodeAdditionByCommitProjectMetricTest >> testCalculate3commits [
+CodeDeletionProjectMetricTest >> testCalculate3commits [
 
 	| result glhImporter codeAddition |
 	glhImporter := GLPHImporterMock new.
@@ -129,7 +129,7 @@ CodeAdditionByCommitProjectMetricTest >> testCalculate3commits [
 				 deletions: 5) }.
 
 
-	codeAddition := CodeAdditionByCommitProjectMetric new
+	codeAddition := CodeDeletionProjectMetric new
 		                project: project1;
 		                glhImporter: glhImporter;
 		                setPeriodSince: since until: until;
@@ -139,11 +139,11 @@ CodeAdditionByCommitProjectMetricTest >> testCalculate3commits [
 	result := codeAddition calculate.
 
 	"Then"
-	self assert: result equals: 3
+	self assert: result equals: 15
 ]
 
 { #category : #tests }
-CodeAdditionByCommitProjectMetricTest >> testCalculateNoCommits [
+CodeDeletionProjectMetricTest >> testCalculateNoCommits [
 
 	| result glhImporter codeAddition |
 	glhImporter := GLPHImporterMock new.
@@ -156,7 +156,7 @@ CodeAdditionByCommitProjectMetricTest >> testCalculateNoCommits [
 	glhImporter commits: {  }.
 
 
-	codeAddition := CodeAdditionByCommitProjectMetric new
+	codeAddition := CodeDeletionProjectMetric new
 		                project: project1;
 		                glhImporter: glhImporter;
 		                setPeriodSince: since until: until;
