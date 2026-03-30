@@ -169,9 +169,12 @@ UserMetric >> loadUserCompleteMergeRequestsWithJiraIssueSince: since until: unti
 		                 until: until.
 
 	email := self userEmail.
-	
+
 	connector := GPJCConnector new.
-	jiraIds := mergeRequests collect: [ :mergeRequest | connector jiraKeyFromCommitMessage: mergeRequest title ].
+	jiraIds := mergeRequests
+		           collect: [ :mergeRequest |
+			           connector jiraKeyFromCommitMessage: mergeRequest title ]
+		           thenReject: [ :id | id isNil ].
 	jiraImporter importAllIssues: jiraIds.
 
 	connector
