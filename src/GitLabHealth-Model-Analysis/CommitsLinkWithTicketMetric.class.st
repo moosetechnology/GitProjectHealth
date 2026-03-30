@@ -37,8 +37,10 @@ CommitsLinkWithTicketMetric >> load [
 
 	email := self userEmail.
 	connector := GPJCConnector new.
-	jiraIds := userCommits collect: [ :userCommit |
-		           connector jiraKeyFromCommitMessage: userCommit message ].
+	jiraIds := userCommits
+		           collect: [ :userCommit |
+			           connector jiraKeyFromCommitMessage: userCommit message ]
+		           thenReject: [ :id | id isNil ].
 	jiraImporter importAllIssues: jiraIds.
 
 	connector
