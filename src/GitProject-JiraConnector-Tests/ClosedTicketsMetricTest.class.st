@@ -16,10 +16,10 @@ ClosedTicketsMetricTest >> testCalculate [
 			 author: user;
 			 project: project1;
 			 created_at: createdAt ;
-			 title: '205 feat do something') }.
+			 title: 'GL-205 feat do something') }.
 
 	jiraImporter := JiraImporterMock new.
-	jiraImporter issues: { (JPIssue new key: '205') }.
+	jiraImporter issues: { (JPIssue new key: 'GL-205') }.
 
 
 	closedTicket := ClosedTicketsMetric new
