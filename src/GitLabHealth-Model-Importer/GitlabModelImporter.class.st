@@ -210,7 +210,7 @@ GitlabModelImporter >> completeImportsOfRepository: aGLHRepository [
 	[
 	('import the repository of project ' , aGLHRepository project name)
 		recordInfo.
-	branches := self importBranchesOf: aGLHRepository project.
+	branches := self importBranchesOfProject: aGLHRepository project.
 	self withFiles ifTrue: [
 		branches do: [ :branch | self importFilesOfBranch: branch ] ] ]
 		on: NeoJSONParseError
