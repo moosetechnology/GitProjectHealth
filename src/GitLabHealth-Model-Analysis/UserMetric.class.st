@@ -90,24 +90,9 @@ UserMetric >> loadMergeRequestsSince: since until: until [
 { #category : #loading }
 UserMetric >> loadMergeRequestsWithJiraIssueSince: since until: until [
 
-	| email mergeRequests connector jiraIds |
+	| mergeRequests |
 	mergeRequests := self loadMergeRequestsSince: since until: until.
-
-	email := self userEmail.
-
-	connector := GPJCConnector new.
-	jiraIds := mergeRequests
-		           collect: [ :mergeRequest |
-			           connector jiraKeyFromCommitMessage: mergeRequest title ]
-		           thenReject: [ :id | id isNil ].
-	jiraImporter importAllIssues: jiraIds.
-	connector
-		gpModel: glhImporter glhModel;
-		jiraModel: jiraImporter model;
-		connectMergeRequests: mergeRequests.
-
-	^ mergeRequests select: [ :mergeRequest |
-		  mergeRequest jiraIssue isNotNil ]
+	^ self searchAndConnectJiraIssueToMergeRequests: mergeRequests
 ]
 
 { #category : #loading }
@@ -166,27 +151,11 @@ UserMetric >> loadUserCompleteMergeRequestsSince: since until: until [
 { #category : #loading }
 UserMetric >> loadUserCompleteMergeRequestsWithJiraIssueSince: since until: until [
 
-	| email mergeRequests connector jiraIds |
+	| mergeRequests |
 	mergeRequests := self
 		                 loadUserCompleteMergeRequestsSince: since
 		                 until: until.
-
-	email := self userEmail.
-
-	connector := GPJCConnector new.
-	jiraIds := mergeRequests
-		           collect: [ :mergeRequest |
-			           connector jiraKeyFromCommitMessage: mergeRequest title ]
-		           thenReject: [ :id | id isNil ].
-	jiraImporter importAllIssues: jiraIds.
-
-	connector
-		gpModel: glhImporter glhModel;
-		jiraModel: jiraImporter model;
-		connectMergeRequests: mergeRequests.
-
-	^ mergeRequests select: [ :mergeRequest |
-		  mergeRequest jiraIssue isNotNil ]
+	^ self searchAndConnectJiraIssueToMergeRequests: mergeRequests
 ]
 
 { #category : #loading }
@@ -201,22 +170,26 @@ UserMetric >> loadUserMergeRequestsSince: since until: until [
 { #category : #loading }
 UserMetric >> loadUserMergeRequestsWithJiraIssueSince: since until: until [
 
-	| email mergeRequests connector jiraIds |
+	| mergeRequests |
 	mergeRequests := self loadUserMergeRequestsSince: since until: until.
+	^ self searchAndConnectJiraIssueToMergeRequests: mergeRequests
+]
 
-	email := self userEmail.
+{ #category : #loading }
+UserMetric >> searchAndConnectJiraIssueToMergeRequests: mergeRequests [
 
+	| jiraIds connector |
 	connector := GPJCConnector new.
 	jiraIds := mergeRequests
 		           collect: [ :mergeRequest |
 			           connector jiraKeyFromCommitMessage: mergeRequest title ]
 		           thenReject: [ :id | id isNil ].
 	jiraImporter importAllIssues: jiraIds.
+
 	connector
 		gpModel: glhImporter glhModel;
 		jiraModel: jiraImporter model;
 		connectMergeRequests: mergeRequests.
-
 
 	^ mergeRequests select: [ :mergeRequest |
 		  mergeRequest jiraIssue isNotNil ]
