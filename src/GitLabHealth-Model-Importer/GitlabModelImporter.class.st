@@ -1315,10 +1315,11 @@ GitlabModelImporter >> importMergeRequestMergeCommits: aGLPHEMergeRequest [
 
 	('Import commit squash_commit_sha of MR:  '
 	 , aGLPHEMergeRequest iid printString) recordInfo.
-	aGLPHEMergeRequest squashCommit: ((self
-			  importCommit: aGLPHEMergeRequest squash_commit_sha
-			  ofProject: aGLPHEMergeRequest project) ifNotNil: [ :commit |
-			 foundCommits add: commit ]).
+	aGLPHEMergeRequest squash_commit_sha ifNotNil: [
+		aGLPHEMergeRequest squashCommit: ((self
+				  importCommit: aGLPHEMergeRequest squash_commit_sha
+				  ofProject: aGLPHEMergeRequest project) ifNotNil: [ :commit |
+				 foundCommits add: commit ]) ].
 
 	self chainsCommitsFrom: foundCommits.
 	^ foundCommits
