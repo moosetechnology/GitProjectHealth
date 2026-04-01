@@ -1320,7 +1320,6 @@ GitlabModelImporter >> importMergeRequestMergeCommits: aGLPHEMergeRequest [
 			  ofProject: aGLPHEMergeRequest project) ifNotNil: [ :commit |
 			 foundCommits add: commit ]).
 
-	self halt. 
 	self chainsCommitsFrom: foundCommits.
 	^ foundCommits
 ]
