@@ -24,13 +24,13 @@ a gitlab merge request
 | `author` | `GLHMergeRequest` | `createdMergeRequests` | `GLHUser` | |
 | `closed_by` | `GLHMergeRequest` | `closedMergeRequests` | `GLHUser` | |
 | `diffs` | `GLHMergeRequest` | `mergeRequest` | `GLHDiff` | |
-| `mergeRequestCommit` | `GLHMergeRequest` | `commitedMergeRequest` | `GLHCommit` | |
+| `mergeRequestCommit` | `GLHMergeRequest` | `commitedMergeRequest` | `GLHCommit` | Head commit of the merge request, identified by the MR's SHA|
 | `merge_user` | `GLHMergeRequest` | `usedMerges` | `GLHUser` | |
-| `mergedCommit` | `GLHMergeRequest` | `commitedMergeRequest` | `GLHCommit` | |
+| `mergedCommit` | `GLHMergeRequest` | `commitedMergeRequest` | `GLHCommit` | Created when the merge request is merged, nil otherwise|
 | `merged_by` | `GLHMergeRequest` | `mergerOfMergeRequests` | `GLHUser` | |
 | `note` | `GLHMergeRequest` | `mergeRequest` | `GLHNote` | |
 | `reviewers` | `GLHMergeRequest` | `reviewedMergeRequest` | `GLHUser` | |
-| `squashCommit` | `GLHMergeRequest` | `squashedMergeRequest` | `GLHCommit` | |
+| `squashCommit` | `GLHMergeRequest` | `squashedMergeRequest` | `GLHCommit` | In case of squash, single commit that gathers all commit info|
 
 
 ## Properties
@@ -579,6 +579,7 @@ GLHMergeRequest >> mergeRequestCommit [
 	"Relation named: #mergeRequestCommit type: #GLHCommit opposite: #commitedMergeRequest"
 
 	<generated>
+	<FMComment: 'Head commit of the merge request, identified by the MR''s SHA'>
 	^ mergeRequestCommit
 ]
 
@@ -651,6 +652,7 @@ GLHMergeRequest >> mergedCommit [
 	"Relation named: #mergedCommit type: #GLHCommit opposite: #commitedMergeRequest"
 
 	<generated>
+	<FMComment: 'Created when the merge request is merged, nil otherwise'>
 	^ mergedCommit
 ]
 
@@ -934,6 +936,7 @@ GLHMergeRequest >> squashCommit [
 	"Relation named: #squashCommit type: #GLHCommit opposite: #squashedMergeRequest"
 
 	<generated>
+	<FMComment: 'In case of squash, single commit that gathers all commit info'>
 	^ squashCommit
 ]
 

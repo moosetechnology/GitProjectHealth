@@ -482,16 +482,18 @@ GLHMetamodelGenerator >> mergeRequestsRelations [
 	*-* (user property: #reviewedMergeRequest).
 	(mergeRequest property: #pipelines)
 	<>-* (pipeline property: #mergeRequest).
-	(mergeRequest property: #mergedCommit)
+	((mergeRequest property: #mergedCommit) comment:
+		 'Created when the merge request is merged, nil otherwise')
 	- (commit property: #commitedMergeRequest).
-	(mergeRequest property: #mergeRequestCommit)
+	((mergeRequest property: #mergeRequestCommit) comment:
+		 'Head commit of the merge request, identified by the MR''s SHA')
 	- (commit property: #commitedMergeRequest).
-	(mergeRequest property: #squashCommit)
+	((mergeRequest property: #squashCommit) comment:
+		 'In case of squash, single commit that gathers all commit info')
 	- (commit property: #squashedMergeRequest).
 	(mergeRequest property: #diffs) -* (diff property: #mergeRequest).
 	(project property: #mergeRequests)
-	<>-* (mergeRequest property: #project).
-
+	<>-* (mergeRequest property: #project)
 ]
 
 { #category : #milestones }
