@@ -1276,6 +1276,27 @@ GitlabModelImporter >> importLatestReleaseOfProject: aGLHProject [
 	^ foundRelease.
 ]
 
+{ #category : #'import - merge-requests' }
+GitlabModelImporter >> importMergeRequest: mergeRequestIID ofProject: aGLHProject [
+
+	| result parsedResult |
+	self flag: 'TODO: add to GitModelImporter and all other subclasses'.
+
+	result := self repoApi mergeRequests
+		          get: mergeRequestIID
+		          inProject: aGLHProject id.
+	parsedResult := (self parseMergeRequestsResult: '[' , result , ']')
+		                first.
+
+	parsedResult := glhModel
+		                add: parsedResult
+		                unless: self blockOnIdEquality.
+	parsedResult := aGLHProject mergeRequests
+		                add: parsedResult
+		                unless: self blockOnIdEquality.
+	^ parsedResult
+]
+
 { #category : #'import - commits' }
 GitlabModelImporter >> importMergeRequestCommits: aGLPHEMergeRequest [
 
