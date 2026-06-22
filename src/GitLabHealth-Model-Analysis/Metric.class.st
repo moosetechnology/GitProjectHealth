@@ -90,6 +90,13 @@ Metric >> over: anObject [
 	over := anObject
 ]
 
+{ #category : #'utils - date' }
+Metric >> readDate: aDateString [
+	"date is supposed to the the format mm-dd-yyyy for compatibility with Moose 12"
+
+	^ Date readFrom: aDateString pattern: 'mm-dd-yyyy'
+]
+
 { #category : #initialization }
 Metric >> setPeriodSince: since until: until [
 
@@ -119,9 +126,9 @@ Metric >> setupGroupedDate [
 		over := #day ].
 
 
-	[ groupedByDate keys last asDate < end ] whileTrue: [
+	[ (self readDate: groupedByDate keys last) < end ] whileTrue: [
 		| index |
-		index := groupedByDate keys last asDate
+		index := (self readDate: groupedByDate keys last)
 		         + (increment perform: overSymbol).
 		index := self transformDate: index to: over.
 		groupedByDate
@@ -132,7 +139,7 @@ Metric >> setupGroupedDate [
 	over = #day ifTrue: [
 		groupedByDate := (groupedByDate associations select: [ :date |
 			                  | aWeekday |
-			                  aWeekday := date key asDate weekday.
+			                  aWeekday := (self readDate: date key) weekday.
 			                  (aWeekday = #Sunday or: [ aWeekday = #Saturday ])
 				                  not ]) asOrderedDictionary ].
 
