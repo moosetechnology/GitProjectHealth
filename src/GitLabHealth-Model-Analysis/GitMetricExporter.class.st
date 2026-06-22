@@ -343,15 +343,22 @@ GitMetricExporter >> findParticipationOfCommitAuthorNamed: username amongProject
 				                size.
 				                ']' }) recordInfo.
 
-							params := { 
-								#author -> username.
-								#since -> '01 january 2023' asDate asDateAndTime asString.
-								#until -> Date today asDateAndTime asString
-							} asDictionary.
-		               response := glhImporter repoApi commits getAllInProject: project id withParams: params.
-		               response := (response collect: [ :commitsJson | glhImporter parseCommitsResult: commitsJson]) flattened.
-		               response isNotEmpty
-		 ].
+		               params := {
+			                         (#author -> username).
+			                         (#since
+			                          ->
+			                          (Date newDay: 1 month: 1 year: 2023)
+				                          asDateAndTime asString).
+			                         (#until
+			                          -> Date today asDateAndTime asString) }
+			                         asDictionary.
+		               response := glhImporter repoApi commits
+			                           getAllInProject: project id
+			                           withParams: params.
+		               response := (response collect: [ :commitsJson |
+			                            glhImporter parseCommitsResult:
+				                            commitsJson ]) flattened.
+		               response isNotEmpty ].
 
 	^ itsProjects
 ]
@@ -477,15 +484,14 @@ GitMetricExporter >> initialize [
 
 	entities := OrderedCollection new.
 	"set up the minimal date from which we are looking for the commits a particular user in projects"
-	sinceTimeLimit := '2024-01-01' asDate asDateAndTime.
+	sinceTimeLimit := (Date newDay: 1 month: 1 year: 2024) asDateAndTime.
 	runningPeriods := OrderedCollection new.
 	maxCommitWindow := 3.
 	over := Date.
 
 	analyses := OrderedCollection new.
 
-	metrics := Metric allSubclasses reject: #isAbstract.
-
+	metrics := Metric allSubclasses reject: #isAbstract
 ]
 
 { #category : #accessing }
