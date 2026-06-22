@@ -67,38 +67,35 @@ CommitFrequencyMetricTest >> testCalculate [
 CommitFrequencyMetricTest >> testCalculate1CommitByWeek [
 
 	| glhImporter result commitFrequency |
-
 	glhImporter := GLPHImporterMock new.
 
-	glhImporter commits: { 
-		(GLHCommit new
+	glhImporter commits: {
+			(GLHCommit new
 				 id: 1;
 				 repository: project1 repository;
 				 created_at: createdAt;
 				 additions: 7;
 				 commitCreator: user;
 				 deletions: 5).
-		(GLHCommit new
+			(GLHCommit new
 				 id: 2;
 				 repository: project1 repository;
 				 created_at: createdAt + 7 days;
 				 additions: 7;
 				 commitCreator: user;
 				 deletions: 5).
-		(GLHCommit new
+			(GLHCommit new
 				 id: 3;
 				 repository: project1 repository;
-				 created_at: createdAt + 7 days ;
+				 created_at: createdAt + 7 days;
 				 additions: 7;
 				 commitCreator: user;
-				 deletions: 5).
-	 }.
-
+				 deletions: 5) }.
 
 	commitFrequency := CommitFrequencyMetric new
 		                   user: user;
 		                   glhImporter: glhImporter;
-		                   setPeriodSince: createdAt asDate until: (createdAt + (7 + 7) days) asDate  ;
+		                   setPeriodSince: since until: '09-18-2024';
 		                   over: Week.
 
 	"When"
@@ -141,8 +138,8 @@ CommitFrequencyMetricTest >> testCalculate1CommitByWeekFromAnotherUser [
 	commitFrequency := CommitFrequencyMetric new
 		                   user: user;
 		                   glhImporter: glhImporter;
-		                   setPeriodSince: createdAt asDate
-		                   until: (createdAt + (7 + 7) days) asDate;
+		                   setPeriodSince: since
+		                   until: '09-18-2024';
 		                   over: Week.
 
 	"When"

@@ -15,7 +15,7 @@ ContributedProjectMetric >> calculate [
 		dateOver := self transformDate: userCommit committed_date to: over.
 
 		groupedByDate
-			at: dateOver printString
+			at: dateOver
 			ifPresent: [ :value | value add: userCommit repository project ] ].
 
 	groupedByDate := groupedByDate collect: [ :group |

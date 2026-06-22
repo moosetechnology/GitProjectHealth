@@ -93,16 +93,16 @@ Metric >> over: anObject [
 { #category : #'utils - date' }
 Metric >> readDate: aDateString [
 	"date is supposed to the the format mm-dd-yyyy for compatibility with Moose 12"
-
+	
 	^ Date readFrom: aDateString pattern: 'mm-dd-yyyy'
 ]
 
 { #category : #initialization }
 Metric >> setPeriodSince: since until: until [
 
-	period :=  {
-			(#since -> since asDate).
-			(#until -> until asDate) } asDictionary
+	period := {
+		          (#since -> (self readDate: since)).
+		          (#until -> (self readDate: until)) } asDictionary
 ]
 
 { #category : #'utils - date' }
@@ -116,7 +116,7 @@ Metric >> setupGroupedDate [
 	end := self transformDate: (period at: #until) to: over.
 
 	groupedByDate
-		at: start printString
+		at: start
 		ifAbsentPut: [ OrderedCollection new ].
 
 	overSymbol := over name asLowercase asSymbol.
@@ -126,26 +126,26 @@ Metric >> setupGroupedDate [
 		over := #day ].
 
 
-	[ (self readDate: groupedByDate keys last) < end ] whileTrue: [
+	[ groupedByDate keys last < end ] whileTrue: [
 		| index |
-		index := (self readDate: groupedByDate keys last)
+		index := groupedByDate keys last
 		         + (increment perform: overSymbol).
 		index := self transformDate: index to: over.
 		groupedByDate
-			at: index printString
+			at: index
 			ifAbsentPut: [ OrderedCollection new ] ].
 
 
 	over = #day ifTrue: [
 		groupedByDate := (groupedByDate associations select: [ :date |
 			                  | aWeekday |
-			                  aWeekday := (self readDate: date key) weekday.
+			                  aWeekday :=  date key weekday.
 			                  (aWeekday = #Sunday or: [ aWeekday = #Saturday ])
 				                  not ]) asOrderedDictionary ].
 
 
 	groupedByDate
-		at: end printString
+		at: end
 		ifAbsentPut: [ OrderedCollection new ].
 
 	^ groupedByDate

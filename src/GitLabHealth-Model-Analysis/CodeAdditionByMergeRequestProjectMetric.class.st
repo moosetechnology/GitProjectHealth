@@ -17,7 +17,7 @@ CodeAdditionByMergeRequestProjectMetric >> calculate [
 	projectMergeRequests do: [ :mr |
 		dateOver := self transformDate: mr created_at to: over.
 		groupedByDate
-			at: dateOver printString
+			at: dateOver
 			ifPresent: [ :value | value add: mr ] ].
 
 	groupedByDate := groupedByDate collect: [ :group |

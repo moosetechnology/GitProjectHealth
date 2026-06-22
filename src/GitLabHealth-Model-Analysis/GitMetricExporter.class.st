@@ -31,8 +31,8 @@ GitMetricExporter class >> demoPeriod [
 GitMetricExporter >> addAPeriodFrom: since to: until [
 
 	runningPeriods add: {
-			(#since -> since asDate).
-			(#until -> until asDate) } asDictionary.
+			(#since -> (self readDate: since)).
+			(#until -> (self readDate: until)) } asDictionary.
 
 	^ runningPeriods
 ]
@@ -540,6 +540,13 @@ GitMetricExporter >> projectEntities [
 GitMetricExporter >> projectMetrics [
 
 	^ metrics select: [ :metric | metric inheritsFrom: ProjectMetric ]
+]
+
+{ #category : #accessing }
+GitMetricExporter >> readDate: aDateString [
+	"date is supposed to the the format mm-dd-yyyy for compatibility with Moose 12"
+
+	^ Date readFrom: aDateString pattern: 'mm-dd-yyyy'
 ]
 
 { #category : #setup }

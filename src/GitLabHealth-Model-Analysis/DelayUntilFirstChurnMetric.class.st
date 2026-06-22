@@ -25,7 +25,7 @@ DelayUntilFirstChurnMetric >> calculate [
 			overDate := self transformDate: commit created_at to: over.
 
 			groupedByDate
-				at: overDate printString
+				at: overDate
 				ifPresent: [ :arrayOfCommits | arrayOfCommits add: commit ]
  ] ].
 

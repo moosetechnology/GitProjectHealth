@@ -20,7 +20,7 @@ CreatedNoteInMergedOrClosedMergeRequest >> calculate [
 			          ifFalse: [ mergeRequest merged_at ].
 		dateOver := self transformDate: mrDate to: over.
 		groupedByDate
-			at: dateOver printString
+			at: dateOver
 			ifPresent: [ :v | v add: mergeRequest ] ].
 
 	groupedByDate := groupedByDate collect: [ :mergeRequestGroup |

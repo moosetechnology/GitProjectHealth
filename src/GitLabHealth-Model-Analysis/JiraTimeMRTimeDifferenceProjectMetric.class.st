@@ -24,7 +24,7 @@ JiraTimeMRTimeDifferenceProjectMetric >> calculate [
 		jiraID := GPJCConnector new jiraKeyFromCommitMessage: mr title.
 
 		groupedByDate
-			at: dateOver printString
+			at: dateOver
 			ifPresent: [ :value | value add: mr ] ].
 
 	groupedByDate := groupedByDate collect: [ :group |
