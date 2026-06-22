@@ -21,10 +21,11 @@ GitAnalyzerLocalTest >> setUp [
 	gitAnalyzer := GitAnalyzer new onModel: glphModel.
 	fromCommit := GLHCommit new.
 	fromCommit short_id: 'testFromCommit'.
-	fromCommit created_at: ('3 August 2021' asDate).
+	"3 august 2021"
+	fromCommit created_at: (Date newDay: 3 month: 8 year: 2021).
 	glphModel add: fromCommit.
-	
-	gitAnalyzer fromCommit: fromCommit.
+
+	gitAnalyzer fromCommit: fromCommit
 ]
 
 { #category : #test }

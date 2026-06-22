@@ -42,7 +42,7 @@ GitAnalyzerTest >> setUp [
 
 	glhImporter
 		importCommitsOfProject: projects first
-		since: since asDate
+		since: since
 		until: nil.
 
 	gitAnalyzer := GitAnalyzer new
