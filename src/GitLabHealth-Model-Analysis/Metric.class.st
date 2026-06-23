@@ -91,10 +91,13 @@ Metric >> over: anObject [
 ]
 
 { #category : #'utils - date' }
-Metric >> readDate: aDateString [
+Metric >> readDate: aDateOrDateString [
 	"date is supposed to the the format mm-dd-yyyy for compatibility with Moose 12"
 	
-	^ Date readFrom: aDateString pattern: 'mm-dd-yyyy'
+	(aDateOrDateString isKindOf: DateAndTime) ifTrue: [
+		^ aDateOrDateString asDate ].
+	(aDateOrDateString isKindOf: Date) ifTrue: [ ^ aDateOrDateString ].
+	^ Date readFrom: aDateOrDateString pattern: 'mm-dd-yyyy'
 ]
 
 { #category : #initialization }
