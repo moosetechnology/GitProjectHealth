@@ -43,3 +43,78 @@ MetricTest >> testName [
 	"Then"
 	self assert: name equals: 'ProjectMetric'.
 ]
+
+{ #category : #tests }
+MetricTest >> testTransformDateTo [
+
+	| metric startingDate aWeekDateAndTime |
+	metric := Metric new.
+	aWeekDateAndTime := '2024-09-04T11:24:11.803+02:00' asDateAndTime.
+
+	startingDate := Date starting:
+		                '2024-09-01T00:00:00.000+00:00' asDateAndTime.
+
+	self
+		assert: (metric transformDate: aWeekDateAndTime to: Week)
+		equals: startingDate
+]
+
+{ #category : #tests }
+MetricTest >> testTransformDateToMonth [
+
+	| metric startingDate aWeekDateAndTime |
+	metric := Metric new.
+	aWeekDateAndTime := '2024-09-17T00:00:00.000+00:00' asDateAndTime.
+
+	startingDate := Date starting:
+		                '2024-09-01T00:00:00.000+00:00' asDateAndTime.
+
+	self
+		assert: (metric transformDate: aWeekDateAndTime to: Month)
+		equals: startingDate
+]
+
+{ #category : #tests }
+MetricTest >> testTransformDateToSameDate [
+
+	| metric startingDate aWeekDateAndTime |
+	metric := Metric new.
+	aWeekDateAndTime := '2024-09-01T00:00:00.000+00:00' asDateAndTime.
+
+	startingDate := Date starting:
+		                '2024-09-01T00:00:00.000+00:00' asDateAndTime.
+
+	self
+		assert: (metric transformDate: aWeekDateAndTime to: Week)
+		equals: startingDate
+]
+
+{ #category : #tests }
+MetricTest >> testTransformDateToSameDateWithOffset [
+
+	| metric startingDate aWeekDateAndTime |
+	metric := Metric new.
+	aWeekDateAndTime := '2024-09-01T00:00:00.000+02:00' asDateAndTime.
+
+	startingDate := Date starting:
+		                '2024-09-01T00:00:00.000+00:00' asDateAndTime.
+
+	self
+		assert: (metric transformDate: aWeekDateAndTime to: Week)
+		equals: startingDate
+]
+
+{ #category : #tests }
+MetricTest >> testTransformDateToWithDate [
+
+	| metric startingDate aWeekDateAndTime |
+	metric := Metric new.
+	aWeekDateAndTime := Date starting: '2024-09-04T11:24:11.803+02:00' asDateAndTime.
+
+	startingDate := Date starting:
+		                '2024-09-01T00:00:00.000+00:00' asDateAndTime.
+
+	self
+		assert: (metric transformDate: aWeekDateAndTime to: Week)
+		equals: startingDate
+]

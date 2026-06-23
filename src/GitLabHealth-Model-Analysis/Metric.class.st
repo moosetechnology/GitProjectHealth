@@ -157,8 +157,11 @@ Metric >> setupGroupedDate [
 { #category : #'utils - date' }
 Metric >> transformDate: date to: aWeekOrMonthOrYear [
 
-	aWeekOrMonthOrYear = Month ifTrue: [ ^ date asDate month asDate ].
+	| dateWithoutOffSet |
+	dateWithoutOffSet := (date asDateAndTime + date offset) withoutOffset.
+	aWeekOrMonthOrYear = Month ifTrue: [
+		^ dateWithoutOffSet asDate month asDate ].
 
-	^ (date asDate perform: ('as' , aWeekOrMonthOrYear name) asSymbol)
-		  asDate
+	^ (dateWithoutOffSet asDate perform:
+		   ('as' , aWeekOrMonthOrYear name) asSymbol) asDate
 ]
