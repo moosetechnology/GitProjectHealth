@@ -210,7 +210,7 @@ GitlabModelImporter >> completeImportsOfRepository: aGLHRepository [
 	[
 	('import the repository of project ' , aGLHRepository project name)
 		recordInfo.
-	branches := self importBranchesOf: aGLHRepository project.
+	branches := self importBranchesOfProject: aGLHRepository project.
 	self withFiles ifTrue: [
 		branches do: [ :branch | self importFilesOfBranch: branch ] ] ]
 		on: NeoJSONParseError
@@ -742,6 +742,8 @@ GitlabModelImporter >> importBranchesOfProject: aGLHProject [
 GitlabModelImporter >> importCommit: aCommitID ofProject: aGLHProject [
 
 	| result parsedResult |
+	"This commit cannot exist"
+	aCommitID ifNil: [ ^ nil ].
 	(self glhModel allWithType: GLHCommit) asOrderedCollection
 		detect: [ :commit | commit id = aCommitID ]
 		ifFound: [ :commit | ^ commit ].
@@ -1302,24 +1304,24 @@ GitlabModelImporter >> importMergeRequestMergeCommits: aGLPHEMergeRequest [
 		recordInfo.
 	"the founds commits are added to the model during their respective import"
 	aGLPHEMergeRequest mergeRequestCommit: ((self
-			  importCommitOfProject: aGLPHEMergeRequest project
-			  withId: aGLPHEMergeRequest sha) ifNotNil: [ :commit |
+			  importCommit: aGLPHEMergeRequest sha
+			  ofProject: aGLPHEMergeRequest project) ifNotNil: [ :commit |
 			 foundCommits add: commit ]).
 
 	('Import commit merge_commit_sha of MR:  '
 	 , aGLPHEMergeRequest iid printString) recordInfo.
 	aGLPHEMergeRequest mergedCommit: ((self
-			  importCommitOfProject: aGLPHEMergeRequest project
-			  withId: aGLPHEMergeRequest merge_commit_sha) ifNotNil: [ :commit |
+			  importCommit: aGLPHEMergeRequest merge_commit_sha
+			  ofProject: aGLPHEMergeRequest project) ifNotNil: [ :commit |
 			 foundCommits add: commit ]).
 
 	('Import commit squash_commit_sha of MR:  '
 	 , aGLPHEMergeRequest iid printString) recordInfo.
-	aGLPHEMergeRequest squashCommit: ((self
-			  importCommitOfProject: aGLPHEMergeRequest project
-			  withId: aGLPHEMergeRequest squash_commit_sha) ifNotNil: [ :commit |
-			 foundCommits add: commit ]).
-
+	aGLPHEMergeRequest squash_commit_sha ifNotNil: [
+		aGLPHEMergeRequest squashCommit: ((self
+				  importCommit: aGLPHEMergeRequest squash_commit_sha
+				  ofProject: aGLPHEMergeRequest project) ifNotNil: [ :commit |
+				 foundCommits add: commit ]) ].
 
 	self chainsCommitsFrom: foundCommits.
 	^ foundCommits

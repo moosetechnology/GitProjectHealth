@@ -129,16 +129,16 @@ BaselineOfGitLabHealth >> defineJiraConnector: spec [
 
 { #category : #baselines }
 BaselineOfGitLabHealth >> definePackages: spec [
+	
 	"generic"
-
 	spec
 		package: 'GitProjectHealth-Model-Importer'
-		with: [ spec requires: #( 'GitlabAPI' ) ].
+		with: [ spec requires: #( 'GitLabHealth-Model' ) ].
 	spec
 		package: 'GitProjectHealth-Model-Importer-Tests'
 		with: [ spec requires: #( 'GitProjectHealth-Model-Importer' ) ].
 
-	"gitlab"
+	"model"
 	spec
 		package: 'GitLabHealth-Model';
 		package: 'GitLabHealth-Model-Extension'
@@ -148,34 +148,33 @@ BaselineOfGitLabHealth >> definePackages: spec [
 		package: 'GitLabHealth-Model-Generator';
 		package: 'GitLabHealth-Model-Inspector'
 		with: [ spec requires: #( 'GitLabHealth-Model-Visualization' ) ];
-		package: 'GitLabHealth-Model-Visualization';
+		package: 'GitLabHealth-Model-Visualization'.
+
+	"Gitlab importer"
+	spec
 		package: 'GitLabHealth-Model-Importer' with: [
 			spec requires:
-					#( 'NeoJSON' 'MoreLogger' 'GitProjectHealth-Model-Importer' ) ];
-		package: 'GitHubHealth-Model-Importer' with: [
-			spec requires:
-					#( 'NeoJSON' 'MoreLogger' 'GitProjectHealth-Model-Importer' ) ];
+					#( 'NeoJSON' 'MoreLogger' 'GitlabAPI' 'GitProjectHealth-Model-Importer' ) ];
 		package: 'GitLabHealth-Model-Importer-Tests' with: [
 			spec requires:
 					#( 'GitLabHealth-Model-Importer' 'GitHubHealth-Model-Importer' ) ].
 	spec
 		package: 'GitLabHealth-Model-Tests'
 		with: [ spec requires: #( 'GitLabHealth-Model' ) ].
-	spec
-		package: 'GitHubHealth-Model-Importer-Tests'
-		with: [ spec requires: #( 'GitHubHealth-Model-Importer' ) ].
 
 	"Bitbucket"
 	spec
-		package: 'BitBucketHealth-Model-Importer'
-		with: [ spec requires: #( 'BitbucketPharoAPI' ) ];
+		package: 'BitBucketHealth-Model-Importer' with: [
+			spec requires:
+					#( 'BitbucketPharoAPI' 'GitProjectHealth-Model-Importer' ) ];
 		package: 'BitBucketHealth-Model-Importer-Tests'
 		with: [ spec requires: #( 'BitBucketHealth-Model-Importer' ) ].
 
 	"github"
-		spec
-		package: 'GitHubHealth-Model-Importer'
-		with: [ spec requires: #( 'GithubAPI' ) ];
+	spec
+		package: 'GitHubHealth-Model-Importer' with: [
+			spec requires:
+					#( 'GithubAPI' 'NeoJSON' 'MoreLogger' 'GitProjectHealth-Model-Importer' ) ];
 		package: 'GitHubHealth-Model-Importer-Tests'
 		with: [ spec requires: #( 'GitHubHealth-Model-Importer' ) ].
 

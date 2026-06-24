@@ -14,7 +14,7 @@ AutoCodeReviewCommitFrequencyProjectMetric >> calculate [
         (c title beginsWith: '[ACR]')  ifTrue: [  
             | dateOver |  
             dateOver := self transformDate: c created_at to: over.  
-            groupedByDate at: dateOver printString ifPresent: [ :v | v add: c ]  
+            groupedByDate at: dateOver ifPresent: [ :v | v add: c ]  
         ]  
     ].  
 

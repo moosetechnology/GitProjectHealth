@@ -85,8 +85,8 @@ JiraTimeMRTimeDifferenceMetricTest >> testCalculate2PeriodWith1EmptyPeriod [
 		                    user: user;
 		                    glhImporter: glhImporter;
 		                    jiraImporter: jiraImporter;
-		                    setPeriodSince: '2024-09-01'
-		                    until: '2024-09-09';
+		                    setPeriodSince: '09-01-2024'
+		                    until: '09-09-2024';
 		                   over: Week.
 
 	"When"

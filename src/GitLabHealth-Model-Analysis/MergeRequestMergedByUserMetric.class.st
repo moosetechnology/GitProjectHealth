@@ -29,7 +29,7 @@ MergeRequestMergedByUserMetric >> calculate [
 	userMergedMergeRequests do: [ :userMergeRequest | "here we look at the specific date of its merged"
 		dateOver := self transformDate: userMergeRequest merged_at to: over.
 		groupedByDate
-			at: dateOver printString
+			at: dateOver
 			ifPresent: [ :value | value add: userMergeRequest ] ].
 	groupedByDate := groupedByDate collect: [ :group | group size ].
 

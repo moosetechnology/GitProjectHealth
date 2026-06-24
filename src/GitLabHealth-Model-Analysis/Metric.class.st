@@ -90,12 +90,22 @@ Metric >> over: anObject [
 	over := anObject
 ]
 
+{ #category : #'utils - date' }
+Metric >> readDate: aDateOrDateString [
+	"date is supposed to the the format mm-dd-yyyy for compatibility with Moose 12"
+	
+	(aDateOrDateString isKindOf: DateAndTime) ifTrue: [
+		^ aDateOrDateString asDate ].
+	(aDateOrDateString isKindOf: Date) ifTrue: [ ^ aDateOrDateString ].
+	^ Date readFrom: aDateOrDateString pattern: 'mm-dd-yyyy'
+]
+
 { #category : #initialization }
 Metric >> setPeriodSince: since until: until [
 
-	period :=  {
-			(#since -> since asDate).
-			(#until -> until asDate) } asDictionary
+	period := {
+		          (#since -> (self readDate: since)).
+		          (#until -> (self readDate: until)) } asDictionary
 ]
 
 { #category : #'utils - date' }
@@ -109,7 +119,7 @@ Metric >> setupGroupedDate [
 	end := self transformDate: (period at: #until) to: over.
 
 	groupedByDate
-		at: start printString
+		at: start
 		ifAbsentPut: [ OrderedCollection new ].
 
 	overSymbol := over name asLowercase asSymbol.
@@ -119,26 +129,26 @@ Metric >> setupGroupedDate [
 		over := #day ].
 
 
-	[ groupedByDate keys last asDate < end ] whileTrue: [
+	[ groupedByDate keys last < end ] whileTrue: [
 		| index |
-		index := groupedByDate keys last asDate
+		index := groupedByDate keys last
 		         + (increment perform: overSymbol).
 		index := self transformDate: index to: over.
 		groupedByDate
-			at: index printString
+			at: index
 			ifAbsentPut: [ OrderedCollection new ] ].
 
 
 	over = #day ifTrue: [
 		groupedByDate := (groupedByDate associations select: [ :date |
 			                  | aWeekday |
-			                  aWeekday := date key asDate weekday.
+			                  aWeekday :=  date key weekday.
 			                  (aWeekday = #Sunday or: [ aWeekday = #Saturday ])
 				                  not ]) asOrderedDictionary ].
 
 
 	groupedByDate
-		at: end printString
+		at: end
 		ifAbsentPut: [ OrderedCollection new ].
 
 	^ groupedByDate
@@ -147,8 +157,11 @@ Metric >> setupGroupedDate [
 { #category : #'utils - date' }
 Metric >> transformDate: date to: aWeekOrMonthOrYear [
 
-	aWeekOrMonthOrYear = Month ifTrue: [ ^ date asDate month asDate ].
+	| dateWithoutOffSet |
+	dateWithoutOffSet := (date asDateAndTime + date offset) withoutOffset.
+	aWeekOrMonthOrYear = Month ifTrue: [
+		^ dateWithoutOffSet asDate month asDate ].
 
-	^ (date asDate perform: ('as' , aWeekOrMonthOrYear name) asSymbol)
-		  asDate
+	^ (dateWithoutOffSet asDate perform:
+		   ('as' , aWeekOrMonthOrYear name) asSymbol) asDate
 ]

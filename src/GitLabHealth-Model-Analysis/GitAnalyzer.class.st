@@ -82,19 +82,18 @@ GitAnalyzer >> analyseCommitFrequencyFromCommits: initialCommits [
 
 	commits := self arrangeCommitsByDate: initialCommits.
 	commits := (commits associations sortAscending: [ :entry |
-		            entry key asDate ]) asOrderedDictionary.
+		            entry key ]) asOrderedDictionary.
 
 	^ commits
 ]
 
 { #category : #analyze }
-GitAnalyzer >> analyseCommitFrequencySince: since until: until [ 
+GitAnalyzer >> analyseCommitFrequencySince: since until: until [
 
 	| commits response |
-	
-	('GitAnalyzer, analyse commit Frequency on: ', onProject printString )
+	('GitAnalyzer, analyse commit Frequency on: ' , onProject printString)
 		recordInfo.
-	
+
 	response := {
 		            (#numberOfCommit -> nil).
 		            (#frequency -> nil) } asDictionary.
@@ -105,8 +104,8 @@ GitAnalyzer >> analyseCommitFrequencySince: since until: until [
 		           until: until.
 
 	commits := self arrangeCommitsByDate: commits.
-	commits := (commits associations sortAscending: [ :entry |
-		            entry key asDate ]) asOrderedDictionary.
+	commits := (commits associations sortAscending: [ :entry | entry key ])
+		           asOrderedDictionary.
 
 	^ commits
 ]
@@ -196,7 +195,7 @@ GitAnalyzer >> arrangeCommitsByDate: commits [
 		| date |
 		date := commit created_at asDate.
 		date2commits
-			at: date printString
+			at: date
 			ifPresent: [ :v | v add: commit ]
 			ifAbsentPut: [
 				OrderedCollection new

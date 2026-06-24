@@ -21,13 +21,14 @@ GitAnalyzerLocalTest >> setUp [
 	gitAnalyzer := GitAnalyzer new onModel: glphModel.
 	fromCommit := GLHCommit new.
 	fromCommit short_id: 'testFromCommit'.
-	fromCommit created_at: ('3 August 2021' asDate).
+	"3 august 2021"
+	fromCommit created_at: (Date newDay: 3 month: 8 year: 2021).
 	glphModel add: fromCommit.
-	
-	gitAnalyzer fromCommit: fromCommit.
+
+	gitAnalyzer fromCommit: fromCommit
 ]
 
-{ #category : #test }
+{ #category : #tests }
 GitAnalyzerLocalTest >> testAnalyseCommentContributionsJavaComment [
 
 	| diffA diffARange addition |
@@ -46,7 +47,7 @@ GitAnalyzerLocalTest >> testAnalyseCommentContributionsJavaComment [
 	self assert: gitAnalyzer analyseCommentContribution equals: 1
 ]
 
-{ #category : #test }
+{ #category : #tests }
 GitAnalyzerLocalTest >> testAnalyseCommentContributionsJavaContinueComment [
 
 	| diffA diffARange addition |
@@ -65,7 +66,7 @@ GitAnalyzerLocalTest >> testAnalyseCommentContributionsJavaContinueComment [
 	self assert: gitAnalyzer analyseCommentContribution equals: 1
 ]
 
-{ #category : #test }
+{ #category : #tests }
 GitAnalyzerLocalTest >> testAnalyseCommentContributionsJavaStopComment [
 
 	| diffA diffARange addition |
@@ -84,7 +85,7 @@ GitAnalyzerLocalTest >> testAnalyseCommentContributionsJavaStopComment [
 	self assert: gitAnalyzer analyseCommentContribution equals: 1
 ]
 
-{ #category : #test }
+{ #category : #tests }
 GitAnalyzerLocalTest >> testAnalyseCommentContributionsMixedMultipleComments [
 
 	| diffA diffARange addition additionB additionC |
@@ -111,7 +112,7 @@ GitAnalyzerLocalTest >> testAnalyseCommentContributionsMixedMultipleComments [
 	self assert: gitAnalyzer analyseCommentContribution equals: 2
 ]
 
-{ #category : #test }
+{ #category : #tests }
 GitAnalyzerLocalTest >> testAnalyseCommentContributionsMultipleComments [
 
 	| diffA diffARange addition additionB additionC |
@@ -138,7 +139,7 @@ GitAnalyzerLocalTest >> testAnalyseCommentContributionsMultipleComments [
 	self assert: gitAnalyzer analyseCommentContribution equals: 3
 ]
 
-{ #category : #test }
+{ #category : #tests }
 GitAnalyzerLocalTest >> testAnalyseCommentContributionsPythonComment [
 
 	| diffA diffARange addition |
@@ -157,7 +158,7 @@ GitAnalyzerLocalTest >> testAnalyseCommentContributionsPythonComment [
 	self assert: gitAnalyzer analyseCommentContribution equals: 1
 ]
 
-{ #category : #test }
+{ #category : #tests }
 GitAnalyzerLocalTest >> testAnalyseCommentContributionsShouldBe0 [
 
 	| diffA diffARange addition |
@@ -176,7 +177,7 @@ GitAnalyzerLocalTest >> testAnalyseCommentContributionsShouldBe0 [
 	self assert: gitAnalyzer analyseCommentContribution equals: 0
 ]
 
-{ #category : #test }
+{ #category : #tests }
 GitAnalyzerLocalTest >> testAnalyseCommentInSomeAroundCode [
 
 	| diffA diffARange addition |
@@ -195,7 +196,7 @@ GitAnalyzerLocalTest >> testAnalyseCommentInSomeAroundCode [
 	self assert: gitAnalyzer analyseCommentContribution equals: 0
 ]
 
-{ #category : #test }
+{ #category : #tests }
 GitAnalyzerLocalTest >> testAnalyseCommentNotAnAddition [
 
 	| diffA diffARange addition |
@@ -214,23 +215,26 @@ GitAnalyzerLocalTest >> testAnalyseCommentNotAnAddition [
 	self assert: gitAnalyzer analyseCommentContribution equals: 0
 ]
 
-{ #category : #test }
+{ #category : #tests }
 GitAnalyzerLocalTest >> testArrangeCommitsByDate [
 
-	| commitA2 commitA3 commitB result |
+	| commitA2 commitA3 commitB result threeAugust fourAugust |
+	threeAugust := Date newDay: 3 month: 8 year: 2021.
+	fourAugust := Date newDay: 4 month: 8 year: 2021.
+
 	commitA2 := GLHCommit new.
 	commitA2 short_id: 'testFromCommit2'.
-	commitA2 created_at: ('3 August 2021' asDate).
+	commitA2 created_at: threeAugust.
 	glphModel add: commitA2.
 
 	commitA3 := GLHCommit new.
 	commitA3 short_id: 'testFromCommit3'.
-	commitA3 created_at: ('3 August 2021' asDate).
+	commitA3 created_at: threeAugust.
 	glphModel add: commitA3.
 
 	commitB := GLHCommit new.
 	commitB short_id: 'testFromCommitB'.
-	commitB created_at: ('4 August 2021' asDate).	
+	commitB created_at: fourAugust.
 	glphModel add: commitB.
 
 	result := gitAnalyzer arrangeCommitsByDate: {
@@ -238,8 +242,8 @@ GitAnalyzerLocalTest >> testArrangeCommitsByDate [
 			          commitA2.
 			          commitA3.
 			          commitB }.
-	
+
 	self assert: result size equals: 2.
-	self assert: (result at: '3 August 2021') size equals: 3.
-	self assert: (result at: '4 August 2021') size equals: 1.
+	self assert: (result at: threeAugust) size equals: 3.
+	self assert: (result at: fourAugust) size equals: 1
 ]

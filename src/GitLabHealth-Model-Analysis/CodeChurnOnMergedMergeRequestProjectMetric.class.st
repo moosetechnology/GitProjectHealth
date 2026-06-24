@@ -56,7 +56,7 @@ CodeChurnOnMergedMergeRequestProjectMetric >> calculate [
 			                 (#LoCOnCommit -> contribution) } asDictionary.
 		overDate := self transformDate: commit created_at to: over.
 		groupedByDate
-			at: overDate printString
+			at: overDate
 			ifPresent: [ :array | array add: churnOnCommit ]
 			ifAbsentPut: [
 				OrderedCollection new

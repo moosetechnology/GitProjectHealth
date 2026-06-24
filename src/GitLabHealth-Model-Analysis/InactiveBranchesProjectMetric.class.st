@@ -23,7 +23,7 @@ InactiveBranchesProjectMetric >> calculate [
 		"sort commits by ASC date"
 		commit := (branch commits sort: [ :c1 :c2 | c1 created_at > c2 created_at]) first.
 		dateOver := self transformDate: commit created_at to: over.
-		groupedByDate at: dateOver printString ifAbsent: [  outside add: branch ] ].
+		groupedByDate at: dateOver ifAbsent: [  outside add: branch ] ].
 
 	
 	^ outside size asFloat
