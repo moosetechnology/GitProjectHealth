@@ -14,7 +14,7 @@ GitlabCommitsMock >> diffOf: commitSha inProject: projectId uniDiff: unidiff [
 
 { #category : #api }
 GitlabCommitsMock >> get: aString inProject: anUndefinedObject [
-
+	aString ifNil: [ ^ nil ].
 	^ '{
   "id": "6104942438c14ec7bd21c6cd5bd995272b3faff6",
   "short_id": "6104942438c",

@@ -42,7 +42,7 @@ GitAnalyzerTest >> setUp [
 
 	glhImporter
 		importCommitsOfProject: projects first
-		since: since asDate
+		since: since
 		until: nil.
 
 	gitAnalyzer := GitAnalyzer new
@@ -106,8 +106,8 @@ GitAnalyzerTest >> testAnalyseCommitFrequencySinceUntil [
 		       onProject: projects first;
 		       analyseCommitFrequencySince: from asDate until: since asDate.
 
-	self assert: (res at: from) size equals: 1.
-	self assert: (res at: '14 May 2024') size equals: 4
+	self assert: (res values at: 1) size equals: 1.
+	self assert: (res values at: 2) size equals: 4
 ]
 
 { #category : #tests }

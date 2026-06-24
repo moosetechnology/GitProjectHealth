@@ -742,6 +742,8 @@ GitlabModelImporter >> importBranchesOfProject: aGLHProject [
 GitlabModelImporter >> importCommit: aCommitID ofProject: aGLHProject [
 
 	| result parsedResult |
+	"This commit cannot exist"
+	aCommitID ifNil: [ ^ nil ].
 	(self glhModel allWithType: GLHCommit) asOrderedCollection
 		detect: [ :commit | commit id = aCommitID ]
 		ifFound: [ :commit | ^ commit ].

@@ -19,7 +19,7 @@ ContributorsProjectMetric >> calculate [
 	projectCommits do: [ :commit |
 		| dateOver |
 		dateOver := self transformDate: commit created_at to: over.
-		groupedByDate at: dateOver printString ifPresent: [ :v | v add: commit commitCreator ] ].
+		groupedByDate at: dateOver ifPresent: [ :v | v add: commit commitCreator ] ].
 
 	groupedByDate := groupedByDate collect: [ :group | group size ].
 

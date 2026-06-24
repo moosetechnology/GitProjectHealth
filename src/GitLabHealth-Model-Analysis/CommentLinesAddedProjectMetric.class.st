@@ -26,7 +26,7 @@ CommentLinesAddedProjectMetric >> calculate [
 		| dateOver |
 		dateOver := self transformDate: assoc key created_at to: over.
 		groupedByDate
-			at: dateOver printString
+			at: dateOver
 			ifPresent: [ :v | v add: assoc value ] ].
 
 	groupedByDate := groupedByDate collect: [ :contribs |

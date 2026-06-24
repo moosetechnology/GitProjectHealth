@@ -19,7 +19,7 @@ TimeBetweenCommitMetric >> calculate [
 		dateOver := self transformDate: commit committed_date to: over.
 
 		groupedByDate
-			at: dateOver printString
+			at: dateOver
 			ifPresent: [ :value | value add: commit ] ].
 
 	groupedByDate := groupedByDate select: [ :group | group size >= 2 ].

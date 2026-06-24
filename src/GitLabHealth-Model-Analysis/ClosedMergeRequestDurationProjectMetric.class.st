@@ -30,7 +30,7 @@ ClosedMergeRequestDurationProjectMetric >> calculate [
 		overDate := self transformDate: (dic at: #closed_at) to: over.
 
 		groupedByDate
-			at: overDate printString
+			at: overDate
 			ifPresent: [ :durations | durations add: (dic at: #close_duration) ] ].
 
 	"deleting the empty array (merge request that are not closed )"

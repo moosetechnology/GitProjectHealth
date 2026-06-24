@@ -24,7 +24,7 @@ ActiveBranchesProjectMetric >> calculate [
 
 		dateOver := self transformDate: commit created_at to: over.
 		groupedByDate
-			at: dateOver printString
+			at: dateOver
 			ifPresent: [ :v | v add: commit created_at ] ].
 
 	groupedByDate := groupedByDate collect: [ :group | group size ].

@@ -10,11 +10,12 @@ MergedMergeRequestDurationProjectMetric >> calculate [
 	| groupedByDate gitAnalyzer mergeRequestsValidation filterGroups |
 	projectMergeRequests ifNil: [ self load ].
 
-		groupedByDate := self setupGroupedDate.
-	
+	groupedByDate := self setupGroupedDate.
+
 	"Filtrer les merge requests pour ne garder que celles qui ont une date de clôture (merged_at) et un statut 'merged'"
-     projectMergeRequests := projectMergeRequests select: [ :mr | 
-    (mr merged_at) notNil and: [(mr state) = 'merged'] ]. 
+	projectMergeRequests := projectMergeRequests select: [ :mr |
+		                        mr merged_at notNil and: [
+			                        mr state = 'merged' ] ].
 
 	projectMergeRequests ifEmpty: [ ^ nil ].
 
@@ -30,7 +31,7 @@ MergedMergeRequestDurationProjectMetric >> calculate [
 		overDate := self transformDate: (dic at: #merged_at) to: over.
 
 		groupedByDate
-			at: overDate printString
+			at: overDate
 			ifPresent: [ :durations | durations add: (dic at: #duration) ] ].
 
 	"deleting the empty array (merge request that are not merged )"

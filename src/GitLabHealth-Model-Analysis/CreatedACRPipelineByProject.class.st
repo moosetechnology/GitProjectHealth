@@ -20,7 +20,7 @@ CreatedACRPipelineByProject >> calculate [
         mr note do: [ :note |  
             | dateOver |  
             dateOver := self transformDate: note created_at to: over.  
-            groupedByDate at: dateOver printString ifPresent: [ :v | v add: note ].  
+            groupedByDate at: dateOver ifPresent: [ :v | v add: note ].  
         ]  
     ].  
     groupedByDate := groupedByDate collect: [ :notesGroup |  
