@@ -732,18 +732,18 @@ GitModelImporter >> makeGlobal: aLabel [
 GitModelImporter >> parseDiffString: aDiff [
 	"parse diff string to create entities for each lines"
 
-	| lines range index firstChangeRange |
+	| lines index firstChangeRange |
+	
+	aDiff diffString ifEmpty: [ ^ aDiff diffRanges ].
+	
 	lines := aDiff diffString lines.
 	index := 0.
-	range := nil.
-
-	lines ifEmpty: [ ^ aDiff diffRanges ].
 	lines := self filterCommitChanges: lines.
 	lines ifEmpty: [ ^ aDiff diffRanges ].
 	(lines first beginsWith: '@@') ifFalse: [ ^ aDiff diffRanges ].
 
 	lines do: [ :line |
-		| aChange |
+		| aChange range |
 		firstChangeRange := false.
 		(line trimLeft beginsWith: #'@@') ifTrue: [
 			range := GLHDiffRange newFrom: line.

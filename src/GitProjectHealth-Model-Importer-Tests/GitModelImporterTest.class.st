@@ -22,6 +22,19 @@ GitModelImporterTest >> setUp [
 ]
 
 { #category : #tests }
+GitModelImporterTest >> testFilterCommitChanges [
+
+	| string |
+	string := '--- hello
+	world
+	+++ how
+	\ No newline at end of file
+	you' lines.
+	self assert: (importer filterCommitChanges: string) equals: '	world
+	you' lines
+]
+
+{ #category : #tests }
 GitModelImporterTest >> testParseDiffString [
 
 	"Given"
@@ -69,4 +82,20 @@ GitModelImporterTest >> testParseDiffStringComplete [
 		assert:
 		(diffRange changes asMooseGroup allWithType: GLHAddition) size
 		equals: 2
+]
+
+{ #category : #tests }
+GitModelImporterTest >> testParseEmptyDiffString [
+	"Given"
+
+	| diff diffRange |
+	diff := GLHDiff new.
+
+	diff diffString: ''.
+
+	"When"
+	diffRange := importer parseDiffString: diff.
+
+	"Then"
+	self assert: diffRange isEmpty
 ]
