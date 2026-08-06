@@ -15,6 +15,177 @@ GLHExtensionTest >> setUp [
 ]
 
 { #category : #tests }
+GLHExtensionTest >> testAddAllKeyedBy [
+
+	| col |
+	col := OrderedCollection new.
+	col addAll: { 12 } keyedBy: [ :a | a ].
+	self assert: col size equals: 1.
+	self assert: col first equals: 12
+]
+
+{ #category : #tests }
+GLHExtensionTest >> testAddAllKeyedByIntersectionOfUsers [
+
+	| col result user1 user2 user3 user2b user3b user4 |
+	user1 := GLHUser new.
+	user1 id: 1.
+	user2 := GLHUser new.
+	user2 id: 2.
+	user3 := GLHUser new.
+	user3 id: 3.
+	col := OrderedCollection new.
+	col
+		addAll: {
+				user1.
+				user2.
+				user3 }
+		keyedBy: [ :a | a id ].
+	self assert: col size equals: 3.
+	user2b := GLHUser new.
+	user2b id: 2.
+	user3b := GLHUser new.
+	user3b id: 3.
+	user4 := GLHUser new.
+	user4 id: 4.
+
+	result := col
+		          addAll: {
+				          user2b.
+				          user3b.
+				          user4 }
+		          keyedBy: [ :a | a id ].
+	self assert: col size equals: 4.
+	self assert: result size equals: 3.
+	self assert: (result includes: user2).
+	self assert: (result includes: user3).
+	self assert: (result includes: user4)
+]
+
+{ #category : #tests }
+GLHExtensionTest >> testAddAllKeyedByTwiceEqualityIsTheSameButNotObject [
+
+	| col user result userB |
+	user := GLHUser new.
+	user id: 12.
+	col := OrderedCollection new.
+	col addAll: { user } keyedBy: [ :a | a id ].
+	self assert: col size equals: 1.
+	self assert: col first identicalTo: user.
+	userB := GLHUser new.
+	userB id: 12.
+	result := col addAll: { userB } keyedBy: [ :a | a id ].
+	self assert: col size equals: 1.
+	self assert: result first identicalTo: user
+]
+
+{ #category : #tests }
+GLHExtensionTest >> testAddAllKeyedByTwiceTheSame [
+
+	| col user result |
+	user := GLHUser new.
+	user id: 12.
+	col := OrderedCollection new.
+	col addAll: { user } keyedBy: [ :a | a ].
+	self assert: col size equals: 1.
+	self assert: col first identicalTo: user.
+	result := col addAll: { user } keyedBy: [ :a | a ].
+	self assert: col size equals: 1.
+	self assert: result first identicalTo: user
+]
+
+{ #category : #tests }
+GLHExtensionTest >> testAddAllOfTypeKeyed [
+
+	| user values |
+	user := GLHUser new.
+	user id: 12.
+	values := model
+		          addAll: { user }
+		          ofType: GLHUser
+		          keyedBy: [ :entry | entry id ].
+	self assert: values size equals: 1.
+	self assert: values anyOne equals: user
+]
+
+{ #category : #tests }
+GLHExtensionTest >> testAddAllOfTypeKeyedByDifferentEntity [
+
+	| user values alreadyExistingUser |
+	alreadyExistingUser := model newUser.
+	alreadyExistingUser id: 15.
+	user := GLHUser new.
+	user id: 12.
+	values := model
+		          addAll: { user }
+		          ofType: GLHUser
+		          keyedBy: [ :val | val id ].
+	self assert: values size equals: 1.
+	self assert: model size equals: 2.
+	self assert: (values includes: user).
+	self assert: (model includes: user).
+	self assert: (model includes: alreadyExistingUser)
+]
+
+{ #category : #tests }
+GLHExtensionTest >> testAddAllOfTypeKeyedDifferentEntity [
+
+	| user values alreadyExistingUser |
+	alreadyExistingUser := model newUser.
+	alreadyExistingUser id: 15.
+	user := GLHUser new.
+	user id: 12.
+	values := model
+		          addAll: { user }
+		          ofType: GLHUser
+		          keyedBy: [ :a | a id ].
+	self assert: values size equals: 1.
+	self assert: model size equals: 2.
+	self assert: (values includes: user).
+	self assert: (model includes: user).
+	self assert: (model includes: alreadyExistingUser)
+]
+
+{ #category : #tests }
+GLHExtensionTest >> testAddAllOfTypeKeyedIntersection [
+
+	| user1 user2 user3 user2b user3b user4 result |
+	user1 := GLHUser new.
+	user1 id: 1.
+	user2 := GLHUser new.
+	user2 id: 2.
+	user3 := GLHUser new.
+	user3 id: 3.
+	model
+		addAll: {
+				user1.
+				user2.
+				user3 }
+		ofType: GLHUser
+		keyedBy: [ :entry | entry id ].
+	self assert: model size equals: 3.
+	user2b := GLHUser new.
+	user2b id: 2.
+	user3b := GLHUser new.
+	user3b id: 3.
+	user4 := GLHUser new.
+	user4 id: 4.
+
+	result := model
+		          addAll: {
+				          user2b.
+				          user3b.
+				          user4 }
+		          ofType: GLHUser
+		          keyedBy: [ :entry | entry id ].
+	self assert: model size equals: 4.
+	self assert: result size equals: 3.
+	self assert: (result includes: user2).
+	self assert: (result includes: user3).
+	self assert: (result includes: user4)
+]
+
+{ #category : #tests }
 GLHExtensionTest >> testAddAllOfTypeUnless [
 
 	| user values |
@@ -188,4 +359,14 @@ GLHExtensionTest >> testAddAllUnlessTwiceTheSame [
 	result := col addAll: { user } unless: [ :a :b | a = b ].
 	self assert: col size equals: 1.
 	self assert: result first identicalTo: user
+]
+
+{ #category : #tests }
+GLHExtensionTest >> testAddAllkeyedBy [
+
+	| col |
+	col := OrderedCollection new.
+	col addAll: { 12 } keyedBy: [ :a | a ].
+	self assert: col size equals: 1.
+	self assert: col first equals: 12
 ]

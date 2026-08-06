@@ -14,12 +14,13 @@ Class {
 		'userCatalogue',
 		'repoApi',
 		'withCommitDiffs',
-		'generalReader'
+		'generalReader',
+		'withCommitDiffsChanges'
 	],
 	#classVars : [
 		'currentImporter'
 	],
-	#category : #'GitProjectHealth-Model-Importer'
+	#category : #'_UnpackagedPackage'
 }
 
 { #category : #bitbucket }
@@ -733,17 +734,15 @@ GitModelImporter >> parseDiffString: aDiff [
 	"parse diff string to create entities for each lines"
 
 	| lines index firstChangeRange range |
-	
 	aDiff diffString ifEmpty: [ ^ aDiff diffRanges ].
-	
+
 	lines := aDiff diffString lines.
 	index := 0.
 	lines := self filterCommitChanges: lines.
 	lines ifEmpty: [ ^ aDiff diffRanges ].
 	(lines first beginsWith: '@@') ifFalse: [ ^ aDiff diffRanges ].
-
 	lines do: [ :line |
-		| aChange  |
+		| aChange |
 		firstChangeRange := false.
 		(line trimLeft beginsWith: #'@@') ifTrue: [
 			range := GLHDiffRange newFrom: line.
@@ -763,10 +762,14 @@ GitModelImporter >> parseDiffString: aDiff [
 
 	"add changes to the diff range"
 	aDiff diffRanges do: [ :diffRange |
-		self glhModel addAll: diffRange changes unless: [ :existing :new |
-			existing diffRange mooseID = new diffRange mooseID and: [
-				existing sourceCode = new sourceCode and: [
-					existing index = new index ] ] ] ].
+		self glhModel
+			addAll: diffRange changes
+			ofType: GLHChange
+			keyedBy: [ :val |
+				{
+					val diffRange mooseID.
+					val sourceCode.
+					val index } ] ].
 
 	^ aDiff diffRanges
 ]
