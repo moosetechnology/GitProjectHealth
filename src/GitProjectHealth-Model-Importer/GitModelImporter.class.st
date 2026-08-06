@@ -20,7 +20,7 @@ Class {
 	#classVars : [
 		'currentImporter'
 	],
-	#category : #'_UnpackagedPackage'
+	#category : #'GitProjectHealth-Model-Importer'
 }
 
 { #category : #bitbucket }
