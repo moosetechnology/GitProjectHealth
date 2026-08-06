@@ -24,7 +24,8 @@ GitLocalModelImporter >> createDiffFrom: patch and: delta [
 		glhDiff new_file: true ].
 	delta status = LGitDeltaTypeEnum git_delta_deleted ifTrue: [
 		glhDiff deleted_file: true ].
-	^ glhDiff diffString: patch patchString
+	glhDiff diffString: (patch patchString allButFirstLines: 2).
+	^ glhDiff
 ]
 
 { #category : #'import - commits' }
@@ -63,11 +64,15 @@ GitLocalModelImporter >> importDiffOfCommit: commit [
 			                ifAbsent: [
 			                Error signal: 'missing importer origin' ].
 		gitDiff := sourceCommit tree diffTo: targetCommit tree.
-		(1 to: gitDiff numberOfDeltas) collect: [ :idx |
-			| delta patch |
-			delta := gitDiff deltas at: idx.
-			patch := gitDiff patchAt: idx.
-			self createDiffFrom: patch and: delta ] ]
+		commit diffs: ((1 to: gitDiff numberOfDeltas) collect: [ :idx |
+				 | delta patch |
+				 delta := gitDiff deltas at: idx.
+				 patch := gitDiff patchAt: idx.
+				 self createDiffFrom: patch and: delta ]) ].
+
+	"changes are added into the model during the import"
+	commit diffs do: [ :diff | self importDiffRangesForDiff: diff ].
+	^ commit diffs
 ]
 
 { #category : #'import - commits' }
@@ -99,7 +104,7 @@ GitLocalModelImporter >> importLatestCommitsOfProject: aGLHProject [
 	self importLatestCommitsOfProject 
 ]
 
-{ #category : #'import - commits' }
+{ #category : #initialization }
 GitLocalModelImporter >> initialize [
 
 	super initialize.

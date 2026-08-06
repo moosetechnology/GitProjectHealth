@@ -745,7 +745,7 @@ GitModelImporter >> parseDiffString: aDiff [
 	lines do: [ :line |
 		| aChange |
 		firstChangeRange := false.
-		(line trim beginsWith: #'@@') ifTrue: [
+		(line trimLeft beginsWith: #'@@') ifTrue: [
 			range := GLHDiffRange newFrom: line.
 			firstChangeRange := true.
 			range := aDiff diffRanges add: range unless: [ :existing :new |
