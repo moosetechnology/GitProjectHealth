@@ -11,6 +11,22 @@ Class {
 	#category : #'GitProjectHealth-Model-LocalImporter'
 }
 
+{ #category : #'private - diffs' }
+GitLocalModelImporter >> createDiffFrom: patch and: delta [
+
+	| glhDiff |
+	glhDiff := self glhModel newDiff.
+	glhDiff new_path: delta newFile path.
+	glhDiff old_path: delta oldFile path.
+	delta status = LGitDeltaTypeEnum git_delta_renamed ifTrue: [
+		glhDiff renamed_file: true ].
+	delta status = LGitDeltaTypeEnum git_delta_added ifTrue: [
+		glhDiff new_file: true ].
+	delta status = LGitDeltaTypeEnum git_delta_deleted ifTrue: [
+		glhDiff deleted_file: true ].
+	^ glhDiff diffString: patch patchString
+]
+
 { #category : #'import - commits' }
 GitLocalModelImporter >> gitRepository [
 
@@ -19,23 +35,39 @@ GitLocalModelImporter >> gitRepository [
 		  yourself
 ]
 
-{ #category : #importCommit }
+{ #category : #'import - commits' }
 GitLocalModelImporter >> importCommit: aLGitCommit [
 
-	^ self glhModel add: (GLHCommit new
-			   id: aLGitCommit name;
-			   message: aLGitCommit message;
-			   committed_date: aLGitCommit time asDateAndTime;
-			   committer_email: aLGitCommit author email;
-			   committer_name: aLGitCommit author name;
-			   parent_ids:
-				   (aLGitCommit parents collect: [ :parent | parent name ]);
-			   yourself)
+	^ self glhModel newCommit
+		  id: aLGitCommit name;
+		  message: aLGitCommit message;
+		  committed_date: aLGitCommit time asDateAndTime;
+		  committer_email: aLGitCommit author email;
+		  committer_name: aLGitCommit author name;
+		  parent_ids:
+			  (aLGitCommit parents collect: [ :parent | parent name ]);
+		  yourself
 ]
 
-{ #category : #'import - commits' }
+{ #category : #'import - diffs' }
 GitLocalModelImporter >> importDiffOfCommit: commit [
-	self halt.
+
+	| sourceCommit targetCommit gitDiff |
+	commit parentCommits ifNotEmpty: [
+		sourceCommit := commit
+			                cacheAt: #importerOrigin
+			                ifAbsent: [
+			                Error signal: 'missing importer origin' ].
+		targetCommit := commit parentCommits anyOne
+			                cacheAt: #importerOrigin
+			                ifAbsent: [
+			                Error signal: 'missing importer origin' ].
+		gitDiff := sourceCommit tree diffTo: targetCommit tree.
+		(1 to: gitDiff numberOfDeltas) collect: [ :idx |
+			| delta patch |
+			delta := gitDiff deltas at: idx.
+			patch := gitDiff patchAt: idx.
+			self createDiffFrom: patch and: delta ] ]
 ]
 
 { #category : #'import - commits' }
@@ -47,18 +79,17 @@ GitLocalModelImporter >> importLatestCommitsOfProject [
 	commits := OrderedCollection new.
 	revwalk pushHead.
 	[ revwalk hasNext and: [ i < 50 ] ] whileTrue: [
-		| gitCommit |
+		| gitCommit glhCommit |
 		i := i + 1.
 		gitCommit := revwalk next.
-		commits add: (self importCommit: gitCommit) ].
+		glhCommit := self importCommit: gitCommit.
+		commits add: glhCommit.
+		glhCommit cacheAt: #importerOrigin put: gitCommit ].
 
-	self chainsCommitsFrom: commits
+	self chainsCommitsFrom: commits.
 
-	"self withCommitDiffs ifTrue: [
-		commits do: [ :commit |
-			revwalk pushCommit: commit id.
-			self halt.
-			self importDiffOfCommit: commit ] ]"
+	self withCommitDiffs ifTrue: [
+		commits do: [ :commit | self importDiffOfCommit: commit ] ]
 ]
 
 { #category : #'import - commits' }
