@@ -11,6 +11,21 @@ Class {
 	#category : #'GitProjectHealth-Model-LocalImporter'
 }
 
+{ #category : #'import - files' }
+GitLocalModelImporter >> buildGPHFileFor: aDiskDirectoryEntry [
+
+	| file |
+	file := (aDiskDirectoryEntry isDirectory
+		         ifTrue: [ GLHFileDirectory ]
+		         ifFalse: [ GLHFileBlob ]) new.
+	self glhModel add: file.
+	file name: aDiskDirectoryEntry basename.
+	(file isKindOf: GLHFileDirectory) ifTrue: [
+		file files: (aDiskDirectoryEntry children collect: [ :child |
+				 self buildGPHFileFor: child ]) ].
+	^ file
+]
+
 { #category : #'private - diffs' }
 GitLocalModelImporter >> createDiffFrom: patch and: delta [
 
@@ -141,8 +156,16 @@ GitLocalModelImporter >> importDiffOfCommit: commit [
 
 { #category : #'import - files' }
 GitLocalModelImporter >> importFilesOfBranch: aGLHBranch [
+
+	| gitBranch |
+	gitRepository := self gitRepositoryOf: aGLHBranch repository.
+	gitBranch := gitRepository allBranches detect: [ :branch |
+		             branch shortName = aGLHBranch name ].
+	gitRepository resetHardTo: gitBranch object.
+	aGLHBranch files: (gitRepository workingDirectory children
+	reject: [ :child | child basename = '.git' ]
+	thenCollect: [ :child | self buildGPHFileFor: child ]) 
 	
-	^ self halt
 ]
 
 { #category : #'import - commits' }
