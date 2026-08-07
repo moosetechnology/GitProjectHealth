@@ -1129,7 +1129,7 @@ GitlabModelImporter >> importFileWithPath: aPath ofProject: aGLHProject inBranch
 	^ self repoApi repositories getRawFile: aPath ofProject: aGLHProject id withParams: {#ref -> aBranch name} asDictionary .
 ]
 
-{ #category : #'import - repositories' }
+{ #category : #'import - files' }
 GitlabModelImporter >> importFilesOfBranch: aBranch [
 
 	| result files apiFiles params |

@@ -447,7 +447,7 @@ GitModelImporter >> importAuthorOfCommit: aGLHCommit [
 	self subclassResponsibility
 ]
 
-{ #category : #'import - repositories' }
+{ #category : #'import - branches' }
 GitModelImporter >> importBranchesOf: aGLHProject [
 
 	self
@@ -459,8 +459,14 @@ GitModelImporter >> importBranchesOf: aGLHProject [
 	^ self subclassResponsibility
 ]
 
-{ #category : #'import - repositories' }
+{ #category : #'import - branches' }
 GitModelImporter >> importBranchesOfProject: aGLHProject [
+
+	^ self subclassResponsibility
+]
+
+{ #category : #'import - branches' }
+GitModelImporter >> importBranchesOfRepository: aGLHRepository [
 
 	^ self subclassResponsibility
 ]
@@ -520,10 +526,20 @@ GitModelImporter >> importDiffRangesForDiff: aGLHDiff [
 
 	diffRanges := self glhModel
 		              addAll: (self parseDiffString: aGLHDiff)
-		              unless: self blockForDiffRangeEquality.
+		              keyedBy: [ :el |
+			              {
+				              el diff mooseID.
+				              el originalLineRange.
+				              el newLineRange } ].
 	^ aGLHDiff diffRanges
 		  addAll: diffRanges
 		  unless: self blockForDiffRangeEquality
+]
+
+{ #category : #'import - files' }
+GitModelImporter >> importFilesOfBranch: aGLHBranch [
+
+	^ self subclassResponsibility
 ]
 
 { #category : #'import - groups' }
@@ -672,6 +688,13 @@ GitModelImporter >> importRelease: aReleaseID ofProject: aGLHProject [
 	self subclassResponsibility 
 ]
 
+{ #category : #'import - repositories' }
+GitModelImporter >> importRepository: aGLHRepository [
+	"Repository is about git, not the social platform directly"
+
+	^ self subclassResponsibility
+]
+
 { #category : #'import - tags' }
 GitModelImporter >> importTagsForProject: aGLHProject [
 	self subclassResponsibility 
@@ -747,17 +770,19 @@ GitModelImporter >> parseDiffString: aDiff [
 		(line trimLeft beginsWith: #'@@') ifTrue: [
 			range := GLHDiffRange newFrom: line.
 			firstChangeRange := true.
-			range := aDiff diffRanges add: range unless: [ :existing :new |
-				         existing originalLineRange = new originalLineRange and: [
-					         existing newLineRange = new newLineRange ] ] ].
+			range := aDiff diffRanges add: range keyedBy: [ :val |
+				         {
+					         val originalLineRange.
+					         val newLineRange } ] ].
 
 		self withCommitDiffs ifTrue: [
 			firstChangeRange ifFalse: [
 				aChange := GLHChange newFrom: line.
 				aChange relativeIndex: index.
-				aChange := range changes add: aChange unless: [ :existing :new |
-					           existing sourceCode = new sourceCode and: [
-						           existing index = new index ] ].
+				aChange := range changes add: aChange keyedBy: [ :el |
+					           {
+						           el index.
+						           el sourceCode } ].
 				index := index + 1 ] ] ].
 
 	"add changes to the diff range"

@@ -379,7 +379,7 @@ GithubModelImporter >> importBranchesOf: aGLHProject [
 	^ branches
 ]
 
-{ #category : #'import - repositories' }
+{ #category : #'import - branches' }
 GithubModelImporter >> importBranchesOfProject: aGLHProject [
 	"add the pipeline (actions runs) in the project"
 

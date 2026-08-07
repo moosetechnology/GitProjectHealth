@@ -1,6 +1,12 @@
 Extension { #name : #OrderedCollection }
 
 { #category : #'*GitLabHealth-Model-Extension' }
+OrderedCollection >> add: anElement keyedBy: aKeyBlock [
+
+	^ (self addAll: { anElement } keyedBy: aKeyBlock) first
+]
+
+{ #category : #'*GitLabHealth-Model-Extension' }
 OrderedCollection >> add: anElmt unless: aConditionAsBlock [
 	"()>>>"
 
@@ -13,7 +19,7 @@ OrderedCollection >> addAll: anElmtCollection keyedBy: aKeyBlock [
 	| elementByKey result |
 	elementByKey := Dictionary new: self size + anElmtCollection size.
 
-	result := self class new: anElmtCollection size.
+	result := OrderedCollection new: anElmtCollection size.
 
 	"Indexe les éléments déjà présents.
     En cas de doublon existant, conserve le premier."
