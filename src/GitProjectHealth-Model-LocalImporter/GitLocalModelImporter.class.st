@@ -66,7 +66,8 @@ GitLocalModelImporter >> gitRepositoryOf: aGLHRepository [
 { #category : #'import - branches' }
 GitLocalModelImporter >> importBranchesOfRepository: aGLHRepository [
 
-	| branches |
+	| branches headCommit |
+	headCommit := (self gitRepositoryOf: aGLHRepository) head object.
 	branches := (self gitRepositoryOf: aGLHRepository) allBranches
 		            select: [ :branch | branch isBranch ]
 		            thenCollect: [ :branch |
@@ -82,7 +83,7 @@ GitLocalModelImporter >> importBranchesOfRepository: aGLHRepository [
 
 	self withFiles ifTrue: [
 		branches do: [ :branch | self importFilesOfBranch: branch ] ].
-
+	(self gitRepositoryOf: aGLHRepository) resetHardTo: headCommit.
 
 	^ branches
 ]
@@ -104,27 +105,54 @@ GitLocalModelImporter >> importCommit: aLGitCommit [
 { #category : #'import - commits' }
 GitLocalModelImporter >> importCommitsOfProject: aProject since: sinceDate until: untilDate [
 
+	self importCommitsOfRepository: aProject repository since: sinceDate until: untilDate
+]
+
+{ #category : #'import - repositories' }
+GitLocalModelImporter >> importCommitsOfRepository: aGLHRepository [
+
+	^ self
+		  importCommitsOfRepository: aGLHRepository
+		  since: withCommitsSince
+		  until: nil
+]
+
+{ #category : #'import - commits' }
+GitLocalModelImporter >> importCommitsOfRepository: aGPHRepository since: sinceDate until: untilDate [
+
 	| i revwalk commits |
 	i := 0.
-	revwalk := LGitRevwalk of: self gitRepository.
+	revwalk := LGitRevwalk of: (self gitRepositoryOf: aGPHRepository).
 	commits := OrderedCollection new.
 	revwalk pushHead.
 	[
 	revwalk hasNext and: [
-		commits isEmpty or: [
-			commits last committed_date > sinceDate ] ] ] whileTrue: [
-		| gitCommit glhCommit |
-		i := i + 1.
-		gitCommit := revwalk next.
-		glhCommit := self importCommit: gitCommit.
-		commits add: glhCommit.
-		glhCommit cacheAt: #importerOrigin put: gitCommit ].
+		commits isEmpty or: [ commits last committed_date > sinceDate ] ] ]
+		whileTrue: [
+			| gitCommit glhCommit |
+			i := i + 1.
+			gitCommit := revwalk next.
+			glhCommit := self importCommit: gitCommit.
+			commits add: glhCommit.
+			glhCommit cacheAt: #importerOrigin put: gitCommit ].
 
 	self chainsCommitsFrom: commits.
 
 	self withCommitDiffs ifTrue: [
-		commits do: [ :commit | self importDiffOfCommit: commit ] ].
+		| diffs |
+		diffs := commits flatCollect: [ :commit |
+			         self importDiffOfCommit: commit ].
+		self withFiles ifTrue: [
+			| indexedFiles |
+			indexedFiles := (aGPHRepository allToScope: GLHFile)
+				                collect: [ :el | el path -> el ]
+				                as: Dictionary.
 
+			diffs do: [ :diff |
+				indexedFiles
+					at: diff new_path
+					ifPresent: [ :gphFile | diff addFile: gphFile ]
+					ifAbsent: [ "not supported yet" ] ] ] ].
 
 	^ commits
 ]
@@ -148,9 +176,11 @@ GitLocalModelImporter >> importDiffOfCommit: commit [
 				 delta := gitDiff deltas at: idx.
 				 patch := gitDiff patchAt: idx.
 				 self createDiffFrom: patch and: delta ]) ].
-
 	"changes are added into the model during the import"
-	commit diffs do: [ :diff | self importDiffRangesForDiff: diff ].
+	commit diffs do: [ :diff |
+		| ranges |
+		ranges := self importDiffRangesForDiff: diff ].
+
 	^ commit diffs
 ]
 
@@ -201,6 +231,7 @@ GitLocalModelImporter >> importLatestCommitsOfProject: aGLHProject [
 GitLocalModelImporter >> importRepository: aGLHRepository [
 
 	self importBranchesOfRepository: aGLHRepository.
+	self importCommitsOfRepository: aGLHRepository
 ]
 
 { #category : #initialization }
