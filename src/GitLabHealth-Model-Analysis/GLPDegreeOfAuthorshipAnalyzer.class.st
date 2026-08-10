@@ -1,52 +1,57 @@
 "
-Based on the paper [A Novel Approach for Estimating Truck Factors](https://arxiv.org/pdf/1604.06766), I compute the DOA between a file and a author based on prexisting computed data by GitProjectHealth.
+Given a `GLHFile` I provide the normalized DOA values with their user.
+I also provide an utility that filters the one considered as real author based on k = 0.75
 
-Here is the algorithm: 
-
-```language=txt
-DOA(md, fp) = 3.293 + 1.098 ×FA(md, fp) + 0.164× DL(md, fp)−0.321 ×ln(1 + AC (md, fp))
-
-From the equation, DOA depends on three factors: (i) first authorship (FA): if md originally created f, FA is 1; otherwise it is 0; (ii) number of deliveries (DL): number of changes in f made by md; and (iii) number of acceptances (AC): number of changes in f made by any developer, except md.
-```
-
-Magic numbers were computed by the authors.
-
-The paper [Algorithms for Estimating Truck Factors: A Comparative study](https://homepages.dcc.ufmg.br/~mtov/pub/2019-sqj.pdf) consider AVL algorithm (on which is based DOA) correct. So DOA seems good
-
-## Usage
-
-```st
-
-GLPDegreeOfAuthorshipAnalyzer new
-	glhFile: glhFile;
-	glhUser: glhUser;
-	compute
-```
+(value comes from the [A Novel Approach for Estimating Truck Factors](https://arxiv.org/pdf/1604.06766) research paper)
 "
 Class {
 	#name : #GLPDegreeOfAuthorshipAnalyzer,
 	#superclass : #Object,
 	#instVars : [
 		'glhFile',
-		'glhUser'
+		'rawResults',
+		'normalizedResults'
 	],
-	#category : #'GitLabHealth-Model-Analysis'
+	#category : #'GitLabHealth-Model-Analysis-TruckFactor'
 }
 
 { #category : #accessing }
-GLPDegreeOfAuthorshipAnalyzer >> authorCreatedFile [
-	"Paper: Should be 1 if yes. 0 if not"
+GLPDegreeOfAuthorshipAnalyzer >> authorshipThreshold [
 
-	"Us: we consider that files might be old, and so in this case 0"
-	^ 0
+	^ 0.75
+]
+
+{ #category : #accessing }
+GLPDegreeOfAuthorshipAnalyzer >> baseKnowledge [
+
+	^ 3.293
 ]
 
 { #category : #accessing }
 GLPDegreeOfAuthorshipAnalyzer >> compute [
 
-	^ 3.293 + (1.098 * self authorCreatedFile)
-	  + (0.164 * self numberOfChageMadeByOriginalAuthorDL)
-	  - (0.321 * (1 + self numberOfChangeMadeByOtherAuthors) ln)
+	| authors  |
+	authors := self glhFile diffs
+		           collect: [ :diff | diff commit commitCreator ]
+		           as: Set.
+	rawResults := (self glhFile mooseModel allWithType: GLHUser)
+		           collect: [ :author |
+			           author -> (GLPUserDegreeOfAuthorshipAnalyzer new
+				            glhFile: self glhFile;
+				            glhUser: author;
+				            compute) ]
+		           as: Dictionary.
+	normalizedResults := AIMinMaxNormalizer new normalize: rawResults.
+	^ normalizedResults
+]
+
+{ #category : #accessing }
+GLPDegreeOfAuthorshipAnalyzer >> computeFileAuthors [
+	"we consider a developer as an author of a file if its resulting normalized DOA is greater than a threshold k and its absolute DOA is not lower than a value m."
+
+	^ self compute associationsSelect: [ :assoc |
+		  assoc value >= self authorshipThreshold and: [
+			  (rawResults at: assoc key) >= self baseKnowledge ] ]
 ]
 
 { #category : #accessing }
@@ -59,30 +64,4 @@ GLPDegreeOfAuthorshipAnalyzer >> glhFile [
 GLPDegreeOfAuthorshipAnalyzer >> glhFile: anObject [
 
 	glhFile := anObject
-]
-
-{ #category : #accessing }
-GLPDegreeOfAuthorshipAnalyzer >> glhUser [
-
-	^ glhUser
-]
-
-{ #category : #accessing }
-GLPDegreeOfAuthorshipAnalyzer >> glhUser: anObject [
-
-	glhUser := anObject
-]
-
-{ #category : #accessing }
-GLPDegreeOfAuthorshipAnalyzer >> numberOfChageMadeByOriginalAuthorDL [
-
-	self flag: #todo.
-	^ 1
-]
-
-{ #category : #accessing }
-GLPDegreeOfAuthorshipAnalyzer >> numberOfChangeMadeByOtherAuthors [
-
-	self flag: #todo.
-	^ 1
 ]
