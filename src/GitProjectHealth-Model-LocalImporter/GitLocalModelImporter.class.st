@@ -91,15 +91,21 @@ GitLocalModelImporter >> importBranchesOfRepository: aGLHRepository [
 { #category : #'import - commits' }
 GitLocalModelImporter >> importCommit: aLGitCommit [
 
-	^ self glhModel newCommit
-		  id: aLGitCommit name;
-		  message: aLGitCommit message;
-		  committed_date: aLGitCommit time asDateAndTime;
-		  committer_email: aLGitCommit author email;
-		  committer_name: aLGitCommit author name;
-		  parent_ids:
-			  (aLGitCommit parents collect: [ :parent | parent name ]);
-		  yourself
+	| commit |
+	commit := self glhModel newCommit
+		          id: aLGitCommit name;
+		          message: aLGitCommit message;
+		          committed_date: aLGitCommit time asDateAndTime;
+		          committer_email: aLGitCommit author email;
+		          committer_name: aLGitCommit author name;
+		          authored_date: aLGitCommit time asDateAndTime;
+		          author_email: aLGitCommit author email;
+		          author_name: aLGitCommit author name;
+		          parent_ids:
+			          (aLGitCommit parents collect: [ :parent | parent name ]);
+		          yourself.
+	self resolveCreatorOfCommit: commit.
+	^ commit
 ]
 
 { #category : #'import - commits' }
@@ -234,6 +240,25 @@ GitLocalModelImporter >> importRepository: aGLHRepository [
 	self importCommitsOfRepository: aGLHRepository
 ]
 
+{ #category : #'import - commits' }
+GitLocalModelImporter >> importUserByCommit: aGLHCommit [
+
+	^ self userCatalogue collectUsernames
+		  at: aGLHCommit author_name
+		  ifAbsent: [
+			  | glhUser |
+			  glhUser := GLHUser new
+								id: aGLHCommit author_name;
+				             username: aGLHCommit author_name;
+				             name: aGLHCommit author_name;
+				             email: aGLHCommit author_email;
+				             yourself.
+
+			  self glhModel add: glhUser unless: self blockOnIdEquality.
+			  self userCatalogue addUser: glhUser withName: glhUser username.
+			  glhUser ]
+]
+
 { #category : #initialization }
 GitLocalModelImporter >> initialize [
 
@@ -245,4 +270,13 @@ GitLocalModelImporter >> initialize [
 GitLocalModelImporter >> localGitRepository: aFileReference [
 
 	localGitRepositoryFileReference := aFileReference
+]
+
+{ #category : #'import - commits' }
+GitLocalModelImporter >> resolveCreatorOfCommit: aGLHCommit [
+	aGLHCommit commitCreator ifNil: [
+		aGLHCommit commitCreator:
+			(self importUserByCommit: aGLHCommit) ].
+
+	^ aGLHCommit commitCreator
 ]
