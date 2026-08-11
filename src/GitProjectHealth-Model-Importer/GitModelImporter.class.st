@@ -757,7 +757,7 @@ GitModelImporter >> parseDiffString: aDiff [
 	"parse diff string to create entities for each lines"
 
 	| lines index firstChangeRange range |
-	aDiff diffString ifEmpty: [ ^ aDiff diffRanges ].
+	(aDiff diffString isNil or: [ aDiff diffString isEmpty ]) ifTrue: [ ^ aDiff diffRanges ].
 
 	lines := aDiff diffString lines.
 	index := 0.

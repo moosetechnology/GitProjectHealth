@@ -39,7 +39,7 @@ GitLocalModelImporter >> createDiffFrom: patch and: delta [
 		glhDiff new_file: true ].
 	delta status = LGitDeltaTypeEnum git_delta_deleted ifTrue: [
 		glhDiff deleted_file: true ].
-	glhDiff diffString: (patch patchString allButFirstLines: 2).
+	[glhDiff diffString: (patch patchString allButFirstLines: 2).] on: Error do: [ self flag: #'some illegal continuation byte for utf-8 encoding can appears here' ].
 	^ glhDiff
 ]
 
