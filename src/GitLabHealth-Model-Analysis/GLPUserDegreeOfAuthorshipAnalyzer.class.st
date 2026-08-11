@@ -40,8 +40,13 @@ Class {
 GLPUserDegreeOfAuthorshipAnalyzer >> authorCreatedFile [
 	"Paper: Should be 1 if yes. 0 if not"
 
-	"Us: we consider that files might be old, and so in this case 0"
-	^ 0
+	"Us: we consider that the author of the first commit on a file is the creator of the file"
+
+	(self glhFile diffs sorted: [ :diff :b |
+		 diff commit committed_date < b commit committed_date ]) first
+		commit commitCreator = self glhUser
+		ifTrue: [ ^ 1 ]
+		ifFalse: [ ^ 0 ]
 ]
 
 { #category : #accessing }
