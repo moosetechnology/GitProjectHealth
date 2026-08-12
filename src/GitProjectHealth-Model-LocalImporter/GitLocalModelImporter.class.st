@@ -183,9 +183,10 @@ GitLocalModelImporter >> importDiffOfCommit: commit [
 				 patch := gitDiff patchAt: idx.
 				 self createDiffFrom: patch and: delta ]) ].
 	"changes are added into the model during the import"
-	commit diffs do: [ :diff |
-		| ranges |
-		ranges := self importDiffRangesForDiff: diff ].
+	self withDiffRanges ifTrue: [
+		commit diffs do: [ :diff |
+			| ranges |
+			ranges := self importDiffRangesForDiff: diff ] ].
 
 	^ commit diffs
 ]

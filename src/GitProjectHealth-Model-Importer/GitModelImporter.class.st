@@ -15,7 +15,8 @@ Class {
 		'repoApi',
 		'withCommitDiffs',
 		'generalReader',
-		'withCommitDiffsChanges'
+		'withCommitDiffsChanges',
+		'withDiffRanges'
 	],
 	#classVars : [
 		'currentImporter'
@@ -730,7 +731,8 @@ GitModelImporter >> initReader [
 GitModelImporter >> initialize [
 
 	super initialize.
-	self withFiles: false. 
+	self withFiles: false.
+	self withDiffRanges: false.
 	self withCommitsSince: (Date today - 1 week) asDateAndTime.
 	userCatalogue := GLHUserCatalogueV2 new
 		                 anImporter: self;
@@ -859,6 +861,18 @@ GitModelImporter >> withCommitsSince: someDays [
 		                    ifTrue: [ someDays ]
 		                    ifFalse: [ DateAndTime today - someDays ].
 	^ withCommitsSince
+]
+
+{ #category : #accessing }
+GitModelImporter >> withDiffRanges [
+
+	^ withDiffRanges
+]
+
+{ #category : #accessing }
+GitModelImporter >> withDiffRanges: anObject [
+
+	withDiffRanges := anObject
 ]
 
 { #category : #accessing }
