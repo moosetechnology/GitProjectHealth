@@ -236,8 +236,10 @@ GitLocalModelImporter >> importLatestCommitsOfProject: aGLHProject [
 { #category : #'import - repositories' }
 GitLocalModelImporter >> importRepository: aGLHRepository [
 
+	| commits |
 	self importBranchesOfRepository: aGLHRepository.
-	self importCommitsOfRepository: aGLHRepository
+	commits := self importCommitsOfRepository: aGLHRepository.
+	aGLHRepository commits addAll: commits keyedBy: [ :el | el id ]
 ]
 
 { #category : #'import - commits' }
