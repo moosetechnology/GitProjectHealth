@@ -246,20 +246,22 @@ GitLocalModelImporter >> importRepository: aGLHRepository [
 { #category : #'import - commits' }
 GitLocalModelImporter >> importUserByCommit: aGLHCommit [
 
-	^ self userCatalogue collectUsernames
-		  at: aGLHCommit author_name
-		  ifAbsent: [
-			  | glhUser |
-			  glhUser := GLHUser new
-								id: aGLHCommit author_name;
-				             username: aGLHCommit author_name;
-				             name: aGLHCommit author_name;
-				             email: aGLHCommit author_email;
-				             yourself.
+	| user |
+	user := self userCatalogue collectUsernames
+		        at: aGLHCommit author_name
+		        ifAbsentPut: [
+			        | glhUser |
+			        glhUser := GLHUser new
+				                   id: aGLHCommit author_name;
+				                   username: aGLHCommit author_name;
+				                   name: aGLHCommit author_name;
+				                   email: aGLHCommit author_email;
+				                   yourself.
 
-			  self glhModel add: glhUser unless: self blockOnIdEquality.
-			  self userCatalogue addUser: glhUser withName: glhUser username.
-			  glhUser ]
+			        glhUser ].
+	self glhModel add: user unless: self blockOnIdEquality.
+	self userCatalogue addUser: user withName: user username.
+	^ user
 ]
 
 { #category : #initialization }
