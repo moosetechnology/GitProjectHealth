@@ -16,3 +16,11 @@ GLHFile >> degreeOfAuthorshipAuthors [
 		  glhFile: self;
 		  computeFileAuthors
 ]
+
+{ #category : #'*GitLabHealth-Model-Analysis' }
+GLHFile >> mainAuthor [
+	
+	^ (GLPDegreeOfAuthorshipAnalyzer new
+		  glhFile: self;
+		  compute)
+]

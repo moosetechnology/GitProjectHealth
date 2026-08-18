@@ -14,16 +14,45 @@ Class {
 { #category : #'import - files' }
 GitLocalModelImporter >> buildGPHFileFor: aDiskDirectoryEntry [
 
-	| file |
-	file := (aDiskDirectoryEntry isDirectory
-		         ifTrue: [ GLHFileDirectory ]
-		         ifFalse: [ GLHFileBlob ]) new.
-	self glhModel add: file.
-	file name: aDiskDirectoryEntry basename.
-	(file isKindOf: GLHFileDirectory) ifTrue: [
-		file files: (aDiskDirectoryEntry children collect: [ :child |
-				 self buildGPHFileFor: child ]) ].
-	^ file
+	| file root |
+	root := (self glhModel allWithSubTypesOf: GLHFile)
+		        detect: [ :f |
+		        f directoryOwner isNil and: [ f name = aDiskDirectoryEntry basename ] ]
+		        ifFound: [ :f | f ]
+		        ifNone: [
+			        file := (aDiskDirectoryEntry isDirectory
+				                 ifTrue: [ GLHFileDirectory ]
+				                 ifFalse: [ GLHFileBlob ]) new.
+			        self glhModel add: file.
+			        file name: aDiskDirectoryEntry basename ].
+	(root isKindOf: GLHFileDirectory) ifTrue: [
+		root files: (aDiskDirectoryEntry children collect: [ :child |
+				 self buildGPHFileFor: child in: root ]) ].
+	^ root
+]
+
+{ #category : #'import - files' }
+GitLocalModelImporter >> buildGPHFileFor: aFileEntry in: parent [
+
+	| modelFile |
+	modelFile := parent files
+		             detect: [ :childFile |
+		             childFile name = aFileEntry basename ]
+		             ifFound: [ :glhFile | glhFile ]
+		             ifNone: [
+			             | file |
+			             file := (aFileEntry isDirectory
+				                      ifTrue: [ GLHFileDirectory ]
+				                      ifFalse: [ GLHFileBlob ]) new.
+			             self glhModel add: file.
+			             file name: aFileEntry basename ].
+
+	(modelFile isKindOf: GLHFileDirectory) ifTrue: [
+		modelFile files
+			addAll: (aFileEntry children collect: [ :child |
+					 self buildGPHFileFor: child in: modelFile ])
+			keyedBy: [ :futurChild | { futurChild name } ] ].
+	^ modelFile
 ]
 
 { #category : #'private - diffs' }
