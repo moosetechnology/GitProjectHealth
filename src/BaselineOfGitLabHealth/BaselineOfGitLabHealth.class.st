@@ -103,7 +103,8 @@ BaselineOfGitLabHealth >> defineGroups: spec [
 			   'GitProjectHealth-Model-Importer-Tests'
 			   'BitBucketHealth-Model-Importer'
 			   'BitBucketHealth-Model-Importer-Tests'
-			   'GitProjectHealth-Model-LocalImporter' ).
+			   'GitProjectHealth-Model-LocalImporter'
+			   'GitProjectHealth-Model-LocalImporter-Tests' ).
 	spec group: 'default' with: #( 'Core' )
 ]
 
@@ -185,6 +186,11 @@ BaselineOfGitLabHealth >> definePackages: spec [
 		spec requires:
 			#( 'GitProjectHealth-Model-Importer'
 			   'GitLabHealth-Model-Extension' ) ].
+	
+	
+	spec package: 'GitProjectHealth-Model-LocalImporter-Tests' with: [
+		spec requires:
+			#( 'GitProjectHealth-Model-LocalImporter' ) ].
 
 	"model extension"
 	spec
