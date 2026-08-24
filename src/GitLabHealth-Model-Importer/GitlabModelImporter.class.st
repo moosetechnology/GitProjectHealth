@@ -1097,7 +1097,7 @@ GitlabModelImporter >> importDiffOfMergeRequest: aMergeRequest [
 	^ aMergeRequest diffs
 ]
 
-{ #category : #'import - repositories' }
+{ #category : #'import - files' }
 GitlabModelImporter >> importDirectoryFiles: aDirectoryFile OfBranch: aBranch [
 
 	| result files apiFiles params |
@@ -1123,13 +1123,13 @@ GitlabModelImporter >> importDirectoryFiles: aDirectoryFile OfBranch: aBranch [
 		self importDirectoryFiles: file OfBranch: aBranch ]
 ]
 
-{ #category : #'import - file' }
+{ #category : #'import - files' }
 GitlabModelImporter >> importFileWithPath: aPath ofProject: aGLHProject inBranch: aBranch [ 
 	self flag: 'imported file need to be store inside the model'.
 	^ self repoApi repositories getRawFile: aPath ofProject: aGLHProject id withParams: {#ref -> aBranch name} asDictionary .
 ]
 
-{ #category : #'import - repositories' }
+{ #category : #'import - files' }
 GitlabModelImporter >> importFilesOfBranch: aBranch [
 
 	| result files apiFiles params |

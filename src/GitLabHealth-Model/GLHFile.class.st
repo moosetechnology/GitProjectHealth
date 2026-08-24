@@ -8,8 +8,12 @@ A file
 | Relation | Origin | Opposite | Type | Comment |
 |---|
 | `branch` | `GLHFile` | `files` | `GLHBranch` | |
-| `diffs` | `GLHFile` | `file` | `GLHDiff` | |
 | `directoryOwner` | `GLHFile` | `files` | `GLHFileDirectory` | |
+
+### Other
+| Relation | Origin | Opposite | Type | Comment |
+|---|
+| `diffs` | `GLHFile` | `file` | `GLHDiff` | |
 
 
 ## Properties
@@ -24,10 +28,10 @@ Class {
 	#name : #GLHFile,
 	#superclass : #GLHEntity,
 	#instVars : [
-		'#name => FMProperty',
 		'#branch => FMOne type: #GLHBranch opposite: #files',
+		'#diffs => FMMany type: #GLHDiff opposite: #file',
 		'#directoryOwner => FMOne type: #GLHFileDirectory opposite: #files',
-		'#diffs => FMOne type: #GLHDiff opposite: #file'
+		'#name => FMProperty'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }
@@ -39,6 +43,12 @@ GLHFile class >> annotation [
 	<package: #'GitLabHealth-Model'>
 	<generated>
 	^ self
+]
+
+{ #category : #adding }
+GLHFile >> addDiff: anObject [
+	<generated>
+	^ self diffs add: anObject
 ]
 
 { #category : #accessing }
@@ -69,7 +79,6 @@ GLHFile >> diffs [
 	"Relation named: #diffs type: #GLHDiff opposite: #file"
 
 	<generated>
-	<container>
 	^ diffs
 ]
 
@@ -77,14 +86,7 @@ GLHFile >> diffs [
 GLHFile >> diffs: anObject [
 
 	<generated>
-	diffs := anObject
-]
-
-{ #category : #navigation }
-GLHFile >> diffsGroup [
-	<generated>
-	<navigation: 'Diffs'>
-	^ MooseSpecializedGroup with: self diffs
+	diffs value: anObject
 ]
 
 { #category : #accessing }

@@ -14,7 +14,9 @@ Class {
 		'userCatalogue',
 		'repoApi',
 		'withCommitDiffs',
-		'generalReader'
+		'generalReader',
+		'withCommitDiffsChanges',
+		'withDiffRanges'
 	],
 	#classVars : [
 		'currentImporter'
@@ -446,7 +448,7 @@ GitModelImporter >> importAuthorOfCommit: aGLHCommit [
 	self subclassResponsibility
 ]
 
-{ #category : #'import - repositories' }
+{ #category : #'import - branches' }
 GitModelImporter >> importBranchesOf: aGLHProject [
 
 	self
@@ -458,8 +460,14 @@ GitModelImporter >> importBranchesOf: aGLHProject [
 	^ self subclassResponsibility
 ]
 
-{ #category : #'import - repositories' }
+{ #category : #'import - branches' }
 GitModelImporter >> importBranchesOfProject: aGLHProject [
+
+	^ self subclassResponsibility
+]
+
+{ #category : #'import - branches' }
+GitModelImporter >> importBranchesOfRepository: aGLHRepository [
 
 	^ self subclassResponsibility
 ]
@@ -519,10 +527,20 @@ GitModelImporter >> importDiffRangesForDiff: aGLHDiff [
 
 	diffRanges := self glhModel
 		              addAll: (self parseDiffString: aGLHDiff)
-		              unless: self blockForDiffRangeEquality.
+		              keyedBy: [ :el |
+			              {
+				              el diff mooseID.
+				              el originalLineRange.
+				              el newLineRange } ].
 	^ aGLHDiff diffRanges
 		  addAll: diffRanges
 		  unless: self blockForDiffRangeEquality
+]
+
+{ #category : #'import - files' }
+GitModelImporter >> importFilesOfBranch: aGLHBranch [
+
+	^ self subclassResponsibility
 ]
 
 { #category : #'import - groups' }
@@ -671,6 +689,13 @@ GitModelImporter >> importRelease: aReleaseID ofProject: aGLHProject [
 	self subclassResponsibility 
 ]
 
+{ #category : #'import - repositories' }
+GitModelImporter >> importRepository: aGLHRepository [
+	"Repository is about git, not the social platform directly"
+
+	^ self subclassResponsibility
+]
+
 { #category : #'import - tags' }
 GitModelImporter >> importTagsForProject: aGLHProject [
 	self subclassResponsibility 
@@ -706,7 +731,8 @@ GitModelImporter >> initReader [
 GitModelImporter >> initialize [
 
 	super initialize.
-	self withFiles: false. 
+	self withFiles: false.
+	self withDiffRanges: false.
 	self withCommitsSince: (Date today - 1 week) asDateAndTime.
 	userCatalogue := GLHUserCatalogueV2 new
 		                 anImporter: self;
@@ -732,41 +758,45 @@ GitModelImporter >> makeGlobal: aLabel [
 GitModelImporter >> parseDiffString: aDiff [
 	"parse diff string to create entities for each lines"
 
-	| lines range index firstChangeRange |
+	| lines index firstChangeRange range |
+	(aDiff diffString isNil or: [ aDiff diffString isEmpty ]) ifTrue: [ ^ aDiff diffRanges ].
+
 	lines := aDiff diffString lines.
 	index := 0.
-	range := nil.
-
-	lines ifEmpty: [ ^ aDiff diffRanges ].
 	lines := self filterCommitChanges: lines.
 	lines ifEmpty: [ ^ aDiff diffRanges ].
 	(lines first beginsWith: '@@') ifFalse: [ ^ aDiff diffRanges ].
-
 	lines do: [ :line |
 		| aChange |
 		firstChangeRange := false.
-		(line trim beginsWith: #'@@') ifTrue: [
+		(line trimLeft beginsWith: #'@@') ifTrue: [
 			range := GLHDiffRange newFrom: line.
 			firstChangeRange := true.
-			range := aDiff diffRanges add: range unless: [ :existing :new |
-				         existing originalLineRange = new originalLineRange and: [
-					         existing newLineRange = new newLineRange ] ] ].
+			range := aDiff diffRanges add: range keyedBy: [ :val |
+				         {
+					         val originalLineRange.
+					         val newLineRange } ] ].
 
 		self withCommitDiffs ifTrue: [
 			firstChangeRange ifFalse: [
 				aChange := GLHChange newFrom: line.
 				aChange relativeIndex: index.
-				aChange := range changes add: aChange unless: [ :existing :new |
-					           existing sourceCode = new sourceCode and: [
-						           existing index = new index ] ].
+				aChange := range changes add: aChange keyedBy: [ :el |
+					           {
+						           el index.
+						           el sourceCode } ].
 				index := index + 1 ] ] ].
 
 	"add changes to the diff range"
 	aDiff diffRanges do: [ :diffRange |
-		self glhModel addAll: diffRange changes unless: [ :existing :new |
-			existing diffRange mooseID = new diffRange mooseID and: [
-				existing sourceCode = new sourceCode and: [
-					existing index = new index ] ] ] ].
+		self glhModel
+			addAll: diffRange changes
+			ofType: GLHChange
+			keyedBy: [ :val |
+				{
+					val diffRange mooseID.
+					val sourceCode.
+					val index } ] ].
 
 	^ aDiff diffRanges
 ]
@@ -831,6 +861,18 @@ GitModelImporter >> withCommitsSince: someDays [
 		                    ifTrue: [ someDays ]
 		                    ifFalse: [ DateAndTime today - someDays ].
 	^ withCommitsSince
+]
+
+{ #category : #accessing }
+GitModelImporter >> withDiffRanges [
+
+	^ withDiffRanges
+]
+
+{ #category : #accessing }
+GitModelImporter >> withDiffRanges: anObject [
+
+	withDiffRanges := anObject
 ]
 
 { #category : #accessing }

@@ -13,11 +13,11 @@ The diff of a commit
 | Relation | Origin | Opposite | Type | Comment |
 |---|
 | `diffRanges` | `GLHDiff` | `diff` | `GLHDiffRange` | |
-| `file` | `GLHDiff` | `diffs` | `GLHFile` | |
 
 ### Other
 | Relation | Origin | Opposite | Type | Comment |
 |---|
+| `file` | `GLHDiff` | `diffs` | `GLHFile` | |
 | `mergeRequest` | `GLHDiff` | `diffs` | `GLHMergeRequest` | |
 
 
@@ -166,13 +166,6 @@ GLHDiff >> file: anObject [
 
 	<generated>
 	file value: anObject
-]
-
-{ #category : #navigation }
-GLHDiff >> fileGroup [
-	<generated>
-	<navigation: 'File'>
-	^ MooseSpecializedGroup withAll: self file asSet
 ]
 
 { #category : #accessing }
