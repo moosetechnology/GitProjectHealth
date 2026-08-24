@@ -56,6 +56,24 @@ GitLocalModelImporter >> buildGPHFileFor: aFileEntry in: parent [
 	^ modelFile
 ]
 
+{ #category : #'import - commits' }
+GitLocalModelImporter >> connectDiffs: diffs inside: aGPHRepository [
+	"could be refactor for a classic lazy accessor. But maybe this project can also be use for several repository. So to think about later"
+
+	indexedFiles ifNil: [
+		indexedFiles := (aGPHRepository allToScope: GLHFile)
+			                collect: [ :el | el path -> el ]
+			                as: Dictionary ].
+	diffs do: [ :diff |
+		indexedFiles
+			at: diff new_path
+			ifPresent: [ :gphFile |
+				diff addFile: gphFile.
+				"support for file renaming"
+				indexedFiles at: diff old_path put: gphFile ]
+			ifAbsent: [ "not supported yet" ] ]
+]
+
 { #category : #'private - diffs' }
 GitLocalModelImporter >> createDiffFrom: patch and: delta [
 
@@ -179,16 +197,7 @@ GitLocalModelImporter >> importCommitsOfRepository: aGPHRepository since: sinceD
 		diffs := commits flatCollect: [ :commit |
 			         self importDiffOfCommit: commit ].
 		self withFiles ifTrue: [
-			| indexedFiles |
-			indexedFiles := (aGPHRepository allToScope: GLHFile)
-				                collect: [ :el | el path -> el ]
-				                as: Dictionary.
-
-			diffs do: [ :diff |
-				indexedFiles
-					at: diff new_path
-					ifPresent: [ :gphFile | diff addFile: gphFile ]
-					ifAbsent: [ "not supported yet" ] ] ] ].
+			self connectDiffs: diffs inside: aGPHRepository ] ].
 
 	^ commits
 ]
@@ -207,6 +216,7 @@ GitLocalModelImporter >> importDiffOfCommit: commit [
 			                ifAbsent: [
 			                Error signal: 'missing importer origin' ].
 		gitDiff := parentCommit tree diffTo: sourceCommit tree.
+		gitDiff diffFindSimilar.
 		commit diffs: ((1 to: gitDiff numberOfDeltas) collect: [ :idx |
 				 | delta patch |
 				 delta := gitDiff deltas at: idx.
