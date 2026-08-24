@@ -6,7 +6,8 @@ Class {
 	#superclass : #GitModelImporter,
 	#instVars : [
 		'localGitRepositoryFileReference',
-		'gitRepository'
+		'gitRepository',
+		'indexedFiles'
 	],
 	#category : #'GitProjectHealth-Model-LocalImporter'
 }
@@ -195,17 +196,17 @@ GitLocalModelImporter >> importCommitsOfRepository: aGPHRepository since: sinceD
 { #category : #'import - diffs' }
 GitLocalModelImporter >> importDiffOfCommit: commit [
 
-	| sourceCommit targetCommit gitDiff |
+	| sourceCommit parentCommit gitDiff |
 	commit parentCommits ifNotEmpty: [
 		sourceCommit := commit
 			                cacheAt: #importerOrigin
 			                ifAbsent: [
 			                Error signal: 'missing importer origin' ].
-		targetCommit := commit parentCommits anyOne
+		parentCommit := commit parentCommits anyOne
 			                cacheAt: #importerOrigin
 			                ifAbsent: [
 			                Error signal: 'missing importer origin' ].
-		gitDiff := sourceCommit tree diffTo: targetCommit tree.
+		gitDiff := parentCommit tree diffTo: sourceCommit tree.
 		commit diffs: ((1 to: gitDiff numberOfDeltas) collect: [ :idx |
 				 | delta patch |
 				 delta := gitDiff deltas at: idx.
