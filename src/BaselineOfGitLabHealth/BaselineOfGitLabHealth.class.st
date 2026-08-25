@@ -49,18 +49,19 @@ BaselineOfGitLabHealth >> defineDependencies: spec [
 
 	spec
 		baseline: 'GitlabAPI'
-		with: [
-		spec repository: 'github://Evref-BL/Gitlab-Pharo-API:main' ].
-	
-		spec
+		with: [ spec repository: 'github://Evref-BL/Gitlab-Pharo-API:main' ].
+
+	spec
 		baseline: 'GithubAPI'
-		with: [
-		spec repository: 'github://Evref-BL/github-Pharo-API:main' ].
+		with: [ spec repository: 'github://Evref-BL/github-Pharo-API:main' ].
 
 	spec
 		baseline: 'BitbucketPharoAPI'
 		with: [
-		spec repository: 'github://Evref-BL/Bitbucket-Pharo-API:main' ]
+		spec repository: 'github://Evref-BL/Bitbucket-Pharo-API:main' ].
+	spec
+		baseline: 'GitBridge'
+		with: [ spec repository: 'github://jecisc/GitBridge:v1.0.2/src' ]
 ]
 
 { #category : #baselines }
@@ -140,6 +141,13 @@ BaselineOfGitLabHealth >> definePackages: spec [
 		package: 'GitProjectHealth-Model-Importer-Tests'
 		with: [ spec requires: #( 'GitProjectHealth-Model-Importer' ) ].
 
+	"test utility"
+	spec
+		package: 'GitProjectHealth-Bridge'
+		with: [ spec requires: #( 'GitBridge' ) ].
+
+
+
 	"model"
 	spec
 		package: 'GitLabHealth-Model';
@@ -186,11 +194,11 @@ BaselineOfGitLabHealth >> definePackages: spec [
 		spec requires:
 			#( 'GitProjectHealth-Model-Importer'
 			   'GitLabHealth-Model-Extension' ) ].
-	
-	
-	spec package: 'GitProjectHealth-Model-LocalImporter-Tests' with: [
-		spec requires:
-			#( 'GitProjectHealth-Model-LocalImporter' ) ].
+
+
+	spec
+		package: 'GitProjectHealth-Model-LocalImporter-Tests'
+		with: [ spec requires: #( 'GitProjectHealth-Model-LocalImporter' ) ].
 
 	"model extension"
 	spec
