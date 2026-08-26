@@ -64,6 +64,7 @@ GitLocalModelImporter >> connectDiffs: diffs inside: aGPHRepository [
 		indexedFiles := (aGPHRepository allToScope: GLHFile)
 			                collect: [ :el | el path -> el ]
 			                as: Dictionary ].
+	self halt. 
 	diffs do: [ :diff |
 		indexedFiles
 			at: diff new_path
@@ -206,22 +207,29 @@ GitLocalModelImporter >> importCommitsOfRepository: aGPHRepository since: sinceD
 GitLocalModelImporter >> importDiffOfCommit: commit [
 
 	| sourceCommit parentCommit gitDiff |
-	commit parentCommits ifNotEmpty: [
-		sourceCommit := commit
-			                cacheAt: #importerOrigin
-			                ifAbsent: [
-			                Error signal: 'missing importer origin' ].
-		parentCommit := commit parentCommits anyOne
-			                cacheAt: #importerOrigin
-			                ifAbsent: [
-			                Error signal: 'missing importer origin' ].
-		gitDiff := parentCommit tree diffTo: sourceCommit tree.
-		gitDiff diffFindSimilar.
-		commit diffs: ((1 to: gitDiff numberOfDeltas) collect: [ :idx |
-				 | delta patch |
-				 delta := gitDiff deltas at: idx.
-				 patch := gitDiff patchAt: idx.
-				 self createDiffFrom: patch and: delta ]) ].
+	sourceCommit := commit
+		                cacheAt: #importerOrigin
+		                ifAbsent: [ Error signal: 'missing importer origin' ].
+	gitDiff := LGitDiff of: sourceCommit repository.
+
+	commit parentCommits
+		ifNotEmpty: [
+			parentCommit := commit parentCommits anyOne
+				                cacheAt: #importerOrigin
+				                ifAbsent: [
+				                Error signal: 'missing importer origin' ].
+			gitDiff := gitDiff
+				           diffTree: parentCommit tree
+				           toTree: sourceCommit tree ]
+		ifEmpty: [
+		gitDiff := gitDiff diffTree: FFIExternalObject null toTree: sourceCommit tree ].
+
+	gitDiff diffFindSimilar.
+	commit diffs: ((1 to: gitDiff numberOfDeltas) collect: [ :idx |
+			 | delta patch |
+			 delta := gitDiff deltas at: idx.
+			 patch := gitDiff patchAt: idx.
+			 self createDiffFrom: patch and: delta ]).
 	"changes are added into the model during the import"
 	self withDiffRanges ifTrue: [
 		commit diffs do: [ :diff |

@@ -32,7 +32,7 @@ GitLocalModelImporterWithTestResourceTest >> setUp [
 
 	repository := GLHRepository new
 		              cacheAt: #localImporterReference
-		              put: GPHBridge testResources asFileReference;
+		              put: (GPHBridge testResources / 'testResource') asFileReference;
 		              yourself.
 
 	model add: repository.
@@ -40,6 +40,20 @@ GitLocalModelImporterWithTestResourceTest >> setUp [
 ]
 
 { #category : #tests }
+GitLocalModelImporterWithTestResourceTest >> testFirstCommitHasADiff [
+
+	| commit |
+	commit := (model allWithType: GLHCommit) detect: [ :commi |
+		          commi parentCommits isEmpty ].
+	self assert: commit diffs isNotEmpty
+]
+
+{ #category : #tests }
 GitLocalModelImporterWithTestResourceTest >> testHasRenamedField [
-	self halt.
+
+	| file |
+	file := (model allWithType: GLHFileBlob) detect: [ :fileBlob |
+		        fileBlob path endsWith: 'renamed-hello.st' ].
+	self assert: file diffs size equals: 3.
+	self assert: file diffs second renamed_file
 ]
