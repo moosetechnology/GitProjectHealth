@@ -18,16 +18,16 @@ GitLocalModelImporter >> buildGPHFileFor: aDiskDirectoryEntry [
 	| file root |
 	root := (self glhModel allWithSubTypesOf: GLHFile)
 		        detect: [ :f |
-		        f directoryOwner isNil and: [ f name = aDiskDirectoryEntry basename ] ]
+		        f directoryOwner isNil and: [ f name = aDiskDirectoryEntry filename ] ]
 		        ifFound: [ :f | f ]
 		        ifNone: [
-			        file := (aDiskDirectoryEntry isDirectory
-				                 ifTrue: [ GLHFileDirectory ]
-				                 ifFalse: [ GLHFileBlob ]) new.
+			        file := (aDiskDirectoryEntry isBlob 
+				                 ifFalse: [ GLHFileDirectory ]
+				                 ifTrue: [ GLHFileBlob ]) new.
 			        self glhModel add: file.
-			        file name: aDiskDirectoryEntry basename ].
+			        file name: aDiskDirectoryEntry filename ].
 	(root isKindOf: GLHFileDirectory) ifTrue: [
-		root files: (aDiskDirectoryEntry children collect: [ :child |
+		root files: (aDiskDirectoryEntry entries collect: [ :child |
 				 self buildGPHFileFor: child in: root ]) ].
 	^ root
 ]
@@ -38,19 +38,19 @@ GitLocalModelImporter >> buildGPHFileFor: aFileEntry in: parent [
 	| modelFile |
 	modelFile := parent files
 		             detect: [ :childFile |
-		             childFile name = aFileEntry basename ]
+		             childFile name = aFileEntry filename ]
 		             ifFound: [ :glhFile | glhFile ]
 		             ifNone: [
 			             | file |
-			             file := (aFileEntry isDirectory
-				                      ifTrue: [ GLHFileDirectory ]
-				                      ifFalse: [ GLHFileBlob ]) new.
+			             file := (aFileEntry isBlob
+				                      ifFalse: [ GLHFileDirectory ]
+				                      ifTrue: [ GLHFileBlob ]) new.
 			             self glhModel add: file.
-			             file name: aFileEntry basename ].
+			             file name: aFileEntry filename ].
 
 	(modelFile isKindOf: GLHFileDirectory) ifTrue: [
 		modelFile files
-			addAll: (aFileEntry children collect: [ :child |
+			addAll: (aFileEntry entries collect: [ :child |
 					 self buildGPHFileFor: child in: modelFile ])
 			keyedBy: [ :futurChild | { futurChild name } ] ].
 	^ modelFile
@@ -245,11 +245,11 @@ GitLocalModelImporter >> importFilesOfBranch: aGLHBranch [
 	gitRepository := self gitRepositoryOf: aGLHBranch repository.
 	gitBranch := gitRepository allBranches detect: [ :branch |
 		             branch shortName = aGLHBranch name ].
+
+
 	gitRepository resetHardTo: gitBranch object.
-	aGLHBranch files: (gitRepository workingDirectory children
-	reject: [ :child | child basename = '.git' ]
-	thenCollect: [ :child | self buildGPHFileFor: child ]) 
-	
+	aGLHBranch files: (gitBranch object tree entries collect: [ :entry |
+			 self buildGPHFileFor: entry ])
 ]
 
 { #category : #'import - commits' }

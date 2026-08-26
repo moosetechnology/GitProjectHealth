@@ -36,13 +36,13 @@ GitLocalModelImporterWithTestResourceTest >> setUp [
 		              yourself.
 
 	model add: repository.
-	localImporter importRepository: repository 
 ]
 
 { #category : #tests }
 GitLocalModelImporterWithTestResourceTest >> testFirstCommitHasADiff [
 
 	| commit |
+	localImporter importRepository: repository.
 	commit := (model allWithType: GLHCommit) detect: [ :commi |
 		          commi parentCommits isEmpty ].
 	self assert: commit diffs isNotEmpty
@@ -52,8 +52,32 @@ GitLocalModelImporterWithTestResourceTest >> testFirstCommitHasADiff [
 GitLocalModelImporterWithTestResourceTest >> testHasRenamedField [
 
 	| file |
+	localImporter importRepository: repository.
 	file := (model allWithType: GLHFileBlob) detect: [ :fileBlob |
 		        fileBlob path endsWith: 'renamed-hello.st' ].
 	self assert: file diffs size equals: 3.
 	self assert: file diffs second renamed_file
+]
+
+{ #category : #tests }
+GitLocalModelImporterWithTestResourceTest >> testImportFilesOfBranch [
+
+	| file |
+	localImporter importRepository: repository.
+	file := (model allWithType: GLHFileBlob) detect: [ :fi |
+		        fi name = 'renamed-hello.st' ].
+	self assert: file isNotNil
+]
+
+{ #category : #tests }
+GitLocalModelImporterWithTestResourceTest >> testImportFilesOfBranchDoNotImportNotCommitedFile [
+
+	| file |
+	(GPHBridge testResources / 'testResource' / 'wrong-file.st')
+		ensureCreateFile.
+	localImporter importRepository: repository.
+	file := (model allWithType: GLHFileBlob)
+		        detect: [ :fi | fi name = 'wrong-file.st' ]
+		        ifNone: [ nil ].
+	self assert: file isNil
 ]
