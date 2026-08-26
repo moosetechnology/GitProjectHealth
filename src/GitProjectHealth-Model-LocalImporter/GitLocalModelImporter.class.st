@@ -64,7 +64,6 @@ GitLocalModelImporter >> connectDiffs: diffs inside: aGPHRepository [
 		indexedFiles := (aGPHRepository allToScope: GLHFile)
 			                collect: [ :el | el path -> el ]
 			                as: Dictionary ].
-	self halt. 
 	diffs do: [ :diff |
 		indexedFiles
 			at: diff new_path

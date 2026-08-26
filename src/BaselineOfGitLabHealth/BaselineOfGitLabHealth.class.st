@@ -198,7 +198,7 @@ BaselineOfGitLabHealth >> definePackages: spec [
 
 	spec
 		package: 'GitProjectHealth-Model-LocalImporter-Tests'
-		with: [ spec requires: #( 'GitProjectHealth-Model-LocalImporter' ) ].
+		with: [ spec requires: #( 'GitProjectHealth-Model-LocalImporter' 'GitProjectHealth-Bridge' ) ].
 
 	"model extension"
 	spec
