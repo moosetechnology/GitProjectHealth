@@ -11,7 +11,18 @@ GPHBridge class >> initialize [
 ]
 
 { #category : #'class initialization' }
-GPHBridge class >> testRessource [
-
+GPHBridge class >> resources [
 	^ self root / 'res'
+]
+
+{ #category : #'class initialization' }
+GPHBridge class >> testResources [
+
+	^ self resources / 'testResource'
+]
+
+{ #category : #'class initialization' }
+GPHBridge class >> testResourcesZip [
+
+	^ self resources / 'testResource.zip'
 ]

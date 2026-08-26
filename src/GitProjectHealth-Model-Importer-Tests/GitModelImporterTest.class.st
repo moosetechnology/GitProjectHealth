@@ -11,7 +11,7 @@ Class {
 	#category : #'GitProjectHealth-Model-Importer-Tests'
 }
 
-{ #category : #tests }
+{ #category : #running }
 GitModelImporterTest >> setUp [
 
 	super setUp.
