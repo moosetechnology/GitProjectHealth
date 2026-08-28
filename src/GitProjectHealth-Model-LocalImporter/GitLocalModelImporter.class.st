@@ -6,7 +6,8 @@ Class {
 	#superclass : #GitModelImporter,
 	#instVars : [
 		'localGitRepositoryFileReference',
-		'gitRepository'
+		'gitRepository',
+		'indexedFiles'
 	],
 	#category : #'GitProjectHealth-Model-LocalImporter'
 }
@@ -17,16 +18,16 @@ GitLocalModelImporter >> buildGPHFileFor: aDiskDirectoryEntry [
 	| file root |
 	root := (self glhModel allWithSubTypesOf: GLHFile)
 		        detect: [ :f |
-		        f directoryOwner isNil and: [ f name = aDiskDirectoryEntry basename ] ]
+		        f directoryOwner isNil and: [ f name = aDiskDirectoryEntry filename ] ]
 		        ifFound: [ :f | f ]
 		        ifNone: [
-			        file := (aDiskDirectoryEntry isDirectory
-				                 ifTrue: [ GLHFileDirectory ]
-				                 ifFalse: [ GLHFileBlob ]) new.
+			        file := (aDiskDirectoryEntry isBlob 
+				                 ifFalse: [ GLHFileDirectory ]
+				                 ifTrue: [ GLHFileBlob ]) new.
 			        self glhModel add: file.
-			        file name: aDiskDirectoryEntry basename ].
+			        file name: aDiskDirectoryEntry filename ].
 	(root isKindOf: GLHFileDirectory) ifTrue: [
-		root files: (aDiskDirectoryEntry children collect: [ :child |
+		root files: (aDiskDirectoryEntry entries collect: [ :child |
 				 self buildGPHFileFor: child in: root ]) ].
 	^ root
 ]
@@ -37,22 +38,40 @@ GitLocalModelImporter >> buildGPHFileFor: aFileEntry in: parent [
 	| modelFile |
 	modelFile := parent files
 		             detect: [ :childFile |
-		             childFile name = aFileEntry basename ]
+		             childFile name = aFileEntry filename ]
 		             ifFound: [ :glhFile | glhFile ]
 		             ifNone: [
 			             | file |
-			             file := (aFileEntry isDirectory
-				                      ifTrue: [ GLHFileDirectory ]
-				                      ifFalse: [ GLHFileBlob ]) new.
+			             file := (aFileEntry isBlob
+				                      ifFalse: [ GLHFileDirectory ]
+				                      ifTrue: [ GLHFileBlob ]) new.
 			             self glhModel add: file.
-			             file name: aFileEntry basename ].
+			             file name: aFileEntry filename ].
 
 	(modelFile isKindOf: GLHFileDirectory) ifTrue: [
 		modelFile files
-			addAll: (aFileEntry children collect: [ :child |
+			addAll: (aFileEntry entries collect: [ :child |
 					 self buildGPHFileFor: child in: modelFile ])
 			keyedBy: [ :futurChild | { futurChild name } ] ].
 	^ modelFile
+]
+
+{ #category : #'import - commits' }
+GitLocalModelImporter >> connectDiffs: diffs inside: aGPHRepository [
+	"could be refactor for a classic lazy accessor. But maybe this project can also be use for several repository. So to think about later"
+
+	indexedFiles ifNil: [
+		indexedFiles := (aGPHRepository allToScope: GLHFile)
+			                collect: [ :el | el path -> el ]
+			                as: Dictionary ].
+	diffs do: [ :diff |
+		indexedFiles
+			at: diff new_path
+			ifPresent: [ :gphFile |
+				diff addFile: gphFile.
+				"support for file renaming"
+				indexedFiles at: diff old_path put: gphFile ]
+			ifAbsent: [ "not supported yet" ] ]
 ]
 
 { #category : #'private - diffs' }
@@ -178,16 +197,7 @@ GitLocalModelImporter >> importCommitsOfRepository: aGPHRepository since: sinceD
 		diffs := commits flatCollect: [ :commit |
 			         self importDiffOfCommit: commit ].
 		self withFiles ifTrue: [
-			| indexedFiles |
-			indexedFiles := (aGPHRepository allToScope: GLHFile)
-				                collect: [ :el | el path -> el ]
-				                as: Dictionary.
-
-			diffs do: [ :diff |
-				indexedFiles
-					at: diff new_path
-					ifPresent: [ :gphFile | diff addFile: gphFile ]
-					ifAbsent: [ "not supported yet" ] ] ] ].
+			self connectDiffs: diffs inside: aGPHRepository ] ].
 
 	^ commits
 ]
@@ -195,22 +205,30 @@ GitLocalModelImporter >> importCommitsOfRepository: aGPHRepository since: sinceD
 { #category : #'import - diffs' }
 GitLocalModelImporter >> importDiffOfCommit: commit [
 
-	| sourceCommit targetCommit gitDiff |
-	commit parentCommits ifNotEmpty: [
-		sourceCommit := commit
-			                cacheAt: #importerOrigin
-			                ifAbsent: [
-			                Error signal: 'missing importer origin' ].
-		targetCommit := commit parentCommits anyOne
-			                cacheAt: #importerOrigin
-			                ifAbsent: [
-			                Error signal: 'missing importer origin' ].
-		gitDiff := sourceCommit tree diffTo: targetCommit tree.
-		commit diffs: ((1 to: gitDiff numberOfDeltas) collect: [ :idx |
-				 | delta patch |
-				 delta := gitDiff deltas at: idx.
-				 patch := gitDiff patchAt: idx.
-				 self createDiffFrom: patch and: delta ]) ].
+	| sourceCommit parentCommit gitDiff |
+	sourceCommit := commit
+		                cacheAt: #importerOrigin
+		                ifAbsent: [ Error signal: 'missing importer origin' ].
+	gitDiff := LGitDiff of: sourceCommit repository.
+
+	commit parentCommits
+		ifNotEmpty: [
+			parentCommit := commit parentCommits anyOne
+				                cacheAt: #importerOrigin
+				                ifAbsent: [
+				                Error signal: 'missing importer origin' ].
+			gitDiff := gitDiff
+				           diffTree: parentCommit tree
+				           toTree: sourceCommit tree ]
+		ifEmpty: [
+		gitDiff := gitDiff diffTree: FFIExternalObject null toTree: sourceCommit tree ].
+
+	gitDiff diffFindSimilar.
+	commit diffs: ((1 to: gitDiff numberOfDeltas) collect: [ :idx |
+			 | delta patch |
+			 delta := gitDiff deltas at: idx.
+			 patch := gitDiff patchAt: idx.
+			 self createDiffFrom: patch and: delta ]).
 	"changes are added into the model during the import"
 	self withDiffRanges ifTrue: [
 		commit diffs do: [ :diff |
@@ -227,11 +245,11 @@ GitLocalModelImporter >> importFilesOfBranch: aGLHBranch [
 	gitRepository := self gitRepositoryOf: aGLHBranch repository.
 	gitBranch := gitRepository allBranches detect: [ :branch |
 		             branch shortName = aGLHBranch name ].
+
+
 	gitRepository resetHardTo: gitBranch object.
-	aGLHBranch files: (gitRepository workingDirectory children
-	reject: [ :child | child basename = '.git' ]
-	thenCollect: [ :child | self buildGPHFileFor: child ]) 
-	
+	aGLHBranch files: (gitBranch object tree entries collect: [ :entry |
+			 self buildGPHFileFor: entry ])
 ]
 
 { #category : #'import - commits' }
