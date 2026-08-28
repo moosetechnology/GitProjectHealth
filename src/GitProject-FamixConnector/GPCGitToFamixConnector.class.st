@@ -46,7 +46,7 @@ GPCGitToFamixConnector >> connectDiff: diff [
 	 , (famixModel allWithType: FamixJavaInterface) reject: [ :type |
 		 type sourceAnchor isNil ])
 		detect: [ :class |
-		class sourceAnchor fileName endsWith: diff new_path ]
+		(self fullSourceAnchorPath: class)  endsWith: diff new_path ]
 		ifFound: [ :class | class appliedDiffs add: diff ]
 ]
 
@@ -60,6 +60,13 @@ GPCGitToFamixConnector >> famixModel [
 GPCGitToFamixConnector >> famixModel: anObject [
 
 	famixModel := anObject
+]
+
+{ #category : #accessing }
+GPCGitToFamixConnector >> fullSourceAnchorPath: aSourcedEntity [
+	"string of the full path name of aSourcedEntity source file, within the mooseModel rootFolder"
+
+	^(aSourcedEntity mooseModel rootFolder / (aSourcedEntity sourceAnchor fileName)) fullName
 ]
 
 { #category : #accessing }
