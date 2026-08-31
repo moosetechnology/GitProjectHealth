@@ -18,6 +18,15 @@ ProjectMetric class >> isAbstract [
 	^ self == ProjectMetric
 ]
 
+{ #category : #load }
+ProjectMetric >> loadAllBranches [
+
+	| branches |
+	branches := glhImporter importBranchesOf: project.
+	branches do: [ :branch | glhImporter importRefCommitOfBranch: branch ].
+	^ branches
+]
+
 { #category : #loading }
 ProjectMetric >> loadAllTags [
 
@@ -27,12 +36,8 @@ ProjectMetric >> loadAllTags [
 { #category : #load }
 ProjectMetric >> loadBranchesSince: since until: until [
 
-	| branches |
-	branches := glhImporter importBranchesOf: project.
-
-
-	branches do: [ :branch | glhImporter importRefCommitOfBranch: branch ].
-	^ branches
+	^ self loadAllBranches select: [ :branch |
+		  branch commits first committed_date between: since and: until ]
 ]
 
 { #category : #loading }
