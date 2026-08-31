@@ -37,7 +37,7 @@ ProjectMetric >> loadAllTags [
 ProjectMetric >> loadBranchesSince: since until: until [
 
 	^ self loadAllBranches select: [ :branch |
-		  branch commits first created_at between: since and: until ]
+		  branch commits first committed_date between: since and: until ]
 ]
 
 { #category : #loading }
