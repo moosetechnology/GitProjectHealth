@@ -61,17 +61,17 @@ GitLocalModelImporter >> connectDiffs: diffs inside: aGPHRepository [
 	"could be refactor for a classic lazy accessor. But maybe this project can also be use for several repository. So to think about later"
 
 	indexedFiles ifNil: [
-			indexedFiles := (aGPHRepository allContainedEntitiesOfType: GLHFile)
-				                collect: [ :el | el path -> el ]
-				                as: Dictionary ].
+		indexedFiles := (aGPHRepository allToScope: GLHFile)
+			                collect: [ :el | el path -> el ]
+			                as: Dictionary ].
 	diffs do: [ :diff |
-			indexedFiles
-				at: diff new_path
-				ifPresent: [ :gphFile |
-						diff addFile: gphFile.
-						"support for file renaming"
-						indexedFiles at: diff old_path put: gphFile ]
-				ifAbsent: [ "not supported yet" ] ]
+		indexedFiles
+			at: diff new_path
+			ifPresent: [ :gphFile |
+				diff addFile: gphFile.
+				"support for file renaming"
+				indexedFiles at: diff old_path put: gphFile ]
+			ifAbsent: [ "not supported yet" ] ]
 ]
 
 { #category : #'private - diffs' }
