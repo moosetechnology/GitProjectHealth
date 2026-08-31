@@ -40,13 +40,16 @@ GPCGitToFamixConnector >> connectCommit: commit [
 { #category : #accessing }
 GPCGitToFamixConnector >> connectDiff: diff [
 	"I connect a glhDiff with the famix model"
-
-	(((famixModel allUsing: FamixTClass) reject: #isAnonymousClass)
-	 , (famixModel allUsing: FamixTEnum)
-	 , (famixModel allWithType: FamixJavaInterface) reject: [ :type |
-		 type sourceAnchor isNil ])
+	| col |
+	col := OrderedCollection new.
+	col addAll: ((famixModel allUsing: FamixTClass) reject: #isAnonymousClass).
+	col addAll: (famixModel allUsing: FamixTEnum).
+	col addAll: (famixModel allWithType: FamixJavaInterface).
+	col
 		detect: [ :class |
-		(self fullSourceAnchorPath: class)  endsWith: diff new_path ]
+			(self fullSourceAnchorPath: class)
+				endsWith: diff new_path
+		]
 		ifFound: [ :class | class appliedDiffs add: diff ]
 ]
 
@@ -66,7 +69,12 @@ GPCGitToFamixConnector >> famixModel: anObject [
 GPCGitToFamixConnector >> fullSourceAnchorPath: aSourcedEntity [
 	"string of the full path name of aSourcedEntity source file, within the mooseModel rootFolder"
 
-	^(aSourcedEntity mooseModel rootFolder / (aSourcedEntity sourceAnchor fileName)) fullName
+	^aSourcedEntity sourceAnchor
+		ifNil: [ '' ]
+		ifNotNil: [ :sourceAnchor |
+			(aSourcedEntity mooseModel rootFolder / (sourceAnchor fileName))
+				fullName
+		]
 ]
 
 { #category : #accessing }
