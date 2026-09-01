@@ -873,9 +873,6 @@ GitlabModelImporter >> importCommitsFromTag: fromTag toTag: toTag [
 GitlabModelImporter >> importCommitsOfBranch: aGLHBranch [
 
 	| commits |
-	"	result := self glhApi
-		          commitsOfProject: aGLHBranch repository project id
-		          forRefName: aGLHBranch name."
 	commits := self
 		           importCommitsOfBranch: aGLHBranch
 		           since: withCommitsSince.
