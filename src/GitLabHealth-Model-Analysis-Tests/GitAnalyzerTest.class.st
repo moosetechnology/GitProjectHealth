@@ -60,17 +60,19 @@ GitAnalyzerTest >> testAnalyseAmandment [
 	mondayCommit -> tuesdayCommit -> wednesdayCommit
 	"
 	wednesdayCommit := glhImporter
-		                   importCommitOfProject: projects first
-		                   withId:
-		                   'f298ec312f81032b611a890f993d98096ab3bbc1'.
+		                   importCommit:
+		                   'f298ec312f81032b611a890f993d98096ab3bbc1'
+		                   ofProject: projects first.
 
 	mondayCommit := glhImporter
-		                importCommitOfProject: projects first
-		                withId: '8a6f665118e6fcfa468d7cce1a7e944ba65812ab'.
+		                importCommit:
+		                '8a6f665118e6fcfa468d7cce1a7e944ba65812ab'
+		                ofProject: projects first.
 
 	tuesdayCommit := glhImporter
-		                 importCommitOfProject: projects first
-		                 withId: '2c7308c727560dd425ef78f9a95ca7650d164bed'.
+		                 importCommit:
+		                 '2c7308c727560dd425ef78f9a95ca7650d164bed'
+		                 ofProject: projects first.
 
 	myCommits := {
 		             mondayCommit.
@@ -135,18 +137,19 @@ GitAnalyzerTest >> testChurnMetric [
 
 	"commit chain: mondayCommit -> tuesdayCommit -> wednesdayCommit "
 	wednesdayCommit := glhImporter
-		                   importCommitOfProject: projects first
-		                   withId:
-		                   'f298ec312f81032b611a890f993d98096ab3bbc1'.
+		                   importCommit:
+		                   'f298ec312f81032b611a890f993d98096ab3bbc1'
+		                   ofProject: projects first.
 
 	mondayCommit := glhImporter
-		                importCommitOfProject: projects first
-		                withId: '8a6f665118e6fcfa468d7cce1a7e944ba65812ab'.
+		                importCommit:
+		                '8a6f665118e6fcfa468d7cce1a7e944ba65812ab'
+		                ofProject: projects first.
 
 	tuesdayCommit := glhImporter
-		                 importCommitOfProject: projects first
-		                 withId: '2c7308c727560dd425ef78f9a95ca7650d164bed'.
-		
+		                 importCommit:
+		                 '2c7308c727560dd425ef78f9a95ca7650d164bed'
+		                 ofProject: projects first.
 
 	myCommits := {
 		             mondayCommit.
