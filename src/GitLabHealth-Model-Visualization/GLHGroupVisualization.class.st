@@ -132,7 +132,7 @@ GLHGroupVisualization >> forGroup: aGLHGroups [
 		canvas: c;
 		shapes: c nodes;
 		connectFrom: #group.
-	RSHorizontalVanDerPloegTreeLayout new on: c nodes.
+	RSHorizontalTreeLayout new on: c nodes.
 
 	legend := self createLegend.
 	legend container: c.
