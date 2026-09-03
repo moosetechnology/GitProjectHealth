@@ -767,73 +767,6 @@ GitlabModelImporter >> importCommit: aCommitID ofProject: aGLHProject [
 ]
 
 { #category : #'import - commits' }
-GitlabModelImporter >> importCommitOfProject: anProject withId: anID [
-
-	| commit result |
-self
-		deprecated: 'Use importCommit:ofProject: instead of current one'
-		on: '27 August 2025'
-		in: 'MSR 1.3.0 '
-		transformWith: '`@rcv importCommitOfProject: `arg1 withId: `arg2' -> '`@rcv importCommit: `arg2 ofProject: `arg1'.
-	anID ifNil: [ ^ nil ].
-
-	('looking for commit ' , anID printString , ' in project : '
-	 , anProject id printString) recordInfo.
-
-	commit := (self
-		           detectEntityType: GLHCommit
-		           overAttribut: #id
-		           equalTo: anID) ifNil: [
-		          result := self repoApi commits
-			                    get: anID
-			                    inProject: anProject id.
-		          commit := (self parseCommitsResult: '[' , result , ']')
-			                    first.
-
-		          commit := self glhModel
-			                    add: commit
-			                    unless: self blockOnIdEquality.
-		          commit repository: anProject repository.
-
-		          commit ].
-
-	self withCommitDiffs ifTrue: [ self importDiffOfCommit: commit ].
-
-	^ commit
-]
-
-{ #category : #'import - commits' }
-GitlabModelImporter >> importCommits: aGLHProject [
-	"limited to the last 20 commits"
-
-	| results parsedResults params |
-	self
-		deprecated:
-		'Use importLatestCommitsOfProject: instead of current one'
-		on: '19 September 2025'
-		in:
-		'Pharo-12.0.0+SNAPSHOT.build.1571.sha.cf5fcd22e66957962c97dffc58b0393b7f368147 (64 Bit)'.
-		
-	params := { (#with_stats -> 'true') } asDictionary.
-	results := self repoApi commits
-		           getByPage: 1
-		           perPage: 20
-		           inProject: aGLHProject id
-		           withParams: params.
-
-	parsedResults := self parseCommitsResult: results.
-	self glhModel addAll: parsedResults unless: self blockOnIdEquality.
-
-	parsedResults do: [ :commit |
-		commit repository: aGLHProject repository ].
-
-	self withCommitDiffs ifTrue: [
-		parsedResults do: [ :commit | self importDiffOfCommit: commit ] ].
-
-	^ parsedResults
-]
-
-{ #category : #'import - commits' }
 GitlabModelImporter >> importCommitsFollowing: aCommit upToDays: aNumberOfDay [
 	"import the 'n' commits of a project starting from an initial 'aCommit' commit. 
 	Lazy import does not import the entities inside the model"
@@ -873,9 +806,6 @@ GitlabModelImporter >> importCommitsFromTag: fromTag toTag: toTag [
 GitlabModelImporter >> importCommitsOfBranch: aGLHBranch [
 
 	| commits |
-	"	result := self glhApi
-		          commitsOfProject: aGLHBranch repository project id
-		          forRefName: aGLHBranch name."
 	commits := self
 		           importCommitsOfBranch: aGLHBranch
 		           since: withCommitsSince.
