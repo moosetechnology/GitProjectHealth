@@ -140,6 +140,10 @@ GitLocalModelImporter >> importBranchesOfRepository: aGLHRepository [
 GitLocalModelImporter >> importCommit: aLGitCommit [
 
 	| commit |
+	(self glhModel allWithType: GLHCommit) asOrderedCollection
+		detect: [ :comm | comm id = aLGitCommit name ]
+		ifFound: [ :comm | ^ comm ].
+		
 	commit := self glhModel newCommit
 		          id: aLGitCommit name;
 		          message: aLGitCommit message;
