@@ -120,7 +120,7 @@ GitLocalModelImporter >> importBranchesOfRepository: aGLHRepository [
 		            select: [ :branch | branch isBranch ]
 		            thenCollect: [ :branch |
 			            GLHBranch new
-				            name: branch shortName;
+				            name: branch gitName;
 				            sha: branch targetId hexString;
 				            yourself ].
 	aGLHRepository branches addAll: branches.
@@ -140,6 +140,10 @@ GitLocalModelImporter >> importBranchesOfRepository: aGLHRepository [
 GitLocalModelImporter >> importCommit: aLGitCommit [
 
 	| commit |
+	(self glhModel allWithType: GLHCommit) asOrderedCollection
+		detect: [ :comm | comm id = aLGitCommit name ]
+		ifFound: [ :comm | ^ comm ].
+		
 	commit := self glhModel newCommit
 		          id: aLGitCommit name;
 		          message: aLGitCommit message;
@@ -174,23 +178,42 @@ GitLocalModelImporter >> importCommitsOfRepository: aGLHRepository [
 { #category : #'import - commits' }
 GitLocalModelImporter >> importCommitsOfRepository: aGPHRepository since: sinceDate until: untilDate [
 
-	| i revwalk commits |
-	i := 0.
-	revwalk := LGitRevwalk of: (self gitRepositoryOf: aGPHRepository).
+	| revwalk commits alreadyExploredCommit |
 	commits := OrderedCollection new.
-	revwalk pushHead.
-	[
-	revwalk hasNext and: [
-		commits isEmpty or: [ commits last committed_date > sinceDate ] ] ]
-		whileTrue: [
-			| gitCommit glhCommit |
-			i := i + 1.
+	"to stop when already explored"
+	alreadyExploredCommit := aGPHRepository commits
+		                         collect: [ :commit | commit id ]
+		                         as: Set.
+	(self gitRepositoryOf: aGPHRepository) allBranches
+		select: #isLocal
+		thenDo: [ :branch |
+			| gphBranch shouldContinue lastBranchCommits |
+			gphBranch := (glhModel allWithType: GLHBranch)
+				             detect: [ :gBranch | branch gitName = gBranch name ]
+				             ifNone: [ nil ].
+
+			revwalk := LGitRevwalk of: (self gitRepositoryOf: aGPHRepository).
+			revwalk pushReference: branch.
+			lastBranchCommits := nil.
+			shouldContinue := true.
+			[
+			| glhCommit gitCommit |
 			gitCommit := revwalk next.
 			glhCommit := self importCommit: gitCommit.
-			commits add: glhCommit.
-			glhCommit cacheAt: #importerOrigin put: gitCommit ].
 
-	self chainsCommitsFrom: commits.
+			lastBranchCommits := glhCommit.
+			commits add: glhCommit.
+			alreadyExploredCommit add: glhCommit id.
+			glhCommit cacheAt: #importerOrigin put: gitCommit.
+
+			gphBranch commits ifEmpty: [ gphBranch addCommit: glhCommit ] ]
+				doWhileTrue: [
+					revwalk hasNext and: [
+						lastBranchCommits committed_date > sinceDate and: [
+							(lastBranchCommits parent_ids anySatisfy: [ :id |
+								 alreadyExploredCommit includes: id ]) not ] ] ].
+
+			self chainsCommitsFrom: commits ].
 
 	self withCommitDiffs ifTrue: [
 		| diffs |
@@ -198,6 +221,7 @@ GitLocalModelImporter >> importCommitsOfRepository: aGPHRepository since: sinceD
 			         self importDiffOfCommit: commit ].
 		self withFiles ifTrue: [
 			self connectDiffs: diffs inside: aGPHRepository ] ].
+
 
 	^ commits
 ]
