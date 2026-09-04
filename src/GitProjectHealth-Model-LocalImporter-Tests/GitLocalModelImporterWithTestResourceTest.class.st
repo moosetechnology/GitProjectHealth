@@ -80,6 +80,7 @@ GitLocalModelImporterWithTestResourceTest >> testHasRenamedField [
 
 	| file renameCommit |
 	localImporter importRepository: repository.
+	self halt. 
 	file := (model allWithType: GLHFileBlob) detect: [ :fileBlob |
 		        fileBlob path endsWith: 'renamed-hello.st' ].
 	self assert: file diffs size equals: 3.
@@ -110,4 +111,18 @@ GitLocalModelImporterWithTestResourceTest >> testImportFilesOfBranchDoNotImportN
 		        detect: [ :fi | fi name = 'wrong-file.st' ]
 		        ifNone: [ nil ].
 	self assert: file isNil
+]
+
+{ #category : #tests }
+GitLocalModelImporterWithTestResourceTest >> testSameHeadCommitForTwoBranches [
+
+	| branchA anotherBranchA |
+	localImporter importRepository: repository.
+	branchA := (model allWithType: GLHBranch) detect: [ :branch |
+		           branch name = 'brancha' ].
+	anotherBranchA := (model allWithType: GLHBranch) detect: [ :branch |
+		                  branch name = 'another-branch-a' ].
+	self
+		assert: branchA commits anyOne
+		identicalTo: anotherBranchA commits anyOne
 ]
