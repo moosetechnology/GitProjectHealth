@@ -279,7 +279,9 @@ GitlabModelImporter >> configureReaderForGroup: reader [
 	super configureReaderForGroup: reader.
 
 	reader for: GLHGroup do: [ :mapping |
-		(mapping mapInstVar: #projects) valueSchema: #ArrayOfProject ]
+		(mapping mapInstVar: #projects) valueSchema: #ArrayOfProject.
+		mapping mapInstVar: #name to: #path.
+		mapping mapInstVar: #display_name to: #name ]
 ]
 
 { #category : #'private - configure reader' }
