@@ -184,6 +184,7 @@ GitLocalModelImporter >> importCommitsOfRepository: aGPHRepository since: sinceD
 		select: #isLocal
 		thenDo: [ :branch |
 			| gphBranch shouldContinue lastBranchCommits |
+
 			gphBranch := (glhModel allWithType: GLHBranch)
 				             detect: [ :gBranch | branch gitName = gBranch name ]
 				             ifNone: [ nil ].
@@ -207,8 +208,9 @@ GitLocalModelImporter >> importCommitsOfRepository: aGPHRepository since: sinceD
 					revwalk hasNext and: [
 						lastBranchCommits committed_date > sinceDate and: [
 							(lastBranchCommits parent_ids anySatisfy: [ :id |
-								alreadyExploredCommit includes: id ]) not ] ] ].
+								 alreadyExploredCommit includes: id ]) not ] ] ].
 
+			self chainsCommitsFrom: commits.
 
 			self withCommitDiffs ifTrue: [
 				| diffs |
@@ -217,8 +219,6 @@ GitLocalModelImporter >> importCommitsOfRepository: aGPHRepository since: sinceD
 				self withFiles ifTrue: [
 					self connectDiffs: diffs inside: aGPHRepository ] ] ].
 
-
-	self chainsCommitsFrom: commits.
 
 	^ commits
 ]
