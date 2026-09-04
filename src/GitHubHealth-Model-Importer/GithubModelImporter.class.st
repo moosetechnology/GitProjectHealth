@@ -271,7 +271,6 @@ GithubModelImporter >> configureReaderForPipeline: reader [
 	reader
 		for: GLHPipeline
 		do: [ :mapping | "mapping mapInstVar: #status to: #conclusion."
-			
 		(mapping mapInstVar: #created_at) valueSchema: DateAndTime.
 		(mapping mapInstVar: #updated_at) valueSchema: DateAndTime.
 			
@@ -286,8 +285,7 @@ GithubModelImporter >> configureReaderForPipeline: reader [
 				mapProperty: #conclusion
 				getter: [ :object | #ignore ]
 				setter: [ :object :value |
-					(object status isNil and: [ value isNotNil ]) ifTrue: [
-						object status: value ] ].
+					value ifNotNil: [ object status: value ] ].
 
 			mapping
 				mapProperty: #run_started_at
