@@ -857,8 +857,8 @@ GitModelImporter >> withCommitsSince: someDays [
 
 	"(GitlabModelImporter new withCommitsSince: 30 day ) >>> (Date today - 30 day) asDateAndTime"
 
-	withCommitsSince := (someDays isKindOf: Date)
-		                    ifTrue: [ someDays ]
+	withCommitsSince := ((someDays isKindOf: Date) or: (someDays isKindOf: DateAndTime))
+		                    ifTrue: [ someDays asDateAndTime ]
 		                    ifFalse: [ DateAndTime today - someDays ].
 	^ withCommitsSince
 ]
