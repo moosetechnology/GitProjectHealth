@@ -51,12 +51,15 @@ GitLocalModelImporterWithTestResourceTest >> testFirstCommitHasADiff [
 { #category : #tests }
 GitLocalModelImporterWithTestResourceTest >> testHasRenamedField [
 
-	| file |
+	| file renameCommit |
 	localImporter importRepository: repository.
 	file := (model allWithType: GLHFileBlob) detect: [ :fileBlob |
 		        fileBlob path endsWith: 'renamed-hello.st' ].
 	self assert: file diffs size equals: 3.
-	self assert: file diffs second renamed_file
+	renameCommit := (model allWithType: GLHCommit) detect: [ :commit |
+		                commit id
+		                = '505cd202d27777c018af5590a44689928ea55430' ].
+	self assert: renameCommit diffs anyOne renamed_file
 ]
 
 { #category : #tests }
