@@ -80,7 +80,6 @@ GitLocalModelImporterWithTestResourceTest >> testHasRenamedField [
 
 	| file renameCommit |
 	localImporter importRepository: repository.
-	self halt. 
 	file := (model allWithType: GLHFileBlob) detect: [ :fileBlob |
 		        fileBlob path endsWith: 'renamed-hello.st' ].
 	self assert: file diffs size equals: 3.
