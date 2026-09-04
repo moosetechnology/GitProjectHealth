@@ -39,6 +39,33 @@ GitLocalModelImporterWithTestResourceTest >> setUp [
 ]
 
 { #category : #tests }
+GitLocalModelImporterWithTestResourceTest >> testConnectionBetweenDivergingBranches [
+
+	| lastCommitBranchB |
+	localImporter importRepository: repository.
+	lastCommitBranchB := (model allWithType: GLHCommit) detect: [ :commit |
+		                     commit id
+		                     = '505cd202d27777c018af5590a44689928ea55430' ].
+	self assert: lastCommitBranchB childCommits size equals: 2
+]
+
+{ #category : #tests }
+GitLocalModelImporterWithTestResourceTest >> testConnectionBetweenSuccessiveBranches [
+
+	| lastCommitBranchB |
+	localImporter importRepository: repository.
+	lastCommitBranchB := (model allWithType: GLHCommit) detect: [ :commit |
+		                     commit id
+		                     = '02766af59f0b1bbf85861c67aa2128ed5315c8df' ].
+	self
+		assert: lastCommitBranchB parentCommits anyOne id
+		equals: '4de84ee217a9e6fe1561233db282e5bc661e5e98'.
+	self
+		assert: lastCommitBranchB childCommits anyOne id
+		equals: 'da8ce23a62daec1c558614e2a66aac7f05b9a589'
+]
+
+{ #category : #tests }
 GitLocalModelImporterWithTestResourceTest >> testFirstCommitHasADiff [
 
 	| commit |
