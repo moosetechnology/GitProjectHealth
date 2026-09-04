@@ -120,7 +120,7 @@ GitLocalModelImporter >> importBranchesOfRepository: aGLHRepository [
 		            select: [ :branch | branch isBranch ]
 		            thenCollect: [ :branch |
 			            GLHBranch new
-				            name: branch shortName;
+				            name: branch gitName;
 				            sha: branch targetId hexString;
 				            yourself ].
 	aGLHRepository branches addAll: branches.
@@ -185,7 +185,7 @@ GitLocalModelImporter >> importCommitsOfRepository: aGPHRepository since: sinceD
 		thenDo: [ :branch |
 			| gphBranch shouldContinue lastBranchCommits |
 			gphBranch := (glhModel allWithType: GLHBranch)
-				             detect: [ :gBranch | branch shortName = gBranch name ]
+				             detect: [ :gBranch | branch gitName = gBranch name ]
 				             ifNone: [ nil ].
 
 			revwalk := LGitRevwalk of: (self gitRepositoryOf: aGPHRepository).
