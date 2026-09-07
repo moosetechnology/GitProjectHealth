@@ -56,8 +56,15 @@ GLPHImporterMock >> glhModel: anObject [
 ]
 
 { #category : #'import - repositories' }
-GLPHImporterMock >> importBranchesOf: aGLHProject [ 
-	^ aGLHProject repository branches . 
+GLPHImporterMock >> importBranchesOf: aGLHProject [
+
+	self deprecated: #'It has been deprecated'
+]
+
+{ #category : #'import - repositories' }
+GLPHImporterMock >> importBranchesOfProject: aGLHProject [
+
+	^ aGLHProject repository branches
 ]
 
 { #category : #'import - commits' }
