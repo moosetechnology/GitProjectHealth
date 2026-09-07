@@ -1,10 +1,6 @@
 Class {
 	#name : #GitlabModelImporter,
 	#superclass : #GitModelImporter,
-	#instVars : [
-		'withInitialCommits',
-		'withInitialMergeRequest'
-	],
 	#category : #'GitLabHealth-Model-Importer'
 }
 
@@ -179,28 +175,26 @@ GitlabModelImporter >> completeImportedProject: aGLHProject [
 		                   add: aGLHProject
 		                   unless: self blockOnIdEquality.
 
-	self importLatestPipelinesOfProject: importedProject.
+	self factoryImporter importLatestPipelinesOfProject: importedProject.
 
 	"aGLHProject creator: (self importUser: aGLHProject creator_id)."
 
-	(self importUser: importedProject creator_id) addCreatedProject:
-		importedProject.
+	(self factoryImporter importUser: importedProject creator_id)
+		addCreatedProject: importedProject.
 
-	
+
 	importedProject repository: GLHRepository new.
 	self glhModel add: importedProject repository.
 	self completeImportsOfRepository: importedProject repository.
-	
+
 
 	withInitialMergeRequest ifTrue: [
-		self
+		self factoryImporter
 			importMergeRequestsOfProject: importedProject
 			since: DateAndTime today
 			until: DateAndTime now ].
 
 	^ importedProject
-	
-
 ]
 
 { #category : #'import - repositories' }
@@ -589,18 +583,6 @@ GitlabModelImporter >> glhApi: anObject [
 		'Pharo-11.0.0+build.726.sha.aece1b5473acf3830a0e082c1bc3a15d4ff3522b (64 Bit)'.
 
 	repoApi := anObject
-]
-
-{ #category : #accessing }
-GitlabModelImporter >> glhModel [
-
-	^ glhModel
-]
-
-{ #category : #accessing }
-GitlabModelImporter >> glhModel: anObject [
-
-	glhModel := anObject
 ]
 
 { #category : #'import - users' }
@@ -1570,7 +1552,7 @@ GitlabModelImporter >> importProject: aProjectID [
 	| result projectResult |
 	('Import project with id:  ' , aProjectID printString) recordInfo.
 
-	(glhModel allWithType: GLHProject)
+	(self glhModel allWithType: GLHProject)
 		detect: [ :project | project id = aProjectID ]
 		ifFound: [ :project | ^ project ].
 
@@ -2141,10 +2123,4 @@ GitlabModelImporter >> subGroupsOf: aGroupID [
 	subgroups := (results collect: [ :subgroupsJson | self parseSubGroupResult: subgroupsJson ]) flattened.
 	
 	^ subgroups
-]
-
-{ #category : #accessing }
-GitlabModelImporter >> withInitialCommits: aBoolean [
-
-	withInitialCommits := aBoolean
 ]

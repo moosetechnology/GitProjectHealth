@@ -87,7 +87,11 @@ GitLocalModelImporter >> createDiffFrom: patch and: delta [
 		glhDiff new_file: true ].
 	delta status = LGitDeltaTypeEnum git_delta_deleted ifTrue: [
 		glhDiff deleted_file: true ].
-	[glhDiff diffString: (patch patchString allButFirstLines: 2).] on: Error do: [ self flag: #'some illegal continuation byte for utf-8 encoding can appears here' ].
+	[ glhDiff diffString: (patch patchString allButFirstLines: 2) ]
+		on: Error
+		do: [
+			self flag:
+				#'some illegal continuation byte for utf-8 encoding can appears here' ].
 	^ glhDiff
 ]
 
@@ -103,12 +107,17 @@ GitLocalModelImporter >> gitRepository [
 GitLocalModelImporter >> gitRepositoryOf: aGLHRepository [
 
 	^ aGLHRepository cacheAt: #localImporterGitReference ifAbsentPut: [
-		(LGitRepository on: (aGLHRepository
-					  cacheAt: #localImporterReference
-					  ifAbsent: [
-						  Error signal: 'Local GLHRepository without importer reference' ]))
-			init;
-			yourself ]
+		  | val |
+		  val := aGLHRepository
+			  cacheAt: #localImporterReference
+			  ifAbsentPut: [ self tryClone: aGLHRepository project ].
+		  val ifNil: [
+			  Error signal: 'Local GLHRepository without importer reference' ].
+
+		  (LGitRepository on:
+				   (aGLHRepository cacheAt: #localImporterReference ifAbsent: [Error signal: 'Local GLHRepository without importer reference']))
+			  init;
+			  yourself ]
 ]
 
 { #category : #'import - branches' }
@@ -143,10 +152,12 @@ GitLocalModelImporter >> importCommit: aLGitCommit [
 	(self glhModel allWithType: GLHCommit) asOrderedCollection
 		detect: [ :comm | comm id = aLGitCommit name ]
 		ifFound: [ :comm | ^ comm ].
-		
 	commit := self glhModel newCommit
 		          id: aLGitCommit name;
+		          title:
+			          (aLGitCommit message lines ifEmpty: [ { '' } ]) first;
 		          message: aLGitCommit message;
+		          created_at: aLGitCommit time asDateAndTime;
 		          committed_date: aLGitCommit time asDateAndTime;
 		          committer_email: aLGitCommit author email;
 		          committer_name: aLGitCommit author name;
@@ -161,9 +172,28 @@ GitLocalModelImporter >> importCommit: aLGitCommit [
 ]
 
 { #category : #'import - commits' }
+GitLocalModelImporter >> importCommit: aCommitID ofProject: aGLHProject [
+
+	| gitCommit commit |
+	gitCommit := LGitCommit
+		             of: (self gitRepositoryOf: aGLHProject repository)
+		             fromHexString: aCommitID.
+
+	commit := self importCommit: gitCommit.
+	^ aGLHProject repository commits add: commit keyedBy: [ :el | el id ]
+]
+
+{ #category : #'import - commits' }
 GitLocalModelImporter >> importCommitsOfProject: aProject since: sinceDate until: untilDate [
 
-	self importCommitsOfRepository: aProject repository since: sinceDate until: untilDate
+	| commits |
+	commits := self
+		           importCommitsOfRepository: aProject repository
+		           since: sinceDate
+		           until: untilDate.
+	^ aProject repository commits
+		  addAll: commits
+		  keyedBy: [ :el | el id ]
 ]
 
 { #category : #'import - repositories' }
@@ -355,4 +385,26 @@ GitLocalModelImporter >> resolveCreatorOfCommit: aGLHCommit [
 			(self importUserByCommit: aGLHCommit) ].
 
 	^ aGLHCommit commitCreator
+]
+
+{ #category : #'as yet unclassified' }
+GitLocalModelImporter >> tryClone: aGLHProject [
+
+	| url clonePath gitUrl repo cloneOptions |
+	aGLHProject ifNil: [ ^ nil ].
+	url := aGLHProject web_url ifNil: [ ^ nil ].
+	clonePath := (FileSystem workingDirectory / 'msr' / aGLHProject name).
+	
+	clonePath exists ifTrue: [ ^ clonePath ].
+	clonePath ensureCreateDirectory.	
+	
+	gitUrl := url , '.git'.
+	repo := LGitRepository on: clonePath.
+
+	cloneOptions := repo cloneOptionsStructureClass
+		                withCredentialsProvider:
+		                (IceCredentialsProvider defaultForRemoteUrl: url).
+
+	repo clone: gitUrl options: cloneOptions.
+	^ clonePath
 ]
