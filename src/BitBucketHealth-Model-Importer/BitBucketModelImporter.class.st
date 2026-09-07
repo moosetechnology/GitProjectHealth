@@ -629,6 +629,7 @@ BitBucketModelImporter >> parseGroupResult: aDictionary [
 		  "use key instead of id because key is use everywhere else for API"
 		  description: (aDictionary at: #description);
 		  name: (aDictionary at: #name);
+		  display_name: (aDictionary at: #name);
 		  web_url: ((aDictionary at: #links at: #self) anyOne at: #href);
 		  yourself
 ]
