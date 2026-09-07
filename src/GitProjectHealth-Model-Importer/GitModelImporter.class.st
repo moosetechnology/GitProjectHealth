@@ -430,6 +430,12 @@ GitModelImporter >> glhModel: anObject [
 	glhModel := anObject
 ]
 
+{ #category : #'import - pipelines' }
+GitModelImporter >> importAllPipelinesOfProject: aGLHProject [
+	self subclassResponsibility 
+	
+]
+
 { #category : #'import - commits' }
 GitModelImporter >> importAndLoadLatestsCommitsOfProject: aGLHProject [
 

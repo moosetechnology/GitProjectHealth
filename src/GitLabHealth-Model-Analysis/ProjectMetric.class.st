@@ -22,7 +22,7 @@ ProjectMetric class >> isAbstract [
 ProjectMetric >> loadAllBranches [
 
 	| branches |
-	branches := glhImporter importBranchesOf: project.
+	branches := glhImporter importBranchesOfProject: project.
 	branches do: [ :branch | glhImporter importRefCommitOfBranch: branch ].
 	^ branches
 ]
