@@ -99,3 +99,15 @@ GitModelImporterTest >> testParseEmptyDiffString [
 	"Then"
 	self assert: diffRange isEmpty
 ]
+
+{ #category : #tests }
+GitModelImporterTest >> testWithCommitsSinceAcceptsDate [
+
+      | aDate |
+      aDate := Date today.
+
+      importer withCommitsSince: aDate.
+
+      self assert: importer withCommitsSince class equals: DateAndTime.
+      self assert: importer withCommitsSince equals: aDate asDateAndTime
+]
