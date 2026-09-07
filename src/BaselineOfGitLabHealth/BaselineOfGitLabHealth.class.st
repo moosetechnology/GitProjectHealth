@@ -49,18 +49,19 @@ BaselineOfGitLabHealth >> defineDependencies: spec [
 
 	spec
 		baseline: 'GitlabAPI'
-		with: [
-		spec repository: 'github://Evref-BL/Gitlab-Pharo-API:main' ].
-	
-		spec
+		with: [ spec repository: 'github://Evref-BL/Gitlab-Pharo-API:main' ].
+
+	spec
 		baseline: 'GithubAPI'
-		with: [
-		spec repository: 'github://Evref-BL/github-Pharo-API:main' ].
+		with: [ spec repository: 'github://Evref-BL/github-Pharo-API:main' ].
 
 	spec
 		baseline: 'BitbucketPharoAPI'
 		with: [
-		spec repository: 'github://Evref-BL/Bitbucket-Pharo-API:main' ]
+		spec repository: 'github://Evref-BL/Bitbucket-Pharo-API:main' ].
+	spec
+		baseline: 'GitBridge'
+		with: [ spec repository: 'github://jecisc/GitBridge:v1.0.2/src' ]
 ]
 
 { #category : #baselines }
@@ -102,7 +103,9 @@ BaselineOfGitLabHealth >> defineGroups: spec [
 			   'GitLabHealth-Visualization' 'GitLabProjectHealth-Model-Importer'
 			   'GitProjectHealth-Model-Importer-Tests'
 			   'BitBucketHealth-Model-Importer'
-			   'BitBucketHealth-Model-Importer-Tests' ).
+			   'BitBucketHealth-Model-Importer-Tests'
+			   'GitProjectHealth-Model-LocalImporter'
+			   'GitProjectHealth-Model-LocalImporter-Tests' ).
 	spec group: 'default' with: #( 'Core' )
 ]
 
@@ -129,14 +132,21 @@ BaselineOfGitLabHealth >> defineJiraConnector: spec [
 
 { #category : #baselines }
 BaselineOfGitLabHealth >> definePackages: spec [
-	
 	"generic"
+
 	spec
 		package: 'GitProjectHealth-Model-Importer'
 		with: [ spec requires: #( 'GitLabHealth-Model' ) ].
 	spec
 		package: 'GitProjectHealth-Model-Importer-Tests'
 		with: [ spec requires: #( 'GitProjectHealth-Model-Importer' ) ].
+
+	"test utility"
+	spec
+		package: 'GitProjectHealth-Bridge'
+		with: [ spec requires: #( 'GitBridge' ) ].
+
+
 
 	"model"
 	spec
@@ -178,6 +188,17 @@ BaselineOfGitLabHealth >> definePackages: spec [
 		package: 'GitHubHealth-Model-Importer-Tests'
 		with: [ spec requires: #( 'GitHubHealth-Model-Importer' ) ].
 
+	"local"
+
+	spec package: 'GitProjectHealth-Model-LocalImporter' with: [
+		spec requires:
+			#( 'GitProjectHealth-Model-Importer'
+			   'GitLabHealth-Model-Extension' ) ].
+
+
+	spec
+		package: 'GitProjectHealth-Model-LocalImporter-Tests'
+		with: [ spec requires: #( 'GitProjectHealth-Model-LocalImporter' 'GitProjectHealth-Bridge' ) ].
 
 	"model extension"
 	spec

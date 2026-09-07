@@ -31,7 +31,7 @@ GitlabModelImporterRemoteTest >> model [
 	^ self class resources first current model
 ]
 
-{ #category : #test }
+{ #category : #tests }
 GitlabModelImporterRemoteTest >> testFilterCommitChanges [
 
 	| importer collection resultCollection |

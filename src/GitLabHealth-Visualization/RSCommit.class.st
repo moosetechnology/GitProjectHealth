@@ -140,7 +140,7 @@ RSCommit >> buildCommitDiffFileImpact [
 	shapes := RSGroup new.
 
 
-	aCommit diffsGroup do: [ :diff |
+	aCommit diffs do: [ :diff |
 		shapes add:
 			(RSCommitDiff new
 				 shapeForDiffRange: diff

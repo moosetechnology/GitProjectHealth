@@ -237,7 +237,7 @@ TGitModelImporterTest >> defaultProject [
 TGitModelImporterTest >> testImportBranchesOf [
 
 	| collection element |
-	collection := importer importBranchesOf: self defaultProject.
+	collection := importer importBranchesOfProject: self defaultProject.
 
 	self assert: collection isCollection.
 

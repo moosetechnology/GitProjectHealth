@@ -292,7 +292,7 @@ GLHMetamodelGenerator >> defineRelations [
 	(pipeline property: #jobs) <>-* (job property: #pipeline).
 	(pipeline property: #user) *- (user property: #launchedPipelines).
 	(user property: #jobs) <>-* (job property: #user).
-	(diff property: #file) <>-* (file property: #diffs).
+	(diff property: #file) *-* (file property: #diffs).
 	(diff property: #diffRanges) <>-* (diffRange property: #diff).
 	(diffRange property: #changes) -* (change property: #diffRange).
 

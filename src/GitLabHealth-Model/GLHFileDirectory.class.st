@@ -16,7 +16,10 @@ Class {
 	#name : #GLHFileDirectory,
 	#superclass : #GLHFile,
 	#instVars : [
-		'#files => FMMany type: #GLHFile opposite: #directoryOwner'
+		'#files => FMMany type: #GLHFile opposite: #directoryOwner',
+		'#coverage',
+		'#numberOfFilesTop1Dev',
+		'#truckFactor'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }

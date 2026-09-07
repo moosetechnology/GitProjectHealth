@@ -8,9 +8,54 @@ MooseAbstractGroup >> add: anElmt unless: aConditionAsBlock [
 ]
 
 { #category : #'*GitLabHealth-Model-Extension' }
+MooseAbstractGroup >> addAll: anElmtCollection keyedBy: aConditionAsBlock [
+	"()>>>"
+
+	anElmtCollection ifEmpty: [ ^ {} ].
+	^ self
+		addAll: anElmtCollection
+		ofType: anElmtCollection first class
+		keyedBy: aConditionAsBlock
+]
+
+{ #category : #'*GitLabHealth-Model-Extension' }
+MooseAbstractGroup >> addAll: anElmtCollection ofType: aType keyedBy: aKeyBlock [
+
+    | existingElements elementByKey result |
+
+    existingElements := self allWithType: aType.
+
+    elementByKey := Dictionary new:
+        existingElements size + anElmtCollection size.
+
+    result := OrderedCollection new: anElmtCollection size.
+
+    "Indexe les éléments déjà présents.
+    En cas de doublon existant, conserve le premier."
+    existingElements do: [ :existing |
+        elementByKey
+            at: (aKeyBlock value: existing)
+            ifAbsentPut: [ existing ] ].
+
+    anElmtCollection do: [ :candidate |
+        | canonicalElement |
+
+        canonicalElement := elementByKey
+            at: (aKeyBlock value: candidate)
+            ifAbsentPut: [
+                self add: candidate.
+                candidate ].
+
+        result add: canonicalElement ].
+
+    ^ result
+]
+
+{ #category : #'*GitLabHealth-Model-Extension' }
 MooseAbstractGroup >> addAll: anElmtCollection ofType: aType unless: aConditionAsBlock [
 
 	| originalCollection returnCollection |
+	"you should use addAll: anElmtCollection ofType: aType keyedBy: aKeyBlock if possible"
 	originalCollection := (self allWithType: aType).
 	"Create same kind of collection"
 	returnCollection := OrderedCollection new.

@@ -71,8 +71,8 @@ GithubModelImporter >> completeImportedProject: aGLHProject [
 	aGLHProject repository: GLHRepository new.
 	self glhModel add: aGLHProject repository.
 
-	self importPipelinesOfProject: aGLHProject.
-	self importBranchesOf: aGLHProject.
+	self importAllPipelinesOfProject: aGLHProject.
+	self importBranchesOfProject: aGLHProject.
 	self withCommitsSince ifNotNil: [ :withCommitSince | "If not nil, it means we have to import commit"
 		| commits |
 		commits := self importCommitsOfProject: aGLHProject.
@@ -271,7 +271,6 @@ GithubModelImporter >> configureReaderForPipeline: reader [
 	reader
 		for: GLHPipeline
 		do: [ :mapping | "mapping mapInstVar: #status to: #conclusion."
-			
 		(mapping mapInstVar: #created_at) valueSchema: DateAndTime.
 		(mapping mapInstVar: #updated_at) valueSchema: DateAndTime.
 			
@@ -286,8 +285,7 @@ GithubModelImporter >> configureReaderForPipeline: reader [
 				mapProperty: #conclusion
 				getter: [ :object | #ignore ]
 				setter: [ :object :value |
-					(object status isNil and: [ value isNotNil ]) ifTrue: [
-						object status: value ] ].
+					value ifNotNil: [ object status: value ] ].
 
 			mapping
 				mapProperty: #run_started_at
@@ -343,6 +341,20 @@ GithubModelImporter >> ensureGroupNamed: aGroupName [
 		  ifNone: [ self glhModel newGroupNamed: aGroupName ]
 ]
 
+{ #category : #'import - pipelines' }
+GithubModelImporter >> importAllPipelinesOfProject: project [
+
+	"add the pipeline (actions runs) in the project"
+
+	| pipelinesResult ghApiPipelineOverview |
+	pipelinesResult := self repoApi actions
+		                   getLatestForRepo: project name
+		                   ofOwner: project group name.
+	ghApiPipelineOverview := self parsePipelinesResult: pipelinesResult.
+	ghApiPipelineOverview workflow_runs do: [ :pipeline | 
+		project addPipeline: pipeline ]
+]
+
 { #category : #'import - branches' }
 GithubModelImporter >> importBranchesOf: aGLHProject [
 	"add the pipeline (actions runs) in the project"
@@ -379,7 +391,7 @@ GithubModelImporter >> importBranchesOf: aGLHProject [
 	^ branches
 ]
 
-{ #category : #'import - repositories' }
+{ #category : #'import - branches' }
 GithubModelImporter >> importBranchesOfProject: aGLHProject [
 	"add the pipeline (actions runs) in the project"
 
@@ -817,15 +829,21 @@ GithubModelImporter >> importPipelinesOfMergeRequest: aGLHMergeRequest [
 
 { #category : #'import - pipelines' }
 GithubModelImporter >> importPipelinesOfProject: project [
-
 	"add the pipeline (actions runs) in the project"
 
 	| pipelinesResult ghApiPipelineOverview |
+	self
+		deprecated:
+		'Use importAllPipelinesOfProject: instead of current one'
+		on: '1 September 2026'
+		in:
+		'Pharo-12.0.0+SNAPSHOT.build.1571.sha.cf5fcd22e66957962c97dffc58b0393b7f368147 (64 Bit)'.
+
 	pipelinesResult := self repoApi actions
 		                   getLatestForRepo: project name
 		                   ofOwner: project group name.
 	ghApiPipelineOverview := self parsePipelinesResult: pipelinesResult.
-	ghApiPipelineOverview workflow_runs do: [ :pipeline | 
+	ghApiPipelineOverview workflow_runs do: [ :pipeline |
 		project addPipeline: pipeline ]
 ]
 
