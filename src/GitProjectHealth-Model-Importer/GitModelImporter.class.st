@@ -192,7 +192,7 @@ GitModelImporter >> blockOnNameEquality [
 	^ self blockEqualityOn: #name
 ]
 
-{ #category : #utils }
+{ #category : #utilities }
 GitModelImporter >> chainsCommitsFrom: commitsCollection [
 
 	| dic |
@@ -612,6 +612,8 @@ GitModelImporter >> importLatestReleaseOfProject: aGLHProject [
 
 { #category : #'import - merge-requests' }
 GitModelImporter >> importMergeRequestCommits: mergeRequest [
+
+	self subclassResponsibility
 ]
 
 { #category : #'import - merge-requests' }

@@ -53,10 +53,28 @@ GitModelMixedImporter >> importCommitsOfProject: aGLHProject since: since until:
 	^ self localImporter importCommitsOfProject: aGLHProject since: since until: until
 ]
 
+{ #category : #'import - diffs' }
+GitModelMixedImporter >> importDiffOfCommit: aCommit [
+
+	^ self localImporter importDiffOfCommit: aCommit
+]
+
 { #category : #'import - pipelines' }
 GitModelMixedImporter >> importLatestPipelinesOfProject: aGLHProject [
 
 	^ self apiImporter importLatestPipelinesOfProject: aGLHProject
+]
+
+{ #category : #'import - merge-requests' }
+GitModelMixedImporter >> importMergeRequestCommits: mergeRequest [
+
+	^ self apiImporter importMergeRequestCommits: mergeRequest
+]
+
+{ #category : #'import - merge-requests' }
+GitModelMixedImporter >> importMergeRequestMergeCommits: aGLHMergeRequest [
+
+	^ self apiImporter importMergeRequestMergeCommits: aGLHMergeRequest
 ]
 
 { #category : #'import - merge-requests' }
@@ -77,6 +95,12 @@ GitModelMixedImporter >> importUser: aUserID [
 	^ self apiImporter importUser: aUserID
 ]
 
+{ #category : #'import - users' }
+GitModelMixedImporter >> importUserByUsername: username [
+
+	^ self apiImporter importUserByUsername: username
+]
+
 { #category : #accessing }
 GitModelMixedImporter >> localImporter [
 
@@ -88,4 +112,20 @@ GitModelMixedImporter >> localImporter: anObject [
 
 	localImporter := anObject.
 	localImporter factoryImporter: self
+]
+
+{ #category : #accessing }
+GitModelMixedImporter >> withCommitDiffs: aBoolean [
+
+	super withCommitDiffs: aBoolean.
+	self localImporter withCommitDiffs: aBoolean.
+	self apiImporter withCommitDiffs: aBoolean.
+]
+
+{ #category : #accessing }
+GitModelMixedImporter >> withDiffRanges: aBoolean [
+
+	super withDiffRanges: aBoolean.
+	self localImporter ifNotNil: [ :importer | importer withDiffRanges: aBoolean ].
+	self apiImporter ifNotNil: [ :importer | importer withDiffRanges: aBoolean ].
 ]

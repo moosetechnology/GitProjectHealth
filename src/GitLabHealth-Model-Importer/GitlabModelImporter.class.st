@@ -1190,16 +1190,22 @@ GitlabModelImporter >> importLatestReleaseOfProject: aGLHProject [
 	^ foundRelease.
 ]
 
-{ #category : #'import - commits' }
+{ #category : #'import - merge-requests' }
 GitlabModelImporter >> importMergeRequestCommits: aGLPHEMergeRequest [
 
 	| commits result |
 	aGLPHEMergeRequest commits ifNotNil: [ ^ aGLPHEMergeRequest commits ].
-	
-	result := self repoApi mergeRequests commitsOf: aGLPHEMergeRequest iid inProject: aGLPHEMergeRequest project id.
-	
-	commits := (result collect: [ :commitsJson | self parseCommitsResult: commitsJson ]) flattened.
-	commits := commits collect: [ :commit | self importCommit: commit id ofProject: aGLPHEMergeRequest project ].
+
+	result := self repoApi mergeRequests
+		          commitsOf: aGLPHEMergeRequest iid
+		          inProject: aGLPHEMergeRequest project id.
+
+	commits := (result collect: [ :commitsJson |
+		            self parseCommitsResult: commitsJson ]) flattened.
+	commits := commits collect: [ :commit | "Could we use factory.. unsure because sometimes commits of squashed MR are only saved on remote"
+		           self
+			           importCommit: commit id
+			           ofProject: aGLPHEMergeRequest project ].
 	aGLPHEMergeRequest commits: commits.
 
 

@@ -95,6 +95,31 @@ GitLocalModelImporter >> createDiffFrom: patch and: delta [
 	^ glhDiff
 ]
 
+{ #category : #operation }
+GitLocalModelImporter >> fetchMRRemotes: repo [
+
+	| refspecMR remote |
+	"But will miss old ones https://stackoverflow.com/a/75139038/5257140"
+	remote := repo allRemotes detect: [ :remote |
+		          remote remoteName = 'origin' ].
+	refspecMR := LGitRefSpec fromString:
+		             '+refs/merge-requests/*/head:refs/remotes/origin/mr/*'.
+	remote fetchSpec: refspecMR.
+	remote
+		fetchWithCredentials:
+		(IceCredentialsProvider defaultForRemoteUrl: remote url)
+		refSpec: refspecMR
+]
+
+{ #category : #accessing }
+GitLocalModelImporter >> gitCommitOf: aGLHCommit [
+
+	^ aGLHCommit cacheAt: #importerOrigin ifAbsentPut: [
+		  LGitCommit
+			  of: (self gitRepositoryOf: aGLHCommit repository)
+			  fromHexString: aGLHCommit id ]
+]
+
 { #category : #'import - commits' }
 GitLocalModelImporter >> gitRepository [
 
@@ -148,7 +173,7 @@ GitLocalModelImporter >> importBranchesOfRepository: aGLHRepository [
 { #category : #'import - commits' }
 GitLocalModelImporter >> importCommit: aLGitCommit [
 
-	| commit |
+	| commit gitDiff stats |
 	(self glhModel allWithType: GLHCommit) asOrderedCollection
 		detect: [ :comm | comm id = aLGitCommit name ]
 		ifFound: [ :comm | ^ comm ].
@@ -167,6 +192,16 @@ GitLocalModelImporter >> importCommit: aLGitCommit [
 		          parent_ids:
 			          (aLGitCommit parents collect: [ :parent | parent name ]);
 		          yourself.
+	gitDiff := LGitDiff of: aLGitCommit repository.
+	gitDiff
+		diffTree: (LGitCommit
+				 of: aLGitCommit repository
+				 fromHexString: commit parent_ids anyOne) tree
+		toTree: aLGitCommit tree.
+	stats := LGitDiffStats of: aLGitCommit repository.
+	gitDiff diff_get_stats: stats diff: gitDiff.
+	commit additions: (stats diff_stats_insertions: stats).
+	commit deletions: (stats diff_stats_deletions: stats).
 	self resolveCreatorOfCommit: commit.
 	^ commit
 ]
@@ -209,7 +244,7 @@ GitLocalModelImporter >> importCommitsOfRepository: aGLHRepository [
 GitLocalModelImporter >> importCommitsOfRepository: aGPHRepository since: sinceDate until: untilDate [
 
 	| revwalk commits alreadyExploredCommit |
-	commits := OrderedCollection new.
+	commits := Set new.
 	"to stop when already explored"
 	alreadyExploredCommit := aGPHRepository commits
 		                         collect: [ :commit | commit id ]
@@ -217,21 +252,21 @@ GitLocalModelImporter >> importCommitsOfRepository: aGPHRepository since: sinceD
 	(self gitRepositoryOf: aGPHRepository) allBranches
 		select: #isLocal
 		thenDo: [ :branch |
-			| gphBranch shouldContinue lastBranchCommits |
+			| gphBranch shouldContinue currentBranchCommit |
 			gphBranch := (glhModel allWithType: GLHBranch)
 				             detect: [ :gBranch | branch gitName = gBranch name ]
 				             ifNone: [ nil ].
 
 			revwalk := LGitRevwalk of: (self gitRepositoryOf: aGPHRepository).
 			revwalk pushReference: branch.
-			lastBranchCommits := nil.
+			currentBranchCommit := nil.
 			shouldContinue := true.
 			[
 			| glhCommit gitCommit |
 			gitCommit := revwalk next.
 			glhCommit := self importCommit: gitCommit.
 
-			lastBranchCommits := glhCommit.
+			currentBranchCommit := glhCommit.
 			commits add: glhCommit.
 			alreadyExploredCommit add: glhCommit id.
 			glhCommit cacheAt: #importerOrigin put: gitCommit.
@@ -239,8 +274,8 @@ GitLocalModelImporter >> importCommitsOfRepository: aGPHRepository since: sinceD
 			gphBranch commits ifEmpty: [ gphBranch addCommit: glhCommit ] ]
 				doWhileTrue: [
 					revwalk hasNext and: [
-						lastBranchCommits committed_date > sinceDate and: [
-							(lastBranchCommits parent_ids anySatisfy: [ :id |
+						currentBranchCommit committed_date > sinceDate and: [
+							(currentBranchCommit parent_ids anySatisfy: [ :id |
 								 alreadyExploredCommit includes: id ]) not ] ] ].
 
 			self chainsCommitsFrom: commits ].
@@ -252,30 +287,26 @@ GitLocalModelImporter >> importCommitsOfRepository: aGPHRepository since: sinceD
 		self withFiles ifTrue: [
 			self connectDiffs: diffs inside: aGPHRepository ] ].
 
-
-	^ commits
+	^ (self glhModel allWithType: GLHCommit)  select: [ :commit | commit committed_date between: sinceDate and: untilDate ]
 ]
 
 { #category : #'import - diffs' }
 GitLocalModelImporter >> importDiffOfCommit: commit [
 
 	| sourceCommit parentCommit gitDiff |
-	sourceCommit := commit
-		                cacheAt: #importerOrigin
-		                ifAbsent: [ Error signal: 'missing importer origin' ].
+	sourceCommit := self gitCommitOf: commit.
 	gitDiff := LGitDiff of: sourceCommit repository.
 
 	commit parentCommits
 		ifNotEmpty: [
-			parentCommit := commit parentCommits anyOne
-				                cacheAt: #importerOrigin
-				                ifAbsent: [
-				                Error signal: 'missing importer origin' ].
+			parentCommit := self gitCommitOf: commit parentCommits anyOne.
 			gitDiff := gitDiff
 				           diffTree: parentCommit tree
 				           toTree: sourceCommit tree ]
 		ifEmpty: [
-		gitDiff := gitDiff diffTree: FFIExternalObject null toTree: sourceCommit tree ].
+			gitDiff := gitDiff
+				           diffTree: FFIExternalObject null
+				           toTree: sourceCommit tree ].
 
 	gitDiff diffFindSimilar.
 	commit diffs: ((1 to: gitDiff numberOfDeltas) collect: [ :idx |
@@ -283,6 +314,7 @@ GitLocalModelImporter >> importDiffOfCommit: commit [
 			 delta := gitDiff deltas at: idx.
 			 patch := gitDiff patchAt: idx.
 			 self createDiffFrom: patch and: delta ]).
+
 	"changes are added into the model during the import"
 	self withDiffRanges ifTrue: [
 		commit diffs do: [ :diff |
@@ -332,7 +364,7 @@ GitLocalModelImporter >> importLatestCommitsOfProject [
 GitLocalModelImporter >> importLatestCommitsOfProject: aGLHProject [
 	"this importer load based on inner state local git repository"
 
-	self importLatestCommitsOfProject 
+	^ self importLatestCommitsOfProject 
 ]
 
 { #category : #'import - repositories' }
@@ -387,24 +419,21 @@ GitLocalModelImporter >> resolveCreatorOfCommit: aGLHCommit [
 	^ aGLHCommit commitCreator
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #operation }
 GitLocalModelImporter >> tryClone: aGLHProject [
 
 	| url clonePath gitUrl repo cloneOptions |
 	aGLHProject ifNil: [ ^ nil ].
 	url := aGLHProject web_url ifNil: [ ^ nil ].
-	clonePath := (FileSystem workingDirectory / 'msr' / aGLHProject name).
-	
+	clonePath := FileSystem workingDirectory / 'msr' / aGLHProject name.
 	clonePath exists ifTrue: [ ^ clonePath ].
-	clonePath ensureCreateDirectory.	
-	
+	clonePath ensureCreateDirectory.
 	gitUrl := url , '.git'.
 	repo := LGitRepository on: clonePath.
-
 	cloneOptions := repo cloneOptionsStructureClass
 		                withCredentialsProvider:
 		                (IceCredentialsProvider defaultForRemoteUrl: url).
-
 	repo clone: gitUrl options: cloneOptions.
+	self fetchMRRemotes: repo.
 	^ clonePath
 ]
