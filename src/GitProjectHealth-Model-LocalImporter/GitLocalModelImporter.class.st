@@ -154,13 +154,14 @@ GitLocalModelImporter >> importBranchesOfRepository: aGLHRepository [
 	| branches headCommit |
 	headCommit := (self gitRepositoryOf: aGLHRepository) head object.
 	branches := (self gitRepositoryOf: aGLHRepository) allBranches
-		            select: [ :branch | branch isBranch ]
-		            thenCollect: [ :branch |
+		            collect: [ :branch |
 			            GLHBranch new
 				            name: branch gitName;
-				            sha: branch targetId hexString;
+				            sha: branch annotatedCommit id hexString;
 				            yourself ].
-	aGLHRepository branches addAll: branches.
+	aGLHRepository branches
+		addAll: branches
+		keyedBy: [ :el | el name ].
 	self glhModel addAll: branches keyedBy: [ :el |
 		{
 			el name.
