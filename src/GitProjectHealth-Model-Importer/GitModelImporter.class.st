@@ -100,21 +100,6 @@ GitModelImporter class >> forGitlabWithToken: anApiToken andModel: aGitModel [
 	^ self forGitlabHostOn: 'https://gitlab.com/api/v4' withToken: anApiToken andModel: aGitModel
 ]
 
-{ #category : #'accessing - global variables' }
-GitModelImporter class >> importers [
-	^ currentImporter 
-]
-
-{ #category : #'class initialization' }
-GitModelImporter class >> initialize [ 
-	currentImporter := Dictionary new. 
-]
-
-{ #category : #'class initialization' }
-GitModelImporter class >> reset [
-	currentImporter := OrderedDictionary new.
-]
-
 { #category : #initialization }
 GitModelImporter >> beWithFiles [
 
@@ -758,19 +743,6 @@ GitModelImporter >> initialize [
 		                 yourself.
 
 	self initReader
-]
-
-{ #category : #initialization }
-GitModelImporter >> makeGlobal [
-	^ self makeGlobal: DateAndTime now printString.
-]
-
-{ #category : #initialization }
-GitModelImporter >> makeGlobal: aLabel [ 
-
-	currentImporter := GithubModelImporter importers ifNil: [ OrderedDictionary new ].
-	currentImporter at: aLabel put: self. 
-	^ currentImporter 
 ]
 
 { #category : #parsing }
