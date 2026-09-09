@@ -64,7 +64,10 @@ GitLocalModelImporter >> connectDiffs: diffs inside: aGPHRepository [
 		indexedFiles := (aGPHRepository allToScope: GLHFile)
 			                collect: [ :el | el path -> el ]
 			                as: Dictionary ].
-	diffs do: [ :diff |
+	"reverse order to have a smart rename history"
+	(diffs asOrderedCollection sort: [ :diffA :diffB |
+		 diffA commit committed_date > diffB commit committed_date ]) do: [
+		:diff |
 		indexedFiles
 			at: diff new_path
 			ifPresent: [ :gphFile |
