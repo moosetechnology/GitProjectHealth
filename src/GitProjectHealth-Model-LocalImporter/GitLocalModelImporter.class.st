@@ -173,7 +173,7 @@ GitLocalModelImporter >> importBranchesOfRepository: aGLHRepository [
 { #category : #'import - commits' }
 GitLocalModelImporter >> importCommit: aLGitCommit [
 
-	| commit gitDiff stats |
+	| commit gitDiff stats parentTree |
 	(self glhModel allWithType: GLHCommit) asOrderedCollection
 		detect: [ :comm | comm id = aLGitCommit name ]
 		ifFound: [ :comm | ^ comm ].
@@ -193,11 +193,13 @@ GitLocalModelImporter >> importCommit: aLGitCommit [
 			          (aLGitCommit parents collect: [ :parent | parent name ]);
 		          yourself.
 	gitDiff := LGitDiff of: aLGitCommit repository.
-	gitDiff
-		diffTree: (LGitCommit
-				 of: aLGitCommit repository
-				 fromHexString: commit parent_ids anyOne) tree
-		toTree: aLGitCommit tree.
+	parentTree := commit parent_ids
+		              ifNotEmpty: [ :parentIds |
+			              (LGitCommit
+				               of: aLGitCommit repository
+				               fromHexString: parentIds anyOne) tree ]
+		              ifEmpty: [ FFIExternalObject null ].
+	gitDiff diffTree: parentTree toTree: aLGitCommit tree.
 	stats := LGitDiffStats of: aLGitCommit repository.
 	gitDiff diff_get_stats: stats diff: gitDiff.
 	commit additions: (stats diff_stats_insertions: stats).
@@ -221,14 +223,10 @@ GitLocalModelImporter >> importCommit: aCommitID ofProject: aGLHProject [
 { #category : #'import - commits' }
 GitLocalModelImporter >> importCommitsOfProject: aProject since: sinceDate until: untilDate [
 
-	| commits |
-	commits := self
-		           importCommitsOfRepository: aProject repository
-		           since: sinceDate
-		           until: untilDate.
-	^ aProject repository commits
-		  addAll: commits
-		  keyedBy: [ :el | el id ]
+	^ self
+		  importCommitsOfRepository: aProject repository
+		  since: sinceDate
+		  until: untilDate
 ]
 
 { #category : #'import - repositories' }
@@ -243,7 +241,7 @@ GitLocalModelImporter >> importCommitsOfRepository: aGLHRepository [
 { #category : #'import - commits' }
 GitLocalModelImporter >> importCommitsOfRepository: aGPHRepository since: sinceDate until: untilDate [
 
-	| revwalk commits alreadyExploredCommit |
+	| revwalk commits alreadyExploredCommit toReturn |
 	commits := Set new.
 	"to stop when already explored"
 	alreadyExploredCommit := aGPHRepository commits
@@ -286,8 +284,13 @@ GitLocalModelImporter >> importCommitsOfRepository: aGPHRepository since: sinceD
 			         self importDiffOfCommit: commit ].
 		self withFiles ifTrue: [
 			self connectDiffs: diffs inside: aGPHRepository ] ].
-
-	^ (self glhModel allWithType: GLHCommit)  select: [ :commit | commit committed_date between: sinceDate and: untilDate ]
+	aGPHRepository commits addAll: commits keyedBy: [ :el | el id ].
+	toReturn := self glhModel allWithType: GLHCommit.
+	sinceDate ifNotNil: [
+		toReturn := toReturn select: [ :c | c committed_date > sinceDate ] ].
+	untilDate ifNotNil: [
+		toReturn := toReturn select: [ :c | c committed_date < untilDate ] ].
+	^ toReturn
 ]
 
 { #category : #'import - diffs' }

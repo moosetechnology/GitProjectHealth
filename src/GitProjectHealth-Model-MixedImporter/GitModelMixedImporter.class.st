@@ -56,7 +56,9 @@ GitModelMixedImporter >> importCommitsOfProject: aGLHProject since: since until:
 { #category : #'import - diffs' }
 GitModelMixedImporter >> importDiffOfCommit: aCommit [
 
-	^ self localImporter importDiffOfCommit: aCommit
+	^ [ self localImporter importDiffOfCommit: aCommit ]
+		  on: LGit_GIT_ENOTFOUND
+		  do: [ self apiImporter importDiffOfCommit: aCommit ]
 ]
 
 { #category : #'import - pipelines' }
@@ -83,10 +85,22 @@ GitModelMixedImporter >> importMergeRequestsOfProject: aGLHProject since: fromDa
 	^ self apiImporter importMergeRequestsOfProject: aGLHProject since: fromDate until: toDate
 ]
 
+{ #category : #'import - notes' }
+GitModelMixedImporter >> importNotesOfMergeRequest: mergeRequest [
+
+	^ self apiImporter importNotesOfMergeRequest: mergeRequest
+]
+
 { #category : #'import - projects' }
 GitModelMixedImporter >> importProject: id [
 
 	^ self apiImporter importProject: id
+]
+
+{ #category : #'import - tags' }
+GitModelMixedImporter >> importTagsForProject: aGLHProject [
+
+	^ self apiImporter importTagsForProject: aGLHProject
 ]
 
 { #category : #'import - users' }
