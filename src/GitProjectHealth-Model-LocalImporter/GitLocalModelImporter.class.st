@@ -151,7 +151,7 @@ GitLocalModelImporter >> gitRepositoryOf: aGLHRepository [
 { #category : #'import - branches' }
 GitLocalModelImporter >> importBranchesOfRepository: aGLHRepository [
 
-	| branches headCommit |
+	| branches headCommit addedBranches |
 	headCommit := (self gitRepositoryOf: aGLHRepository) head object.
 	branches := (self gitRepositoryOf: aGLHRepository) allBranches
 		            collect: [ :branch |
@@ -159,19 +159,19 @@ GitLocalModelImporter >> importBranchesOfRepository: aGLHRepository [
 				            name: branch gitName;
 				            sha: branch annotatedCommit id hexString;
 				            yourself ].
-	aGLHRepository branches
-		addAll: branches
-		keyedBy: [ :el | el name ].
+	addedBranches := aGLHRepository branches
+		                 addAll: branches
+		                 keyedBy: [ :el | el name ].
 	self glhModel addAll: branches keyedBy: [ :el |
 		{
 			el name.
 			el repository } ].
 
 	self withFiles ifTrue: [
-		branches do: [ :branch | self importFilesOfBranch: branch ] ].
+		addedBranches do: [ :branch | self importFilesOfBranch: branch ] ].
 	(self gitRepositoryOf: aGLHRepository) resetHardTo: headCommit.
 
-	^ branches
+	^ addedBranches
 ]
 
 { #category : #'import - commits' }

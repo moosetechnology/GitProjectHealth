@@ -44,7 +44,11 @@ GitModelMixedImporter >> importBranchesOfRepository: aGLHRepository [
 { #category : #'import - commits' }
 GitModelMixedImporter >> importCommit: aCommitID ofProject: aGLHProject [
 
-	^ self localImporter importCommit: aCommitID ofProject: aGLHProject
+	^ [
+	  self localImporter importCommit: aCommitID ofProject: aGLHProject ]
+		  on: LGit_GIT_ENOTFOUND
+		  do: [
+		  self apiImporter importCommit: aCommitID ofProject: aGLHProject ]
 ]
 
 { #category : #'import - commits' }
