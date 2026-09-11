@@ -1,9 +1,6 @@
 Class {
 	#name : #BitBucketModelImporter,
 	#superclass : #GitModelImporter,
-	#instVars : [
-		'withInitialCommits'
-	],
 	#category : #'BitBucketHealth-Model-Importer'
 }
 
@@ -753,16 +750,4 @@ BitBucketModelImporter >> parseUserIntoGLHUser: userDictionnary [
 		  public_email: (userDictionnary at: #emailAddress ifAbsent: [ nil ]);
 		  id: (userDictionnary at: #id);
 		  username: (userDictionnary at: #name)
-]
-
-{ #category : #accessing }
-BitBucketModelImporter >> withInitialCommits [
-
-	^ withInitialCommits
-]
-
-{ #category : #accessing }
-BitBucketModelImporter >> withInitialCommits: anObject [
-
-	withInitialCommits := anObject
 ]

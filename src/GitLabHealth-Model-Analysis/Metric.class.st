@@ -51,8 +51,7 @@ Metric >> foundSuccessorOf: commits andCompleteImportForMax: commitLimit [
 			visitChildCommits: c childCommits
 			toStoreThemIn: analyzingCommits
 			upto: commitLimit.
-		analyzingCommits add: c.
-		 ].
+		analyzingCommits add: c ].
 
 	i := 0.
 	size := analyzingCommits size.
