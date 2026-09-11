@@ -337,7 +337,7 @@ GitLocalModelImporter >> importFilesOfBranch: aGLHBranch [
 	| gitBranch |
 	gitRepository := self gitRepositoryOf: aGLHBranch repository.
 	gitBranch := gitRepository allBranches detect: [ :branch |
-		             branch shortName = aGLHBranch name ].
+		             branch gitName = aGLHBranch name ].
 
 
 	gitRepository resetHardTo: gitBranch object.

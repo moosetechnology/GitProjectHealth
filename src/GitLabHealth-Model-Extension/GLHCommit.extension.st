@@ -1,6 +1,15 @@
 Extension { #name : #GLHCommit }
 
 { #category : #'*GitLabHealth-Model-Extension' }
+GLHCommit >> allBranches [
+	"A commit is associated to a branch only if it is the head of its branch. This method search all the branches by exploring the children commit "
+
+	^ (self
+		   deep: [ :commit | commit childCommits ]
+		   flatCollect: [ :commit | commit branch ]) , { self branch }
+]
+
+{ #category : #'*GitLabHealth-Model-Extension' }
 GLHCommit >> computeChurnForMaxCommits: aLimit [
 
 	^ GitAnalyzer new
