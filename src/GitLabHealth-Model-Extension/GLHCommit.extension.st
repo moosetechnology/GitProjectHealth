@@ -6,7 +6,7 @@ GLHCommit >> allBranches [
 
 	^ (self
 		   deep: [ :commit | commit childCommits ]
-		   flatCollect: [ :commit | commit branch ]) , { self branch }
+		   flatCollect: [ :commit | commit branch ]) , self branch
 ]
 
 { #category : #'*GitLabHealth-Model-Extension' }
