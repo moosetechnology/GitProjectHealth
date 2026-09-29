@@ -251,36 +251,32 @@ GitLocalModelImporter >> importCommitsOfRepository: aGPHRepository since: sinceD
 	alreadyExploredCommit := aGPHRepository commits
 		                         collect: [ :commit | commit id ]
 		                         as: Set.
-	(self gitRepositoryOf: aGPHRepository) allBranches
-		select: #isLocal
-		thenDo: [ :branch |
-			| gphBranch shouldContinue currentBranchCommit |
-			gphBranch := (glhModel allWithType: GLHBranch)
-				             detect: [ :gBranch | branch gitName = gBranch name ]
-				             ifNone: [ nil ].
+	(self gitRepositoryOf: aGPHRepository) allBranches do: [ :branch |
+		| gphBranch shouldContinue currentBranchCommit |
+		gphBranch := (glhModel allWithType: GLHBranch)
+			             detect: [ :gBranch | branch gitName = gBranch name ]
+			             ifNone: [ nil ].
 
-			revwalk := LGitRevwalk of: (self gitRepositoryOf: aGPHRepository).
-			revwalk pushReference: branch.
-			currentBranchCommit := nil.
-			shouldContinue := true.
-			[
-			| glhCommit gitCommit |
-			gitCommit := revwalk next.
-			glhCommit := self importCommit: gitCommit.
+		revwalk := LGitRevwalk of: (self gitRepositoryOf: aGPHRepository).
+		revwalk pushReference: branch.
+		currentBranchCommit := nil.
+		shouldContinue := true.
+		[
+		| glhCommit gitCommit |
+		gitCommit := revwalk next.
+		glhCommit := self importCommit: gitCommit.
 
-			currentBranchCommit := glhCommit.
-			commits add: glhCommit.
-			alreadyExploredCommit add: glhCommit id.
-			glhCommit cacheAt: #importerOrigin put: gitCommit.
+		currentBranchCommit := glhCommit.
+		commits add: glhCommit.
+		alreadyExploredCommit add: glhCommit id.
+		glhCommit cacheAt: #importerOrigin put: gitCommit.
 
-			gphBranch commits ifEmpty: [ gphBranch addCommit: glhCommit ] ]
-				doWhileTrue: [
-					revwalk hasNext and: [
-						currentBranchCommit committed_date > sinceDate and: [
-							(currentBranchCommit parent_ids anySatisfy: [ :id |
-								 alreadyExploredCommit includes: id ]) not ] ] ].
+		gphBranch commits ifEmpty: [ gphBranch addCommit: glhCommit ] ]
+			doWhileTrue: [
+				revwalk hasNext and: [
+					currentBranchCommit committed_date > sinceDate ] ].
 
-			self chainsCommitsFrom: commits ].
+		self chainsCommitsFrom: commits ].
 
 	self withCommitDiffs ifTrue: [
 		| diffs |
@@ -300,27 +296,32 @@ GitLocalModelImporter >> importCommitsOfRepository: aGPHRepository since: sinceD
 { #category : #'import - diffs' }
 GitLocalModelImporter >> importDiffOfCommit: commit [
 
-	| sourceCommit parentCommit gitDiff |
-	sourceCommit := self gitCommitOf: commit.
-	gitDiff := LGitDiff of: sourceCommit repository.
+	| sourceCommit gitDiff |
+	commit diffs ifNotEmpty: [
+		sourceCommit := self gitCommitOf: commit.
+		gitDiff := LGitDiff of: sourceCommit repository.
 
-	commit parentCommits
-		ifNotEmpty: [
-			parentCommit := self gitCommitOf: commit parentCommits anyOne.
-			gitDiff := gitDiff
-				           diffTree: parentCommit tree
-				           toTree: sourceCommit tree ]
-		ifEmpty: [
-			gitDiff := gitDiff
-				           diffTree: FFIExternalObject null
-				           toTree: sourceCommit tree ].
+		commit parent_ids
+			ifNotEmpty: [
+				| parentTree |
+				parentTree := commit parent_ids
+					              ifNotEmpty: [ :parentIds |
+						              (LGitCommit
+							               of: sourceCommit repository
+							               fromHexString: parentIds anyOne) tree ]
+					              ifEmpty: [ FFIExternalObject null ].
+				gitDiff := gitDiff diffTree: parentTree toTree: sourceCommit tree ]
+			ifEmpty: [
+				gitDiff := gitDiff
+					           diffTree: FFIExternalObject null
+					           toTree: sourceCommit tree ].
 
-	gitDiff diffFindSimilar.
-	commit diffs: ((1 to: gitDiff numberOfDeltas) collect: [ :idx |
-			 | delta patch |
-			 delta := gitDiff deltas at: idx.
-			 patch := gitDiff patchAt: idx.
-			 self createDiffFrom: patch and: delta ]).
+		gitDiff diffFindSimilar.
+		commit diffs: ((1 to: gitDiff numberOfDeltas) collect: [ :idx |
+				 | delta patch |
+				 delta := gitDiff deltas at: idx.
+				 patch := gitDiff patchAt: idx.
+				 self createDiffFrom: patch and: delta ]) ].
 
 	"changes are added into the model during the import"
 	self withDiffRanges ifTrue: [
