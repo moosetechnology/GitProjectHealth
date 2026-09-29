@@ -12,7 +12,7 @@ a Tag is a reference to a specific point in the repository's history
 ### Other
 | Relation | Origin | Opposite | Type | Comment |
 |---|
-| `commit` | `GLHTag` | `tag` | `GLHCommit` | |
+| `commit` | `GLHTag` | `tags` | `GLHCommit` | |
 | `release` | `GLHTag` | `tag` | `GLHRelease` | |
 
 
@@ -35,13 +35,13 @@ Class {
 	#traits : 'GLHTRef',
 	#classTraits : 'GLHTRef classTrait',
 	#instVars : [
-		'#message => FMProperty',
-		'#target => FMProperty',
-		'#protected => FMProperty',
+		'#commit => FMOne type: #GLHCommit opposite: #tags',
 		'#created_at => FMProperty',
-		'#commit => FMOne type: #GLHCommit opposite: #tag',
+		'#message => FMProperty',
+		'#protected => FMProperty',
 		'#release => FMOne type: #GLHRelease opposite: #tag',
-		'#repository => FMOne type: #GLHRepository opposite: #tags'
+		'#repository => FMOne type: #GLHRepository opposite: #tags',
+		'#target => FMProperty'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }
@@ -57,7 +57,7 @@ GLHTag class >> annotation [
 
 { #category : #accessing }
 GLHTag >> commit [
-	"Relation named: #commit type: #GLHCommit opposite: #tag"
+	"Relation named: #commit type: #GLHCommit opposite: #tags"
 
 	<generated>
 	^ commit

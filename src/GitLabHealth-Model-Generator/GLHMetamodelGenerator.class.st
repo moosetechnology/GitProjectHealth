@@ -685,7 +685,7 @@ GLHMetamodelGenerator >> tagProperties [
 
 { #category : #tags }
 GLHMetamodelGenerator >> tagRelations [
-	(tag property: #commit) - (commit property: #tag).
+	(tag property: #commit) *- (commit property: #tags).
 	(tag property: #release) - (release property: #tag).
 	(tag property: #repository) *-<> (repository property: #tags).
 ]

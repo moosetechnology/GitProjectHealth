@@ -16,10 +16,10 @@ Class {
 		'withCommitDiffs',
 		'generalReader',
 		'withCommitDiffsChanges',
-		'withDiffRanges'
-	],
-	#classVars : [
-		'currentImporter'
+		'withDiffRanges',
+		'withInitialCommits',
+		'withInitialMergeRequest',
+		'factoryImporter'
 	],
 	#category : #'GitProjectHealth-Model-Importer'
 }
@@ -100,21 +100,6 @@ GitModelImporter class >> forGitlabWithToken: anApiToken andModel: aGitModel [
 	^ self forGitlabHostOn: 'https://gitlab.com/api/v4' withToken: anApiToken andModel: aGitModel
 ]
 
-{ #category : #'accessing - global variables' }
-GitModelImporter class >> importers [
-	^ currentImporter 
-]
-
-{ #category : #'class initialization' }
-GitModelImporter class >> initialize [ 
-	currentImporter := Dictionary new. 
-]
-
-{ #category : #initialization }
-GitModelImporter class >> reset [
-	currentImporter := OrderedDictionary new.
-]
-
 { #category : #initialization }
 GitModelImporter >> beWithFiles [
 
@@ -148,14 +133,12 @@ GitModelImporter >> blockForBranchEquality [
 { #category : #equality }
 GitModelImporter >> blockForDiffEquality [
 
-^ [ :existing :new |
-	  | sameSize sameDiff sameFile |
-	  sameSize := existing diffString size = new diffString size.
+	^ [ :existing :new |
+	  | sameDiff sameFile |
 	  sameDiff := existing diffString = new diffString.
 	  sameFile := existing new_path = new new_path.
 
-	  sameSize and: [ sameDiff and: [ sameFile ] ].
- ]
+	  sameDiff and: [ sameFile ] ]
 ]
 
 { #category : #equality }
@@ -194,7 +177,7 @@ GitModelImporter >> blockOnNameEquality [
 	^ self blockEqualityOn: #name
 ]
 
-{ #category : #utils }
+{ #category : #utilities }
 GitModelImporter >> chainsCommitsFrom: commitsCollection [
 
 	| dic |
@@ -407,6 +390,18 @@ GitModelImporter >> configureReaderForUser: reader [
 	
 ]
 
+{ #category : #accessing }
+GitModelImporter >> factoryImporter [
+
+	^ factoryImporter
+]
+
+{ #category : #accessing }
+GitModelImporter >> factoryImporter: anObject [
+
+	factoryImporter := anObject
+]
+
 { #category : #utils }
 GitModelImporter >> filterCommitChanges: aCollection [
 
@@ -469,7 +464,7 @@ GitModelImporter >> importBranchesOf: aGLHProject [
 { #category : #'import - branches' }
 GitModelImporter >> importBranchesOfProject: aGLHProject [
 
-	^ self subclassResponsibility
+	^ self factoryImporter importBranchesOfRepository: aGLHProject repository
 ]
 
 { #category : #'import - branches' }
@@ -602,6 +597,8 @@ GitModelImporter >> importLatestReleaseOfProject: aGLHProject [
 
 { #category : #'import - merge-requests' }
 GitModelImporter >> importMergeRequestCommits: mergeRequest [
+
+	self subclassResponsibility
 ]
 
 { #category : #'import - merge-requests' }
@@ -740,24 +737,12 @@ GitModelImporter >> initialize [
 	self withFiles: false.
 	self withDiffRanges: false.
 	self withCommitsSince: (Date today - 1 week) asDateAndTime.
+	self factoryImporter: self.
 	userCatalogue := GLHUserCatalogueV2 new
 		                 anImporter: self;
 		                 yourself.
 
 	self initReader
-]
-
-{ #category : #initialization }
-GitModelImporter >> makeGlobal [
-	^ self makeGlobal: DateAndTime now printString.
-]
-
-{ #category : #initialization }
-GitModelImporter >> makeGlobal: aLabel [ 
-
-	currentImporter := GithubModelImporter importers ifNil: [ OrderedDictionary new ].
-	currentImporter at: aLabel put: self. 
-	^ currentImporter 
 ]
 
 { #category : #parsing }
@@ -891,4 +876,16 @@ GitModelImporter >> withFiles [
 GitModelImporter >> withFiles: aBoolean [
 
 	withFiles := aBoolean
+]
+
+{ #category : #accessing }
+GitModelImporter >> withInitialCommits [
+
+	^ withInitialCommits
+]
+
+{ #category : #accessing }
+GitModelImporter >> withInitialCommits: anObject [
+
+	withInitialCommits := anObject
 ]

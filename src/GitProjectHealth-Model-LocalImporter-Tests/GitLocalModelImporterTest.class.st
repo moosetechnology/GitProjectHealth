@@ -2,7 +2,7 @@
 This tests uses the test repository under GPHBridge (the files of the repository)
 "
 Class {
-	#name : #GitLocalModelImporterWithTestResourceTest,
+	#name : #GitLocalModelImporterTest,
 	#superclass : #TestCase,
 	#instVars : [
 		'localImporter',
@@ -13,13 +13,13 @@ Class {
 }
 
 { #category : #accessing }
-GitLocalModelImporterWithTestResourceTest class >> resources [
+GitLocalModelImporterTest class >> resources [
 
 	^ Array with: GitLocalModelImporterWithTestResource
 ]
 
 { #category : #running }
-GitLocalModelImporterWithTestResourceTest >> setUp [
+GitLocalModelImporterTest >> setUp [
 
 	super setUp.
 	localImporter := GitLocalModelImporter new.
@@ -39,7 +39,7 @@ GitLocalModelImporterWithTestResourceTest >> setUp [
 ]
 
 { #category : #tests }
-GitLocalModelImporterWithTestResourceTest >> testConnectionBetweenDivergingBranches [
+GitLocalModelImporterTest >> testConnectionBetweenDivergingBranches [
 
 	| lastCommitBranchB |
 	localImporter importRepository: repository.
@@ -50,7 +50,7 @@ GitLocalModelImporterWithTestResourceTest >> testConnectionBetweenDivergingBranc
 ]
 
 { #category : #tests }
-GitLocalModelImporterWithTestResourceTest >> testConnectionBetweenSuccessiveBranches [
+GitLocalModelImporterTest >> testConnectionBetweenSuccessiveBranches [
 
 	| lastCommitBranchB |
 	localImporter importRepository: repository.
@@ -66,7 +66,7 @@ GitLocalModelImporterWithTestResourceTest >> testConnectionBetweenSuccessiveBran
 ]
 
 { #category : #tests }
-GitLocalModelImporterWithTestResourceTest >> testFirstCommitHasADiff [
+GitLocalModelImporterTest >> testFirstCommitHasADiff [
 
 	| commit |
 	localImporter importRepository: repository.
@@ -76,7 +76,7 @@ GitLocalModelImporterWithTestResourceTest >> testFirstCommitHasADiff [
 ]
 
 { #category : #tests }
-GitLocalModelImporterWithTestResourceTest >> testHasRenamedField [
+GitLocalModelImporterTest >> testHasRenamedField [
 
 	| file renameCommit |
 	localImporter importRepository: repository.
@@ -90,7 +90,24 @@ GitLocalModelImporterWithTestResourceTest >> testHasRenamedField [
 ]
 
 { #category : #tests }
-GitLocalModelImporterWithTestResourceTest >> testImportFilesOfBranch [
+GitLocalModelImporterTest >> testImportCommitsOfRepositorySinceUntil [
+
+	| commits originalSize |
+	localImporter importBranchesOfRepository: repository.
+	commits := localImporter
+		           importCommitsOfRepository: repository
+		           since: (DateAndTime year: 2026 month: 9 day: 3)
+		           until: (DateAndTime year: 2026 month: 9 day: 5).
+	originalSize := commits size.
+	commits := localImporter
+		           importCommitsOfRepository: repository
+		           since: (DateAndTime year: 2026 month: 8 day: 3)
+		           until: (DateAndTime year: 2026 month: 9 day: 5).
+	self assert: originalSize < commits size
+]
+
+{ #category : #tests }
+GitLocalModelImporterTest >> testImportFilesOfBranch [
 
 	| file |
 	localImporter importRepository: repository.
@@ -100,7 +117,7 @@ GitLocalModelImporterWithTestResourceTest >> testImportFilesOfBranch [
 ]
 
 { #category : #tests }
-GitLocalModelImporterWithTestResourceTest >> testImportFilesOfBranchDoNotImportNotCommitedFile [
+GitLocalModelImporterTest >> testImportFilesOfBranchDoNotImportNotCommitedFile [
 
 	| file |
 	(GPHBridge testResources / 'testResource' / 'wrong-file.st')
@@ -113,7 +130,7 @@ GitLocalModelImporterWithTestResourceTest >> testImportFilesOfBranchDoNotImportN
 ]
 
 { #category : #tests }
-GitLocalModelImporterWithTestResourceTest >> testSameHeadCommitForTwoBranches [
+GitLocalModelImporterTest >> testSameHeadCommitForTwoBranches [
 
 	| branchA anotherBranchA |
 	localImporter importRepository: repository.

@@ -52,15 +52,13 @@ ProjectMetric >> loadCommitsSince: since until: until [
 		               until: until.
 
 	"download commits unless project cache is not empty"
-	allCommits := project repository
-			              cacheAt: cacheSymbol
-			              ifAbsentPut: [
-				              | foundCommits |
-				              foundCommits := glhImporter
-					                              importCommitsOfProject: project
-					                              since: since
-					                              until: until.
-				              foundCommits ].
+	allCommits := project repository cacheAt: cacheSymbol ifAbsentPut: [
+		              | foundCommits |
+		              foundCommits := glhImporter
+			                              importCommitsOfProject: project
+			                              since: since
+			                              until: until.
+		              foundCommits ].
 
 	allCommits do: [ :commit | glhImporter importCreatorOfCommit: commit ].
 	glhImporter chainsCommitsFrom: allCommits.
@@ -103,7 +101,9 @@ ProjectMetric >> loadMergeRequestsSince: since until: until [
 ProjectMetric >> loadProjectCompleteMergeRequestsSince: since until: until [
 
 	| mergeRequests |
-    mergeRequests := self loadProjectMergeRequestsSince:  since until: until.
+	mergeRequests := self
+		                 loadProjectMergeRequestsSince: since
+		                 until: until.
 
 	mergeRequests do: [ :mergeRequest |
 		glhImporter importMergeResquestMerger: mergeRequest.
