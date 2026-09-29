@@ -297,7 +297,7 @@ GitLocalModelImporter >> importCommitsOfRepository: aGPHRepository since: sinceD
 GitLocalModelImporter >> importDiffOfCommit: commit [
 
 	| sourceCommit gitDiff |
-	commit diffs ifNotEmpty: [
+	commit diffs ifEmpty: [
 		sourceCommit := self gitCommitOf: commit.
 		gitDiff := LGitDiff of: sourceCommit repository.
 
