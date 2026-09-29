@@ -23,6 +23,7 @@ A GitLab Group
 |---|
 | `avatar_url` | `String` | nil | |
 | `description` | `String` | nil | |
+| `display_name` | `String` | nil | |
 | `id` | `Number` | nil | |
 | `name` | `String` | nil | Basic name of the entity, not full reference.|
 | `visibility` | `String` | nil | |
@@ -35,14 +36,15 @@ Class {
 	#traits : 'FamixTNamedEntity',
 	#classTraits : 'FamixTNamedEntity classTrait',
 	#instVars : [
-		'#id => FMProperty',
-		'#web_url => FMProperty',
-		'#description => FMProperty',
-		'#visibility => FMProperty',
 		'#avatar_url => FMProperty',
+		'#description => FMProperty',
+		'#display_name => FMProperty',
+		'#group => FMOne type: #GLHGroup opposite: #subGroups',
+		'#id => FMProperty',
 		'#projects => FMMany type: #GLHProject opposite: #group',
 		'#subGroups => FMMany type: #GLHGroup opposite: #group',
-		'#group => FMOne type: #GLHGroup opposite: #subGroups'
+		'#visibility => FMProperty',
+		'#web_url => FMProperty'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }
@@ -101,6 +103,20 @@ GLHGroup >> description [
 GLHGroup >> description: anObject [
 	<generated>
 	description := anObject
+]
+
+{ #category : #accessing }
+GLHGroup >> display_name [
+
+	<FMProperty: #display_name type: #String>
+	<generated>
+	^ display_name
+]
+
+{ #category : #accessing }
+GLHGroup >> display_name: anObject [
+	<generated>
+	display_name := anObject
 ]
 
 { #category : #accessing }
