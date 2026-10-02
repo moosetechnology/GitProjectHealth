@@ -18,6 +18,15 @@ ProjectMetric class >> isAbstract [
 	^ self == ProjectMetric
 ]
 
+{ #category : #load }
+ProjectMetric >> loadAllBranches [
+
+	| branches |
+	branches := glhImporter importBranchesOfProject: project.
+	branches do: [ :branch | glhImporter importRefCommitOfBranch: branch ].
+	^ branches
+]
+
 { #category : #loading }
 ProjectMetric >> loadAllTags [
 
@@ -27,12 +36,8 @@ ProjectMetric >> loadAllTags [
 { #category : #load }
 ProjectMetric >> loadBranchesSince: since until: until [
 
-	| branches |
-	branches := glhImporter importBranchesOf: project.
-
-
-	branches do: [ :branch | glhImporter importRefCommitOfBranch: branch ].
-	^ branches
+	^ self loadAllBranches select: [ :branch |
+		  branch commits first committed_date between: since and: until ]
 ]
 
 { #category : #loading }
@@ -47,15 +52,13 @@ ProjectMetric >> loadCommitsSince: since until: until [
 		               until: until.
 
 	"download commits unless project cache is not empty"
-	allCommits := project repository
-			              cacheAt: cacheSymbol
-			              ifAbsentPut: [
-				              | foundCommits |
-				              foundCommits := glhImporter
-					                              importCommitsOfProject: project
-					                              since: since
-					                              until: until.
-				              foundCommits ].
+	allCommits := project repository cacheAt: cacheSymbol ifAbsentPut: [
+		              | foundCommits |
+		              foundCommits := glhImporter
+			                              importCommitsOfProject: project
+			                              since: since
+			                              until: until.
+		              foundCommits ].
 
 	allCommits do: [ :commit | glhImporter importCreatorOfCommit: commit ].
 	glhImporter chainsCommitsFrom: allCommits.
@@ -98,7 +101,9 @@ ProjectMetric >> loadMergeRequestsSince: since until: until [
 ProjectMetric >> loadProjectCompleteMergeRequestsSince: since until: until [
 
 	| mergeRequests |
-    mergeRequests := self loadProjectMergeRequestsSince:  since until: until.
+	mergeRequests := self
+		                 loadProjectMergeRequestsSince: since
+		                 until: until.
 
 	mergeRequests do: [ :mergeRequest |
 		glhImporter importMergeResquestMerger: mergeRequest.

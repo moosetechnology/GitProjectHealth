@@ -21,11 +21,11 @@ a commit attached to a repository
 |---|
 | `branch` | `GLHCommit` | `commits` | `GLHBranch` | |
 | `childCommits` | `GLHCommit` | `parentCommits` | `GLHCommit` | |
-| `commitedMergeRequest` | `GLHCommit` | `mergeRequestCommit` | `GLHMergeRequest` | |
 | `commitedMergeRequest` | `GLHCommit` | `mergedCommit` | `GLHMergeRequest` | |
+| `commitedMergeRequest` | `GLHCommit` | `mergeRequestCommit` | `GLHMergeRequest` | |
 | `parentCommits` | `GLHCommit` | `childCommits` | `GLHCommit` | |
 | `squashedMergeRequest` | `GLHCommit` | `squashCommit` | `GLHMergeRequest` | |
-| `tag` | `GLHCommit` | `commit` | `GLHTag` | |
+| `tags` | `GLHCommit` | `commit` | `GLHTag` | |
 
 
 ## Properties
@@ -58,31 +58,31 @@ Class {
 	#traits : 'FamixTNamedEntity + GLHTRef',
 	#classTraits : 'FamixTNamedEntity classTrait + GLHTRef classTrait',
 	#instVars : [
-		'#parent_ids => FMProperty defaultValue: \'OrderedCollection new\'',
-		'#id => FMProperty',
-		'#short_id => FMProperty',
-		'#title => FMProperty',
-		'#author_name => FMProperty',
-		'#author_email => FMProperty',
-		'#authored_date => FMProperty',
-		'#committer_name => FMProperty',
-		'#committer_email => FMProperty',
-		'#committed_date => FMProperty',
-		'#created_at => FMProperty',
-		'#message => FMProperty',
-		'#web_url => FMProperty',
 		'#additions => FMProperty',
-		'#deletions => FMProperty',
-		'#repository => FMOne type: #GLHRepository opposite: #commits',
+		'#author_email => FMProperty',
+		'#author_name => FMProperty',
+		'#authored_date => FMProperty',
 		'#branch => FMMany type: #GLHBranch opposite: #commits',
-		'#diffs => FMMany type: #GLHDiff opposite: #commit',
-		'#commitCreator => FMOne type: #GLHUser opposite: #commits',
-		'#parentCommits => FMMany type: #GLHCommit opposite: #childCommits',
 		'#childCommits => FMMany type: #GLHCommit opposite: #parentCommits',
-		'#jobs => FMMany type: #GLHJob opposite: #commit',
-		'#tag => FMOne type: #GLHTag opposite: #commit',
+		'#commitCreator => FMOne type: #GLHUser opposite: #commits',
 		'#commitedMergeRequest => FMOne type: #GLHMergeRequest opposite: #mergedCommit',
-		'#squashedMergeRequest => FMOne type: #GLHMergeRequest opposite: #squashCommit'
+		'#committed_date => FMProperty',
+		'#committer_email => FMProperty',
+		'#committer_name => FMProperty',
+		'#created_at => FMProperty',
+		'#deletions => FMProperty',
+		'#diffs => FMMany type: #GLHDiff opposite: #commit',
+		'#id => FMProperty',
+		'#jobs => FMMany type: #GLHJob opposite: #commit',
+		'#message => FMProperty',
+		'#parentCommits => FMMany type: #GLHCommit opposite: #childCommits',
+		'#parent_ids => FMProperty defaultValue: \'OrderedCollection new\'',
+		'#repository => FMOne type: #GLHRepository opposite: #commits',
+		'#short_id => FMProperty',
+		'#squashedMergeRequest => FMOne type: #GLHMergeRequest opposite: #squashCommit',
+		'#tags => FMMany type: #GLHTag opposite: #commit',
+		'#title => FMProperty',
+		'#web_url => FMProperty'
 	],
 	#category : #'GitLabHealth-Model-Entities'
 }
@@ -124,6 +124,12 @@ GLHCommit >> addJob: anObject [
 GLHCommit >> addParentCommit: anObject [
 	<generated>
 	^ self parentCommits add: anObject
+]
+
+{ #category : #adding }
+GLHCommit >> addTag: anObject [
+	<generated>
+	^ self tags add: anObject
 ]
 
 { #category : #accessing }
@@ -473,19 +479,19 @@ GLHCommit >> squashedMergeRequest: anObject [
 ]
 
 { #category : #accessing }
-GLHCommit >> tag [
-	"Relation named: #tag type: #GLHTag opposite: #commit"
+GLHCommit >> tags [
+	"Relation named: #tags type: #GLHTag opposite: #commit"
 
 	<generated>
 	<derived>
-	^ tag
+	^ tags
 ]
 
 { #category : #accessing }
-GLHCommit >> tag: anObject [
+GLHCommit >> tags: anObject [
 
 	<generated>
-	tag := anObject
+	tags value: anObject
 ]
 
 { #category : #accessing }

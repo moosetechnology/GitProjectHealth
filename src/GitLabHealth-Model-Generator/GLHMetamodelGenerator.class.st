@@ -292,7 +292,7 @@ GLHMetamodelGenerator >> defineRelations [
 	(pipeline property: #jobs) <>-* (job property: #pipeline).
 	(pipeline property: #user) *- (user property: #launchedPipelines).
 	(user property: #jobs) <>-* (job property: #user).
-	(diff property: #file) <>-* (file property: #diffs).
+	(diff property: #file) *-* (file property: #diffs).
 	(diff property: #diffRanges) <>-* (diffRange property: #diff).
 	(diffRange property: #changes) -* (change property: #diffRange).
 
@@ -685,7 +685,7 @@ GLHMetamodelGenerator >> tagProperties [
 
 { #category : #tags }
 GLHMetamodelGenerator >> tagRelations [
-	(tag property: #commit) - (commit property: #tag).
+	(tag property: #commit) *- (commit property: #tags).
 	(tag property: #release) - (release property: #tag).
 	(tag property: #repository) *-<> (repository property: #tags).
 ]

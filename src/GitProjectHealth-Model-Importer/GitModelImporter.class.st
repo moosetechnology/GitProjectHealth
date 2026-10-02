@@ -14,10 +14,12 @@ Class {
 		'userCatalogue',
 		'repoApi',
 		'withCommitDiffs',
-		'generalReader'
-	],
-	#classVars : [
-		'currentImporter'
+		'generalReader',
+		'withCommitDiffsChanges',
+		'withDiffRanges',
+		'withInitialCommits',
+		'withInitialMergeRequest',
+		'factoryImporter'
 	],
 	#category : #'GitProjectHealth-Model-Importer'
 }
@@ -98,21 +100,6 @@ GitModelImporter class >> forGitlabWithToken: anApiToken andModel: aGitModel [
 	^ self forGitlabHostOn: 'https://gitlab.com/api/v4' withToken: anApiToken andModel: aGitModel
 ]
 
-{ #category : #'accessing - global variables' }
-GitModelImporter class >> importers [
-	^ currentImporter 
-]
-
-{ #category : #'class initialization' }
-GitModelImporter class >> initialize [ 
-	currentImporter := Dictionary new. 
-]
-
-{ #category : #initialization }
-GitModelImporter class >> reset [
-	currentImporter := OrderedDictionary new.
-]
-
 { #category : #initialization }
 GitModelImporter >> beWithFiles [
 
@@ -146,14 +133,12 @@ GitModelImporter >> blockForBranchEquality [
 { #category : #equality }
 GitModelImporter >> blockForDiffEquality [
 
-^ [ :existing :new |
-	  | sameSize sameDiff sameFile |
-	  sameSize := existing diffString size = new diffString size.
+	^ [ :existing :new |
+	  | sameDiff sameFile |
 	  sameDiff := existing diffString = new diffString.
 	  sameFile := existing new_path = new new_path.
 
-	  sameSize and: [ sameDiff and: [ sameFile ] ].
- ]
+	  sameDiff and: [ sameFile ] ]
 ]
 
 { #category : #equality }
@@ -192,7 +177,7 @@ GitModelImporter >> blockOnNameEquality [
 	^ self blockEqualityOn: #name
 ]
 
-{ #category : #utils }
+{ #category : #utilities }
 GitModelImporter >> chainsCommitsFrom: commitsCollection [
 
 	| dic |
@@ -405,6 +390,18 @@ GitModelImporter >> configureReaderForUser: reader [
 	
 ]
 
+{ #category : #accessing }
+GitModelImporter >> factoryImporter [
+
+	^ factoryImporter
+]
+
+{ #category : #accessing }
+GitModelImporter >> factoryImporter: anObject [
+
+	factoryImporter := anObject
+]
+
 { #category : #utils }
 GitModelImporter >> filterCommitChanges: aCollection [
 
@@ -428,6 +425,12 @@ GitModelImporter >> glhModel: anObject [
 	glhModel := anObject
 ]
 
+{ #category : #'import - pipelines' }
+GitModelImporter >> importAllPipelinesOfProject: aGLHProject [
+	self subclassResponsibility 
+	
+]
+
 { #category : #'import - commits' }
 GitModelImporter >> importAndLoadLatestsCommitsOfProject: aGLHProject [
 
@@ -446,7 +449,7 @@ GitModelImporter >> importAuthorOfCommit: aGLHCommit [
 	self subclassResponsibility
 ]
 
-{ #category : #'import - repositories' }
+{ #category : #'import - branches' }
 GitModelImporter >> importBranchesOf: aGLHProject [
 
 	self
@@ -458,8 +461,14 @@ GitModelImporter >> importBranchesOf: aGLHProject [
 	^ self subclassResponsibility
 ]
 
-{ #category : #'import - repositories' }
+{ #category : #'import - branches' }
 GitModelImporter >> importBranchesOfProject: aGLHProject [
+
+	^ self factoryImporter importBranchesOfRepository: aGLHProject repository
+]
+
+{ #category : #'import - branches' }
+GitModelImporter >> importBranchesOfRepository: aGLHRepository [
 
 	^ self subclassResponsibility
 ]
@@ -519,10 +528,20 @@ GitModelImporter >> importDiffRangesForDiff: aGLHDiff [
 
 	diffRanges := self glhModel
 		              addAll: (self parseDiffString: aGLHDiff)
-		              unless: self blockForDiffRangeEquality.
+		              keyedBy: [ :el |
+			              {
+				              el diff mooseID.
+				              el originalLineRange.
+				              el newLineRange } ].
 	^ aGLHDiff diffRanges
 		  addAll: diffRanges
 		  unless: self blockForDiffRangeEquality
+]
+
+{ #category : #'import - files' }
+GitModelImporter >> importFilesOfBranch: aGLHBranch [
+
+	^ self subclassResponsibility
 ]
 
 { #category : #'import - groups' }
@@ -578,6 +597,8 @@ GitModelImporter >> importLatestReleaseOfProject: aGLHProject [
 
 { #category : #'import - merge-requests' }
 GitModelImporter >> importMergeRequestCommits: mergeRequest [
+
+	self subclassResponsibility
 ]
 
 { #category : #'import - merge-requests' }
@@ -671,6 +692,13 @@ GitModelImporter >> importRelease: aReleaseID ofProject: aGLHProject [
 	self subclassResponsibility 
 ]
 
+{ #category : #'import - repositories' }
+GitModelImporter >> importRepository: aGLHRepository [
+	"Repository is about git, not the social platform directly"
+
+	^ self subclassResponsibility
+]
+
 { #category : #'import - tags' }
 GitModelImporter >> importTagsForProject: aGLHProject [
 	self subclassResponsibility 
@@ -706,8 +734,10 @@ GitModelImporter >> initReader [
 GitModelImporter >> initialize [
 
 	super initialize.
-	self withFiles: false. 
+	self withFiles: false.
+	self withDiffRanges: false.
 	self withCommitsSince: (Date today - 1 week) asDateAndTime.
+	self factoryImporter: self.
 	userCatalogue := GLHUserCatalogueV2 new
 		                 anImporter: self;
 		                 yourself.
@@ -715,58 +745,49 @@ GitModelImporter >> initialize [
 	self initReader
 ]
 
-{ #category : #initialization }
-GitModelImporter >> makeGlobal [
-	^ self makeGlobal: DateAndTime now printString.
-]
-
-{ #category : #initialization }
-GitModelImporter >> makeGlobal: aLabel [ 
-
-	currentImporter := GithubModelImporter importers ifNil: [ OrderedDictionary new ].
-	currentImporter at: aLabel put: self. 
-	^ currentImporter 
-]
-
 { #category : #parsing }
 GitModelImporter >> parseDiffString: aDiff [
 	"parse diff string to create entities for each lines"
 
-	| lines range index firstChangeRange |
+	| lines index firstChangeRange range |
+	(aDiff diffString isNil or: [ aDiff diffString isEmpty ]) ifTrue: [ ^ aDiff diffRanges ].
+
 	lines := aDiff diffString lines.
 	index := 0.
-	range := nil.
-
-	lines ifEmpty: [ ^ aDiff diffRanges ].
 	lines := self filterCommitChanges: lines.
 	lines ifEmpty: [ ^ aDiff diffRanges ].
 	(lines first beginsWith: '@@') ifFalse: [ ^ aDiff diffRanges ].
-
 	lines do: [ :line |
 		| aChange |
 		firstChangeRange := false.
-		(line trim beginsWith: #'@@') ifTrue: [
+		(line trimLeft beginsWith: #'@@') ifTrue: [
 			range := GLHDiffRange newFrom: line.
 			firstChangeRange := true.
-			range := aDiff diffRanges add: range unless: [ :existing :new |
-				         existing originalLineRange = new originalLineRange and: [
-					         existing newLineRange = new newLineRange ] ] ].
+			range := aDiff diffRanges add: range keyedBy: [ :val |
+				         {
+					         val originalLineRange.
+					         val newLineRange } ] ].
 
 		self withCommitDiffs ifTrue: [
 			firstChangeRange ifFalse: [
 				aChange := GLHChange newFrom: line.
 				aChange relativeIndex: index.
-				aChange := range changes add: aChange unless: [ :existing :new |
-					           existing sourceCode = new sourceCode and: [
-						           existing index = new index ] ].
+				aChange := range changes add: aChange keyedBy: [ :el |
+					           {
+						           el index.
+						           el sourceCode } ].
 				index := index + 1 ] ] ].
 
 	"add changes to the diff range"
 	aDiff diffRanges do: [ :diffRange |
-		self glhModel addAll: diffRange changes unless: [ :existing :new |
-			existing diffRange mooseID = new diffRange mooseID and: [
-				existing sourceCode = new sourceCode and: [
-					existing index = new index ] ] ] ].
+		self glhModel
+			addAll: diffRange changes
+			ofType: GLHChange
+			keyedBy: [ :val |
+				{
+					val diffRange mooseID.
+					val sourceCode.
+					val index } ] ].
 
 	^ aDiff diffRanges
 ]
@@ -834,6 +855,18 @@ GitModelImporter >> withCommitsSince: someDays [
 ]
 
 { #category : #accessing }
+GitModelImporter >> withDiffRanges [
+
+	^ withDiffRanges
+]
+
+{ #category : #accessing }
+GitModelImporter >> withDiffRanges: anObject [
+
+	withDiffRanges := anObject
+]
+
+{ #category : #accessing }
 GitModelImporter >> withFiles [
 
 	^ withFiles
@@ -843,4 +876,16 @@ GitModelImporter >> withFiles [
 GitModelImporter >> withFiles: aBoolean [
 
 	withFiles := aBoolean
+]
+
+{ #category : #accessing }
+GitModelImporter >> withInitialCommits [
+
+	^ withInitialCommits
+]
+
+{ #category : #accessing }
+GitModelImporter >> withInitialCommits: anObject [
+
+	withInitialCommits := anObject
 ]

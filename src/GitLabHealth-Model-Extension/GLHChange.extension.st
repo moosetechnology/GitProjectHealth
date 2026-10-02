@@ -31,7 +31,7 @@ GLHChange class >> newFrom: aDiffLine [
 	aChange := (trimedLine beginsWith: #+)
 		           ifTrue: [ GLHAddition new ]
 		           ifFalse: [
-			           (aDiffLine trim beginsWith: #-)
+			           (trimedLine beginsWith: #-)
 				           ifTrue: [ GLHDeletion new ]
 				           ifFalse: [ GLHLineOfCode new ] ].
 

@@ -41,7 +41,5 @@ ActiveBranchesProjectMetric >> description [
 { #category : #loading }
 ActiveBranchesProjectMetric >> load [
 
-	^ projectBranches := self
-		                  loadBranchesSince: (period at: #since)
-		                  until: (period at: #until)
+	^ projectBranches := self loadAllBranches
 ]
