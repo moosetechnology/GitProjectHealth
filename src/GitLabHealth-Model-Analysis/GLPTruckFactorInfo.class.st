@@ -5,7 +5,8 @@ Class {
 		'truckFactor',
 		'totalFiles',
 		'coverage',
-		'developers'
+		'developers',
+		'fileAuthorship'
 	],
 	#category : #'GitLabHealth-Model-Analysis-TruckFactor'
 }
@@ -34,6 +35,18 @@ GLPTruckFactorInfo >> developers: anObject [
 	developers := anObject
 ]
 
+{ #category : #accessing }
+GLPTruckFactorInfo >> fileAuthorship [
+
+	^ fileAuthorship
+]
+
+{ #category : #accessing }
+GLPTruckFactorInfo >> fileAuthorship: anObject [
+
+	fileAuthorship := anObject
+]
+
 { #category : #initialization }
 GLPTruckFactorInfo >> initialize [
 
@@ -41,7 +54,7 @@ GLPTruckFactorInfo >> initialize [
 	developers := OrderedCollection new
 ]
 
-{ #category : #initialization }
+{ #category : #printing }
 GLPTruckFactorInfo >> printOn: stream [
 
 	stream
@@ -63,18 +76,17 @@ GLPTruckFactorInfo >> printOn: stream [
 		cr.
 
 	developers do: [ :developer |
-		| devFiles |
-		"	devFiles := developer authorshipFiles size.
-""stream
-		nextPutAll: repository;
-		nextPut: $;;
-		nextPutAll: developer name;
-		nextPut: $;;
-		print: ((devFiles asFloat / totalFiles) * 100) roundTo: 0.01;
-		nextPut: $;;
-		print: devFiles;
-		cr"
-		 ].
+		stream
+			nextPutAll: developer name;
+			nextPut: $;;
+			print:
+				((self fileAuthorship at: developer) size asFloat / totalFiles * 100
+					 roundTo: 0.01);
+			nextPut: $;;
+			print: (self fileAuthorship at: developer) size;
+			cr
+		"nextPutAll: repository;
+		nextPut: $;;" ].
 
 	stream
 ]

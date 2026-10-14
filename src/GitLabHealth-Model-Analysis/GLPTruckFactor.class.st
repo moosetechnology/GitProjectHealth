@@ -95,6 +95,7 @@ GLPTruckFactor >> truckFactor [
 	numberOfFiles := self blobFiles size.
 	factor := 0.
 	coverage := 1.0.
+	tfInfo fileAuthorship: authorsMap copy.
 	[
 	authorsMap isNotEmpty and: [
 		0.5 < (self computeCoverageOf: numberOfFiles from: authorsMap) ] ]
