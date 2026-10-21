@@ -659,6 +659,8 @@ GitModelImporter >> importProject: id [
 
 { #category : #'import - projects' }
 GitModelImporter >> importProject: aProjectID ofGroup: aGroup [
+
+	^ self apiImporter importProject: aProjectID ofGroup: aGroup
 ]
 
 { #category : #'import - projects' }

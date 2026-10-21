@@ -438,9 +438,15 @@ GitLocalModelImporter >> tryClone: aGLHProject [
 	clonePath ensureCreateDirectory.
 	gitUrl := url , '.git'.
 	repo := LGitRepository on: clonePath.
-	cloneOptions := repo cloneOptionsStructureClass
-		                withCredentialsProvider:
-		                (IceCredentialsProvider defaultForRemoteUrl: url).
+
+	cloneOptions := SystemVersion current major < 12
+		                ifTrue: [
+				                repo cloneOptionsStructureClass
+					                withCredentialsProvider:
+					                (IceCredentialsProvider defaultForRemoteUrl: url) ]
+		                ifFalse: [
+				                LGitCloneOptions withCredentialsProvider:
+					                (IceCredentialsProvider defaultForRemoteUrl: url) ].
 	repo clone: gitUrl options: cloneOptions.
 	self fetchMRRemotes: repo.
 	^ clonePath
