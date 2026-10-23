@@ -61,20 +61,55 @@ GitLocalModelImporter >> connectDiffs: diffs inside: aGPHRepository [
 	"could be refactor for a classic lazy accessor. But maybe this project can also be use for several repository. So to think about later"
 
 	indexedFiles ifNil: [
-		indexedFiles := (aGPHRepository allToScope: GLHFile)
-			                collect: [ :el | el path -> el ]
-			                as: Dictionary ].
+			indexedFiles := (aGPHRepository allContainedEntitiesOfType: GLHFile)
+				                collect: [ :el | el path -> el ]
+				                as: Dictionary ].
 	"reverse order to have a smart rename history"
 	(diffs asOrderedCollection sort: [ :diffA :diffB |
 		 diffA commit committed_date > diffB commit committed_date ]) do: [
-		:diff |
-		indexedFiles
-			at: diff new_path
-			ifPresent: [ :gphFile |
-				diff addFile: gphFile.
-				"support for file renaming"
-				indexedFiles at: diff old_path put: gphFile ]
-			ifAbsent: [ "not supported yet" ] ]
+			:diff |
+			indexedFiles
+				at: diff new_path
+				ifPresent: [ :gphFile |
+						diff addFile: gphFile.
+						"support for file renaming"
+						indexedFiles at: diff old_path put: gphFile ]
+				ifAbsent: [ "not supported yet" ] ]
+]
+
+{ #category : #private }
+GitLocalModelImporter >> createCommitFrom: aLGitCommit [
+
+	| commit gitDiff stats parentTree |
+	commit := self glhModel newCommit
+		          id: aLGitCommit name;
+		          title:
+			          (aLGitCommit message lines ifEmpty: [ { '' } ]) first;
+		          message: aLGitCommit message;
+		          created_at: aLGitCommit time asDateAndTime;
+		          committed_date: aLGitCommit time asDateAndTime;
+		          committer_email: aLGitCommit author email;
+		          committer_name: aLGitCommit author name;
+		          authored_date: aLGitCommit time asDateAndTime;
+		          author_email: aLGitCommit author email;
+		          author_name: aLGitCommit author name;
+		          parent_ids:
+			          (aLGitCommit parents collect: [ :parent | parent name ]);
+		          yourself.
+	gitDiff := LGitDiff of: aLGitCommit repository.
+	parentTree := commit parent_ids
+		              ifNotEmpty: [ :parentIds |
+			              (LGitCommit
+				               of: aLGitCommit repository
+				               fromHexString: parentIds anyOne) tree ]
+		              ifEmpty: [ FFIExternalObject null ].
+	gitDiff diffTree: parentTree toTree: aLGitCommit tree.
+	stats := LGitDiffStats of: aLGitCommit repository.
+	gitDiff diff_get_stats: stats diff: gitDiff.
+	commit additions: (stats diff_stats_insertions: stats).
+	commit deletions: (stats diff_stats_deletions: stats).
+	self resolveCreatorOfCommit: commit.
+	^ commit
 ]
 
 { #category : #'private - diffs' }
@@ -177,39 +212,24 @@ GitLocalModelImporter >> importBranchesOfRepository: aGLHRepository [
 { #category : #'import - commits' }
 GitLocalModelImporter >> importCommit: aLGitCommit [
 
-	| commit gitDiff stats parentTree |
+	| sha |
+	sha := aLGitCommit name.
 	(self glhModel allWithType: GLHCommit) asOrderedCollection
-		detect: [ :comm | comm id = aLGitCommit name ]
+		detect: [ :comm | comm id = sha ]
 		ifFound: [ :comm | ^ comm ].
-	commit := self glhModel newCommit
-		          id: aLGitCommit name;
-		          title:
-			          (aLGitCommit message lines ifEmpty: [ { '' } ]) first;
-		          message: aLGitCommit message;
-		          created_at: aLGitCommit time asDateAndTime;
-		          committed_date: aLGitCommit time asDateAndTime;
-		          committer_email: aLGitCommit author email;
-		          committer_name: aLGitCommit author name;
-		          authored_date: aLGitCommit time asDateAndTime;
-		          author_email: aLGitCommit author email;
-		          author_name: aLGitCommit author name;
-		          parent_ids:
-			          (aLGitCommit parents collect: [ :parent | parent name ]);
-		          yourself.
-	gitDiff := LGitDiff of: aLGitCommit repository.
-	parentTree := commit parent_ids
-		              ifNotEmpty: [ :parentIds |
-			              (LGitCommit
-				               of: aLGitCommit repository
-				               fromHexString: parentIds anyOne) tree ]
-		              ifEmpty: [ FFIExternalObject null ].
-	gitDiff diffTree: parentTree toTree: aLGitCommit tree.
-	stats := LGitDiffStats of: aLGitCommit repository.
-	gitDiff diff_get_stats: stats diff: gitDiff.
-	commit additions: (stats diff_stats_insertions: stats).
-	commit deletions: (stats diff_stats_deletions: stats).
-	self resolveCreatorOfCommit: commit.
-	^ commit
+	^ self createCommitFrom: aLGitCommit
+]
+
+{ #category : #private }
+GitLocalModelImporter >> importCommit: aLGitCommit inIndex: aDictionary [
+	"F10. aDictionary maps sha -> the first GLHCommit with that id in the model; it must index the whole model. Commits created here are added to it."
+
+	| sha |
+	sha := aLGitCommit name.
+	^ aDictionary
+		  at: sha
+		  ifAbsent: [
+		  aDictionary at: sha put: (self createCommitFrom: aLGitCommit) ]
 ]
 
 { #category : #'import - commits' }
@@ -245,45 +265,44 @@ GitLocalModelImporter >> importCommitsOfRepository: aGLHRepository [
 { #category : #'import - commits' }
 GitLocalModelImporter >> importCommitsOfRepository: aGPHRepository since: sinceDate until: untilDate [
 
-	| revwalk commits alreadyExploredCommit toReturn |
+	| gitRepository revwalk commits commitsById branchesByName toReturn |
 	commits := Set new.
-	"to stop when already explored"
-	alreadyExploredCommit := aGPHRepository commits
-		                         collect: [ :commit | commit id ]
-		                         as: Set.
-	(self gitRepositoryOf: aGPHRepository) allBranches do: [ :branch |
-		| gphBranch shouldContinue currentBranchCommit |
-		gphBranch := (glhModel allWithType: GLHBranch)
-			             detect: [ :gBranch | branch gitName = gBranch name ]
-			             ifNone: [ nil ].
-
-		revwalk := LGitRevwalk of: (self gitRepositoryOf: aGPHRepository).
-		revwalk pushReference: branch.
-		currentBranchCommit := nil.
-		shouldContinue := true.
-		[
-		| glhCommit gitCommit |
-		gitCommit := revwalk next.
-		glhCommit := self importCommit: gitCommit.
-
-		currentBranchCommit := glhCommit.
-		commits add: glhCommit.
-		alreadyExploredCommit add: glhCommit id.
-		glhCommit cacheAt: #importerOrigin put: gitCommit.
-
-		gphBranch commits ifEmpty: [ gphBranch addCommit: glhCommit ] ]
-			doWhileTrue: [
-				revwalk hasNext and: [
-					currentBranchCommit committed_date > sinceDate ] ].
-
-		self chainsCommitsFrom: commits ].
+	gitRepository := self gitRepositoryOf: aGPHRepository.
+	"index the model once; the first element wins, as detect: did."
+	commitsById := Dictionary new.
+	(self glhModel allWithType: GLHCommit) do: [ :commit |
+			commit id ifNotNil: [ :id |
+				commitsById at: id ifAbsentPut: [ commit ] ] ].
+	branchesByName := Dictionary new.
+	(self glhModel allWithType: GLHBranch) do: [ :gBranch |
+			gBranch name ifNotNil: [ :name |
+				branchesByName at: name ifAbsentPut: [ gBranch ] ] ].
+	gitRepository allBranches do: [ :branch |
+			| gphBranch currentBranchCommit |
+			gphBranch := branchesByName at: branch gitName ifAbsent: [ nil ].
+			revwalk := LGitRevwalk of: gitRepository.
+			revwalk pushReference: branch.
+			currentBranchCommit := nil.
+			[
+				| glhCommit gitCommit |
+				gitCommit := revwalk next.
+				glhCommit := self importCommit: gitCommit inIndex: commitsById.
+				currentBranchCommit := glhCommit.
+				commits add: glhCommit.
+				glhCommit cacheAt: #importerOrigin put: gitCommit.
+				gphBranch commits ifEmpty: [ gphBranch addCommit: glhCommit ] ]
+				doWhileTrue: [
+					revwalk hasNext and: [
+						currentBranchCommit committed_date > sinceDate ] ] ].
+	"one chaining over the final set equals chaining the cumulative set after every branch."
+	commits ifNotEmpty: [ self chainsCommitsFrom: commits ].
 
 	self withCommitDiffs ifTrue: [
-		| diffs |
-		diffs := commits flatCollect: [ :commit |
-			         self importDiffOfCommit: commit ].
-		self withFiles ifTrue: [
-			self connectDiffs: diffs inside: aGPHRepository ] ].
+			| diffs |
+			diffs := commits flatCollect: [ :commit |
+				         self importDiffOfCommit: commit ].
+			self withFiles ifTrue: [
+				self connectDiffs: diffs inside: aGPHRepository ] ].
 	aGPHRepository commits addAll: commits keyedBy: [ :el | el id ].
 	toReturn := self glhModel allWithType: GLHCommit.
 	sinceDate ifNotNil: [
