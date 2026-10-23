@@ -61,20 +61,20 @@ GitLocalModelImporter >> connectDiffs: diffs inside: aGPHRepository [
 	"could be refactor for a classic lazy accessor. But maybe this project can also be use for several repository. So to think about later"
 
 	indexedFiles ifNil: [
-		indexedFiles := (aGPHRepository allToScope: GLHFile)
-			                collect: [ :el | el path -> el ]
-			                as: Dictionary ].
+			indexedFiles := (aGPHRepository allContainedEntitiesOfType: GLHFile)
+				                collect: [ :el | el path -> el ]
+				                as: Dictionary ].
 	"reverse order to have a smart rename history"
 	(diffs asOrderedCollection sort: [ :diffA :diffB |
 		 diffA commit committed_date > diffB commit committed_date ]) do: [
-		:diff |
-		indexedFiles
-			at: diff new_path
-			ifPresent: [ :gphFile |
-				diff addFile: gphFile.
-				"support for file renaming"
-				indexedFiles at: diff old_path put: gphFile ]
-			ifAbsent: [ "not supported yet" ] ]
+			:diff |
+			indexedFiles
+				at: diff new_path
+				ifPresent: [ :gphFile |
+						diff addFile: gphFile.
+						"support for file renaming"
+						indexedFiles at: diff old_path put: gphFile ]
+				ifAbsent: [ "not supported yet" ] ]
 ]
 
 { #category : #'private - diffs' }

@@ -28,6 +28,19 @@ GithubModelImporter >> api: anObject [
 	repoApi := anObject
 ]
 
+{ #category : #private }
+GithubModelImporter >> apiDateString: aDateAndTime [
+	"Answer an ISO 8601 UTC string such as 2025-10-01T00:00:00Z, without offset nor fraction"
+
+	| utc |
+	utc := aDateAndTime asUTC.
+	^ String streamContents: [ :stream |
+			  utc printYMDOn: stream.
+			  stream nextPut: $T.
+			  utc printHMSOn: stream.
+			  stream nextPut: $Z ]
+]
+
 { #category : #'import - commits' }
 GithubModelImporter >> completeImportedCommit: aGLHCommit [
 
@@ -97,49 +110,52 @@ GithubModelImporter >> configureReaderForCommit: reader [
 	super configureReaderForCommit: reader.
 
 	reader for: GLHCommit do: [ :mapping |
-		mapping mapInstVar: #id to: #sha.
-		mapping mapInstVar: #web_url to: #html_url.
+			mapping mapInstVar: #id to: #sha.
+			mapping mapInstVar: #web_url to: #html_url.
 
-		mapping
-			mapProperty: #commit
-			getter: [ :object | #ignore ]
-			setter: [ :glhCommit :value |
-				glhCommit message: (value at: #message).
-				glhCommit authored_date:
-					(DateAndTime fromString: (value at: #author at: #date)).
-				glhCommit committed_date:
-					(DateAndTime fromString: (value at: #committer at: #date)) ].
+			mapping
+				mapProperty: #commit
+				getter: [ :object | #ignore ]
+				setter: [ :glhCommit :value |
+						glhCommit message: (value at: #message).
+						glhCommit authored_date:
+							(DateAndTime fromString: (value at: #author at: #date)).
+						glhCommit committed_date:
+							(DateAndTime fromString: (value at: #committer at: #date)).
+						glhCommit author_email: (value at: #author at: #email).
+						glhCommit committer_email: (value at: #committer at: #email).
+						glhCommit
+							cacheAt: #gitAuthorName
+							put: (value at: #author at: #name) ].
 
-		mapping
-			mapProperty: #author
-			getter: [ :object | #ignore ]
-			setter: [ :glhCommit :value |
-				value ifNotNil: [
-					glhCommit author_name: (value at: #login).
-					value
-						at: #id
-						ifPresent: [ :authorId |
-						glhCommit cacheAt: #authorID put: (value at: #id) ] ] ].
+			mapping
+				mapProperty: #author
+				getter: [ :object | #ignore ]
+				setter: [ :glhCommit :value |
+						value ifNotNil: [
+								glhCommit author_name: (value at: #login).
+								value
+									at: #id
+									ifPresent: [ :authorId |
+									glhCommit cacheAt: #authorID put: (value at: #id) ] ] ].
 
-		mapping
-			mapProperty: #committer
-			getter: [ :object | #ignore ]
-			setter: [ :glhCommit :value |
-				value ifNotNil: [ glhCommit committer_name: (value at: #login) ] ].
+			mapping
+				mapProperty: #committer
+				getter: [ :object | #ignore ]
+				setter: [ :glhCommit :value |
+					value ifNotNil: [ glhCommit committer_name: (value at: #login) ] ].
 
-		(mapping mapInstVar: #parent_ids to: #parents) valueSchema:
-			#ArrayOfId.
-			
-		(mapping mapInstVar: #diffs to: #files) valueSchema: #ArrayOfDiff. 
-			
-			 ].
+			(mapping mapInstVar: #parent_ids to: #parents) valueSchema:
+				#ArrayOfId.
+
+			(mapping mapInstVar: #diffs to: #files) valueSchema: #ArrayOfDiff ].
 
 	reader for: DateAndTime customDo: [ :mapping |
 		mapping decoder: [ :string | DateAndTime fromString: string ] ].
 
 	reader for: #ArrayOfId customDo: [ :mapping |
-		mapping decoder: [ :parents |
-			parents collect: [ :parent | parent at: #sha ] ] ]
+			mapping decoder: [ :parents |
+				parents collect: [ :parent | parent at: #sha ] ] ]
 ]
 
 { #category : #'private - configure reader' }
@@ -426,15 +442,18 @@ GithubModelImporter >> importBranchesOfProject: aGLHProject [
 GithubModelImporter >> importCommit: aCommitID ofProject: aGLHProject [
 
 	| result parsedResult |
+	aCommitID ifNil: [ ^ nil ].
 	(self glhModel allWithType: GLHCommit) asOrderedCollection
 		detect: [ :commit | commit id = aCommitID ]
 		ifFound: [ :commit | ^ commit ].
 
 	result := self repoApi commits
-		          get: aCommitID
-		          inProject: aGLHProject id.
+		          getCommit: aCommitID
+		          ForRepo: aGLHProject name
+		          ofOwner: aGLHProject group name.
 
 	parsedResult := self parseCommitResult: result.
+	(parsedResult isNil or: [ parsedResult id isNil ]) ifTrue: [ ^ nil ].
 
 	parsedResult := self glhModel
 		                add: parsedResult
@@ -460,29 +479,29 @@ GithubModelImporter >> importCommitsOfProject: aGLHProject [
 	 , (foundCommits size + itemByPage) printString) recordInfo.
 	"also check that there is at least one commit with the error handling"
 	[
-	tmp := self parseCommitsResult: (self repoApi commits
-			        getForRepo: aGLHProject name
-			        ofOwner: aGLHProject group name
-			        withParms: {
-					        (#since -> self withCommitsSince).
-					        (#perPage -> itemByPage).
-					        (#page -> pageNumber) } asDictionary) ]
+		tmp := self parseCommitsResult: (self repoApi commits
+				        getForRepo: aGLHProject name
+				        ofOwner: aGLHProject group name
+				        withParms: {
+						        (#since -> self withCommitsSince).
+						        (#per_page -> itemByPage).
+						        (#page -> pageNumber) } asDictionary) ]
 		on: GHRepositoryEmptyError
 		do: [ ^ {  } ].
 
 	foundCommits addAll: tmp.
 	[ tmp size = itemByPage ] whileTrue: [
-		pageNumber := pageNumber + 1.
-		('Extract issues from ' , foundCommits size printString , ' to '
-		 , (foundCommits size + itemByPage) printString) recordInfo.
-		tmp := self parseCommitsResult: (self repoApi commits
-				        getForRepo: aGLHProject name
-				        ofOwner: aGLHProject group name
-				        withParms: {
-						        (#sine -> self withCommitsSince).
-						        (#perPage -> itemByPage).
-						        (#page -> pageNumber) } asDictionary).
-		foundCommits addAll: tmp ].
+			pageNumber := pageNumber + 1.
+			('Extract issues from ' , foundCommits size printString , ' to '
+			 , (foundCommits size + itemByPage) printString) recordInfo.
+			tmp := self parseCommitsResult: (self repoApi commits
+					        getForRepo: aGLHProject name
+					        ofOwner: aGLHProject group name
+					        withParms: {
+							        (#since -> self withCommitsSince).
+							        (#per_page -> itemByPage).
+							        (#page -> pageNumber) } asDictionary).
+			foundCommits addAll: tmp ].
 
 	"add the imported commits (unless they are already added to this repository)"
 	aGLHProject repository commits
@@ -492,6 +511,40 @@ GithubModelImporter >> importCommitsOfProject: aGLHProject [
 	^ self glhModel
 		  addAll: foundCommits
 		  unless: [ :existing :new | existing id = new id ]
+]
+
+{ #category : #'import - commits' }
+GithubModelImporter >> importCommitsOfProject: aGLHProject since: sinceDate until: untilDate [
+
+	| pageNumber found tmp params |
+	pageNumber := 1.
+	found := OrderedCollection new.
+	[
+		params := Dictionary new
+			          at: #per_page put: 100;
+			          at: #page put: pageNumber;
+			          yourself.
+		sinceDate ifNotNil: [
+			params at: #since put: (self apiDateString: sinceDate) ].
+		untilDate ifNotNil: [
+			params at: #until put: (self apiDateString: untilDate) ].
+		tmp := [
+			       self parseCommitsResult: (self repoApi commits
+					        getForRepo: aGLHProject name
+					        ofOwner: aGLHProject group name
+					        withParms: params) ]
+			       on: GHRepositoryEmptyError
+			       do: [ #(  ) ].
+		found addAll: tmp.
+		pageNumber := pageNumber + 1.
+		tmp size = 100 ] whileTrue.
+
+	aGLHProject repository commits
+		addAll: found
+		unless: self blockOnIdEquality.
+	found := self glhModel addAll: found unless: self blockOnIdEquality.
+	self chainsCommitsFrom: found.
+	^ found
 ]
 
 { #category : #'import - commits' }
@@ -785,6 +838,47 @@ GithubModelImporter >> importMergeRequestsOfProject: aGLHProject [
 	^ mergeRequests
 ]
 
+{ #category : #'import - merge-requests' }
+GithubModelImporter >> importMergeRequestsOfProject: aGLHProject since: sinceDate until: untilDate [
+
+	| page found raw json inWindow done |
+	page := 1.
+	found := OrderedCollection new.
+	done := false.
+	[ done ] whileFalse: [
+			raw := self repoApi pullRequests
+				       getForRepo: aGLHProject name
+				       ofOwner: aGLHProject group name
+				       withParms: {
+						       (#state -> 'all').
+						       (#per_page -> 100).
+						       (#page -> page).
+						       (#sort -> 'created').
+						       (#direction -> 'desc') } asDictionary.
+			json := NeoJSONReader fromString: raw.
+			json isArray ifFalse: [
+				Error signal: 'GitHub pulls API error: ' , raw ].
+			inWindow := json select: [ :pr |
+					            | c |
+					            c := (pr at: #created_at) asDateAndTime.
+					            (sinceDate isNil or: [ c >= sinceDate ]) and: [
+						            untilDate isNil or: [ c < untilDate ] ] ].
+			inWindow ifNotEmpty: [
+					found addAll:
+						(self parseMergeRequestsResult:
+							 (NeoJSONWriter toString: inWindow)) ].
+			done := json size < 100 or: [
+					        sinceDate notNil and: [
+							        json notEmpty and: [
+								        (json last at: #created_at) asDateAndTime < sinceDate ] ] ].
+			done ifFalse: [ page := page + 1 ] ].
+
+	found := aGLHProject mergeRequests
+		         addAll: found
+		         unless: self blockOnIdEquality.
+	^ found
+]
+
 { #category : #'import - pipelines' }
 GithubModelImporter >> importPipeline: aPipelineId OfProject: aGLHProject [
 
@@ -931,36 +1025,46 @@ GithubModelImporter >> importUserByUsername: anUsername [
 	resultUser := dicUsername
 		              at: anUsername
 		              ifAbsent: [ "thus we have to import this new user"
-			              | userId searchResult |
-			              ('Import user with username: '
-			               , anUsername printString) recordInfo.
+				              | userId searchResult |
+				              ('Import user with username: '
+				               , anUsername printString) recordInfo.
 
-			              searchResult := self repoApi users getUsername: anUsername.
+				              searchResult := self repoApi users getUsername:
+					                              anUsername.
+				              searchResult isString ifTrue: [
+					              searchResult := NeoJSONReader fromString:
+						                              searchResult ].
 
-			              (searchResult class = Dictionary and: [
-				               (searchResult at: #status) includesSubstring:
-					               '404' ])
-				              ifTrue: [ "if the result is an 403 error we fake a new user"
-					              self glhModel
-						              add: (GLHUser new
-								               username: anUsername;
-								               name: anUsername;
-								               yourself)
-						              unless: [ :nu :ou | nu username = ou username ] ]
-				              ifFalse: [
-					              searchResult
-						              ifEmpty: [ "results can be empty thus we force a new user with the info we have "
+				              (searchResult isDictionary and: [
+						               ((searchResult at: #status ifAbsent: [ '' ])
+							                asString includesSubstring: '404') or: [
+							               (searchResult at: #message ifAbsent: [ '' ])
+							               = 'Not Found' ] ])
+					              ifTrue: [ "if the result is an 403 error we fake a new user"
 							              self glhModel
 								              add: (GLHUser new
 										               username: anUsername;
 										               name: anUsername;
 										               yourself)
 								              unless: [ :nu :ou | nu username = ou username ] ]
-						              ifNotEmpty: [ "because we may already have the researched user, we look by ID in the model"
-							              userId := searchResult first at: #id.
-							              (self glhModel allWithType: GLHUser)
-								              detect: [ :user | user id = userId ]
-								              ifNone: [ self importUser: userId ] ] ] ].
+					              ifFalse: [
+							              searchResult
+								              ifEmpty: [ "results can be empty thus we force a new user with the info we have "
+										              self glhModel
+											              add: (GLHUser new
+													               username: anUsername;
+													               name: anUsername;
+													               yourself)
+											              unless: [ :nu :ou |
+											              nu username = ou username ] ]
+								              ifNotEmpty: [ "because we may already have the researched user, we look by ID in the model"
+										              userId := searchResult isDictionary
+											                        ifTrue: [ searchResult at: #id ]
+											                        ifFalse: [
+											                        searchResult first at: #id ].
+										              (self glhModel allWithType: GLHUser)
+											              detect: [ :user | user id = userId ]
+											              ifNone: [ self importUser: userId ] ] ] ].
 
 	self userCatalogue addUser: resultUser withName: anUsername.
 
@@ -1076,25 +1180,26 @@ GithubModelImporter >> parseIssuesResult: result [
 { #category : #parsing }
 GithubModelImporter >> parseMergeRequestsResult: response [
 
-	| result json|
+	| result json |
 	self flag: 'temp version, must remade using NeoJsonReader'.
 	json := NeoJSONReader fromString: response.
-	
+
 	result := json collect: [ :aPull |
-		          GLHMergeRequest new
-			          id: (aPull at: #id);
-			          title: (aPull at: #title);
-			          state: (aPull at: #state);
-			          closed_at:
-				          ((aPull at: #closed_at) ifNotNil: #asDateAndTime);
-			          merged_at:
-				          ((aPull at: #merged_at) ifNotNil: #asDateAndTime);
-			          updated_at:
-				          ((aPull at: #updated_at) ifNotNil: #asDateAndTime);
-			          created_at:
-				          ((aPull at: #created_at) ifNotNil: #asDateAndTime);
-			          sha: (aPull at: #head at: #sha);
-			          merge_commit_sha: (aPull at: #merge_commit_sha) ].
+			          GLHMergeRequest new
+				          id: (aPull at: #id);
+				          iid: (aPull at: #number ifAbsent: [ nil ]);
+				          title: (aPull at: #title);
+				          state: (aPull at: #state);
+				          closed_at:
+					          ((aPull at: #closed_at) ifNotNil: #asDateAndTime);
+				          merged_at:
+					          ((aPull at: #merged_at) ifNotNil: #asDateAndTime);
+				          updated_at:
+					          ((aPull at: #updated_at) ifNotNil: #asDateAndTime);
+				          created_at:
+					          ((aPull at: #created_at) ifNotNil: #asDateAndTime);
+				          sha: (aPull at: #head at: #sha);
+				          merge_commit_sha: (aPull at: #merge_commit_sha) ].
 	result := self glhModel addAll: result unless: self blockOnIdEquality.
 	^ result
 ]
