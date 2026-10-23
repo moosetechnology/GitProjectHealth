@@ -160,13 +160,23 @@ GithubModelImporter >> configureReaderForCommit: reader [
 
 { #category : #'private - configure reader' }
 GithubModelImporter >> configureReaderForDiff: reader [
+	"GitHub files: filename is the current path; previous_filename is only present for renamed files.
+	The result must not depend on the order of the keys in the JSON object"
 
 	super configureReaderForDiff: reader.
 
 	reader for: GLHDiff do: [ :mapping |
-		mapping mapInstVar: #new_path to: #filename.
-		mapping mapInstVar: #old_path to: #filename.
-		mapping mapInstVar: #diffString to: #patch. ]
+			mapping
+				mapProperty: #filename
+				getter: [ :diff | diff new_path ]
+				setter: [ :diff :value |
+						diff new_path: value.
+						diff old_path ifNil: [ diff old_path: value ] ].
+			mapping
+				mapProperty: #previous_filename
+				getter: [ :diff | diff old_path ]
+				setter: [ :diff :value | diff old_path: value ].
+			mapping mapInstVar: #diffString to: #patch ]
 ]
 
 { #category : #'private - configure reader' }

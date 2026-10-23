@@ -16,6 +16,22 @@ Class {
 }
 
 { #category : #helpers }
+GithubModelImporterFixesTest >> commitJsonSha: aSha files: aCollectionOfFileDictionaries [
+	"JSON of GET /repos/{owner}/{repo}/commits/{ref} carrying the given entries under the files key"
+
+	| json |
+	json := GithubJsonFixtures
+		        commitDictionarySha: aSha
+		        date: '2025-11-15T10:00:00Z'
+		        login: 'octocat'
+		        name: 'Monalisa Octocat'
+		        email: 'mona@github.com'
+		        parents: #(  ).
+	json at: #files put: aCollectionOfFileDictionaries asArray.
+	^ NeoJSONWriter toString: json
+]
+
+{ #category : #helpers }
 GithubModelImporterFixesTest >> commitsParamsAt: anIndex [
 	"Parameters Dictionary of the anIndex-th commits listing request"
 
@@ -29,6 +45,24 @@ GithubModelImporterFixesTest >> commitsResponderByPage: aDictionary [
 
 	api commits responder: [ :arguments |
 		aDictionary at: (arguments third at: #page) ifAbsent: [ '[]' ] ]
+]
+
+{ #category : #helpers }
+GithubModelImporterFixesTest >> importDiffsOfCommitSha: aSha files: aCollectionOfFileDictionaries [
+	"Run importDiffOfCommit: against a commit whose getCommit:ForRepo:ofOwner: answer carries the given files"
+
+	| commit |
+	api commits responder: [ :arguments |
+			self
+				commitJsonSha: arguments first
+				files: aCollectionOfFileDictionaries ].
+	commit := GLHCommit new
+		          id: aSha;
+		          short_id: (aSha first: 8);
+		          repository: defaultProject repository;
+		          yourself.
+	importer importDiffOfCommit: commit.
+	^ commit
 ]
 
 { #category : #helpers }
@@ -620,6 +654,120 @@ GithubModelImporterFixesTest >> testF8CommitReaderKeepsEmailsAndGitAuthorName [
 	self
 		assert: commit parent_ids asArray
 		equals: #( 'a6d1e968439c78962da289f5ac58f4afe4632b0a' )
+]
+
+{ #category : #'tests - F9' }
+GithubModelImporterFixesTest >> testF9DiffPathsFromFilenameAndPreviousFilename [
+	"new_path is filename; old_path is previous_filename when present (renames), filename otherwise.
+	Both key orders must give the same paths"
+
+	| modifiedFirst renamedFirst |
+	modifiedFirst := OrderedDictionary new
+		                 at: #filename put: 'src/Modified.java';
+		                 at: #status put: 'modified';
+		                 at: #patch put: '@@ -1 +1 @@\-a\+b' withCRs;
+		                 yourself.
+	renamedFirst := OrderedDictionary new
+		                at: #filename put: 'src/NewName.java';
+		                at: #status put: 'renamed';
+		                at: #previous_filename put: 'src/OldName.java';
+		                yourself.
+	{
+		{
+			modifiedFirst.
+			renamedFirst }.
+		{
+			(OrderedDictionary new
+				 at: #patch put: '@@ -1 +1 @@\-a\+b' withCRs;
+				 at: #status put: 'modified';
+				 at: #filename put: 'src/Modified.java';
+				 yourself).
+			(OrderedDictionary new
+				 at: #previous_filename put: 'src/OldName.java';
+				 at: #status put: 'renamed';
+				 at: #filename put: 'src/NewName.java';
+				 yourself) } } do: [ :files |
+			| commit modified renamed |
+			commit := importer parseCommitResult: (self
+					           commitJsonSha:
+					           'abc1234567890abcdef1234567890abcdef12345'
+					           files: files).
+			self assert: commit diffs size equals: 2.
+			modified := commit diffs first.
+			renamed := commit diffs second.
+			self assert: modified new_path equals: 'src/Modified.java'.
+			self assert: modified old_path equals: 'src/Modified.java'.
+			self
+				assert: modified diffString
+				equals: '@@ -1 +1 @@\-a\+b' withCRs.
+			self assert: renamed new_path equals: 'src/NewName.java'.
+			self assert: renamed old_path equals: 'src/OldName.java'.
+			self assert: renamed diffString isNil ]
+]
+
+{ #category : #'tests - F9' }
+GithubModelImporterFixesTest >> testF9ImportDiffKeepsFilesWithIdenticalPatch [
+	"Two different files with the very same patch must give two diffs"
+
+	| commit patch files |
+	patch := '@@ -1,3 +1,3 @@\ package p;\-import a.A;\+import b.A;'
+		         withCRs.
+	files := #( 'src/Parameter.java' 'src/LocalVariable.java' ) collect: [
+			         :path |
+			         OrderedDictionary new
+				         at: #filename put: path;
+				         at: #status put: 'modified';
+				         at: #patch put: patch;
+				         yourself ].
+
+	commit := self
+		          importDiffsOfCommitSha:
+		          '9cf66ecbf17206b60247d33bff749e1190be7e49'
+		          files: files.
+
+	self assert: commit diffs size equals: 2.
+	self
+		assert: (commit diffs collect: [ :diff | diff new_path ]) asSet
+		equals: #( 'src/Parameter.java' 'src/LocalVariable.java' ) asSet.
+	self assert:
+		(commit diffs allSatisfy: [ :diff | diff diffString = patch ])
+]
+
+{ #category : #'tests - F9' }
+GithubModelImporterFixesTest >> testF9ImportDiffKeepsRenamesWithoutPatch [
+	"Pure renames have no patch: they must still give one diff per file"
+
+	| commit files |
+	files := (1 to: 3) collect: [ :index |
+			         OrderedDictionary new
+				         at: #filename
+				         put: 'src/new/File' , index printString , '.java';
+				         at: #status put: 'renamed';
+				         at: #previous_filename
+				         put: 'src/old/File' , index printString , '.java';
+				         yourself ].
+
+	commit := self
+		          importDiffsOfCommitSha:
+		          'de779fd4ad456948ece30540041e08583a0e624b'
+		          files: files.
+
+	self
+		assert: api commits calls asArray
+		equals: { (#getCommit:ForRepo:ofOwner:
+			 -> { 'de779fd4ad456948ece30540041e08583a0e624b'.
+				 'myProject'. 'itsGroup' }) }.
+	self assert: commit diffs size equals: 3.
+	self
+		assert: (commit diffs collect: [ :diff | diff new_path ]) asSet
+		equals:
+			#( 'src/new/File1.java' 'src/new/File2.java' 'src/new/File3.java' )
+				asSet.
+	self
+		assert: (commit diffs collect: [ :diff | diff old_path ]) asSet
+		equals:
+			#( 'src/old/File1.java' 'src/old/File2.java' 'src/old/File3.java' )
+				asSet
 ]
 
 { #category : #helpers }
