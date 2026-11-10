@@ -48,6 +48,37 @@ GithubModelImporterFixesTest >> commitsResponderByPage: aDictionary [
 ]
 
 { #category : #helpers }
+GithubModelImporterFixesTest >> completeCommitSha: aSha files: aCollectionOfFileDictionaries [
+	"Run completeImportedCommit: (with commit diffs) against a commit whose commit:ofOrganisation:ofProject: answer carries the given files. author_name is left nil so that no user is imported"
+
+	| commit |
+	api commits responder: [ :arguments |
+			self
+				commitJsonSha: arguments first
+				files: aCollectionOfFileDictionaries ].
+	commit := GLHCommit new
+		          id: aSha;
+		          short_id: (aSha first: 8);
+		          repository: defaultProject repository;
+		          yourself.
+	importer completeImportedCommit: commit.
+	^ commit
+]
+
+{ #category : #helpers }
+GithubModelImporterFixesTest >> fileNamed: aPath patch: aPatch [
+	"One entry of the files key of GET /repos/{owner}/{repo}/commits/{ref}"
+
+	^ OrderedDictionary new
+		  at: #filename put: aPath;
+		  at: #status put: 'modified';
+		  at: #additions put: 1;
+		  at: #deletions put: 1;
+		  at: #patch put: aPatch;
+		  yourself
+]
+
+{ #category : #helpers }
 GithubModelImporterFixesTest >> importDiffsOfCommitSha: aSha files: aCollectionOfFileDictionaries [
 	"Run importDiffOfCommit: against a commit whose getCommit:ForRepo:ofOwner: answer carries the given files"
 
@@ -113,10 +144,58 @@ GithubModelImporterFixesTest >> setUp [
 ]
 
 { #category : #helpers }
+GithubModelImporterFixesTest >> sharedPatch [
+	"A patch that several files or commits can carry verbatim (cherry-pick, backport, merge)"
+
+	^ '@@ -1,3 +1,3 @@\ package p;\-import a.A;\+import b.A;' withCRs
+]
+
+{ #category : #helpers }
 GithubModelImporterFixesTest >> since [
 	"Lower bound of the observation window: 2025-10-01T00:00:00Z"
 
 	^ self utcYear: 2025 month: 10 day: 1
+]
+
+{ #category : #'tests - F11 diff registration' }
+GithubModelImporterFixesTest >> testCompleteImportedCommitRegistersDiffsSharedWithAnotherCommit [
+	"Same cross-commit case as testImportDiffRegistersDiffsSharedWithAnotherCommit, through completeImportedCommit: with commit diffs"
+
+	| files c1 c2 d1 d2 |
+	importer withCommitDiffs: true.
+	files := { (self
+		          fileNamed: 'src/Parameter.java'
+		          patch: self sharedPatch) }.
+
+	c1 := self
+		      completeCommitSha: '5555555555555555555555555555555555555555'
+		      files: files.
+	c2 := self
+		      completeCommitSha: '6666666666666666666666666666666666666666'
+		      files: files.
+
+	self assert: api commits calls asArray equals: {
+			(#getCommit:ForRepo:ofOwner:
+			 -> { '5555555555555555555555555555555555555555'.
+				 'myProject'. 'itsGroup' }).
+			(#getCommit:ForRepo:ofOwner:
+			 -> { '6666666666666666666666666666666666666666'.
+				 'myProject'. 'itsGroup' }) }.
+	self assert: c1 additions equals: 1.
+	self assert: c1 deletions equals: 1.
+	self assert: c1 diffs size equals: 1.
+	self assert: c2 diffs size equals: 1.
+	d1 := c1 diffs anyOne.
+	d2 := c2 diffs anyOne.
+	self deny: d1 identicalTo: d2.
+	self assert: (model allWithType: GLHDiff) size equals: 2.
+	self
+		assert: (model allWithType: GLHDiff) size
+		equals: c1 diffs size + c2 diffs size.
+	self assert: d1 mooseModel identicalTo: model.
+	self assert: d2 mooseModel identicalTo: model.
+	self assert: d1 commit identicalTo: c1.
+	self assert: d2 commit identicalTo: c2
 ]
 
 { #category : #'tests - F1' }
@@ -768,6 +847,116 @@ GithubModelImporterFixesTest >> testF9ImportDiffKeepsRenamesWithoutPatch [
 		equals:
 			#( 'src/old/File1.java' 'src/old/File2.java' 'src/old/File3.java' )
 				asSet
+]
+
+{ #category : #'tests - F11 diff registration' }
+GithubModelImporterFixesTest >> testImportDiffCollapsesSamePathAndPatchWithinACommit [
+	"Deduplication is kept inside one commit: the same (path, patch) listed twice gives one diff, in the commit and in the model"
+
+	| commit files modelDiffs |
+	files := {
+		         (self
+			          fileNamed: 'src/Parameter.java'
+			          patch: self sharedPatch).
+		         (self
+			          fileNamed: 'src/Parameter.java'
+			          patch: self sharedPatch) }.
+
+	commit := self
+		          importDiffsOfCommitSha:
+		          '4444444444444444444444444444444444444444'
+		          files: files.
+
+	modelDiffs := model allWithType: GLHDiff.
+	self assert: commit diffs size equals: 1.
+	self assert: modelDiffs size equals: 1.
+	self assert: modelDiffs anyOne identicalTo: commit diffs anyOne.
+	self assert: commit diffs anyOne commit identicalTo: commit
+]
+
+{ #category : #'tests - F11 diff registration' }
+GithubModelImporterFixesTest >> testImportDiffRegistersDiffsSharedWithAnotherCommit [
+	"Two commits touching the same file with the very same patch (cherry-pick, backport, merge) own two distinct diffs. Each one must be in the model: before F11 the model-wide addAll:unless: dropped the second one, which stayed attached to its commit but was not in the model"
+
+	| files c1 c2 d1 d2 |
+	files := { (self
+		          fileNamed: 'src/Parameter.java'
+		          patch: self sharedPatch) }.
+
+	c1 := self
+		      importDiffsOfCommitSha:
+		      '1111111111111111111111111111111111111111'
+		      files: files.
+	c2 := self
+		      importDiffsOfCommitSha:
+		      '2222222222222222222222222222222222222222'
+		      files: files.
+
+	self assert: c1 diffs size equals: 1.
+	self assert: c2 diffs size equals: 1.
+	d1 := c1 diffs anyOne.
+	d2 := c2 diffs anyOne.
+	self deny: d1 identicalTo: d2.
+	self assert: (model allWithType: GLHDiff) size equals: 2.
+	self
+		assert: (model allWithType: GLHDiff) size
+		equals: c1 diffs size + c2 diffs size.
+	self assert: d1 mooseModel identicalTo: model.
+	self assert: d2 mooseModel identicalTo: model.
+	self assert: d1 commit identicalTo: c1.
+	self assert: d2 commit identicalTo: c2
+]
+
+{ #category : #'tests - F11 diff registration' }
+GithubModelImporterFixesTest >> testImportDiffRegistersEachCommitDiffOnce [
+	"F9 scenario (two paths, same patch, one commit): both diffs are in the model, each exactly once"
+
+	| commit files modelDiffs |
+	files := #( 'src/Parameter.java' 'src/LocalVariable.java' ) collect: [
+		         :path | self fileNamed: path patch: self sharedPatch ].
+
+	commit := self
+		          importDiffsOfCommitSha:
+		          '9cf66ecbf17206b60247d33bff749e1190be7e49'
+		          files: files.
+
+	"MooseGroup does not understand asIdentitySet: go through an Array"
+	modelDiffs := (model allWithType: GLHDiff) asArray.
+	self assert: commit diffs size equals: 2.
+	self assert: modelDiffs size equals: 2.
+	self assert: modelDiffs asIdentitySet size equals: modelDiffs size.
+	self
+		assert: modelDiffs asIdentitySet
+		equals: commit diffs asArray asIdentitySet
+]
+
+{ #category : #'tests - F11 diff registration' }
+GithubModelImporterFixesTest >> testImportDiffTwiceOnSameCommitAddsNothing [
+	"A commit whose diffs are already imported is short-circuited: no second API call, no new diff in the commit or in the model"
+
+	| commit files diffsBefore |
+	files := {
+		         (self
+			          fileNamed: 'src/A.java'
+			          patch: '@@ -1 +1 @@\-a\+b' withCRs).
+		         (self
+			          fileNamed: 'src/B.java'
+			          patch: '@@ -1 +1 @@\-c\+d' withCRs) }.
+	commit := self
+		          importDiffsOfCommitSha:
+		          '3333333333333333333333333333333333333333'
+		          files: files.
+	diffsBefore := commit diffs asIdentitySet.
+
+	importer importDiffOfCommit: commit.
+
+	self assert: commit diffs size equals: 2.
+	self assert: commit diffs asIdentitySet equals: diffsBefore.
+	self assert: (model allWithType: GLHDiff) size equals: 2.
+	self assert: api commits calls size equals: 1.
+	self
+		assert: (api commits callsTo: #getCommit:ForRepo:ofOwner:) size
+		equals: 1
 ]
 
 { #category : #helpers }

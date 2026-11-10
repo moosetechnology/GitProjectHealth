@@ -12,6 +12,16 @@ Class {
 	#category : #'GitHubHealth-Model-Importer-Tests'
 }
 
+{ #category : #'api - deprecated' }
+GithubApiRecordingMock >> commit: commitSHA ofOrganisation: anOrganisation ofProject: aProjectId [
+	"Mirror of the deprecated GHApi>>commit:ofOrganisation:ofProject:, which delegates to commits getCommit:ForRepo:ofOwner: and parses the JSON answer. Used by GithubModelImporter>>completeImportedCommit:"
+
+	^ NeoJSONReader fromString: (self commits
+			   getCommit: commitSHA
+			   ForRepo: aProjectId asString
+			   ofOwner: anOrganisation asString)
+]
+
 { #category : #accessing }
 GithubApiRecordingMock >> commits [
 

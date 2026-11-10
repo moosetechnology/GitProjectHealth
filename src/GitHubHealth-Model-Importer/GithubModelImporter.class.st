@@ -62,16 +62,17 @@ GithubModelImporter >> completeImportedCommit: aGLHCommit [
 
 	"import diffs of this commits"
 	self withCommitDiffs ifTrue: [
-		| diffs |
-		aGLHCommit diffs ifEmpty: [
-			diffs := self parseDiffresult: result.
-			diffs := aGLHCommit diffs
-				         addAll: diffs
-				         unless: self blockForDiffEquality.
-			self glhModel addAll: diffs unless: self blockForDiffEquality.
-			diffs do: [ :diff | self importDiffRangesForDiff: diff ] ] ].
+			| diffs |
+			aGLHCommit diffs ifEmpty: [
+					diffs := self parseDiffresult: result.
+					"Deduplicate within this commit only"
+					aGLHCommit diffs addAll: diffs unless: self blockForDiffEquality.
+					"The commit had no diff (ifEmpty: guard), so its diffs are exactly the new ones: register them all in the model (no model-wide deduplication, see importDiffOfCommit:)."
+					self glhModel addAll: aGLHCommit diffs.
+					aGLHCommit diffs do: [ :diff |
+						self importDiffRangesForDiff: diff ] ] ].
 
-	^ aGLHCommit 
+	^ aGLHCommit
 ]
 
 { #category : #'import - projects' }
@@ -578,9 +579,9 @@ GithubModelImporter >> importDiffOfCommit: aGLHCommit [
 
 	| result diffs |
 	aGLHCommit diffs ifNotEmpty: [
-		'Diff already importer: '
-		, aGLHCommit short_id printString recordInfo.
-		^ aGLHCommit diffs ].
+			'Diff already importer: '
+			, aGLHCommit short_id printString recordInfo.
+			^ aGLHCommit diffs ].
 	('Import diff of commit: ' , aGLHCommit short_id printString)
 		recordInfo.
 
@@ -588,19 +589,16 @@ GithubModelImporter >> importDiffOfCommit: aGLHCommit [
 		          getCommit: aGLHCommit id
 		          ForRepo: aGLHCommit repository project name
 		          ofOwner: aGLHCommit repository project group name.
-		
-	diffs := (self parseCommitResult: result) diffs.
-	
-	diffs do: [ :diff | 
-		self parseDiffString: diff.
-		].	
 
-	diffs := aGLHCommit diffs
-		         addAll: diffs
-		         unless: self blockForDiffEquality.
-	glhModel
-		         addAll: diffs
-		         unless: self blockForDiffEquality.
+	diffs := (self parseCommitResult: result) diffs.
+
+	diffs do: [ :diff | self parseDiffString: diff ].
+
+	"Deduplicate within this commit only. The commit has no diff yet (see the guard above), so its diffs are exactly the new ones."
+	aGLHCommit diffs addAll: diffs unless: self blockForDiffEquality.
+
+	"Register all of them in the model. A diff with the same new_path and patch in another commit (merge, cherry-pick, backport) is a distinct entity owned by that other commit (GLHDiff>>commit is single-valued), so it must not be deduplicated across the model."
+	glhModel addAll: aGLHCommit diffs.
 
 	^ aGLHCommit diffs
 ]
